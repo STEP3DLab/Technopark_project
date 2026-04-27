@@ -926,6 +926,21 @@ button:disabled { background: var(--surface-soft); }
   border-color: var(--line-strong);
 }
 
+.table-action {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.project-edit-form {
+  margin-top: 16px;
+}
+
+.toolbar.compact {
+  margin: 0 0 12px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
 /* 60. УЛУЧШЕНИЕ: Улучшенная animation для поиска (pulse при активности) */
 @keyframes searchGlow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }

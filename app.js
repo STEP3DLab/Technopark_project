@@ -31,6 +31,11 @@ const state = {
     readiness: "all",
     risk: "all",
   },
+  ui: {
+    isLoading: false,
+    lastLoadedAt: null,
+    requestId: 0,
+  },
 };
 
 const els = {
@@ -61,6 +66,46 @@ const els = {
   feedbackFeed: document.querySelector("#feedbackFeed"),
   toast: document.querySelector("#toast"),
 };
+
+
+
+const FILTERS_STORAGE_KEY = "technopark_dashboard_filters_v1";
+
+function persistFilters() {
+  try {
+    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(state.filters));
+  } catch (_) {
+    // ignore storage errors
+  }
+}
+
+function hydrateFilters() {
+  try {
+    const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    state.filters = { ...state.filters, ...saved };
+  } catch (_) {
+    // ignore parse/storage errors
+  }
+}
+
+function applyFilterControls() {
+  els.searchInput.value = state.filters.query;
+  els.statusFilter.value = state.filters.status;
+  els.ownerFilter.value = state.filters.owner;
+  els.readinessFilter.value = state.filters.readiness;
+  els.riskFilter.value = state.filters.risk;
+}
+
+function setLoadingState(isLoading) {
+  state.ui.isLoading = isLoading;
+  if (els.refreshData) {
+    els.refreshData.disabled = isLoading;
+    els.refreshData.textContent = isLoading ? "Обновляю..." : "Обновить";
+  }
+  document.body.setAttribute("aria-busy", String(isLoading));
+}
 
 const FUNNEL_STAGES = [
   { name: "Идея", hint: "Зафиксировать проблему, целевую аудиторию и ожидаемый эффект." },
@@ -474,6 +519,8 @@ function renderAll() {
 }
 
 async function loadAllData() {
+  const requestId = ++state.ui.requestId;
+  setLoadingState(true);
   setSync("Загружаю проекты, гранты и пожелания НТС из Google Таблицы...");
   try {
     const [projectRows, grantRows, feedbackRows] = await Promise.all([
@@ -481,15 +528,24 @@ async function loadAllData() {
       loadSheet(CONFIG.sheets.grants, ["маршрут", "оператор"]),
       loadSheet(CONFIG.sheets.nts, ["фио", "текст"]).catch(() => []),
     ]);
+
+    if (requestId !== state.ui.requestId) return;
+
     state.projects = projectRows.map(normalizeProject).filter((p) => p.name && p.name !== "без названия");
     state.grants = grantRows.map(normalizeGrant).filter((g) => g.route);
     state.feedback = feedbackRows.map(normalizeFeedback).filter((f) => f.message || f.author).reverse();
+    state.ui.lastLoadedAt = new Date().toISOString();
+
     renderFilters();
+    applyFilterControls();
     renderAll();
     setSync(`Данные загружены: ${state.projects.length} проектов, ${state.grants.length} грантов, ${state.feedback.length} пожеланий НТС. Источник проектов: gid ${CONFIG.sheets.projects}.`, "ok");
   } catch (error) {
+    if (requestId !== state.ui.requestId) return;
     setSync("Не удалось загрузить данные. Проверьте доступ к Google Таблице или структуру листа.", "error");
     showToast(error.message || "Ошибка загрузки данных", "error");
+  } finally {
+    if (requestId === state.ui.requestId) setLoadingState(false);
   }
 }
 
@@ -499,6 +555,7 @@ function handleFilters() {
   state.filters.owner = els.ownerFilter.value;
   state.filters.readiness = els.readinessFilter.value;
   state.filters.risk = els.riskFilter.value;
+  persistFilters();
   renderProjects();
 }
 
@@ -577,7 +634,9 @@ function setupNavigation() {
 
 function setupEvents() {
   els.refreshData.addEventListener("click", loadAllData);
-  [els.searchInput, els.statusFilter, els.ownerFilter, els.readinessFilter, els.riskFilter].forEach((el) => el.addEventListener("input", handleFilters));
+  const debouncedSearch = debounce(handleFilters, 220);
+  els.searchInput.addEventListener("input", debouncedSearch);
+  [els.statusFilter, els.ownerFilter, els.readinessFilter, els.riskFilter].forEach((el) => el.addEventListener("input", handleFilters));
   els.ntsForm.addEventListener("submit", submitFeedback);
 }
 
@@ -610,13 +669,6 @@ function enhanceKeyboardNavigation() {
     }
   });
 
-  // 36. УЛУЧШЕНИЕ: Tab-навигация между фильтрами
-  const filterElement = document.querySelector(".toolbar");
-  if (filterElement) {
-    filterElement.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") e.currentTarget.focus();
-    });
-  }
 }
 
 /* 37. УЛУЧШЕНИЕ: Сохранение позиции скролла при возврате */
@@ -840,57 +892,35 @@ function enhanceSearchInput() {
   });
 }
 
-/* 54. УЛУЧШЕНИЕ: Undo/Redo stack */
-const undoRedoStack = {
-  past: [],
-  present: null,
-  future: [],
-  
-  saveState(state) {
-    this.past.push(this.present);
-    this.present = state;
-    this.future = [];
-  },
-  
-  undo() {
-    if (this.past.length === 0) return null;
-    this.future.push(this.present);
-    this.present = this.past.pop();
-    return this.present;
-  },
-  
-  redo() {
-    if (this.future.length === 0) return null;
-    this.past.push(this.present);
-    this.present = this.future.pop();
-    return this.present;
-  }
-};
-
 /* 55. УЛУЧШЕНИЕ: Keyboard shortcuts registration */
 function setupKeyboardShortcuts() {
   document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key === "z" && !e.shiftKey) {
-        e.preventDefault();
-        const undoState = undoRedoStack.undo();
-        if (undoState) announceToScreenReader("Действие отменено");
-      } else if ((e.key === "z" && e.shiftKey) || (e.key === "y")) {
-        e.preventDefault();
-        const redoState = undoRedoStack.redo();
-        if (redoState) announceToScreenReader("Действие повторено");
-      }
+    const isMod = e.ctrlKey || e.metaKey;
+    const key = e.key.toLowerCase();
+
+    if (!isMod) return;
+
+    if (key === "k") {
+      e.preventDefault();
+      els.searchInput.focus();
+      announceToScreenReader("Фокус на поле поиска");
+    }
+
+    if (key === "r" && !e.shiftKey && document.visibilityState === "visible") {
+      e.preventDefault();
+      loadAllData();
+      announceToScreenReader("Запущено обновление данных");
     }
   });
 }
 
+hydrateFilters();
 setupNavigation();
 setupScrollShadow();
 setupEvents();
 
-// Инициализация новых улучшений (46-55)
+// Инициализация новых улучшений
 enhanceKeyboardNavigation();
-enhanceScrollRestoration();
 enhanceFocusManagement();
 respectReducedMotion();
 setupChipSelection();
@@ -901,4 +931,5 @@ enhanceSearchInput();
 setupKeyboardShortcuts();
 setupAutoRefresh();
 
+applyFilterControls();
 loadAllData();

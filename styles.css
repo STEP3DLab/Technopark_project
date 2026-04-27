@@ -559,15 +559,17 @@ tbody tr:hover { background: rgba(37, 99, 235, 0.04); }
 .is-required::after { content: ' *'; color: var(--red); font-weight: 900; }
 .validated { border-color: var(--green) !important; }
 
-/* 24. УЛУЧШЕНИЕ: Dark mode переменные (готовность) */
+/* 24. УЛУЧШЕНИЕ: Не инвертируем тему автоматически в dark-mode
+   (в десктопной версии это ухудшало контраст и читаемость). */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f172a !important;
-    --surface: #1e293b !important;
-    --surface-soft: #334155 !important;
-    --text: #f1f5f9 !important;
-    --muted: #cbd5e1 !important;
-    --line: #334155 !important;
+    --bg: #f2f5fb;
+    --surface: #ffffff;
+    --surface-soft: #f7f9fc;
+    --text: #0f1f3d;
+    --muted: #52627f;
+    --line: #d9e2ef;
+    --line-strong: #bfcde0;
   }
 }
 

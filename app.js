@@ -32,6 +32,11 @@ const state = {
     readiness: "all",
     risk: "all",
   },
+  grantFilters: {
+    query: "",
+    status: "all",
+    sort: "deadline_asc",
+  },
   ui: {
     isLoading: false,
     lastLoadedAt: null,
@@ -57,6 +62,10 @@ const els = {
   ownerFilter: document.querySelector("#ownerFilter"),
   readinessFilter: document.querySelector("#readinessFilter"),
   riskFilter: document.querySelector("#riskFilter"),
+  grantsQuickKpi: document.querySelector("#grantsQuickKpi"),
+  grantSearchInput: document.querySelector("#grantSearchInput"),
+  grantStatusFilter: document.querySelector("#grantStatusFilter"),
+  grantSortSelect: document.querySelector("#grantSortSelect"),
   projectGrid: document.querySelector("#projectGrid"),
   projectTable: document.querySelector("#projectTable"),
   grantGrid: document.querySelector("#grantGrid"),
@@ -189,6 +198,15 @@ function daysUntil(iso) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return Math.ceil((new Date(`${iso}T00:00:00`) - today) / 86400000);
+}
+
+function parseAmount(value) {
+  const cleaned = String(value || "")
+    .replace(/\s+/g, "")
+    .replace(/,/g, ".")
+    .match(/\d+(\.\d+)?/g);
+  if (!cleaned || !cleaned.length) return null;
+  return Math.max(...cleaned.map(Number));
 }
 
 function setSync(message, type = "loading") {
@@ -541,30 +559,94 @@ async function submitProjectEdit(event) {
 function grantStatus(grant) {
   const text = normalize(grant.window);
   const d = daysUntil(grant.deadline);
-  if (grant.deadline && grant.deadline < CONFIG.juneStart) return { label: "раннее окно / не приоритет с июня", color: "yellow", className: "is-low-priority" };
-  if (grant.deadline && d < 0) return { label: "прошедший дедлайн", color: "gray", className: "is-archive" };
-  if (grant.deadline && d <= 21) return { label: "скоро завершится", color: "red", className: "is-low-priority" };
-  if (text.includes("монитор") || text.includes("провер")) return { label: "требует перепроверки", color: "yellow", className: "is-low-priority" };
-  return { label: "актуально", color: "green", className: "" };
+  if (grant.deadline && grant.deadline < CONFIG.juneStart) return { key: "early", label: "раннее окно / не приоритет с июня", color: "yellow", className: "is-low-priority" };
+  if (grant.deadline && d < 0) return { key: "archive", label: "прошедший дедлайн", color: "gray", className: "is-archive" };
+  if (grant.deadline && d <= 21) return { key: "urgent", label: "скоро завершится", color: "red", className: "is-low-priority" };
+  if (grant.deadline && d > 45) return { key: "future", label: "позднее окно", color: "blue", className: "" };
+  if (text.includes("монитор") || text.includes("провер")) return { key: "review", label: "требует перепроверки", color: "yellow", className: "is-low-priority" };
+  return { key: "actual", label: "актуально", color: "green", className: "" };
+}
+
+function renderGrantsKpi(grants) {
+  if (!els.grantsQuickKpi) return;
+  if (!grants.length) {
+    els.grantsQuickKpi.innerHTML = `<div class="empty-state">Нет данных для сводки</div>`;
+    return;
+  }
+  const urgent = grants.filter((item) => item.status.key === "urgent").length;
+  const actual = grants.filter((item) => item.status.key === "actual").length;
+  const archived = grants.filter((item) => item.status.key === "archive").length;
+  els.grantsQuickKpi.innerHTML = `
+    <div><span>Актуальные</span><strong>${actual}</strong></div>
+    <div><span>Срочные</span><strong>${urgent}</strong></div>
+    <div><span>Архив</span><strong>${archived}</strong></div>
+  `;
 }
 
 function renderGrants() {
-  const grants = state.grants.filter((g) => g.route);
-  if (!grants.length) {
+  const prepared = state.grants
+    .filter((g) => g.route)
+    .map((grant) => ({
+      ...grant,
+      status: grantStatus(grant),
+      amount: parseAmount(grant.funding),
+      days: daysUntil(grant.deadline),
+    }));
+
+  if (!prepared.length) {
+    if (els.grantsQuickKpi) els.grantsQuickKpi.innerHTML = "";
     els.grantGrid.innerHTML = `<div class="empty-state">Нет данных по грантам. Проверьте лист «Актуальные гранты».</div>`;
     return;
   }
-  els.grantGrid.innerHTML = grants.map((grant) => {
-    const status = grantStatus(grant);
+
+  const query = normalize(state.grantFilters.query);
+  const statusFilter = state.grantFilters.status;
+  const filtered = prepared.filter((grant) => {
+    const haystack = normalize([grant.route, grant.operator, grant.projects, grant.funding, grant.purpose].join(" "));
+    const byQuery = !query || haystack.includes(query);
+    const byStatus = statusFilter === "all"
+      || grant.status.key === statusFilter
+      || (statusFilter === "actual" && grant.status.key === "future");
+    return byQuery && byStatus;
+  });
+
+  const sorted = filtered.sort((a, b) => {
+    switch (state.grantFilters.sort) {
+      case "priority_desc": {
+        const aScore = a.status.key === "urgent" ? 3 : a.status.key === "actual" ? 2 : a.status.key === "future" ? 1 : 0;
+        const bScore = b.status.key === "urgent" ? 3 : b.status.key === "actual" ? 2 : b.status.key === "future" ? 1 : 0;
+        return bScore - aScore || a.days - b.days;
+      }
+      case "amount_desc":
+        return (b.amount ?? -1) - (a.amount ?? -1);
+      case "name_asc":
+        return a.route.localeCompare(b.route, "ru");
+      case "deadline_asc":
+      default:
+        return a.days - b.days;
+    }
+  });
+
+  renderGrantsKpi(prepared);
+
+  if (!sorted.length) {
+    els.grantGrid.innerHTML = `<div class="empty-state"><strong>По текущим фильтрам грантов не найдено</strong>Попробуйте снять фильтр статуса или расширить поисковый запрос.</div>`;
+    return;
+  }
+
+  els.grantGrid.innerHTML = sorted.map((grant) => {
     const source = grant.source ? `<a href="${escapeHtml(grant.source)}" target="_blank" rel="noreferrer">Источник</a>` : `<span class="badge yellow">ссылка не указана</span>`;
-    return `<article class="grant-card ${status.className}">
-      <div class="card-top"><h3>${escapeHtml(grant.route)}</h3><span class="badge ${status.color}">${escapeHtml(status.label)}</span></div>
+    const countdown = Number.isFinite(grant.days)
+      ? (grant.days < 0 ? `дедлайн прошел ${Math.abs(grant.days)} дн. назад` : `до дедлайна ${grant.days} дн.`)
+      : "дата требует уточнения";
+    return `<article class="grant-card ${grant.status.className}">
+      <div class="card-top"><h3>${escapeHtml(grant.route)}</h3><span class="badge ${grant.status.color}">${escapeHtml(grant.status.label)}</span></div>
       <p class="card-text"><strong>Оператор:</strong> ${escapeHtml(grant.operator || "нет данных")}</p>
       <p class="card-text"><strong>Сумма:</strong> ${escapeHtml(grant.funding || "требует уточнения")}</p>
       <p class="card-text"><strong>Кому подходит:</strong> ${escapeHtml(grant.purpose || "ожидает заполнения")}</p>
       <p class="card-text"><strong>Проекты:</strong> ${escapeHtml(grant.projects || "требует сопоставления")}</p>
       <p class="card-text"><strong>Первый шаг:</strong> ${escapeHtml(grant.firstStep || "ожидает заполнения")}</p>
-      <div class="card-meta"><span class="badge blue">${escapeHtml(grant.window || "нет точных данных")}</span>${source}</div>
+      <div class="card-meta"><span class="badge blue">${escapeHtml(grant.window || "нет точных данных")}</span><span class="badge gray">${escapeHtml(countdown)}</span>${source}</div>
     </article>`;
   }).join("");
 }
@@ -643,6 +725,9 @@ async function loadAllData() {
 
     renderFilters();
     applyFilterControls();
+    if (els.grantSearchInput) els.grantSearchInput.value = state.grantFilters.query;
+    if (els.grantStatusFilter) els.grantStatusFilter.value = state.grantFilters.status;
+    if (els.grantSortSelect) els.grantSortSelect.value = state.grantFilters.sort;
     renderAll();
     setSync(`Данные загружены: ${state.projects.length} проектов, ${state.grants.length} грантов, ${state.feedback.length} пожеланий НТС. Источник проектов: gid ${CONFIG.sheets.projects}.`, "ok");
   } catch (error) {
@@ -742,6 +827,25 @@ function setupEvents() {
   const debouncedSearch = debounce(handleFilters, 220);
   els.searchInput.addEventListener("input", debouncedSearch);
   [els.statusFilter, els.ownerFilter, els.readinessFilter, els.riskFilter].forEach((el) => el.addEventListener("input", handleFilters));
+  if (els.grantSearchInput) {
+    const debouncedGrantSearch = debounce(() => {
+      state.grantFilters.query = els.grantSearchInput.value;
+      renderGrants();
+    }, 180);
+    els.grantSearchInput.addEventListener("input", debouncedGrantSearch);
+  }
+  if (els.grantStatusFilter) {
+    els.grantStatusFilter.addEventListener("input", () => {
+      state.grantFilters.status = els.grantStatusFilter.value;
+      renderGrants();
+    });
+  }
+  if (els.grantSortSelect) {
+    els.grantSortSelect.addEventListener("input", () => {
+      state.grantFilters.sort = els.grantSortSelect.value;
+      renderGrants();
+    });
+  }
   els.ntsForm.addEventListener("submit", submitFeedback);
   els.projectTable.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-action='edit-project']");

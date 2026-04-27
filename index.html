@@ -193,11 +193,43 @@
 
     <!-- Раздел грантов. -->
     <section class="section" id="grants">
-      <div class="section-title">
-        <p class="eyebrow">Грантовые маршруты</p>
-        <h2>Гранты</h2>
-        <p>Проекты планируется подавать с 1 июня 2026 года. Ранние и завершенные окна не удаляются, а отделяются визуально.</p>
+      <div class="section-title grants-headline">
+        <div>
+          <p class="eyebrow">Грантовые маршруты</p>
+          <h2>Гранты</h2>
+          <p>Умный каталог с приоритетами, быстрыми фильтрами и фокусом на ближайшие дедлайны после 1 июня 2026 года.</p>
+        </div>
+        <div class="grants-quick-kpi" id="grantsQuickKpi" aria-label="Сводка по грантам"></div>
       </div>
+
+      <div class="grants-toolbar" aria-label="Фильтры грантов">
+        <label>
+          <span>Поиск по маршруту</span>
+          <input id="grantSearchInput" type="search" placeholder="Маршрут, оператор, проект, сумма">
+        </label>
+        <label>
+          <span>Статус окна</span>
+          <select id="grantStatusFilter">
+            <option value="all">Все статусы</option>
+            <option value="actual">Актуальные</option>
+            <option value="urgent">Скоро дедлайн</option>
+            <option value="future">Поздние окна</option>
+            <option value="early">Ранние до 1 июня</option>
+            <option value="archive">Завершенные</option>
+            <option value="review">Требуют перепроверки</option>
+          </select>
+        </label>
+        <label>
+          <span>Сортировка</span>
+          <select id="grantSortSelect">
+            <option value="deadline_asc">Сначала ближайшие дедлайны</option>
+            <option value="priority_desc">Сначала приоритетные для запуска</option>
+            <option value="amount_desc">По убыванию суммы</option>
+            <option value="name_asc">По названию маршрута</option>
+          </select>
+        </label>
+      </div>
+
       <div class="grant-grid" id="grantGrid"></div>
     </section>
 

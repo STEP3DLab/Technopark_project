@@ -1,6 +1,6 @@
 /*
   Панель руководителя Технопарка РГСУ
-  Версия v3: устойчивое чтение обновленного листа проектов gid=150570752.
+  Версия v3: устойчивое чтение обновленного листа проектов gid=341683209.
   Код специально оставлен на чистом JavaScript, чтобы сайт работал на GitHub Pages без сборки.
 */
 
@@ -8,7 +8,7 @@ const CONFIG = {
   sheetId: "1cNN4cPE1F1dlewJCelJPGUR5EkYUmQyJGb_BOKN4n60",
   sheets: {
     // Лист реестра проектов.
-    projects: "150570752",
+    projects: "341683209",
     // Лист с грантовыми окнами оставлен прежним.
     grants: "1500721586",
     // Лист пожеланий НТС.
@@ -17,6 +17,7 @@ const CONFIG = {
   sheetUrl: "https://docs.google.com/spreadsheets/d/1cNN4cPE1F1dlewJCelJPGUR5EkYUmQyJGb_BOKN4n60/edit",
   scriptUrl: "https://script.google.com/macros/s/AKfycbwzbWEjEpb1ySylb--7VhqEHvaC05WB5jhcw-8xpAj811bIJurVB3CW-ElDsoeKnWOA/exec",
   formKey: "NTS_TECHNOPARK_2026",
+  confirmCode: "11111111",
   juneStart: "2026-06-01",
 };
 
@@ -65,6 +66,20 @@ const els = {
   feedbackProject: document.querySelector("#feedbackProject"),
   feedbackFeed: document.querySelector("#feedbackFeed"),
   toast: document.querySelector("#toast"),
+  projectEditForm: document.querySelector("#projectEditForm"),
+  projectEditTitle: document.querySelector("#projectEditTitle"),
+  editProjectId: document.querySelector("#editProjectId"),
+  editProjectName: document.querySelector("#editProjectName"),
+  editProjectOwner: document.querySelector("#editProjectOwner"),
+  editProjectStatus: document.querySelector("#editProjectStatus"),
+  editProjectGrant: document.querySelector("#editProjectGrant"),
+  editProjectDeadline: document.querySelector("#editProjectDeadline"),
+  editProjectReadiness: document.querySelector("#editProjectReadiness"),
+  editProjectNextStep: document.querySelector("#editProjectNextStep"),
+  editProjectNote: document.querySelector("#editProjectNote"),
+  editProjectSubmit: document.querySelector("#editProjectSubmit"),
+  editProjectCancel: document.querySelector("#editProjectCancel"),
+  editProjectHint: document.querySelector("#editProjectHint"),
 };
 
 
@@ -430,7 +445,97 @@ function renderProjects() {
     <td>${escapeHtml(formatDate(project.deadline))}</td>
     <td>${project.readiness === null ? `<span class="badge yellow">нет точных данных</span>` : `${project.readiness}%`}</td>
     <td>${escapeHtml(project.nextStep || "ожидает заполнения")}</td>
+    <td><button class="button ghost table-action" type="button" data-action="edit-project" data-id="${escapeHtml(project.id)}" data-name="${escapeHtml(project.name)}">Редактировать</button></td>
   </tr>`).join("");
+}
+
+function openProjectEditor(projectId) {
+  const project = state.projects.find((item) => String(item.id) === String(projectId));
+  if (!project) {
+    showToast("Проект для редактирования не найден", "error");
+    return;
+  }
+  if (!els.projectEditForm) return;
+
+  els.projectEditForm.hidden = false;
+  els.projectEditTitle.textContent = `Редактирование: ${project.name}`;
+  els.editProjectId.value = project.id || "";
+  els.editProjectName.value = project.name || "";
+  els.editProjectOwner.value = project.owner || "";
+  els.editProjectStatus.value = project.status || "";
+  els.editProjectGrant.value = project.grant || "";
+  els.editProjectDeadline.value = project.deadline || "";
+  els.editProjectReadiness.value = project.readiness ?? "";
+  els.editProjectNextStep.value = project.nextStep || "";
+  els.editProjectNote.value = project.note || "";
+  els.editProjectHint.textContent = "Измените поля и сохраните — запись уйдет в Google Таблицу через Apps Script.";
+  els.editProjectHint.classList.remove("error");
+}
+
+function closeProjectEditor() {
+  if (!els.projectEditForm) return;
+  els.projectEditForm.hidden = true;
+  els.projectEditForm.reset();
+}
+
+async function submitProjectEdit(event) {
+  event.preventDefault();
+  const projectId = els.editProjectId.value.trim();
+  if (!projectId) {
+    showToast("Не указан ID проекта для сохранения", "error");
+    return;
+  }
+
+  const payload = {
+    action: "update_project",
+    confirmCode: CONFIG.confirmCode,
+    id: projectId,
+    project: els.editProjectName.value.trim(),
+    owner: els.editProjectOwner.value.trim(),
+    status: els.editProjectStatus.value.trim(),
+    funding: els.editProjectGrant.value.trim(),
+    deadline: els.editProjectDeadline.value,
+    readiness: els.editProjectReadiness.value ? `${els.editProjectReadiness.value}%` : "",
+    nextAction: els.editProjectNextStep.value.trim(),
+    note: els.editProjectNote.value.trim(),
+  };
+
+  els.editProjectSubmit.disabled = true;
+  els.editProjectHint.textContent = "Сохраняю изменения в Google Таблицу...";
+  els.editProjectHint.classList.remove("error");
+
+  try {
+    const response = await fetch(CONFIG.scriptUrl, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json().catch(() => ({ ok: response.ok }));
+    if (!response.ok || result.ok === false) throw new Error(result.error || "Не удалось обновить проект");
+
+    const project = state.projects.find((item) => String(item.id) === String(projectId));
+    if (project) {
+      project.name = payload.project || project.name;
+      project.owner = payload.owner;
+      project.status = normalizeStatus(payload.status || project.status);
+      project.grant = payload.funding;
+      project.deadline = payload.deadline;
+      project.readiness = payload.readiness ? clampPercent(payload.readiness) : null;
+      project.nextStep = payload.nextAction;
+      project.note = payload.note;
+    }
+
+    renderAll();
+    closeProjectEditor();
+    showToast("Проект обновлен в таблице");
+  } catch (error) {
+    els.editProjectHint.textContent = `Ошибка сохранения: ${error.message}`;
+    els.editProjectHint.classList.add("error");
+    showToast("Не удалось сохранить изменения", "error");
+  } finally {
+    els.editProjectSubmit.disabled = false;
+  }
 }
 
 function grantStatus(grant) {
@@ -638,6 +743,17 @@ function setupEvents() {
   els.searchInput.addEventListener("input", debouncedSearch);
   [els.statusFilter, els.ownerFilter, els.readinessFilter, els.riskFilter].forEach((el) => el.addEventListener("input", handleFilters));
   els.ntsForm.addEventListener("submit", submitFeedback);
+  els.projectTable.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-action='edit-project']");
+    if (!button) return;
+    openProjectEditor(button.dataset.id);
+  });
+  if (els.projectEditForm) {
+    els.projectEditForm.addEventListener("submit", submitProjectEdit);
+  }
+  if (els.editProjectCancel) {
+    els.editProjectCancel.addEventListener("click", closeProjectEditor);
+  }
 }
 
 /* UX улучшение 3: Добавляем эффект тени шапки при прокрутке */

@@ -62,7 +62,7 @@
         </div>
         <div class="mini-grid">
           <div><span>Источник</span><strong>Google Sheets</strong></div>
-          <div><span>Проекты</span><strong>gid 150570752</strong></div>
+          <div><span>Проекты</span><strong>gid 341683209</strong></div>
         </div>
       </aside>
     </section>
@@ -159,11 +159,36 @@
               <th>Срок</th>
               <th>Готовность</th>
               <th>Следующее действие</th>
+              <th>Действия</th>
             </tr>
           </thead>
           <tbody id="projectTable"></tbody>
         </table>
       </div>
+      <form class="panel project-edit-form" id="projectEditForm" hidden>
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Редактирование</p>
+            <h3 id="projectEditTitle">Редактирование проекта</h3>
+          </div>
+        </div>
+        <input id="editProjectId" type="hidden">
+        <div class="toolbar compact">
+          <label><span>Проект</span><input id="editProjectName" required></label>
+          <label><span>Ответственный</span><input id="editProjectOwner"></label>
+          <label><span>Статус</span><input id="editProjectStatus"></label>
+          <label><span>Грант / маршрут</span><input id="editProjectGrant"></label>
+          <label><span>Срок</span><input id="editProjectDeadline" type="date"></label>
+          <label><span>Готовность, %</span><input id="editProjectReadiness" type="number" min="0" max="100" step="1"></label>
+        </div>
+        <label><span>Следующее действие</span><input id="editProjectNextStep"></label>
+        <label><span>Примечание</span><textarea id="editProjectNote" rows="3"></textarea></label>
+        <p class="form-note" id="editProjectHint">Измените поля и сохраните — запись уйдет в Google Таблицу.</p>
+        <div class="hero-actions">
+          <button class="button primary" id="editProjectSubmit" type="submit">Сохранить изменения</button>
+          <button class="button secondary" id="editProjectCancel" type="button">Отмена</button>
+        </div>
+      </form>
     </section>
 
     <!-- Раздел грантов. -->

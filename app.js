@@ -26,6 +26,7 @@ const state = {
     riskOnly: false,
     readyOnly: false,
   },
+  wishFilters: { project: "all", type: "all", priority: "all", status: "all", query: "", sort: "new" },
 };
 
 const FUNNEL_STAGES = ["Идея", "Прототип", "Пилот", "Готов к гранту", "Подан", "Получено решение"];
@@ -50,9 +51,20 @@ const els = {
   funnelDetails: document.getElementById("funnelDetails"),
   timelineBoard: document.getElementById("timelineBoard"),
   wishForm: document.getElementById("wishForm"),
+  wishSubmit: document.getElementById("wishSubmit"),
   wishProject: document.getElementById("wishProject"),
   wishFeed: document.getElementById("wishFeed"),
   wishStatus: document.getElementById("wishStatus"),
+  ntsKpiGrid: document.getElementById("ntsKpiGrid"),
+  wishProjectFilter: document.getElementById("wishProjectFilter"),
+  wishTypeFilter: document.getElementById("wishTypeFilter"),
+  wishPriorityFilter: document.getElementById("wishPriorityFilter"),
+  wishStatusFilter: document.getElementById("wishStatusFilter"),
+  wishSearch: document.getElementById("wishSearch"),
+  wishSort: document.getElementById("wishSort"),
+  jumpCritical: document.getElementById("jumpCritical"),
+  jumpNew: document.getElementById("jumpNew"),
+  jumpDecision: document.getElementById("jumpDecision"),
   sheetLink: document.getElementById("sheetLink"),
   scriptLink: document.getElementById("scriptLink"),
   footerSheet: document.getElementById("footerSheet"),
@@ -168,13 +180,18 @@ function normalizeGrant(row) {
 }
 
 function normalizeWish(row) {
+  // Поддержка разных заголовков без изменения структуры листа.
+  const typeRaw = getValue(row, ["Тип обращения", "Тип сообщения", "category"]);
   return {
     author: getValue(row, ["ФИО / автор", "Автор", "ФИО"]),
+    role: getValue(row, ["Роль / статус", "Роль", "Подразделение", "Статус автора"]),
     project: getValue(row, ["Проект", "Связанный проект"]),
-    type: getValue(row, ["Тип обращения", "Тип сообщения"]),
-    priority: getValue(row, ["Приоритет"]),
-    date: getValue(row, ["Дата и время", "Дата"]),
+    type: typeRaw || "пожелание",
+    priority: getValue(row, ["Приоритет"]) || "средний",
+    status: getValue(row, ["Статус обработки", "Статус", "Обработка"]) || "новое",
+    date: getValue(row, ["Дата и время", "Дата"]) || new Date().toISOString(),
     message: getValue(row, ["Текст пожелания", "Сообщение"]),
+    requiresLeader: normalize(getValue(row, ["Требует реакции руководителя", "Реакция руководителя"])) === "да" || normalize(typeRaw) === "риск" || normalize(getValue(row, ["Приоритет"])) === "критический",
   };
 }
 
@@ -403,15 +420,91 @@ function renderAttentionList() {
 }
 
 function renderWishes() {
-  const list = state.wishes.slice(0, 20);
-  els.wishFeed.innerHTML = list.length
-    ? list.map((w) => `<article class="wish-item"><strong>${w.author || "Автор"}</strong> · ${w.project || "Без проекта"}<br><span class="badge">${w.type || "пожелание"}</span> <span class="badge">${w.priority || "средний"}</span><br><small>${w.date || "дата не указана"}</small><p>${w.message || ""}</p></article>`).join("")
-    : `<div class="hint">Пока нет пожеланий НТС.</div>`;
+  const list = filteredWishes();
+  if (!state.wishes.length) {
+    els.wishFeed.innerHTML = `<div class="empty-state">Пока нет сообщений НТС. Добавьте первое пожелание или замечание.</div>`;
+    return;
+  }
+  if (!list.length) {
+    els.wishFeed.innerHTML = `<div class="empty-state">По выбранным фильтрам сообщений нет.</div>`;
+    return;
+  }
+  els.wishFeed.innerHTML = list.map((w, idx) => {
+    const priorityClass = getPriorityClass(w.priority);
+    const typeClass = normalize(w.type) === "риск" ? "type-risk" : normalize(w.type) === "решение нтс" ? "type-decision" : "";
+    return `<article class="wish-item" id="wish_${idx}">
+      <div class="wish-head"><strong>${w.author || "Автор не указан"}</strong><small>${formatWishDate(w.date)}</small></div>
+      <div class="wish-meta">${w.role || "Роль не указана"} · ${w.project || "Ко всему портфелю"}</div>
+      <div class="wish-badges">
+        <span class="badge ${typeClass}">${w.type || "пожелание"}</span>
+        <span class="badge ${priorityClass}">Приоритет: ${w.priority || "средний"}</span>
+        <span class="badge status-pill">Статус: ${w.status || "новое"}</span>
+      </div>
+      <p>${w.message || "Текст не указан."}</p>
+    </article>`;
+  }).join("");
+}
+
+function formatWishDate(value) {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? (value || "дата не указана") : d.toLocaleString("ru-RU");
+}
+
+function getPriorityScore(priority) {
+  const p = normalize(priority);
+  if (p === "критический") return 4;
+  if (p === "высокий") return 3;
+  if (p === "средний") return 2;
+  return 1;
+}
+
+function getPriorityClass(priority) {
+  const p = normalize(priority);
+  if (p === "критический") return "priority-critical";
+  if (p === "высокий") return "priority-high";
+  if (p === "средний") return "priority-mid";
+  return "priority-low";
+}
+
+function filteredWishes() {
+  const list = [...state.wishes].filter((w) => {
+    const byProject = state.wishFilters.project === "all" || (w.project || "") === state.wishFilters.project;
+    const byType = state.wishFilters.type === "all" || normalize(w.type) === normalize(state.wishFilters.type);
+    const byPriority = state.wishFilters.priority === "all" || normalize(w.priority) === normalize(state.wishFilters.priority);
+    const byStatus = state.wishFilters.status === "all" || normalize(w.status) === normalize(state.wishFilters.status);
+    const byQuery = !state.wishFilters.query || normalize(`${w.message} ${w.author} ${w.project}`).includes(normalize(state.wishFilters.query));
+    return byProject && byType && byPriority && byStatus && byQuery;
+  });
+  if (state.wishFilters.sort === "critical") list.sort((a, b) => getPriorityScore(b.priority) - getPriorityScore(a.priority));
+  else if (state.wishFilters.sort === "unprocessed") list.sort((a, b) => Number(normalize(a.status) !== "новое") - Number(normalize(b.status) !== "новое"));
+  else list.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return list;
+}
+
+function renderWishesKpi() {
+  const all = state.wishes;
+  const cards = [
+    ["Всего сообщений", all.length],
+    ["Новых", all.filter((w) => normalize(w.status) === "новое").length],
+    ["Критических", all.filter((w) => normalize(w.priority) === "критический").length],
+    ["Рисков", all.filter((w) => normalize(w.type) === "риск").length],
+    ["Решений НТС", all.filter((w) => normalize(w.type) === "решение нтс").length],
+    ["Без проекта", all.filter((w) => !w.project).length],
+    ["Требуют реакции руководителя", all.filter((w) => w.requiresLeader || normalize(w.priority) === "критический" || normalize(w.type) === "риск").length],
+  ];
+  els.ntsKpiGrid.innerHTML = cards.map(([t, v]) => `<article class="nts-kpi"><div class="value">${v}</div><div class="hint">${t}</div></article>`).join("");
 }
 
 async function submitWish(event) {
   event.preventDefault();
+  if (!els.wishForm.reportValidity()) return;
   const formData = new FormData(els.wishForm);
+  const message = String(formData.get("message") || "").trim();
+  if (!message) {
+    els.wishStatus.className = "hint wish-error";
+    els.wishStatus.textContent = "Добавьте текст сообщения перед отправкой.";
+    return;
+  }
   const payload = {
     action: "add_nts_feedback",
     formKey: "NTS_TECHNOPARK_2026",
@@ -426,7 +519,9 @@ async function submitWish(event) {
     createdAt: new Date().toISOString(),
   };
 
-  els.wishStatus.textContent = "Отправка пожелания...";
+  els.wishSubmit.disabled = true;
+  els.wishStatus.className = "hint";
+  els.wishStatus.textContent = "Сообщение отправляется...";
   try {
     const response = await fetch(CONFIG.scriptUrl, {
       method: "POST",
@@ -438,12 +533,27 @@ async function submitWish(event) {
     if (!response.ok || result.ok === false) throw new Error(result.error || "Ошибка отправки");
 
     els.wishForm.reset();
-    els.wishStatus.textContent = "Пожелание отправлено";
-    state.wishes.unshift({ ...payload, type: payload.category, date: new Date().toLocaleString("ru-RU") });
+    els.wishStatus.className = "hint wish-success";
+    els.wishStatus.textContent = "Сообщение успешно отправлено в НТС.";
+    state.wishes.unshift({
+      ...payload,
+      role: payload.role,
+      type: payload.category,
+      status: "новое",
+      date: new Date().toISOString(),
+      requiresLeader: normalize(payload.priority) === "критический" || normalize(payload.category) === "риск",
+    });
     renderWishes();
+    renderWishesKpi();
     renderKpi();
   } catch (e) {
-    els.wishStatus.textContent = `Не удалось отправить: ${e.message}. Проверьте Apps Script URL.`;
+    els.wishStatus.className = "hint wish-error";
+    const isOffline = typeof navigator !== "undefined" && navigator.onLine === false;
+    els.wishStatus.textContent = isOffline
+      ? "Нет подключения к таблице. Проверьте интернет и повторите отправку."
+      : `Сообщение не отправилось: ${e.message}. Проверьте Apps Script URL.`;
+  } finally {
+    els.wishSubmit.disabled = false;
   }
 }
 
@@ -453,6 +563,17 @@ function renderAll() {
   renderFunnel();
   renderGrantTimeline();
   renderAttentionList();
+  renderWishes();
+  renderWishesKpi();
+}
+
+function applyWishFiltersFromUI() {
+  state.wishFilters.project = els.wishProjectFilter.value;
+  state.wishFilters.type = els.wishTypeFilter.value;
+  state.wishFilters.priority = els.wishPriorityFilter.value;
+  state.wishFilters.status = els.wishStatusFilter.value;
+  state.wishFilters.query = els.wishSearch.value.trim();
+  state.wishFilters.sort = els.wishSort.value;
   renderWishes();
 }
 
@@ -468,7 +589,9 @@ function applyFiltersFromUI() {
 function fillFilterOptions() {
   const statuses = [...new Set(state.projects.map((p) => p.status).filter(Boolean))];
   els.statusFilter.innerHTML = `<option value="all">Все статусы</option>${statuses.map((s) => `<option value="${s}">${s}</option>`).join("")}`;
-  els.wishProject.innerHTML = `<option value="">Проект (не выбран)</option>${state.projects.map((p) => `<option>${p.name}</option>`).join("")}`;
+  const projects = [...new Set(state.projects.map((p) => p.name).filter(Boolean))];
+  els.wishProject.innerHTML = `<option value="">Ко всему портфелю (без проекта)</option>${projects.map((name) => `<option>${name}</option>`).join("")}`;
+  els.wishProjectFilter.innerHTML = `<option value="all">Все проекты</option><option value="">Ко всему портфелю</option>${projects.map((name) => `<option>${name}</option>`).join("")}`;
 }
 
 function bindUi() {
@@ -495,6 +618,23 @@ function bindUi() {
 
   els.refreshData.addEventListener("click", initData);
   els.wishForm.addEventListener("submit", submitWish);
+  [els.wishProjectFilter, els.wishTypeFilter, els.wishPriorityFilter, els.wishStatusFilter, els.wishSearch, els.wishSort]
+    .forEach((el) => el.addEventListener("input", applyWishFiltersFromUI));
+  // Быстрые кнопки переключают фильтры, чтобы за 1 клик увидеть нужный блок.
+  els.jumpCritical.addEventListener("click", () => {
+    els.wishPriorityFilter.value = "критический";
+    els.wishSort.value = "critical";
+    applyWishFiltersFromUI();
+  });
+  els.jumpNew.addEventListener("click", () => {
+    els.wishStatusFilter.value = "новое";
+    els.wishSort.value = "new";
+    applyWishFiltersFromUI();
+  });
+  els.jumpDecision.addEventListener("click", () => {
+    els.wishTypeFilter.value = "решение НТС";
+    applyWishFiltersFromUI();
+  });
 
   els.projectsTable.addEventListener("click", (e) => {
     const row = e.target.closest("tr[data-open]");
@@ -508,6 +648,7 @@ function bindUi() {
 async function initData() {
   els.syncStatus.textContent = "Данные загружаются";
   els.kpiGrid.innerHTML = new Array(5).fill(0).map(() => '<div class="skeleton"></div>').join("");
+  els.wishFeed.innerHTML = '<div class="empty-state">Загрузка сообщений НТС…</div>';
 
   try {
     const [projectsRows, grantsRows, wishesRows] = await Promise.all([
@@ -530,6 +671,7 @@ async function initData() {
       els.projectsTable.innerHTML = '<tr><td colspan="5">Не удалось загрузить данные из таблицы.</td></tr>';
       els.timelineBoard.innerHTML = '<div class="empty">Проверьте URL таблицы и Apps Script.</div>';
     }
+    els.wishFeed.innerHTML = '<div class="empty-state">Данные НТС не загрузились. Проверьте подключение к таблице и Apps Script.</div>';
   }
 }
 

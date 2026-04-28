@@ -150,3 +150,13 @@ URL Apps Script уже добавлен в `app.js` как стандартны�
 - `google-apps-script.gs` - backend Apps Script с `doGet/doPost`, операциями по проектам/пакету/НТС и журналом действий.
 - `.nojekyll` - отключает обработку Jekyll на GitHub Pages.
 - `robots.txt` - разрешает индексацию опубликованного сайта.
+
+## Accessibility checklist
+
+Перед релизом UI-правок проверьте:
+
+- У всех `input`, `select`, `textarea` есть явный `<label for="...">`.
+- Для динамических статусных сообщений используется `role="status"` и `aria-live="polite"` (при необходимости `aria-atomic="true"`).
+- Для кнопок раскрытия/меню синхронизируются `aria-controls` и `aria-expanded`.
+- Интерактивные элементы (`a`, `button`, поля форм) имеют заметный `:focus-visible`.
+- Навигация по форме и основным сценариям работает с клавиатуры без мыши.

@@ -13,7 +13,7 @@
 <body>
 <header class="topbar">
   <a class="brand" href="#overview">Технопарк РГСУ</a>
-  <button id="menuToggle" class="menu-btn" aria-expanded="false" aria-label="Открыть меню">☰</button>
+  <button id="menuToggle" class="menu-btn" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">☰</button>
   <nav id="mainNav" class="main-nav">
     <a href="#overview">Обзор</a>
     <a href="#projects">Проекты</a>
@@ -34,7 +34,7 @@
     <div>
       <h1>Панель руководителя Проектного центра «Технопарк РГСУ»</h1>
       <p class="subtitle">Проекты, гранты, дедлайны, риски и решения НТС в одном интерфейсе</p>
-      <p id="syncStatus" class="sync-status">Данные загружаются…</p>
+      <p id="syncStatus" class="sync-status" role="status" aria-live="polite" aria-atomic="true">Данные загружаются…</p>
     </div>
     <div id="kpiGrid" class="kpi-grid" aria-live="polite"></div>
   </section>
@@ -54,8 +54,11 @@
     </div>
 
     <div class="filters">
+      <label for="searchInput" class="visually-hidden">Поиск по названию проекта</label>
       <input id="searchInput" type="search" placeholder="Поиск по названию проекта">
+      <label for="statusFilter" class="visually-hidden">Фильтр по статусу проекта</label>
       <select id="statusFilter"><option value="all">Все статусы</option></select>
+      <label for="deadlineFilter" class="visually-hidden">Фильтр по дедлайну</label>
       <select id="deadlineFilter">
         <option value="all">Любой дедлайн</option>
         <option value="14">14 дней</option>
@@ -64,8 +67,8 @@
         <option value="90">90 дней</option>
         <option value="none">Без дедлайна</option>
       </select>
-      <label><input id="riskOnly" type="checkbox"> Только риски</label>
-      <label><input id="readyOnly" type="checkbox"> Готовы к гранту</label>
+      <label for="riskOnly"><input id="riskOnly" type="checkbox"> Только риски</label>
+      <label for="readyOnly"><input id="readyOnly" type="checkbox"> Готовы к гранту</label>
       <button id="resetFilters" type="button" class="btn btn-ghost">Сбросить фильтры</button>
     </div>
 
@@ -110,24 +113,30 @@
     </div>
     <div class="wish-layout">
       <form id="wishForm" class="wish-form">
-        <input name="author" required placeholder="ФИО">
-        <input name="role" placeholder="Роль / подразделение">
+        <label for="wishAuthor">ФИО</label>
+        <input id="wishAuthor" name="author" required placeholder="ФИО">
+        <label for="wishRole">Роль / подразделение</label>
+        <input id="wishRole" name="role" placeholder="Роль / подразделение">
+        <label for="wishProject">Проект</label>
         <select name="project" id="wishProject"><option value="">Проект (не выбран)</option></select>
-        <select name="type" required>
+        <label for="wishType">Тип пожелания</label>
+        <select id="wishType" name="type" required>
           <option value="идея">идея</option>
           <option value="риск">риск</option>
           <option value="замечание">замечание</option>
           <option value="предложение">предложение</option>
           <option value="вопрос">вопрос</option>
         </select>
-        <select name="priority" required>
+        <label for="wishPriority">Приоритет</label>
+        <select id="wishPriority" name="priority" required>
           <option value="низкий">низкий</option>
           <option value="средний" selected>средний</option>
           <option value="высокий">высокий</option>
         </select>
-        <textarea name="message" required rows="4" placeholder="Текст пожелания"></textarea>
+        <label for="wishMessage">Текст пожелания</label>
+        <textarea id="wishMessage" name="message" required rows="4" placeholder="Текст пожелания"></textarea>
         <button class="btn btn-primary" type="submit">Отправить пожелание</button>
-        <p id="wishStatus" class="hint">Форма готова к отправке в Apps Script.</p>
+        <p id="wishStatus" class="hint" role="status" aria-live="polite" aria-atomic="true">Форма готова к отправке в Apps Script.</p>
       </form>
       <div id="wishFeed" class="wish-feed"></div>
     </div>

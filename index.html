@@ -108,37 +108,89 @@
   </section>
 
   <section id="wishes" class="panel">
+    <div id="nts" aria-hidden="true"></div>
     <div class="section-head">
       <h2>Пожелания НТС</h2>
+      <span class="hint">Рабочая лента экспертных сообщений НТС</span>
     </div>
+    <p class="hint nts-intro">Здесь можно оставить замечание, риск, идею или решение по проектам Технопарка. Все сообщения сохраняются в отдельный лист Google Таблицы.</p>
+    <div class="nts-quick-actions">
+      <a class="btn btn-ghost" href="#wishForm">Добавить пожелание</a>
+      <button id="jumpCritical" class="btn btn-ghost" type="button">Критические риски</button>
+      <button id="jumpNew" class="btn btn-ghost" type="button">Новые сообщения</button>
+      <button id="jumpDecision" class="btn btn-ghost" type="button">Решения НТС</button>
+    </div>
+    <div id="ntsKpiGrid" class="nts-kpi-grid" aria-live="polite"></div>
     <div class="wish-layout">
       <form id="wishForm" class="wish-form">
         <label for="wishAuthor">ФИО</label>
         <input id="wishAuthor" name="author" required placeholder="ФИО">
-        <label for="wishRole">Роль / подразделение</label>
-        <input id="wishRole" name="role" placeholder="Роль / подразделение">
-        <label for="wishProject">Проект</label>
-        <select name="project" id="wishProject"><option value="">Проект (не выбран)</option></select>
-        <label for="wishType">Тип пожелания</label>
+        <label for="wishRole">Роль / статус</label>
+        <input id="wishRole" name="role" placeholder="Например: член НТС, руководитель проекта">
+        <label for="wishProject">К какому проекту относится</label>
+        <select name="project" id="wishProject"><option value="">Ко всему портфелю (без проекта)</option></select>
+        <label for="wishType">Тип сообщения</label>
         <select id="wishType" name="type" required>
-          <option value="идея">идея</option>
-          <option value="риск">риск</option>
+          <option value="пожелание">пожелание</option>
           <option value="замечание">замечание</option>
-          <option value="предложение">предложение</option>
+          <option value="риск">риск</option>
+          <option value="идея">идея</option>
           <option value="вопрос">вопрос</option>
+          <option value="решение НТС">решение НТС</option>
         </select>
-        <label for="wishPriority">Приоритет</label>
+        <label for="wishPriority">Насколько срочно</label>
         <select id="wishPriority" name="priority" required>
           <option value="низкий">низкий</option>
           <option value="средний" selected>средний</option>
           <option value="высокий">высокий</option>
+          <option value="критический">критический</option>
         </select>
-        <label for="wishMessage">Текст пожелания</label>
-        <textarea id="wishMessage" name="message" required rows="4" placeholder="Текст пожелания"></textarea>
-        <button class="btn btn-primary" type="submit">Отправить пожелание</button>
+        <label for="wishMessage">Что нужно учесть</label>
+        <textarea id="wishMessage" name="message" required rows="6" placeholder="Опишите контекст, риск или предлагаемое решение НТС"></textarea>
+        <button id="wishSubmit" class="btn btn-primary" type="submit">Отправить в НТС</button>
         <p id="wishStatus" class="hint" role="status" aria-live="polite" aria-atomic="true">Форма готова к отправке в Apps Script.</p>
       </form>
-      <div id="wishFeed" class="wish-feed"></div>
+      <div>
+        <div class="wish-feed-toolbar">
+          <label class="visually-hidden" for="wishProjectFilter">Фильтр по проекту</label>
+          <select id="wishProjectFilter"><option value="all">Все проекты</option></select>
+          <label class="visually-hidden" for="wishTypeFilter">Фильтр по типу сообщения</label>
+          <select id="wishTypeFilter">
+            <option value="all">Все типы</option>
+            <option value="пожелание">пожелание</option>
+            <option value="замечание">замечание</option>
+            <option value="риск">риск</option>
+            <option value="идея">идея</option>
+            <option value="вопрос">вопрос</option>
+            <option value="решение НТС">решение НТС</option>
+          </select>
+          <label class="visually-hidden" for="wishPriorityFilter">Фильтр по приоритету</label>
+          <select id="wishPriorityFilter">
+            <option value="all">Любой приоритет</option>
+            <option value="низкий">низкий</option>
+            <option value="средний">средний</option>
+            <option value="высокий">высокий</option>
+            <option value="критический">критический</option>
+          </select>
+          <label class="visually-hidden" for="wishStatusFilter">Фильтр по статусу обработки</label>
+          <select id="wishStatusFilter">
+            <option value="all">Любой статус</option>
+            <option value="новое">новое</option>
+            <option value="в работе">в работе</option>
+            <option value="выполнено">выполнено</option>
+            <option value="отложено">отложено</option>
+          </select>
+          <label class="visually-hidden" for="wishSearch">Поиск по тексту сообщений НТС</label>
+          <input id="wishSearch" type="search" placeholder="Поиск по тексту">
+          <label class="visually-hidden" for="wishSort">Сортировка ленты НТС</label>
+          <select id="wishSort">
+            <option value="new">Сначала новые</option>
+            <option value="critical">Сначала критические</option>
+            <option value="unprocessed">Сначала необработанные</option>
+          </select>
+        </div>
+        <div id="wishFeed" class="wish-feed"></div>
+      </div>
     </div>
   </section>
 

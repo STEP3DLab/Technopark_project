@@ -175,6 +175,10 @@ const state = {
     grants: "demo-данные",
     feedback: API_CONFIG.enabled ? "отправка в таблицу доступна" : "недоступна"
   },
+  connectionCounts: {
+    projects: 0,
+    grants: 0
+  },
   notifications: [],
   diagnostics: {
     issues: [],
@@ -347,10 +351,12 @@ function splitProjects(value) {
     .filter(Boolean);
 }
 
-// fetchFromApi выполняет безопасный запрос к Google Apps Script и возвращает JSON либо текстовый ответ.
+// fetchFromApi выполняет безопасный запрос к Google Apps Script, добавляя _ts для cache-busting.
 async function fetchFromApi(endpoint, options = {}) {
   if (!API_CONFIG.enabled) throw new Error("API disabled");
-  const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`, {
+  const method = (options.method || "GET").toUpperCase();
+  const url = method === "GET" ? appendTsParam(`${API_CONFIG.baseUrl}${endpoint}`) : `${API_CONFIG.baseUrl}${endpoint}`;
+  const response = await fetch(url, {
     cache: "no-store",
     ...options
   });
@@ -368,9 +374,10 @@ async function fetchFromApi(endpoint, options = {}) {
 async function loadProjects() {
   try {
     const apiData = await fetchFromApi(API_CONFIG.endpoints.projects);
-    const projects = extractArray(apiData, "projects").map(normalizeProject);
+    const projects = getApiItems(apiData, "projects").map(normalizeProject);
     if (!projects.length) throw new Error("API returned empty projects");
     state.connection.projects = "Google Таблица";
+    state.connectionCounts.projects = projects.length;
     state.dataStatus.projects = { ok: true, message: "Проекты загружены из Google Таблицы" };
     addNotification("success", "Проекты загружены из Google Таблицы");
     return projects;
@@ -386,6 +393,7 @@ async function loadProjects() {
     if (!Array.isArray(rawProjects)) throw new Error("projects.json must contain array");
     const projects = rawProjects.map(normalizeProject);
     state.connection.projects = "локальный файл";
+    state.connectionCounts.projects = projects.length;
     state.dataStatus.projects = { ok: true, message: "Проекты загружены из data/projects.json" };
     addNotification("success", "Проекты загружены из локального файла");
     return projects;
@@ -394,7 +402,9 @@ async function loadProjects() {
     state.connection.projects = "demo-данные";
     state.dataStatus.projects = { ok: false, message: "Используются demo-проекты" };
     addNotification("warning", "Локальный файл проектов недоступен. Используются demo-данные");
-    return DEMO_PROJECTS.map(normalizeProject);
+    const demoProjects = DEMO_PROJECTS.map(normalizeProject);
+    state.connectionCounts.projects = demoProjects.length;
+    return demoProjects;
   }
 }
 
@@ -402,9 +412,10 @@ async function loadProjects() {
 async function loadGrants() {
   try {
     const apiData = await fetchFromApi(API_CONFIG.endpoints.grants);
-    const grants = normalizeApiGrants(apiData);
+    const grants = getApiItems(apiData, "grants").map(normalizeGrant);
     if (!grants.length) throw new Error("API returned empty grants");
     state.connection.grants = "Google Таблица";
+    state.connectionCounts.grants = grants.length;
     state.dataStatus.grants = { ok: true, message: "Гранты загружены из Google Таблицы" };
     addNotification("success", "Гранты загружены из Google Таблицы");
     return grants;
@@ -420,6 +431,7 @@ async function loadGrants() {
     const rows = parseCSV(csvText).filter(row => row["Маршрут"] || row["РњР°СЂС€СЂСѓС‚"]);
     const grants = rows.map(normalizeGrantRow);
     state.connection.grants = "локальный файл";
+    state.connectionCounts.grants = grants.length;
     state.dataStatus.grants = { ok: true, message: "Гранты загружены из data/grants.csv" };
     addNotification("success", "Гранты загружены из локального файла");
     return grants;
@@ -428,8 +440,16 @@ async function loadGrants() {
     state.connection.grants = "demo-данные";
     state.dataStatus.grants = { ok: false, message: "Используются demo-гранты" };
     addNotification("warning", "Локальный файл грантов недоступен. Используются demo-данные");
-    return DEMO_GRANTS.map(normalizeGrant);
+    const demoGrants = DEMO_GRANTS.map(normalizeGrant);
+    state.connectionCounts.grants = demoGrants.length;
+    return demoGrants;
   }
+}
+
+
+function appendTsParam(url) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_ts=${Date.now()}`;
 }
 
 function extractArray(payload, key) {
@@ -452,14 +472,21 @@ function normalizeProject(project) {
   return {
     id: project.id || project.ID || "",
     title: project.title || project.name || project["Проект"] || project["Название проекта"] || "",
-    manager: project.manager || project.leader || project["Руководитель"] || project["ФИО руководителя"] || "Не назначен",
-    stage: project.stage || project["Этап"] || "Идея",
+    manager: project.manager || project.leader || project["Ответственный"] || project["Руководитель"] || project["ФИО руководителя"] || "Не назначен",
+    stage: project.stage || project["Стадия"] || project["Этап"] || "Идея",
     status: project.status || project["Статус"] || "В работе",
-    readiness: Number(project.readiness ?? project["Готовность"] ?? project["Готовность, %"] ?? 0),
-    nextAction: project.nextAction || project["Ближайшее действие"] || "",
-    nextActionDate: project.nextActionDate || project["Дата ближайшего действия"] || "",
-    risk: normalizeRisk(project.risk || project["Риск"]),
-    grants: Array.isArray(project.grants) ? project.grants : splitProjects(project.grants || project["Подходящие гранты"]),
+    readiness: Number(project.readiness ?? project["Готовность пакета"] ?? project["Готовность"] ?? project["Готовность, %"] ?? 0),
+    nextAction: project.nextAction || project["Следующее действие"] || project["Ближайшее действие"] || "",
+    nextActionDate: project.nextActionDate || project["Срок"] || project["Дата ближайшего действия"] || "",
+    risk: normalizeRisk(project.risk || project["Риск"] || project["Приоритет"]),
+    grants: Array.isArray(project.grants) ? project.grants : splitProjects(project.grants || project["Маршрут финансирования"] || project["Подходящие гранты"]),
+    blocker: project.blocker || project["Блокер / примечание"] || project["Блокер"] || project["Примечание"] || "",
+    direction: project.direction || project["Направление"] || "",
+    contour: project.contour || project["Контур"] || "",
+    priority: project.priority || project["Приоритет"] || "",
+    utg: project.utg || project["УТГ"] || "",
+    nearestGrantWindow: project.nearestGrantWindow || project["Ближайшее окно"] || "",
+    fundingLimit: project.fundingLimit || project["Лимит / ориентир"] || "",
     hasPassport: normalizeBoolean(project.hasPassport ?? project["Паспорт проекта"]),
     hasTZ: normalizeBoolean(project.hasTZ ?? project["ТЗ"]),
     hasBudget: normalizeBoolean(project.hasBudget ?? project["Бюджет"]),
@@ -467,12 +494,26 @@ function normalizeProject(project) {
   };
 }
 
-function normalizeApiGrants(payload) {
+function getApiItems(payload, key) {
+  if (Array.isArray(payload)) return payload;
+
   if (typeof payload === "string") {
-    const rows = parseCSV(payload).filter(row => row["Маршрут"] || row["РњР°СЂС€СЂСѓС‚"]);
-    return rows.map(normalizeGrantRow);
+    try {
+      return getApiItems(JSON.parse(payload), key);
+    } catch {
+      return [];
+    }
   }
-  return extractArray(payload, "grants").map(normalizeGrant);
+
+  if (!payload || typeof payload !== "object") return [];
+
+  if (payload.ok === false) {
+    throw new Error(payload.error || `API ${key} error`);
+  }
+
+  if (payload.ok === true && Array.isArray(payload.items)) return payload.items;
+
+  return extractArray(payload, key);
 }
 
 function normalizeGrant(grant) {
@@ -598,17 +639,17 @@ function renderDataStatus() {
 function renderConnectionStatus() {
   const feedbackOk = state.connection.feedback === "отправка в таблицу доступна";
   const cards = [
-    ["Проекты", compactSourceName(state.connection.projects)],
-    ["Гранты", compactSourceName(state.connection.grants)],
-    ["Пожелания НТС", feedbackOk ? "доступно" : "недоступно"]
+    { label: "Проекты", source: state.connection.projects, value: formatConnectionValue(state.connection.projects, state.connectionCounts.projects) },
+    { label: "Гранты", source: state.connection.grants, value: formatConnectionValue(state.connection.grants, state.connectionCounts.grants) },
+    { label: "Пожелания НТС", source: feedbackOk ? "доступно" : "недоступно", value: feedbackOk ? "доступно" : "недоступно" }
   ];
 
   elements.connectionStatus.innerHTML = `
     <div class="connection-card connection-card--title"><strong>Статус подключения</strong></div>
-    ${cards.map(([label, value]) => {
-      const className = value === "Google Таблица" || (label === "Пожелания НТС" && value === "доступно")
+    ${cards.map(({ label, value, source }) => {
+      const className = source === "Google Таблица" || (label === "Пожелания НТС" && value === "доступно")
         ? "is-ok"
-        : value === "локальный файл"
+        : source === "локальный файл"
           ? "is-warning"
           : "is-danger";
       return `<div class="connection-card ${className}">${label}: ${escapeHtml(value)}</div>`;
@@ -619,6 +660,12 @@ function renderConnectionStatus() {
 function compactSourceName(value) {
   if (value === "demo-данные") return "demo";
   return value;
+}
+
+function formatConnectionValue(source, count) {
+  const name = compactSourceName(source);
+  if (source === "Google Таблица") return `${name}, ${count} записей`;
+  return name;
 }
 
 function renderNotifications() {
@@ -1569,7 +1616,13 @@ async function submitFeedback(feedback) {
     body: JSON.stringify(feedback)
   });
   if (!response.ok) throw new Error(`Feedback HTTP ${response.status}`);
-  return response.text();
+
+  try {
+    return await response.text();
+  } catch (readError) {
+    addNotification("warning", "Пожелание отправлено, но ответ сервера не удалось прочитать");
+    return "sent-without-readable-response";
+  }
 }
 
 // saveFeedbackLocally сохраняет пожелание в localStorage, если Google Таблица временно недоступна.

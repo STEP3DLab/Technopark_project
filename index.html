@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель управления Технопарком РГСУ</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__content">
+      <div>
+        <p class="eyebrow">Проектный центр</p>
+        <h1>Панель управления Технопарком РГСУ</h1>
+        <p class="subtitle">Проекты, гранты, НТС, риски и управленческие решения</p>
+        <p class="hero-note">Рабочая панель для контроля проектов, грантов, рисков и решений НТС</p>
+      </div>
+      <nav class="topbar__actions" aria-label="Основная навигация">
+        <a class="button button--ghost" href="#projects">Открыть реестр проектов</a>
+        <a class="button button--ghost" href="#grants">Смотреть гранты</a>
+        <a class="button button--primary" href="#nts">Оставить пожелание НТС</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="summary" aria-label="Ключевые показатели">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Сводка</p>
+          <h2>Ситуация на сегодня</h2>
+        </div>
+        <span class="update-badge" id="currentDate"></span>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
+
+    <section class="panel-section diagnostics" id="diagnostics">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Качество данных</p>
+          <h2>Диагностика данных</h2>
+        </div>
+        <p class="section-note">Автоматическая проверка полноты проектов, грантов и связей</p>
+      </div>
+      <div class="diagnostic-filters" id="diagnosticFilters" aria-label="Фильтры диагностики">
+        <button class="diagnostic-filter is-active" type="button" data-diagnostic-filter="all">Все проблемы</button>
+        <button class="diagnostic-filter" type="button" data-diagnostic-filter="critical">Только критические</button>
+        <button class="diagnostic-filter" type="button" data-diagnostic-filter="warning">Только предупреждения</button>
+        <button class="diagnostic-filter" type="button" data-diagnostic-filter="recommendation">Только рекомендации</button>
+        <button class="diagnostic-filter" type="button" data-diagnostic-filter="project">Только проекты</button>
+        <button class="diagnostic-filter" type="button" data-diagnostic-filter="grant">Только гранты</button>
+        <button class="diagnostic-filter" type="button" data-diagnostic-filter="relation">Только связи</button>
+      </div>
+      <div id="dataDiagnostics"></div>
+    </section>
+
+    <section class="data-status" id="dataStatus" aria-live="polite"></section>
+
+    <section class="connection-status" id="connectionStatus" aria-live="polite"></section>
+    <section class="notifications" id="notifications" aria-live="polite"></section>
+
+    <section class="panel-section" id="funnel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Воронка</p>
+          <h2>Движение проектов по этапам</h2>
+        </div>
+        <p class="section-note">Нажмите на этап, чтобы увидеть проекты</p>
+      </div>
+      <div class="funnel" id="funnelSteps"></div>
+      <div class="stage-details" id="stageDetails"></div>
+    </section>
+
+    <section class="panel-section" id="projects">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Реестр</p>
+          <h2>Проекты</h2>
+        </div>
+        <p class="section-note">Фильтры применяются мгновенно</p>
+      </div>
+
+      <div class="filters" aria-label="Фильтры проектов">
+        <label>
+          Поиск
+          <input id="searchInput" type="search" placeholder="Название, ID, руководитель">
+        </label>
+        <label>
+          Статус
+          <select id="statusFilter">
+            <option value="all">Все статусы</option>
+          </select>
+        </label>
+        <label>
+          Готовность
+          <select id="readinessFilter">
+            <option value="all">Любая</option>
+            <option value="high">80% и выше</option>
+            <option value="medium">50-79%</option>
+            <option value="low">До 50%</option>
+          </select>
+        </label>
+        <label>
+          Риск
+          <select id="riskFilter">
+            <option value="all">Все риски</option>
+            <option value="high">Высокий</option>
+            <option value="medium">Средний</option>
+            <option value="low">Низкий</option>
+          </select>
+        </label>
+        <label>
+          Грант
+          <select id="grantFilter">
+            <option value="all">Все гранты</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Проект</th>
+              <th>Руководитель</th>
+              <th>Статус</th>
+              <th>Готовность, %</th>
+              <th>Ближайшее действие</th>
+              <th>Риск</th>
+              <th>Подходящие гранты</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="projectsTable"></tbody>
+        </table>
+      </div>
+      <p class="empty-state" id="emptyProjects" hidden>Проекты по выбранным условиям не найдены.</p>
+    </section>
+
+    <section class="panel-section" id="grants">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Гранты</p>
+          <h2>Календарь грантовых окон</h2>
+        </div>
+        <p class="section-note">Данные загружаются из CSV и готовы к замене на Google Sheets</p>
+      </div>
+      <div class="grant-toolbar">
+        <label>
+          Оператор
+          <select id="grantOperatorFilter">
+            <option value="all">Все операторы</option>
+          </select>
+        </label>
+      </div>
+      <div class="grant-calendar" id="grantCalendar"></div>
+    </section>
+
+    <section class="two-column">
+      <section class="panel-section" id="risks">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Контроль</p>
+            <h2>Риски и действия</h2>
+          </div>
+        </div>
+        <div class="risk-list" id="riskList"></div>
+      </section>
+
+      <section class="panel-section" id="nts">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">НТС</p>
+            <h2>Пожелания членов НТС</h2>
+            <p class="section-note">Пожелание будет сохранено в отдельный лист Google Таблицы. Если связи нет, запись сохранится в браузере.</p>
+          </div>
+        </div>
+        <form class="nts-form" id="ntsForm">
+          <label>
+            ФИО
+            <input name="fullName" type="text" placeholder="Иванов Иван Иванович" required>
+          </label>
+          <label>
+            Роль
+            <select name="role" required>
+              <option value="">Выберите роль</option>
+              <option>Член НТС</option>
+              <option>Руководитель проекта</option>
+              <option>Эксперт</option>
+              <option>Координатор</option>
+            </select>
+          </label>
+          <label>
+            Проект
+            <select name="project" id="ntsProjectSelect" required></select>
+          </label>
+          <label>
+            Пожелание
+            <textarea name="wish" rows="4" placeholder="Что нужно уточнить, добавить или изменить?" required></textarea>
+          </label>
+          <label>
+            Приоритет
+            <select name="priority" required>
+              <option>Высокий</option>
+              <option>Средний</option>
+              <option>Низкий</option>
+            </select>
+          </label>
+          <button class="button button--primary" type="submit">Отправить пожелание</button>
+        </form>
+        <div class="wish-log" id="wishLog"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

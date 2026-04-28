@@ -15,205 +15,29 @@ const DATA_SOURCES = {
 
 const FUNNEL_STAGES = ["Идея", "Паспорт проекта", "ТЗ", "Команда", "Бюджет", "Грантовая заявка", "Подано", "Поддержано"];
 
-const DEMO_PROJECTS = [
-  {
-    id: "TP-001",
-    title: "Цифровой наставник студента",
-    manager: "А. В. Смирнова",
-    stage: "Грантовая заявка",
-    status: "Готов к грантам",
-    readiness: 88,
-    nextAction: "Финализировать смету и письмо поддержки",
-    nextActionDate: "2026-05-03",
-    risk: "Низкий",
-    grants: ["Фонд содействия инновациям", "Старт-1"],
-    hasPassport: true,
-    hasTZ: true,
-    hasBudget: false,
-    needsDecision: false
-  },
-  {
-    id: "TP-002",
-    title: "VR-тренажер социальной работы",
-    manager: "М. П. Крылов",
-    stage: "ТЗ",
-    status: "Требует доработки",
-    readiness: 54,
-    nextAction: "Уточнить сценарии симуляций с кафедрой",
-    nextActionDate: "2026-05-06",
-    risk: "Средний",
-    grants: ["Президентский фонд культурных инициатив"],
-    hasPassport: true,
-    hasTZ: false,
-    hasBudget: true,
-    needsDecision: false
-  },
-  {
-    id: "TP-003",
-    title: "Платформа мониторинга благополучия семей",
-    manager: "Е. С. Орлова",
-    stage: "Паспорт проекта",
-    status: "В зоне риска",
-    readiness: 37,
-    nextAction: "Назначить владельца бюджета и описать метрики",
-    nextActionDate: "2026-04-30",
-    risk: "Высокий",
-    grants: ["Фонд президентских грантов"],
-    hasPassport: true,
-    hasTZ: false,
-    hasBudget: false,
-    needsDecision: true
-  },
-  {
-    id: "TP-004",
-    title: "Лаборатория инклюзивных ассистивных технологий",
-    manager: "Д. Н. Павлов",
-    stage: "Подано",
-    status: "Готов к грантам",
-    readiness: 96,
-    nextAction: "Подготовить ответы на возможные вопросы экспертов",
-    nextActionDate: "2026-05-08",
-    risk: "Низкий",
-    grants: ["Приоритет-2030", "Фонд содействия инновациям"],
-    hasPassport: true,
-    hasTZ: true,
-    hasBudget: true,
-    needsDecision: false
-  },
-  {
-    id: "TP-005",
-    title: "Аналитика трудоустройства выпускников",
-    manager: "Не назначен",
-    stage: "Идея",
-    status: "Требует решения руководителя",
-    readiness: 22,
-    nextAction: "Назначить руководителя и подтвердить заказчика",
-    nextActionDate: "2026-05-01",
-    risk: "Высокий",
-    grants: ["Росмолодежь.Гранты"],
-    hasPassport: false,
-    hasTZ: false,
-    hasBudget: false,
-    needsDecision: true
-  },
-  {
-    id: "TP-006",
-    title: "Социальный навигатор НКО",
-    manager: "Н. И. Беляева",
-    stage: "Команда",
-    status: "В работе",
-    readiness: 64,
-    nextAction: "Закрепить технического архитектора",
-    nextActionDate: "2026-05-10",
-    risk: "Средний",
-    grants: ["Фонд президентских грантов"],
-    hasPassport: true,
-    hasTZ: true,
-    hasBudget: true,
-    needsDecision: false
-  },
-  {
-    id: "TP-007",
-    title: "Модуль оценки грантовой готовности",
-    manager: "С. Р. Гайнутдинов",
-    stage: "Поддержано",
-    status: "Готов к грантам",
-    readiness: 100,
-    nextAction: "Запустить пилот внутри проектного офиса",
-    nextActionDate: "2026-05-12",
-    risk: "Низкий",
-    grants: ["Внутренний конкурс РГСУ"],
-    hasPassport: true,
-    hasTZ: true,
-    hasBudget: true,
-    needsDecision: false
-  },
-  {
-    id: "TP-008",
-    title: "Маркетплейс практик для студентов",
-    manager: "О. А. Данилова",
-    stage: "Бюджет",
-    status: "Требует доработки",
-    readiness: 71,
-    nextAction: "Согласовать модель сопровождения партнеров",
-    nextActionDate: "2026-05-04",
-    risk: "Средний",
-    grants: ["Росмолодежь.Гранты", "Приоритет-2030"],
-    hasPassport: true,
-    hasTZ: true,
-    hasBudget: false,
-    needsDecision: false
-  }
-];
-
-const DEMO_GRANTS = [
-  {
-    title: "ФСИ Старт-1",
-    operator: "Фонд содействия инновациям",
-    purpose: "Технологический MVP, НИОКР, ранняя коммерциализация",
-    applicant: "Физлицо или малое предприятие по условиям конкурса",
-    funding: "до 5 млн ₽; 12 месяцев; без софинансирования на первом этапе",
-    window: "Актуально: прием заявок по Старт-1 до 01.06.2026",
-    projects: ["TP-001", "TP-002"],
-    firstStep: "Паспорт проекта, новизна, MVP, рынок, команда, смета, письма пилотов",
-    source: "https://www.fasie.ru/programs/programma-start/",
-    checkedAt: "27.04.2026",
-    planFromJune: "Подавать только готовые пакеты к 01.06",
-    confidence: "Высокая"
-  }
-];
-
 const state = {
   projects: [],
   grants: [],
-  dataStatus: {
-    projects: { ok: false, message: "" },
-    grants: { ok: false, message: "" }
-  },
-  connection: {
-    projects: "demo-данные",
-    grants: "demo-данные",
-    feedback: API_CONFIG.enabled ? "Google Таблица" : "недоступно"
-  },
-  connectionCounts: {
-    projects: 0,
-    grants: 0
-  },
-  notifications: [],
-  diagnostics: {
-    issues: [],
-    filter: "all",
-    summary: { total: 0, critical: 0, warnings: 0, recommendations: 0 }
-  },
-  activeStage: FUNNEL_STAGES[0],
+  connection: { projects: "demo-данные", grants: "demo-данные", feedback: API_CONFIG.enabled ? "Google Таблица" : "недоступно" },
+  connectionCounts: { projects: 0, grants: 0 },
+  diagnostics: { issues: [], filter: "all", mode: "short", visible: 5 },
   expandedProjectId: null,
-  filters: {
-    search: "",
-    status: "all",
-    readiness: "all",
-    risk: "all",
-    grant: "all",
-    grantOperator: "all"
-  }
-};
-
-const riskClasses = {
-  "Высокий": "tag--red",
-  "Средний": "tag--yellow",
-  "Низкий": "tag--green"
+  activeStage: null,
+  expandedGrantKey: null,
+  expandedRiskGroup: null,
+  filters: { search: "", status: "all", readiness: "all", risk: "all", grant: "all", grantOperator: "all", grantSearch: "" }
 };
 
 const elements = {
   currentDate: document.getElementById("currentDate"),
-  dataStatus: document.getElementById("dataStatus"),
   connectionStatus: document.getElementById("connectionStatus"),
-  notifications: document.getElementById("notifications"),
   dataDiagnostics: document.getElementById("dataDiagnostics"),
   diagnosticFilters: document.getElementById("diagnosticFilters"),
   kpiGrid: document.getElementById("kpiGrid"),
   funnelSteps: document.getElementById("funnelSteps"),
   stageDetails: document.getElementById("stageDetails"),
   projectsTable: document.getElementById("projectsTable"),
+  projectsMobile: document.getElementById("projectsMobile"),
   emptyProjects: document.getElementById("emptyProjects"),
   searchInput: document.getElementById("searchInput"),
   statusFilter: document.getElementById("statusFilter"),
@@ -221,60 +45,627 @@ const elements = {
   riskFilter: document.getElementById("riskFilter"),
   grantFilter: document.getElementById("grantFilter"),
   grantOperatorFilter: document.getElementById("grantOperatorFilter"),
+  grantSearchInput: document.getElementById("grantSearchInput"),
   grantCalendar: document.getElementById("grantCalendar"),
   riskList: document.getElementById("riskList"),
   ntsForm: document.getElementById("ntsForm"),
   ntsProjectSelect: document.getElementById("ntsProjectSelect"),
-  wishLog: document.getElementById("wishLog")
+  wishLog: document.getElementById("wishLog"),
+  toastStack: document.getElementById("toastStack")
 };
 
 document.addEventListener("DOMContentLoaded", initApp);
 
-// initApp загружает внешние источники данных, настраивает события и запускает первый рендер панели.
 async function initApp() {
-  elements.currentDate.textContent = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date());
+  elements.currentDate.textContent = new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "long", year: "numeric" }).format(new Date());
   const [projects, grants] = await Promise.all([loadProjects(), loadGrants()]);
   state.projects = projects;
   state.grants = grants;
+  state.activeStage = FUNNEL_STAGES[0];
   fillFilterOptions();
   bindEvents();
   renderAll();
 }
 
-// loadProjects получает data/projects.json; если файл недоступен, возвращает резервные demo-проекты.
-async function unusedLegacyLoadProjects() {
+function bindEvents() {
+  elements.searchInput.addEventListener("input", e => { state.filters.search = e.target.value.toLowerCase().trim(); renderProjectsCompact(); });
+  [elements.statusFilter, elements.readinessFilter, elements.riskFilter, elements.grantFilter].forEach(select => {
+    select.addEventListener("change", e => { state.filters[e.target.id.replace("Filter", "")] = e.target.value; renderProjectsCompact(); });
+  });
+  elements.grantOperatorFilter.addEventListener("change", e => { state.filters.grantOperator = e.target.value; renderGrantsCompact(); });
+  elements.grantSearchInput.addEventListener("input", e => { state.filters.grantSearch = e.target.value.toLowerCase().trim(); renderGrantsCompact(); });
+  elements.diagnosticFilters.addEventListener("click", e => {
+    const btn = e.target.closest("[data-diagnostic-filter]");
+    if (!btn) return;
+    state.diagnostics.filter = btn.dataset.diagnosticFilter;
+    state.diagnostics.visible = state.diagnostics.filter === "critical" ? 10 : 5;
+    renderCompactDiagnostics();
+  });
+  elements.ntsForm.addEventListener("submit", handleWishSubmit);
+}
+
+function renderAll() {
+  renderKpis();
+  renderConnectionStatus();
+  state.diagnostics.issues = buildDiagnostics(state.projects, state.grants);
+  renderCompactDiagnostics();
+  renderFunnel();
+  renderProjectsCompact();
+  renderGrantsCompact();
+  renderRisks();
+  renderWishLog();
+}
+
+function renderKpis() {
+  const total = state.projects.length;
+  const ready = state.projects.filter(p => p.status === "Готов к грантам").length;
+  const risky = state.projects.filter(p => p.risk === "Высокий").length;
+  const work = state.projects.filter(p => p.status === "Требует доработки").length;
+  const decision = state.projects.filter(p => p.needsDecision).length;
+  const data = [
+    ["Всего проектов", total, "в реестре", ""],
+    ["Готовы к грантам", ready, "пакет собран", "is-good"],
+    ["Требуют доработки", work, "нужны шаги", "is-warning"],
+    ["Высокий риск", risky, "контроль", "is-danger"],
+    ["Решение руководителя", decision, "ожидают", "is-warning"]
+  ];
+  elements.kpiGrid.innerHTML = data.map(([label, val, hint, c]) => `<article class="kpi-card ${c}"><strong>${val}</strong><span>${label}</span><small>${hint}</small></article>`).join("");
+}
+
+function renderConnectionStatus() {
+  const p = state.connection.projects === "Google Таблица" ? `Google Таблица, ${state.connectionCounts.projects} записей` : "локальный файл";
+  const g = state.connection.grants === "Google Таблица" ? `Google Таблица, ${state.connectionCounts.grants} записей` : "локальный файл";
+  const nts = state.connection.feedback === "Google Таблица" ? "доступно" : "локально";
+  elements.connectionStatus.textContent = `Данные: проекты — ${p} · гранты — ${g} · НТС — ${nts}`;
+}
+
+function renderCompactDiagnostics() {
+  const all = state.diagnostics.issues;
+  const filtered = all.filter(issue => {
+    const filter = state.diagnostics.filter;
+    if (filter === "all") return true;
+    if (["critical", "warning", "recommendation"].includes(filter)) return issue.severity === filter;
+    return issue.type === filter;
+  }).sort((a, b) => severityRank(a.severity) - severityRank(b.severity));
+
+  const summary = {
+    total: all.length,
+    critical: all.filter(i => i.severity === "critical").length,
+    warning: all.filter(i => i.severity === "warning").length,
+    recommendation: all.filter(i => i.severity === "recommendation").length
+  };
+  const statusClass = summary.critical ? "is-critical" : summary.warning ? "is-warning" : summary.recommendation ? "is-recommendation" : "is-ok";
+  const statusText = summary.critical ? "Есть критические проблемы" : summary.warning ? "Есть предупреждения" : "Критичных рисков в данных не найдено";
+
+  elements.diagnosticFilters.querySelectorAll(".chip").forEach(btn => btn.classList.toggle("is-active", btn.dataset.diagnosticFilter === state.diagnostics.filter));
+
+  const limit = state.diagnostics.mode === "short" ? (state.diagnostics.filter === "critical" ? 10 : 5) : state.diagnostics.visible;
+  const page = paginateList(filtered, limit);
+
+  elements.dataDiagnostics.innerHTML = `
+    <div class="diagnostics-headline ${statusClass}">${statusText}</div>
+    <div class="diag-kpis">
+      <article class="diag-kpi"><strong>${summary.total}</strong><span>Всего проблем</span></article>
+      <article class="diag-kpi"><strong>${summary.critical}</strong><span>Критические</span></article>
+      <article class="diag-kpi"><strong>${summary.warning}</strong><span>Предупреждения</span></article>
+      <article class="diag-kpi"><strong>${summary.recommendation}</strong><span>Рекомендации</span></article>
+    </div>
+    <div class="diagnostic-controls">
+      <button class="chip ${state.diagnostics.mode === "short" ? "is-active" : ""}" data-mode="short">Кратко</button>
+      <button class="chip ${state.diagnostics.mode === "full" ? "is-active" : ""}" data-mode="full">Подробно</button>
+      <button class="chip" data-action="collapse-all">Свернуть все</button>
+      <button class="chip" data-action="expand-critical">Развернуть критические</button>
+      <span class="meta-count">Показано ${page.items.length} из ${filtered.length}</span>
+    </div>
+    <div id="diagnosticContent"></div>
+  `;
+
+  const content = elements.dataDiagnostics.querySelector("#diagnosticContent");
+  if (!filtered.length) {
+    content.innerHTML = `<div class="risk-empty">По выбранному фильтру проблем не найдено.</div>`;
+  } else if (state.diagnostics.mode === "short") {
+    const frag = document.createDocumentFragment();
+    page.items.forEach(issue => frag.append(renderDiagnosticIssue(issue)));
+    content.append(frag);
+  } else {
+    renderDiagnosticsGroup(content, filtered);
+  }
+
+  elements.dataDiagnostics.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => {
+    state.diagnostics.mode = btn.dataset.mode;
+    if (state.diagnostics.mode === "full") state.diagnostics.visible = 10;
+    renderCompactDiagnostics();
+  }));
+
+  const showMoreText = state.diagnostics.filter === "critical" ? "Показать еще" : `Показать еще 10`;
+  if (page.hasMore && state.diagnostics.mode === "short") {
+    const moreBtn = document.createElement("button");
+    moreBtn.className = "chip";
+    moreBtn.textContent = showMoreText;
+    moreBtn.addEventListener("click", () => {
+      state.diagnostics.visible += 10;
+      renderCompactDiagnostics();
+    });
+    content.append(moreBtn);
+  }
+
+  elements.dataDiagnostics.querySelector("[data-action='collapse-all']").addEventListener("click", collapseAllAccordions);
+  elements.dataDiagnostics.querySelector("[data-action='expand-critical']").addEventListener("click", () => {
+    document.querySelectorAll(".accordion[data-severity='critical']").forEach(acc => acc.classList.add("is-open"));
+  });
+}
+
+function renderDiagnosticIssue(issue) {
+  const wrap = document.createElement("article");
+  wrap.className = `issue-row is-${issue.severity}`;
+  wrap.innerHTML = `
+    <div class="issue-row__line">
+      <p class="issue-title">${escapeHtml(issue.target)}: ${escapeHtml(issue.description)}</p>
+      <span class="tag ${issue.severity === "critical" ? "tag--red" : issue.severity === "warning" ? "tag--yellow" : "tag--blue"}">${issue.severity}</span>
+    </div>
+    <div class="issue-actions"><button class="chip" data-show-rec>Подробнее</button></div>
+    <div class="issue-extra" hidden>${escapeHtml(issue.recommendation)}</div>
+  `;
+  wrap.querySelector("[data-show-rec]").addEventListener("click", () => {
+    const extra = wrap.querySelector(".issue-extra");
+    extra.hidden = !extra.hidden;
+  });
+  return wrap;
+}
+
+function renderDiagnosticsGroup(container, issues) {
+  const groups = {
+    critical: { project: [], grant: [], relation: [] },
+    warning: { project: [], grant: [], relation: [] },
+    recommendation: { project: [], grant: [], relation: [] }
+  };
+  issues.forEach(i => groups[i.severity][i.type].push(i));
+
+  ["critical", "warning", "recommendation"].forEach(sev => {
+    const total = Object.values(groups[sev]).reduce((sum, arr) => sum + arr.length, 0);
+    if (!total) return;
+    const sevAcc = createAccordion(`${sev.toUpperCase()} — ${total}`, { severity: sev, open: false });
+    const body = sevAcc.querySelector(".accordion__body");
+    ["project", "grant", "relation"].forEach(type => {
+      const rows = groups[sev][type];
+      if (!rows.length) return;
+      const typeAcc = createAccordion(`${diagnosticTypeLabel(type)} — ${rows.length}`, { severity: sev });
+      const typeBody = typeAcc.querySelector(".accordion__body");
+      rows.forEach(issue => typeBody.append(renderDiagnosticIssue(issue)));
+      body.append(typeAcc);
+    });
+    container.append(sevAcc);
+  });
+}
+
+function renderFunnel() {
+  const total = state.projects.length || 1;
+  const frag = document.createDocumentFragment();
+  FUNNEL_STAGES.forEach(stage => {
+    const count = state.projects.filter(p => p.stage === stage).length;
+    const pct = Math.round((count / total) * 100);
+    const button = document.createElement("button");
+    button.className = `funnel-step ${state.activeStage === stage ? "is-active" : ""}`;
+    button.innerHTML = `<h3>${escapeHtml(stage)}</h3><p>${count} · ${pct}%</p>`;
+    button.addEventListener("click", () => {
+      state.activeStage = state.activeStage === stage ? null : stage;
+      renderFunnel();
+    });
+    frag.append(button);
+  });
+  elements.funnelSteps.replaceChildren(frag);
+
+  if (!state.activeStage) {
+    elements.stageDetails.innerHTML = "";
+    return;
+  }
+  const current = state.projects.filter(p => p.stage === state.activeStage);
+  const acc = createAccordion(`${state.activeStage}: ${current.length} проектов`, { open: true });
+  const body = acc.querySelector(".accordion__body");
+  if (!current.length) body.textContent = "На этапе пока нет проектов.";
+  current.forEach(p => {
+    const row = document.createElement("div");
+    row.className = "issue-row";
+    row.innerHTML = `<strong>${escapeHtml(p.id)}</strong> — ${escapeHtml(p.title)} <button class="chip" data-collapse>Свернуть этап</button>`;
+    row.querySelector("[data-collapse]").addEventListener("click", () => { state.activeStage = null; renderFunnel(); });
+    body.append(row);
+  });
+  elements.stageDetails.replaceChildren(acc);
+}
+
+function renderProjectsCompact() {
+  const projects = getFilteredProjects();
+  elements.emptyProjects.hidden = Boolean(projects.length);
+
+  const tableFrag = document.createDocumentFragment();
+  projects.forEach(project => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(project.id)}</td>
+      <td><div class="project-title">${escapeHtml(project.title)}</div></td>
+      <td><span class="tag tag--blue">${escapeHtml(project.stage)}</span></td>
+      <td>${progressBar(project.readiness)}</td>
+      <td>${statusTag(project.status)}</td>
+      <td><span class="tag ${riskClass(project.risk)}">${escapeHtml(project.risk || "—")}</span></td>
+      <td><button class="chip" data-project="${escapeHtml(project.id)}">${state.expandedProjectId === project.id ? "Свернуть" : "Подробнее"}</button></td>
+    `;
+    tableFrag.append(tr);
+    if (state.expandedProjectId === project.id) {
+      const details = document.createElement("tr");
+      details.className = "details-row";
+      details.innerHTML = `<td colspan="7">${renderProjectDetails(project)}</td>`;
+      tableFrag.append(details);
+    }
+  });
+  elements.projectsTable.replaceChildren(tableFrag);
+
+  elements.projectsTable.querySelectorAll("[data-project]").forEach(btn => btn.addEventListener("click", () => {
+    state.expandedProjectId = state.expandedProjectId === btn.dataset.project ? null : btn.dataset.project;
+    renderProjectsCompact();
+  }));
+
+  const mobileFrag = document.createDocumentFragment();
+  projects.forEach(project => {
+    const card = document.createElement("article");
+    card.className = "mobile-card";
+    card.innerHTML = `
+      <div><strong>${escapeHtml(project.id)}</strong></div>
+      <div class="project-title">${escapeHtml(project.title)}</div>
+      <div><span class="tag tag--blue">${escapeHtml(project.stage)}</span> ${statusTag(project.status)}</div>
+      <div>${progressBar(project.readiness)}</div>
+      <div><span class="tag ${riskClass(project.risk)}">${escapeHtml(project.risk || "—")}</span></div>
+      <button class="chip" data-project="${escapeHtml(project.id)}">${state.expandedProjectId === project.id ? "Свернуть" : "Подробнее"}</button>
+      <div class="mobile-details" ${state.expandedProjectId === project.id ? "" : "hidden"}>${renderProjectDetails(project)}</div>
+    `;
+    mobileFrag.append(card);
+  });
+  elements.projectsMobile.replaceChildren(mobileFrag);
+  elements.projectsMobile.querySelectorAll("[data-project]").forEach(btn => btn.addEventListener("click", () => {
+    state.expandedProjectId = state.expandedProjectId === btn.dataset.project ? null : btn.dataset.project;
+    renderProjectsCompact();
+  }));
+}
+
+function renderProjectDetails(project) {
+  return `
+    <div class="details-grid">
+      <div><strong>Полное название:</strong><br>${escapeHtml(project.title)}</div>
+      <div><strong>Направление / контур:</strong><br>${escapeHtml(project.direction || "—")} / ${escapeHtml(project.contour || "—")}</div>
+      <div><strong>Ответственный:</strong><br>${escapeHtml(project.manager || "—")}</div>
+      <div><strong>Маршрут финансирования:</strong><br>${escapeHtml((project.grants || []).join(", ") || "—")}</div>
+      <div><strong>Ближайшее окно / лимит:</strong><br>${escapeHtml(project.nearestGrantWindow || "—")} / ${escapeHtml(project.fundingLimit || "—")}</div>
+      <div><strong>Блокер / примечание:</strong><br>${escapeHtml(project.blocker || "—")}</div>
+    </div>
+  `;
+}
+
+function renderGrantsCompact() {
+  const grants = state.grants.filter(g => {
+    const byOperator = state.filters.grantOperator === "all" || g.operator === state.filters.grantOperator;
+    const bySearch = !state.filters.grantSearch || `${g.title} ${g.operator}`.toLowerCase().includes(state.filters.grantSearch);
+    return byOperator && bySearch;
+  });
+  const limit = 5;
+  const page = paginateList(grants, limit);
+
+  const frag = document.createDocumentFragment();
+  page.items.forEach(grant => {
+    const key = `${grant.title}-${grant.operator}`;
+    const acc = createAccordion(`
+      <div class="grant-head">
+        <strong>${escapeHtml(grant.title)}</strong>
+        <span class="grant-summary">${escapeHtml(grant.operator || "—")}</span>
+        <span class="grant-summary">${escapeHtml(grant.window || "Окно не указано")}</span>
+        <span class="grant-summary">Проектов: ${(grant.projects || []).length}</span>
+        <span class="grant-summary">Уверенность: ${escapeHtml(grant.confidence || "—")}</span>
+      </div>
+    `, { rawTitle: true, open: state.expandedGrantKey === key });
+    const body = acc.querySelector(".accordion__body");
+    body.innerHTML = renderGrantDetails(grant);
+    acc.querySelector(".accordion__trigger").addEventListener("click", () => {
+      state.expandedGrantKey = state.expandedGrantKey === key ? null : key;
+      renderGrantsCompact();
+    });
+    frag.append(acc);
+  });
+
+  if (!grants.length) {
+    elements.grantCalendar.innerHTML = `<p class="empty-state">Гранты не найдены.</p>`;
+    return;
+  }
+
+  elements.grantCalendar.replaceChildren(frag);
+  if (page.hasMore) {
+    const more = document.createElement("button");
+    more.className = "chip";
+    more.textContent = `Показать еще`;
+    more.addEventListener("click", () => {
+      elements.grantCalendar.append(...grants.slice(limit, limit + 5).map(g => {
+        const row = document.createElement("div");
+        row.className = "issue-row";
+        row.textContent = `${g.title} · ${g.operator}`;
+        return row;
+      }));
+      more.remove();
+    });
+    elements.grantCalendar.append(more);
+  }
+}
+
+function renderGrantDetails(grant) {
+  const source = String(grant.source || "").startsWith("http")
+    ? `<a href="${escapeHtml(grant.source)}" target="_blank" rel="noopener">${escapeHtml(grant.source)}</a>`
+    : escapeHtml(grant.source || "—");
+  return `
+    <div class="details-grid">
+      <div><strong>Для чего подходит:</strong><br>${escapeHtml(grant.purpose || "—")}</div>
+      <div><strong>Кто подает:</strong><br>${escapeHtml(grant.applicant || "—")}</div>
+      <div><strong>Финансирование:</strong><br>${escapeHtml(grant.funding || "—")}</div>
+      <div><strong>Проекты:</strong><br>${escapeHtml((grant.projects || []).join(", ") || "—")}</div>
+      <div><strong>Что подготовить первым:</strong><br>${escapeHtml(grant.firstStep || "—")}</div>
+      <div><strong>Источник:</strong><br>${source}</div>
+    </div>
+  `;
+}
+
+function renderRisks() {
+  const groups = {
+    "Документы": state.projects.filter(p => !p.hasPassport || !p.hasTZ || !p.hasBudget),
+    "Сроки": state.projects.filter(p => daysUntil(p.nextActionDate) <= 14),
+    "Руководители": state.projects.filter(p => !p.manager || p.manager === "Не назначен"),
+    "Гранты": state.projects.filter(p => !(p.grants || []).length),
+    "Решения руководителя": state.projects.filter(p => p.needsDecision)
+  };
+
+  const total = Object.values(groups).reduce((sum, arr) => sum + arr.length, 0);
+  if (!total) {
+    elements.riskList.innerHTML = `<div class="risk-empty">Критических рисков не найдено</div>`;
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  Object.entries(groups).forEach(([name, list]) => {
+    if (!list.length) return;
+    const acc = createAccordion(`${name} — ${list.length}`, { open: state.expandedRiskGroup === name });
+    const body = acc.querySelector(".accordion__body");
+    list.forEach(project => {
+      const item = document.createElement("div");
+      item.className = "issue-row";
+      item.textContent = `${project.id} · ${project.title}`;
+      body.append(item);
+    });
+    acc.querySelector(".accordion__trigger").addEventListener("click", () => {
+      state.expandedRiskGroup = state.expandedRiskGroup === name ? null : name;
+      renderRisks();
+    });
+    frag.append(acc);
+  });
+  elements.riskList.replaceChildren(frag);
+}
+
+function createAccordion(title, options = {}) {
+  const root = document.createElement("article");
+  root.className = `accordion ${options.open ? "is-open" : ""}`;
+  if (options.severity) root.dataset.severity = options.severity;
+  root.innerHTML = `
+    <button class="accordion__trigger" type="button">${options.rawTitle ? title : escapeHtml(title)}<span>${options.open ? "−" : "+"}</span></button>
+    <div class="accordion__body"></div>
+  `;
+  root.querySelector(".accordion__trigger").addEventListener("click", () => toggleAccordion(root));
+  return root;
+}
+
+function toggleAccordion(accordion, force = null) {
+  const shouldOpen = force === null ? !accordion.classList.contains("is-open") : force;
+  accordion.classList.toggle("is-open", shouldOpen);
+  const marker = accordion.querySelector(".accordion__trigger span");
+  if (marker) marker.textContent = shouldOpen ? "−" : "+";
+}
+
+function collapseAllAccordions() {
+  document.querySelectorAll(".accordion.is-open").forEach(acc => toggleAccordion(acc, false));
+}
+
+function paginateList(list, visibleCount) {
+  return { items: list.slice(0, visibleCount), hasMore: list.length > visibleCount, total: list.length };
+}
+
+function getFilteredProjects() {
+  return state.projects.filter(project => {
+    const query = `${project.id} ${project.title} ${project.manager}`.toLowerCase();
+    const matchesSearch = !state.filters.search || query.includes(state.filters.search);
+    const matchesStatus = state.filters.status === "all" || project.status === state.filters.status;
+    const matchesRisk = state.filters.risk === "all" || riskToFilterValue(project.risk) === state.filters.risk;
+    const matchesGrant = state.filters.grant === "all" || (project.grants || []).includes(state.filters.grant);
+    const r = project.readiness || 0;
+    const matchesReadiness = state.filters.readiness === "all"
+      || (state.filters.readiness === "high" && r >= 80)
+      || (state.filters.readiness === "medium" && r >= 50 && r < 80)
+      || (state.filters.readiness === "low" && r < 50);
+    return matchesSearch && matchesStatus && matchesRisk && matchesGrant && matchesReadiness;
+  });
+}
+
+function fillFilterOptions() {
+  fillSelect(elements.statusFilter, ["all", ...unique(state.projects.map(p => p.status))], "Все");
+  fillSelect(elements.grantFilter, ["all", ...unique(state.projects.flatMap(p => p.grants || []))], "Все");
+  fillSelect(elements.grantOperatorFilter, ["all", ...unique(state.grants.map(g => g.operator))], "Все");
+  elements.ntsProjectSelect.innerHTML = state.projects.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.id)} · ${escapeHtml(p.title)}</option>`).join("");
+}
+
+function fillSelect(select, options, allLabel) {
+  select.innerHTML = "";
+  options.forEach(value => select.append(new Option(value === "all" ? allLabel : value, value)));
+}
+
+async function handleWishSubmit(event) {
+  event.preventDefault();
+  const fd = new FormData(event.target);
+  const payload = {
+    action: "feedback",
+    fio: fd.get("fullName"),
+    role: fd.get("role"),
+    project: fd.get("project"),
+    message: fd.get("wish"),
+    priority: fd.get("priority"),
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await submitFeedback(payload);
+    state.connection.feedback = "Google Таблица";
+    showToast("success", "Пожелание отправлено в Google Таблицу");
+  } catch {
+    saveFeedbackLocally(payload);
+    state.connection.feedback = "недоступно";
+    showToast("warning", "Связь недоступна: пожелание сохранено локально");
+  }
+
+  event.target.reset();
+  renderConnectionStatus();
+  renderWishLog();
+}
+
+function renderWishLog() {
+  const wishes = getSavedWishes().slice(0, 4);
+  elements.wishLog.innerHTML = wishes.length
+    ? wishes.map(w => `<div class="wish-log__item"><strong>${escapeHtml(w.fullName)}</strong> · ${escapeHtml(w.priority)}<br>${escapeHtml(w.wish)}</div>`).join("")
+    : `<p class="section-note">Пока пожеланий нет.</p>`;
+}
+
+function showToast(type, text) {
+  const node = document.createElement("div");
+  node.className = `toast is-${type}`;
+  node.textContent = text;
+  elements.toastStack.append(node);
+  setTimeout(() => node.remove(), 3200);
+}
+
+function buildDiagnostics(projects, grants) {
+  return [...validateProjects(projects), ...validateGrants(grants), ...validateRelations(projects, grants)];
+}
+
+function validateProjects(projects) {
+  const issues = [];
+  projects.forEach(p => {
+    const add = (severity, description, recommendation) => issues.push({ type: "project", severity, target: p.id || "Проект без ID", description, recommendation });
+    if (!p.id) add("critical", "нет ID", "Заполнить ID.");
+    if (!p.title) add("critical", "нет названия", "Заполнить название.");
+    if (!p.manager || p.manager === "Не назначен") add("critical", "нет руководителя", "Назначить ответственного.");
+    if (Number.isNaN(Number(p.readiness)) || Number(p.readiness) < 0 || Number(p.readiness) > 100) add("critical", "некорректная готовность", "Указать число 0-100.");
+    if (!p.nextAction) add("warning", "нет ближайшего действия", "Добавить следующий шаг.");
+    if (!p.nextActionDate || !isValidDate(p.nextActionDate)) add("warning", "нет даты ближайшего действия", "Указать дату YYYY-MM-DD.");
+    if (!(p.grants || []).length) add("warning", "не выбран грант", "Указать минимум один грант.");
+    if (p.needsDecision) add("recommendation", "нужно решение руководителя", "Вынести на управленческую встречу.");
+  });
+  return issues;
+}
+
+function validateGrants(grants) {
+  const issues = [];
+  grants.forEach(g => {
+    const add = (severity, description, recommendation) => issues.push({ type: "grant", severity, target: g.title || "Грант без названия", description, recommendation });
+    if (!g.title) add("critical", "нет названия", "Заполнить маршрут.");
+    if (!g.operator) add("warning", "нет оператора", "Заполнить оператора.");
+    if (!g.window) add("warning", "нет окна подачи", "Заполнить окно.");
+    if (!g.source) add("recommendation", "нет источника", "Добавить источник.");
+  });
+  return issues;
+}
+
+function validateRelations(projects, grants) {
+  const issues = [];
+  const projectIds = new Set(projects.map(p => p.id));
+  projects.forEach(project => {
+    (project.grants || []).forEach(name => {
+      if (!hasMatchingGrant(name, grants)) {
+        issues.push({ type: "relation", severity: "warning", target: project.id, description: `нет гранта «${name}» в реестре грантов`, recommendation: "Привести названия к единому виду." });
+      }
+    });
+  });
+  grants.forEach(grant => {
+    (grant.projects || []).forEach(id => {
+      if (!projectIds.has(id)) {
+        issues.push({ type: "relation", severity: "warning", target: grant.title, description: `указан несуществующий проект ${id}`, recommendation: "Проверить ID проекта." });
+      }
+    });
+  });
+  return issues;
+}
+
+async function loadProjects() {
+  try {
+    const apiData = await fetchFromApi(API_CONFIG.endpoints.projects);
+    const projects = getApiItems(apiData, "projects").map(normalizeProject);
+    if (!projects.length) throw new Error("API empty");
+    state.connection.projects = "Google Таблица";
+    state.connectionCounts.projects = projects.length;
+    return projects;
+  } catch {}
+
   try {
     const response = await fetch(DATA_SOURCES.projects, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const projects = await response.json();
-    if (!Array.isArray(projects)) throw new Error("projects.json должен содержать массив");
-    state.dataStatus.projects = { ok: true, message: "Проекты загружены из data/projects.json" };
+    if (!response.ok) throw new Error("local projects error");
+    const projects = (await response.json()).map(normalizeProject);
+    state.connection.projects = "локальный файл";
+    state.connectionCounts.projects = projects.length;
     return projects;
-  } catch (error) {
-    state.dataStatus.projects = { ok: false, message: "Используются demo-проекты: data/projects.json не загрузился" };
-    console.warn("Не удалось загрузить проекты:", error);
-    return DEMO_PROJECTS;
+  } catch {
+    state.connection.projects = "demo-данные";
+    return [];
   }
 }
 
-// loadGrants получает data/grants.csv, парсит русские заголовки и нормализует строки в объекты grants.
-async function unusedLegacyLoadGrants() {
+async function loadGrants() {
+  try {
+    const apiData = await fetchFromApi(API_CONFIG.endpoints.grants);
+    const grants = getApiItems(apiData, "grants").map(normalizeGrant);
+    if (!grants.length) throw new Error("API empty");
+    state.connection.grants = "Google Таблица";
+    state.connectionCounts.grants = grants.length;
+    return grants;
+  } catch {}
+
   try {
     const response = await fetch(DATA_SOURCES.grants, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const csvText = await response.text();
-    const rows = parseCSV(csvText).filter(row => row["Маршрут"]);
+    if (!response.ok) throw new Error("local grants error");
+    const rows = parseCSV(await response.text()).filter(row => row["Маршрут"] || row["РњР°СЂС€СЂСѓС‚"]);
     const grants = rows.map(normalizeGrantRow);
-    state.dataStatus.grants = { ok: true, message: "Гранты загружены из data/grants.csv" };
+    state.connection.grants = "локальный файл";
+    state.connectionCounts.grants = grants.length;
     return grants;
-  } catch (error) {
-    state.dataStatus.grants = { ok: false, message: "Используются demo-гранты: data/grants.csv не загрузился" };
-    console.warn("Не удалось загрузить гранты:", error);
-    return DEMO_GRANTS;
+  } catch {
+    state.connection.grants = "demo-данные";
+    return [];
   }
 }
 
-// parseCSV разбирает CSV с кавычками, переносами строк, запятыми, точками с запятой и пустыми ячейками.
+async function fetchFromApi(endpoint, options = {}) {
+  if (!API_CONFIG.enabled) throw new Error("API disabled");
+  const method = (options.method || "GET").toUpperCase();
+  const url = method === "GET" ? appendTsParam(`${API_CONFIG.baseUrl}${endpoint}`) : `${API_CONFIG.baseUrl}${endpoint}`;
+  const response = await fetch(url, { cache: "no-store", ...options });
+  if (!response.ok) throw new Error(`API HTTP ${response.status}`);
+  const text = await response.text();
+  if (!text) return {};
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+async function submitFeedback(feedback) {
+  if (!API_CONFIG.enabled) throw new Error("API disabled");
+  const response = await fetch(API_CONFIG.baseUrl, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(feedback) });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.text();
+}
+
+function saveFeedbackLocally(feedback) {
+  const wishes = getSavedWishes();
+  wishes.unshift({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), createdAt: feedback.createdAt, fullName: feedback.fio, role: feedback.role, project: feedback.project, wish: feedback.message, priority: feedback.priority });
+  localStorage.setItem("ntsWishes", JSON.stringify(wishes));
+}
+
+function getSavedWishes() { try { return JSON.parse(localStorage.getItem("ntsWishes")) || []; } catch { return []; } }
+
 function parseCSV(text) {
   const normalized = text.replace(/^\uFEFF/, "");
   const delimiter = detectDelimiter(normalized);
@@ -282,190 +673,19 @@ function parseCSV(text) {
   let row = [];
   let cell = "";
   let inQuotes = false;
-
   for (let i = 0; i < normalized.length; i += 1) {
     const char = normalized[i];
     const nextChar = normalized[i + 1];
-
-    if (char === '"' && inQuotes && nextChar === '"') {
-      cell += '"';
-      i += 1;
-    } else if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === delimiter && !inQuotes) {
-      row.push(cell.trim());
-      cell = "";
-    } else if ((char === "\n" || char === "\r") && !inQuotes) {
-      if (char === "\r" && nextChar === "\n") i += 1;
-      row.push(cell.trim());
-      if (row.some(value => value !== "")) rows.push(row);
-      row = [];
-      cell = "";
-    } else {
-      cell += char;
-    }
+    if (char === '"' && inQuotes && nextChar === '"') { cell += '"'; i += 1; }
+    else if (char === '"') inQuotes = !inQuotes;
+    else if (char === delimiter && !inQuotes) { row.push(cell.trim()); cell = ""; }
+    else if ((char === "\n" || char === "\r") && !inQuotes) { if (char === "\r" && nextChar === "\n") i += 1; row.push(cell.trim()); if (row.some(v => v !== "")) rows.push(row); row = []; cell = ""; }
+    else cell += char;
   }
-
   row.push(cell.trim());
-  if (row.some(value => value !== "")) rows.push(row);
-
+  if (row.some(v => v !== "")) rows.push(row);
   const headers = rows.shift() || [];
-  return rows.map(values => {
-    const entry = {};
-    headers.forEach((header, index) => {
-      entry[header] = values[index] || "";
-    });
-    return entry;
-  });
-}
-
-// normalizeGrantRow переводит строку CSV с русскими заголовками в стабильную структуру объекта гранта.
-function unusedLegacyNormalizeGrantRow(row) {
-  return {
-    title: row["Маршрут"] || "",
-    operator: row["Оператор"] || "",
-    purpose: row["Для чего подходит"] || "",
-    applicant: row["Кто подает"] || "",
-    funding: row["Финансирование"] || "",
-    window: row["Окно / статус на 27.04.2026"] || "",
-    projects: splitProjects(row["Проекты из реестра"]),
-    firstStep: row["Что подготовить первым"] || "",
-    source: row["Источник"] || "",
-    checkedAt: row["Дата проверки"] || "",
-    planFromJune: row["План подачи с 1 июня 2026"] || "",
-    confidence: row["Уверенность / что перепроверить"] || ""
-  };
-}
-
-function detectDelimiter(text) {
-  const firstLine = text.split(/\r?\n/)[0] || "";
-  const semicolons = (firstLine.match(/;/g) || []).length;
-  const commas = (firstLine.match(/,/g) || []).length;
-  return semicolons >= commas ? ";" : ",";
-}
-
-function splitProjects(value) {
-  return (value || "")
-    .split(/[;,\n]/)
-    .map(item => item.trim())
-    .filter(Boolean);
-}
-
-// fetchFromApi выполняет безопасный запрос к Google Apps Script, добавляя _ts для cache-busting.
-async function fetchFromApi(endpoint, options = {}) {
-  if (!API_CONFIG.enabled) throw new Error("API disabled");
-  const method = (options.method || "GET").toUpperCase();
-  const url = method === "GET" ? appendTsParam(`${API_CONFIG.baseUrl}${endpoint}`) : `${API_CONFIG.baseUrl}${endpoint}`;
-  const response = await fetch(url, {
-    cache: "no-store",
-    ...options
-  });
-  if (!response.ok) throw new Error(`API HTTP ${response.status}`);
-  const text = await response.text();
-  if (!text) return {};
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-}
-
-// loadProjects сначала пробует Google Таблицу через Apps Script, потом data/projects.json, потом DEMO_PROJECTS.
-async function loadProjects() {
-  try {
-    const apiData = await fetchFromApi(API_CONFIG.endpoints.projects);
-    const projects = getApiItems(apiData, "projects").map(normalizeProject);
-    if (!projects.length) throw new Error("API returned empty projects");
-    state.connection.projects = "Google Таблица";
-    state.connectionCounts.projects = projects.length;
-    state.dataStatus.projects = { ok: true, message: "Проекты загружены из Google Таблицы" };
-    addNotification("success", "Проекты загружены из Google Таблицы");
-    return projects;
-  } catch (apiError) {
-    console.warn("API projects unavailable:", apiError);
-    addNotification("warning", "Ошибка API проектов. Переход на локальный файл");
-  }
-
-  try {
-    const response = await fetch(DATA_SOURCES.projects, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const rawProjects = await response.json();
-    if (!Array.isArray(rawProjects)) throw new Error("projects.json must contain array");
-    const projects = rawProjects.map(normalizeProject);
-    state.connection.projects = "локальный файл";
-    state.connectionCounts.projects = projects.length;
-    state.dataStatus.projects = { ok: true, message: "Проекты загружены из data/projects.json" };
-    addNotification("success", "Проекты загружены из локального файла");
-    return projects;
-  } catch (localError) {
-    console.warn("Local projects unavailable:", localError);
-    state.connection.projects = "demo-данные";
-    state.dataStatus.projects = { ok: false, message: "Используются demo-проекты" };
-    addNotification("warning", "Локальный файл проектов недоступен. Используются demo-данные");
-    const demoProjects = DEMO_PROJECTS.map(normalizeProject);
-    state.connectionCounts.projects = demoProjects.length;
-    return demoProjects;
-  }
-}
-
-// loadGrants сначала пробует Google Таблицу через Apps Script, потом data/grants.csv, потом DEMO_GRANTS.
-async function loadGrants() {
-  try {
-    const apiData = await fetchFromApi(API_CONFIG.endpoints.grants);
-    const grants = getApiItems(apiData, "grants").map(normalizeGrant);
-    if (!grants.length) throw new Error("API returned empty grants");
-    state.connection.grants = "Google Таблица";
-    state.connectionCounts.grants = grants.length;
-    state.dataStatus.grants = { ok: true, message: "Гранты загружены из Google Таблицы" };
-    addNotification("success", "Гранты загружены из Google Таблицы");
-    return grants;
-  } catch (apiError) {
-    console.warn("API grants unavailable:", apiError);
-    addNotification("warning", "Ошибка API грантов. Переход на локальный файл");
-  }
-
-  try {
-    const response = await fetch(DATA_SOURCES.grants, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const csvText = await response.text();
-    const rows = parseCSV(csvText).filter(row => row["Маршрут"] || row["РњР°СЂС€СЂСѓС‚"]);
-    const grants = rows.map(normalizeGrantRow);
-    state.connection.grants = "локальный файл";
-    state.connectionCounts.grants = grants.length;
-    state.dataStatus.grants = { ok: true, message: "Гранты загружены из data/grants.csv" };
-    addNotification("success", "Гранты загружены из локального файла");
-    return grants;
-  } catch (localError) {
-    console.warn("Local grants unavailable:", localError);
-    state.connection.grants = "demo-данные";
-    state.dataStatus.grants = { ok: false, message: "Используются demo-гранты" };
-    addNotification("warning", "Локальный файл грантов недоступен. Используются demo-данные");
-    const demoGrants = DEMO_GRANTS.map(normalizeGrant);
-    state.connectionCounts.grants = demoGrants.length;
-    return demoGrants;
-  }
-}
-
-
-function appendTsParam(url) {
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}_ts=${Date.now()}`;
-}
-
-function extractArray(payload, key) {
-  if (Array.isArray(payload)) return payload;
-  if (payload && Array.isArray(payload[key])) return payload[key];
-  if (payload && Array.isArray(payload.items)) return payload.items;
-  if (payload && Array.isArray(payload.data)) return payload.data;
-  if (typeof payload === "string") {
-    try {
-      const parsed = JSON.parse(payload);
-      return extractArray(parsed, key);
-    } catch {
-      return [];
-    }
-  }
-  return [];
+  return rows.map(values => Object.fromEntries(headers.map((h, i) => [h, values[i] || ""])));
 }
 
 function normalizeProject(project) {
@@ -483,8 +703,6 @@ function normalizeProject(project) {
     blocker: project.blocker || project["Блокер / примечание"] || project["Блокер"] || project["Примечание"] || "",
     direction: project.direction || project["Направление"] || "",
     contour: project.contour || project["Контур"] || "",
-    priority: project.priority || project["Приоритет"] || "",
-    utg: project.utg || project["УТГ"] || "",
     nearestGrantWindow: project.nearestGrantWindow || project["Ближайшее окно"] || "",
     fundingLimit: project.fundingLimit || project["Лимит / ориентир"] || "",
     hasPassport: normalizeBoolean(project.hasPassport ?? project["Паспорт проекта"]),
@@ -494,60 +712,7 @@ function normalizeProject(project) {
   };
 }
 
-function getApiItems(payload, key) {
-  if (Array.isArray(payload)) return payload;
-
-  if (typeof payload === "string") {
-    try {
-      return getApiItems(JSON.parse(payload), key);
-    } catch {
-      return [];
-    }
-  }
-
-  if (!payload || typeof payload !== "object") return [];
-
-  if (payload.ok === false) {
-    throw new Error(payload.error || `API ${key} error`);
-  }
-
-  if (payload.ok === true && Array.isArray(payload.items)) return payload.items;
-
-  return extractArray(payload, key);
-}
-
-function normalizeGrant(grant) {
-  if (grant["Маршрут"] || grant["РњР°СЂС€СЂСѓС‚"]) return normalizeGrantRow(grant);
-  return {
-    title: grant.title || grant.name || "",
-    operator: grant.operator || "",
-    purpose: grant.purpose || "",
-    applicant: grant.applicant || "",
-    funding: grant.funding || "",
-    window: grant.window || "",
-    projects: Array.isArray(grant.projects) ? grant.projects : splitProjects(grant.projects),
-    firstStep: grant.firstStep || "",
-    source: grant.source || "",
-    checkedAt: grant.checkedAt || "",
-    planFromJune: grant.planFromJune || "",
-    confidence: grant.confidence || ""
-  };
-}
-
-function normalizeBoolean(value) {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value > 0;
-  const normalized = String(value ?? "").trim().toLowerCase();
-  return ["true", "1", "да", "есть", "yes", "y"].includes(normalized);
-}
-
-function normalizeRisk(value) {
-  const normalized = String(value || "").trim().toLowerCase();
-  if (["high", "высокий"].includes(normalized)) return "Высокий";
-  if (["medium", "средний"].includes(normalized)) return "Средний";
-  if (["low", "низкий"].includes(normalized)) return "Низкий";
-  return value || "";
-}
+function normalizeGrant(grant) { return grant["Маршрут"] || grant["РњР°СЂС€СЂСѓС‚"] ? normalizeGrantRow(grant) : { title: grant.title || grant.name || "", operator: grant.operator || "", purpose: grant.purpose || "", applicant: grant.applicant || "", funding: grant.funding || "", window: grant.window || "", projects: Array.isArray(grant.projects) ? grant.projects : splitProjects(grant.projects), firstStep: grant.firstStep || "", source: grant.source || "", checkedAt: grant.checkedAt || "", planFromJune: grant.planFromJune || "", confidence: grant.confidence || "" }; }
 
 function normalizeGrantRow(row) {
   return {
@@ -566,1085 +731,31 @@ function normalizeGrantRow(row) {
   };
 }
 
-function bindEvents() {
-  elements.searchInput.addEventListener("input", event => {
-    state.filters.search = event.target.value.trim().toLowerCase();
-    renderProjects();
-  });
-
-  [elements.statusFilter, elements.readinessFilter, elements.riskFilter, elements.grantFilter].forEach(select => {
-    select.addEventListener("change", event => {
-      const key = event.target.id.replace("Filter", "");
-      state.filters[key] = event.target.value;
-      renderProjects();
-    });
-  });
-
-  elements.grantOperatorFilter.addEventListener("change", event => {
-    state.filters.grantOperator = event.target.value;
-    renderGrants();
-  });
-
-  elements.ntsForm.addEventListener("submit", handleWishSubmit);
-
-  elements.diagnosticFilters.addEventListener("click", event => {
-    const button = event.target.closest("[data-diagnostic-filter]");
-    if (!button) return;
-    filterDiagnostics(button.dataset.diagnosticFilter);
-  });
+function getApiItems(payload, key) {
+  if (Array.isArray(payload)) return payload;
+  if (typeof payload === "string") { try { return getApiItems(JSON.parse(payload), key); } catch { return []; } }
+  if (!payload || typeof payload !== "object") return [];
+  if (payload.ok === false) throw new Error(payload.error || `API ${key} error`);
+  if (Array.isArray(payload[key])) return payload[key];
+  if (Array.isArray(payload.items)) return payload.items;
+  if (Array.isArray(payload.data)) return payload.data;
+  return [];
 }
 
-function fillFilterOptions() {
-  resetSelect(elements.statusFilter, "all", "Все статусы");
-  resetSelect(elements.grantFilter, "all", "Все гранты");
-  resetSelect(elements.grantOperatorFilter, "all", "Все операторы");
-
-  unique(state.projects.map(project => project.status)).forEach(status => elements.statusFilter.append(new Option(status, status)));
-  unique(state.projects.flatMap(project => project.grants)).forEach(grant => elements.grantFilter.append(new Option(grant, grant)));
-  unique(state.grants.map(grant => grant.operator)).forEach(operator => elements.grantOperatorFilter.append(new Option(operator, operator)));
-
-  elements.ntsProjectSelect.innerHTML = state.projects
-    .map(project => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.id)} · ${escapeHtml(project.title)}</option>`)
-    .join("");
-}
-
-function resetSelect(select, value, label) {
-  select.innerHTML = "";
-  select.append(new Option(label, value));
-}
-
-function renderAll() {
-  renderDataStatus();
-  renderConnectionStatus();
-  renderNotifications();
-  state.diagnostics = buildDiagnostics(state.projects, state.grants);
-  renderDiagnostics(state.diagnostics);
-  renderKpis();
-  renderFunnel();
-  renderProjects();
-  renderGrants();
-  renderRisks();
-  renderWishLog();
-}
-
-// renderDataStatus показывает, откуда сейчас пришли проекты и гранты, либо мягкое предупреждение о fallback.
-function renderDataStatus() {
-  const items = [state.dataStatus.projects, state.dataStatus.grants];
-  elements.dataStatus.innerHTML = items
-    .map(item => `<span class="data-status__item ${item.ok ? "is-ok" : "is-warning"}">${escapeHtml(item.message)}</span>`)
-    .join("");
-}
-
-// renderConnectionStatus показывает человеку понятный источник данных и доступность отправки формы.
-function renderConnectionStatus() {
-  const feedbackOk = state.connection.feedback === "Google Таблица";
-  const cards = [
-    { label: "Проекты", source: state.connection.projects, value: formatConnectionValue(state.connection.projects, state.connectionCounts.projects) },
-    { label: "Гранты", source: state.connection.grants, value: formatConnectionValue(state.connection.grants, state.connectionCounts.grants) },
-    { label: "Пожелания НТС", source: feedbackOk ? "Google Таблица" : "недоступно", value: feedbackOk ? "Google Таблица" : "недоступно" }
-  ];
-
-  elements.connectionStatus.innerHTML = `
-    <div class="connection-card connection-card--title"><strong>Статус подключения</strong></div>
-    ${cards.map(({ label, value, source }) => {
-      const className = source === "Google Таблица"
-        ? "is-ok"
-        : source === "локальный файл"
-          ? "is-warning"
-          : "is-danger";
-      return `<div class="connection-card ${className}">${label}: ${escapeHtml(value)}</div>`;
-    }).join("")}
-  `;
-}
-
-function compactSourceName(value) {
-  if (value === "demo-данные") return "demo";
-  return value;
-}
-
-function formatConnectionValue(source, count) {
-  const name = compactSourceName(source);
-  if (source === "Google Таблица") return `${name}, ${count} записей`;
-  return name;
-}
-
-function renderNotifications() {
-  elements.notifications.innerHTML = state.notifications
-    .slice(-4)
-    .map(item => `<div class="notification is-${item.type}">${escapeHtml(item.message)}</div>`)
-    .join("");
-}
-
-function addNotification(type, message) {
-  state.notifications.push({ type, message, createdAt: new Date().toISOString() });
-}
-
-// validateProjects проверяет полноту, корректность и управленческие риски в каждом проекте.
-function legacyValidateProjects(projects) {
-  const issues = [];
-
-  projects.forEach(project => {
-    const addIssue = (severity, message, recommendation) => {
-      issues.push({
-        scope: "project",
-        projectId: project.id || "без ID",
-        projectTitle: project.title || "Без названия",
-        severity,
-        message,
-        recommendation
-      });
-    };
-
-    if (!project.manager || project.manager === "Не назначен") {
-      addIssue("critical", "Нет руководителя.", "Назначить руководителя проекта.");
-    }
-
-    if (!project.hasPassport) {
-      addIssue("warning", "Нет паспорта проекта.", "Подготовить и согласовать паспорт проекта.");
-    }
-
-    if (!project.hasTZ) {
-      addIssue("warning", "Нет ТЗ.", "Описать техническое задание и критерии результата.");
-    }
-
-    if (!project.hasBudget) {
-      addIssue("warning", "Нет бюджета.", "Собрать смету и подтвердить источники расходов.");
-    }
-
-    if (typeof project.readiness !== "number" || project.readiness < 0 || project.readiness > 100) {
-      addIssue("critical", "Готовность должна быть числом от 0 до 100.", "Исправить поле readiness в projects.json.");
-    }
-
-    if (!project.nextAction) {
-      addIssue("warning", "Нет ближайшего действия.", "Добавить следующий конкретный шаг.");
-    }
-
-    if (!project.nextActionDate || !isValidDate(project.nextActionDate)) {
-      addIssue("warning", "Нет даты ближайшего действия.", "Добавить дату в формате YYYY-MM-DD.");
-    } else if (daysUntil(project.nextActionDate) < 14) {
-      addIssue("warning", "Дедлайн ближайшего действия меньше 14 дней.", "Проверить готовность исполнителя и приоритет действия.");
-    }
-
-    if (!project.grants || project.grants.length === 0) {
-      addIssue("warning", "Нет подходящего гранта.", "Выбрать минимум одно релевантное грантовое окно.");
-    }
-
-    if (project.needsDecision) {
-      addIssue("warning", "Проект требует решения руководителя.", "Вынести вопрос на управленческое решение.");
-    }
-  });
-
-  return issues;
-}
-
-// validateGrants проверяет базовую полноту грантов после нормализации CSV.
-function legacyValidateGrants(grants) {
-  const issues = [];
-
-  grants.forEach(grant => {
-    const addIssue = (severity, message, recommendation) => {
-      issues.push({
-        scope: "grant",
-        grantTitle: grant.title || "Без названия",
-        severity,
-        message,
-        recommendation
-      });
-    };
-
-    if (!grant.title) addIssue("critical", "В гранте не заполнен маршрут.", "Заполнить колонку «Маршрут» в grants.csv.");
-    if (!grant.operator) addIssue("warning", "В гранте не заполнен оператор.", "Заполнить колонку «Оператор».");
-    if (!grant.window) addIssue("warning", "В гранте не заполнено окно подачи.", "Уточнить колонку «Окно / статус на 27.04.2026».");
-    if (!grant.source) addIssue("warning", "В гранте не указан источник.", "Добавить ссылку или источник проверки.");
-  });
-
-  return issues;
-}
-
-// validateRelations сверяет связи проектов и грантов, а также ловит противоречия в готовности.
-function legacyValidateRelations(projects, grants) {
-  const issues = [];
-  const projectIds = new Set(projects.map(project => project.id));
-
-  projects.forEach(project => {
-    (project.grants || []).forEach(grantName => {
-      if (!hasMatchingGrant(grantName, grants)) {
-        issues.push({
-          scope: "project",
-          projectId: project.id,
-          projectTitle: project.title,
-          severity: "warning",
-          message: `В проекте указан грант «${grantName}», которого нет в grants.csv.`,
-          recommendation: "Добавить грант в grants.csv или уточнить название в projects.json."
-        });
-      }
-    });
-
-    if (project.readiness > 80 && (!project.hasBudget || !project.hasTZ)) {
-      issues.push({
-        scope: "project",
-        projectId: project.id,
-        projectTitle: project.title,
-        severity: "warning",
-        message: "Готовность выше 80%, но нет бюджета или ТЗ.",
-        recommendation: "Снизить готовность или закрыть недостающие документы."
-      });
-    }
-
-    if (project.status === "Готов к грантам" && (!project.hasPassport || !project.hasTZ || !project.hasBudget)) {
-      issues.push({
-        scope: "project",
-        projectId: project.id,
-        projectTitle: project.title,
-        severity: "critical",
-        message: "Проект отмечен как «Готов к грантам», но нет паспорта, ТЗ или бюджета.",
-        recommendation: "Исправить статус или завершить пакет документов."
-      });
-    }
-  });
-
-  grants.forEach(grant => {
-    grant.projects.forEach(projectId => {
-      if (!projectIds.has(projectId)) {
-        issues.push({
-          scope: "relation",
-          grantTitle: grant.title,
-          severity: "warning",
-          message: `В grants.csv указан проект «${projectId}», которого нет в projects.json.`,
-          recommendation: "Добавить проект в projects.json или удалить ID из grants.csv."
-        });
-      }
-    });
-  });
-
-  return issues;
-}
-
-// renderDataDiagnostics собирает результаты проверок, показывает счетчики и список проблем.
-function legacyRenderDataDiagnostics() {
-  const issues = [
-    ...validateProjects(state.projects),
-    ...validateGrants(state.grants),
-    ...validateRelations(state.projects, state.grants)
-  ];
-  const critical = issues.filter(issue => issue.severity === "critical").length;
-  const warnings = issues.filter(issue => issue.severity === "warning").length;
-  const recommendations = issues.filter(issue => issue.recommendation).length;
-
-  state.diagnostics = {
-    issues,
-    summary: {
-      total: issues.length,
-      critical,
-      warnings,
-      recommendations
-    }
-  };
-
-  const statusClass = critical ? "is-critical" : warnings ? "is-warning" : "is-ok";
-  const groupedIssues = groupDiagnosticsByTarget(issues);
-  const listHtml = groupedIssues.length
-    ? groupedIssues.map(group => diagnosticGroupTemplate(group)).join("")
-    : `
-      <article class="diagnostic-group is-ok">
-        <h3>Данные выглядят хорошо</h3>
-        <p class="section-note">Критичных ошибок и предупреждений не найдено.</p>
-      </article>
-    `;
-
-  elements.dataDiagnostics.innerHTML = `
-    <div class="diagnostics-grid">
-      <article class="diagnostic-card ${statusClass}">
-        <strong>${issues.length}</strong>
-        <span>Всего ошибок</span>
-      </article>
-      <article class="diagnostic-card ${critical ? "is-critical" : "is-ok"}">
-        <strong>${critical}</strong>
-        <span>Критические ошибки</span>
-      </article>
-      <article class="diagnostic-card ${warnings ? "is-warning" : "is-ok"}">
-        <strong>${warnings}</strong>
-        <span>Предупреждения</span>
-      </article>
-      <article class="diagnostic-card ${recommendations ? "is-warning" : "is-ok"}">
-        <strong>${recommendations}</strong>
-        <span>Рекомендации</span>
-      </article>
-    </div>
-    <div class="diagnostic-list">${listHtml}</div>
-  `;
-}
-
-function renderKpis() {
-  const total = state.projects.length;
-  const ready = state.projects.filter(project => project.status === "Готов к грантам").length;
-  const needsWork = state.projects.filter(project => project.status === "Требует доработки").length;
-  const risky = state.projects.filter(project => project.risk === "Высокий").length;
-  const decisions = state.projects.filter(project => project.needsDecision).length;
-
-  const kpis = [
-    ["Всего проектов", total, "в активном реестре", ""],
-    ["Готовы к грантам", ready, "можно упаковывать", "is-good"],
-    ["Требуют доработки", needsWork, "нужны документы", "is-warning"],
-    ["В зоне риска", risky, "требуют контроля", "is-danger"],
-    ["Требуют решения руководителя", decisions, "нужна развилка", "is-warning"]
-  ];
-
-  elements.kpiGrid.innerHTML = kpis
-    .map(([label, value, hint, className]) => `
-      <article class="kpi-card ${className}">
-        <strong>${value}</strong>
-        <span>${label}</span>
-        <small>${hint}</small>
-      </article>
-    `)
-    .join("");
-}
-
-function renderFunnel() {
-  const total = state.projects.length || 1;
-  elements.funnelSteps.innerHTML = FUNNEL_STAGES
-    .map((stage, index) => {
-      const count = state.projects.filter(project => project.stage === stage).length;
-      const percent = Math.round((count / total) * 100);
-      const width = Math.max(58, 100 - index * 5);
-      const activeClass = state.activeStage === stage ? "is-active" : "";
-      return `
-        <button class="funnel-step ${activeClass}" type="button" data-stage="${escapeHtml(stage)}" style="--funnel-width: ${width}%">
-          <span class="funnel-step__name">${escapeHtml(stage)}</span>
-          <strong>${count}</strong>
-          <span>${percent}% проектов</span>
-        </button>
-      `;
-    })
-    .join("");
-
-  elements.funnelSteps.querySelectorAll(".funnel-step").forEach(button => {
-    button.addEventListener("click", () => {
-      state.activeStage = button.dataset.stage;
-      renderFunnel();
-    });
-  });
-
-  renderStageDetails();
-}
-
-function renderStageDetails() {
-  const projects = state.projects.filter(project => project.stage === state.activeStage);
-  const list = projects.length
-    ? projects.map(project => `<li><strong>${escapeHtml(project.id)}</strong><br>${escapeHtml(project.title)}<br><span class="tag ${riskClass(project.risk)}">${escapeHtml(project.risk)}</span></li>`).join("")
-    : "<li>На этом этапе пока нет проектов</li>";
-
-  elements.stageDetails.innerHTML = `
-    <strong>${escapeHtml(state.activeStage)}</strong>
-    <ul>${list}</ul>
-  `;
-}
-
-function renderProjects() {
-  const projects = getFilteredProjects();
-  elements.emptyProjects.hidden = projects.length > 0;
-
-  elements.projectsTable.innerHTML = projects
-    .map(project => {
-      const isExpanded = state.expandedProjectId === project.id;
-      const grants = project.grants.map(grant => `<span class="tag tag--blue">${escapeHtml(grant)}</span>`).join(" ");
-
-      return `
-        <tr>
-          <td>${escapeHtml(project.id)}</td>
-          <td><span class="project-title">${escapeHtml(project.title)}</span><br><span class="tag tag--blue">${escapeHtml(project.stage)}</span></td>
-          <td>${escapeHtml(project.manager)}</td>
-          <td>${statusTag(project.status)}</td>
-          <td>${progressBar(project.readiness)}</td>
-          <td>${deadlineTag(project.nextActionDate)}<br>${escapeHtml(project.nextAction)}</td>
-          <td><span class="tag ${riskClass(project.risk)}">${escapeHtml(project.risk)}</span></td>
-          <td>${grants}</td>
-          <td><button class="button button--ghost" type="button" data-project-id="${escapeHtml(project.id)}">${isExpanded ? "Скрыть" : "Подробнее"}</button></td>
-        </tr>
-        ${isExpanded ? projectDetailsRow(project) : ""}
-      `;
-    })
-    .join("");
-
-  elements.projectsTable.querySelectorAll("[data-project-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      state.expandedProjectId = state.expandedProjectId === button.dataset.projectId ? null : button.dataset.projectId;
-      renderProjects();
-    });
-  });
-}
-
-function getFilteredProjects() {
-  return state.projects.filter(project => {
-    const query = `${project.id} ${project.title} ${project.manager}`.toLowerCase();
-    const riskValue = riskToFilterValue(project.risk);
-    const matchesSearch = !state.filters.search || query.includes(state.filters.search);
-    const matchesStatus = state.filters.status === "all" || project.status === state.filters.status;
-    const matchesRisk = state.filters.risk === "all" || riskValue === state.filters.risk;
-    const matchesGrant = state.filters.grant === "all" || project.grants.includes(state.filters.grant);
-    const matchesReadiness = state.filters.readiness === "all"
-      || (state.filters.readiness === "high" && project.readiness >= 80)
-      || (state.filters.readiness === "medium" && project.readiness >= 50 && project.readiness < 80)
-      || (state.filters.readiness === "low" && project.readiness < 50);
-
-    return matchesSearch && matchesStatus && matchesRisk && matchesGrant && matchesReadiness;
-  });
-}
-
-function statusTag(status) {
-  if (status === "Готов к грантам") return `<span class="tag tag--green">${escapeHtml(status)}</span>`;
-  if (status === "В зоне риска") return `<span class="tag tag--red">${escapeHtml(status)}</span>`;
-  if (status === "Требует решения руководителя") return `<span class="tag tag--yellow">${escapeHtml(status)}</span>`;
-  return `<span class="tag tag--blue">${escapeHtml(status)}</span>`;
-}
-
-function progressBar(value) {
-  return `
-    <div class="progress" aria-label="Готовность ${value}%">
-      <span>${value}%</span>
-      <div class="timeline"><span style="left: 0; width: ${value}%"></span></div>
-    </div>
-  `;
-}
-
-function deadlineTag(dateString) {
-  const days = daysUntil(dateString);
-  const className = days <= 3 ? "tag--red" : days <= 7 ? "tag--yellow" : "tag--blue";
-  return `<span class="tag ${className}">${formatDate(dateString)}</span>`;
-}
-
-function projectDetailsRow(project) {
-  const gaps = projectGaps(project);
-  return `
-    <tr class="details-row">
-      <td colspan="9">
-        <div class="details-grid">
-          <div><strong>Этап</strong><br>${escapeHtml(project.stage)}</div>
-          <div><strong>Документы</strong><br>${documentStatus(project)}</div>
-          <div><strong>Пробелы</strong><br>${escapeHtml(gaps.length ? gaps.join(", ") : "Критичных пробелов нет")}</div>
-          <div><strong>Решение руководителя</strong><br>${project.needsDecision ? "Требуется" : "Не требуется"}</div>
-        </div>
-      </td>
-    </tr>
-  `;
-}
-
-function renderGrants() {
-  const grants = state.grants.filter(grant => state.filters.grantOperator === "all" || grant.operator === state.filters.grantOperator);
-  elements.grantCalendar.innerHTML = grants.length ? grants
-    .map(grant => {
-      const projectBadges = grant.projects.length
-        ? grant.projects.map(projectId => `<span class="tag tag--blue">${escapeHtml(projectId)}</span>`).join(" ")
-        : `<span class="section-note">Не указаны</span>`;
-      const source = grant.source.startsWith("http")
-        ? `<a class="source-button" href="${escapeHtml(grant.source)}" target="_blank" rel="noopener">Источник</a>`
-        : escapeHtml(grant.source || "Не указан");
-      const deadlineClass = grant.window && grant.window.match(/0[1-9]\.0[5-6]\.2026/) ? "is-near" : "";
-
-      return `
-        <article class="grant-card ${deadlineClass}">
-          <div>
-            <h3>${escapeHtml(grant.title)}</h3>
-            <p class="section-note">${escapeHtml(grant.operator)}</p>
-            <div class="timeline"><span style="left: 0; width: ${grantWidth(grant.window)}%"></span></div>
-            <p><strong>Окно:</strong> ${escapeHtml(grant.window || "Требует проверки")}</p>
-            <p><strong>Финансирование:</strong> ${escapeHtml(grant.funding || "Не указано")}</p>
-          </div>
-          <div>
-            <p><strong>Для чего подходит:</strong> ${escapeHtml(grant.purpose || "Не указано")}</p>
-            <p><strong>Кто подает:</strong> ${escapeHtml(grant.applicant || "Не указано")}</p>
-            <p><strong>Подходящие проекты:</strong><br>${projectBadges}</p>
-          </div>
-          <div>
-            <p><strong>Что подготовить первым:</strong> ${escapeHtml(grant.firstStep || "Не указано")}</p>
-            <p><strong>План с 1 июня:</strong> ${escapeHtml(grant.planFromJune || "Не указан")}</p>
-            <p><strong>Источник:</strong> ${source}</p>
-            <p><strong>Проверено:</strong> ${escapeHtml(grant.checkedAt || "Не указано")} · ${escapeHtml(grant.confidence || "Без оценки")}</p>
-          </div>
-        </article>
-      `;
-    })
-    .join("") : `<p class="empty-state">Гранты по выбранному оператору не найдены.</p>`;
-}
-
-function renderRisks() {
-  const riskRules = [
-    ["нет паспорта проекта", project => !project.hasPassport],
-    ["нет ТЗ", project => !project.hasTZ],
-    ["нет бюджета", project => !project.hasBudget],
-    ["не назначен руководитель", project => !project.manager || project.manager === "Не назначен"],
-    ["не выбран грант", project => !project.grants || project.grants.length === 0],
-    ["дедлайн ближе 14 дней", project => daysUntil(project.nextActionDate) < 14]
-  ];
-
-  elements.riskList.innerHTML = riskRules
-    .map(([label, predicate]) => {
-      const projects = state.projects.filter(predicate);
-      const isDeadline = label.includes("дедлайн");
-      const className = projects.length && !isDeadline ? "is-critical" : projects.length && isDeadline ? "is-deadline" : "";
-      const names = projects.length ? projects.map(project => project.id).join(", ") : "нет";
-      return `
-        <article class="risk-item ${className}">
-          <div>
-            <strong>${label}</strong>
-            <p class="section-note">Проекты: ${escapeHtml(names)}</p>
-          </div>
-          <span class="tag ${projects.length ? (isDeadline ? "tag--yellow" : "tag--red") : "tag--green"}">${projects.length}</span>
-        </article>
-      `;
-    })
-    .join("");
-}
-
-function handleWishSubmit(event) {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const wish = {
-    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-    createdAt: new Date().toISOString(),
-    fullName: formData.get("fullName"),
-    role: formData.get("role"),
-    project: formData.get("project"),
-    wish: formData.get("wish"),
-    priority: formData.get("priority")
-  };
-
-  const wishes = getSavedWishes();
-  wishes.unshift(wish);
-  localStorage.setItem("ntsWishes", JSON.stringify(wishes));
-  console.log("Пожелание НТС:", wish);
-
-  // Позже здесь можно добавить fetch(GOOGLE_APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(wish) }).
-  event.target.reset();
-  renderWishLog();
-}
-
-function renderWishLog() {
-  const wishes = getSavedWishes().slice(0, 4);
-  elements.wishLog.innerHTML = wishes.length
-    ? wishes.map(wish => `
-      <div class="wish-log__item">
-        <strong>${escapeHtml(wish.fullName)}</strong> · ${escapeHtml(wish.priority)}<br>
-        ${escapeHtml(wish.wish)}
-      </div>
-    `).join("")
-    : `<p class="section-note">Пока пожеланий нет. Новые записи сохранятся в браузере.</p>`;
-}
-
-function projectGaps(project) {
-  const gaps = [];
-  if (!project.hasPassport) gaps.push("нет паспорта проекта");
-  if (!project.hasTZ) gaps.push("нет ТЗ");
-  if (!project.hasBudget) gaps.push("нет бюджета");
-  if (!project.manager || project.manager === "Не назначен") gaps.push("не назначен руководитель");
-  if (!project.grants || project.grants.length === 0) gaps.push("не выбран грант");
-  if (daysUntil(project.nextActionDate) < 14) gaps.push("дедлайн ближе 14 дней");
-  return gaps;
-}
-
-function documentStatus(project) {
-  const passport = project.hasPassport ? "паспорт есть" : "нет паспорта";
-  const tz = project.hasTZ ? "ТЗ есть" : "нет ТЗ";
-  const budget = project.hasBudget ? "бюджет есть" : "нет бюджета";
-  return `${passport}; ${tz}; ${budget}`;
-}
-
-function riskClass(risk) {
-  return riskClasses[risk] || "tag--blue";
-}
-
-function riskToFilterValue(risk) {
-  if (risk === "Высокий") return "high";
-  if (risk === "Средний") return "medium";
-  if (risk === "Низкий") return "low";
-  return "all";
-}
-
-function grantWidth(windowText) {
-  const dates = (windowText.match(/\d{2}\.\d{2}\.\d{4}/g) || []).length;
-  if (dates >= 2) return 72;
-  if (dates === 1) return 46;
-  return 30;
-}
-
-function groupDiagnosticsByTarget(issues) {
-  const groups = new Map();
-
-  issues.forEach(issue => {
-    const key = issue.scope === "project"
-      ? `project:${issue.projectId}`
-      : issue.scope === "grant"
-        ? `grant:${issue.grantTitle}`
-        : `relation:${issue.grantTitle || issue.message}`;
-
-    if (!groups.has(key)) {
-      groups.set(key, {
-        title: diagnosticGroupTitle(issue),
-        severity: issue.severity,
-        issues: []
-      });
-    }
-
-    const group = groups.get(key);
-    if (issue.severity === "critical") group.severity = "critical";
-    group.issues.push(issue);
-  });
-
-  return [...groups.values()];
-}
-
-function diagnosticGroupTitle(issue) {
-  if (issue.scope === "project") return `${issue.projectId} · ${issue.projectTitle}`;
-  if (issue.scope === "grant") return `Грант · ${issue.grantTitle}`;
-  return `Связи · ${issue.grantTitle || "проверка реестра"}`;
-}
-
-function diagnosticGroupTemplate(group) {
-  const className = group.severity === "critical" ? "is-critical" : "is-warning";
-  const items = group.issues
-    .map(issue => `
-      <li>
-        <span class="tag ${issue.severity === "critical" ? "tag--red" : "tag--yellow"}">${issue.severity === "critical" ? "Критично" : "Внимание"}</span>
-        ${escapeHtml(issue.message)}
-        <br><span class="section-note">${escapeHtml(issue.recommendation)}</span>
-      </li>
-    `)
-    .join("");
-
-  return `
-    <article class="diagnostic-group ${className}">
-      <h3>${escapeHtml(group.title)}</h3>
-      <ul>${items}</ul>
-    </article>
-  `;
-}
-
-function hasMatchingGrant(projectGrantName, grants) {
-  const target = normalizeForMatch(projectGrantName);
-  return grants.some(grant => {
-    const title = normalizeForMatch(grant.title);
-    const operator = normalizeForMatch(grant.operator);
-    return title === target || operator === target || title.includes(target) || target.includes(title);
-  });
-}
-
-function normalizeForMatch(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/ё/g, "е")
-    .replace(/[«»"']/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function getSavedWishes() {
-  try {
-    return JSON.parse(localStorage.getItem("ntsWishes")) || [];
-  } catch {
-    return [];
-  }
-}
-
-function unique(items) {
-  return [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
-}
-
-function formatDate(dateString) {
-  return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(dateString));
-}
-
-function daysUntil(dateString) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const date = new Date(dateString);
-  date.setHours(0, 0, 0, 0);
-  return Math.ceil((date - today) / 86400000);
-}
-
-function isValidDate(dateString) {
-  return Boolean(dateString) && !Number.isNaN(new Date(dateString).getTime());
-}
-
-// validateProjects проверяет проектные записи. Критичность повышается до critical, если ошибка блокирует управленческое решение или грантовую подачу.
-function validateProjects(projects) {
-  const issues = [];
-
-  projects.forEach(project => {
-    const target = project.id ? `Проект ${project.id}` : "Проект без ID";
-    const addIssue = (severity, description, recommendation) => {
-      issues.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : `${target}-${description}`,
-        type: "project",
-        severity,
-        target,
-        description,
-        recommendation
-      });
-    };
-
-    if (!project.id) {
-      addIssue("critical", "нет ID проекта.", "Добавить уникальный id в data/projects.json.");
-    }
-
-    if (!project.title) {
-      addIssue("critical", "нет названия проекта.", "Заполнить поле title.");
-    }
-
-    if (!project.manager || project.manager === "Не назначен") {
-      addIssue("critical", "нет руководителя.", "Назначить руководителя проекта.");
-    }
-
-    // Готовность используется в KPI, фильтрах и диагностике, поэтому нечисловое значение считаем критичным.
-    if (typeof project.readiness !== "number" || Number.isNaN(project.readiness)) {
-      addIssue("critical", "готовность не является числом.", "Указать readiness числом от 0 до 100.");
-    } else if (project.readiness < 0 || project.readiness > 100) {
-      addIssue("critical", "готовность меньше 0 или больше 100.", "Исправить readiness: допустимый диапазон 0-100.");
-    }
-
-    // Статус «Готов к грантам» обещает полный пакет документов, поэтому отсутствие любого базового документа критично.
-    if (project.status === "Готов к грантам" && !project.hasPassport) {
-      addIssue("critical", "статус «Готов к грантам», но нет паспорта проекта.", "Добавить паспорт проекта или изменить статус.");
-    }
-
-    if (project.status === "Готов к грантам" && !project.hasTZ) {
-      addIssue("critical", "статус «Готов к грантам», но нет ТЗ.", "Добавить ссылку на техническое задание или изменить статус готовности.");
-    }
-
-    if (project.status === "Готов к грантам" && !project.hasBudget) {
-      addIssue("critical", "статус «Готов к грантам», но нет бюджета.", "Добавить бюджет или снять статус готовности к грантам.");
-    }
-
-    // Высокая готовность без ТЗ или бюджета противоречит логике грантовой упаковки, поэтому это блокирующая ошибка качества данных.
-    if (typeof project.readiness === "number" && project.readiness > 80 && (!project.hasTZ || !project.hasBudget)) {
-      addIssue("critical", "проект готов больше чем на 80%, но нет ТЗ или бюджета.", "Закрыть ТЗ и бюджет либо снизить процент готовности.");
-    }
-
-    if (!project.nextAction) {
-      addIssue("warning", "нет ближайшего действия.", "Добавить конкретный следующий шаг.");
-    }
-
-    if (!project.nextActionDate || !isValidDate(project.nextActionDate)) {
-      addIssue("warning", "нет даты ближайшего действия.", "Добавить дату в формате YYYY-MM-DD.");
-    } else if (daysUntil(project.nextActionDate) < 14) {
-      addIssue("warning", "ближайшее действие ближе 14 дней.", "Проверить, назначен ли исполнитель и достаточно ли времени на действие.");
-    }
-
-    if (!project.risk) {
-      addIssue("warning", "не указан риск.", "Заполнить риск: Высокий, Средний или Низкий.");
-    }
-
-    if (!project.grants || project.grants.length === 0) {
-      addIssue("warning", "не указаны подходящие гранты.", "Выбрать минимум один релевантный грант.");
-    }
-
-    if (project.needsDecision) {
-      addIssue("warning", "проект требует решения руководителя.", "Вынести вопрос в повестку руководителя.");
-    }
-  });
-
-  return issues;
-}
-
-// validateGrants проверяет строки grants.csv. Поля, без которых нельзя понять окно и источник гранта, считаются critical.
-function validateGrants(grants) {
-  const issues = [];
-
-  grants.forEach(grant => {
-    const target = grant.title ? `Грант ${grant.title}` : "Грант без названия";
-    const addIssue = (severity, description, recommendation) => {
-      issues.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : `${target}-${description}`,
-        type: "grant",
-        severity,
-        target,
-        description,
-        recommendation
-      });
-    };
-
-    if (!grant.title) {
-      addIssue("critical", "нет названия гранта.", "Заполнить колонку «Маршрут».");
-    }
-
-    if (!grant.operator) {
-      addIssue("critical", "нет оператора.", "Заполнить колонку «Оператор».");
-    }
-
-    if (!grant.window) {
-      addIssue("critical", "нет окна подачи.", "Заполнить колонку «Окно / статус на 27.04.2026».");
-    }
-
-    if (!grant.source) {
-      addIssue("critical", "нет источника.", "Добавить ссылку на официальный источник или страницу конкурса.");
-    }
-
-    if (!grant.projects || grant.projects.length === 0) {
-      addIssue("warning", "нет подходящих проектов.", "Указать ID проектов в колонке «Проекты из реестра».");
-    }
-
-    if (!grant.firstStep) {
-      addIssue("warning", "нет информации «что подготовить первым».", "Заполнить первый практический шаг подготовки.");
-    }
-
-    if (!grant.checkedAt) {
-      addIssue("warning", "нет даты проверки.", "Заполнить дату проверки актуальности.");
-    }
-
-    if (!grant.confidence || normalizeForMatch(grant.confidence).includes("низк")) {
-      addIssue("warning", "низкая уверенность или поле уверенности пустое.", "Перепроверить условия конкурса и обновить поле уверенности.");
-    }
-  });
-
-  return issues;
-}
-
-// validateRelations проверяет связи между реестром и CSV. Несовпадения помечаются warning, а невозможность подачи готового проекта без привязки к гранту - critical.
-function validateRelations(projects, grants) {
-  const issues = [];
-  const projectById = new Map(projects.map(project => [project.id, project]));
-  const grantProjectIds = new Set(grants.flatMap(grant => grant.projects || []));
-
-  projects.forEach(project => {
-    (project.grants || []).forEach(grantName => {
-      if (!hasMatchingGrant(grantName, grants)) {
-        issues.push({
-          id: crypto.randomUUID ? crypto.randomUUID() : `${project.id}-${grantName}`,
-          type: "relation",
-          severity: "warning",
-          target: `Проект ${project.id}`,
-          description: `указан грант «${grantName}», которого нет в grants.csv.`,
-          recommendation: "Добавить грант в data/grants.csv или привести название к существующему маршруту."
-        });
-      }
-    });
-
-    const hasCatalogGrant = (project.grants || []).some(grantName => hasMatchingGrant(grantName, grants));
-    const hasCsvGrantLink = grantProjectIds.has(project.id);
-    if (project.status === "Готов к грантам" && !hasCatalogGrant && !hasCsvGrantLink) {
-      issues.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : `${project.id}-no-grant-link`,
-        type: "relation",
-        severity: "critical",
-        target: `Проект ${project.id}`,
-        description: "проект готов к грантам, но ни один грант к нему не привязан.",
-        recommendation: "Добавить подходящий грант в projects.json или указать ID проекта в grants.csv."
-      });
-    }
-  });
-
-  grants.forEach(grant => {
-    (grant.projects || []).forEach(projectId => {
-      const project = projectById.get(projectId);
-      if (!project) {
-        issues.push({
-          id: crypto.randomUUID ? crypto.randomUUID() : `${grant.title}-${projectId}`,
-          type: "relation",
-          severity: "warning",
-          target: `Грант ${grant.title}`,
-          description: `указан проект «${projectId}», которого нет в projects.json.`,
-          recommendation: "Добавить проект в data/projects.json или удалить ID из grants.csv."
-        });
-        return;
-      }
-
-      if (typeof project.readiness === "number" && project.readiness < 50) {
-        issues.push({
-          id: crypto.randomUUID ? crypto.randomUUID() : `${grant.title}-${projectId}-low-readiness`,
-          type: "relation",
-          severity: "recommendation",
-          target: `Грант ${grant.title}`,
-          description: `содержит проект ${projectId} с готовностью ниже 50%.`,
-          recommendation: "Проверить реалистичность подачи или перенести проект в более позднее окно."
-        });
-      }
-    });
-  });
-
-  return issues;
-}
-
-function buildDiagnostics(projects, grants) {
-  const issues = [
-    ...validateProjects(projects),
-    ...validateGrants(grants),
-    ...validateRelations(projects, grants)
-  ];
-
-  return {
-    issues,
-    filter: state.diagnostics.filter || "all",
-    summary: {
-      total: issues.length,
-      critical: issues.filter(issue => issue.severity === "critical").length,
-      warnings: issues.filter(issue => issue.severity === "warning").length,
-      recommendations: issues.filter(issue => issue.severity === "recommendation").length
-    }
-  };
-}
-
-function renderDiagnostics(diagnostics) {
-  const sortedIssues = [...diagnostics.issues].sort((a, b) => severityRank(a.severity) - severityRank(b.severity));
-  const filteredIssues = sortedIssues.filter(issue => {
-    if (diagnostics.filter === "all") return true;
-    if (["critical", "warning", "recommendation"].includes(diagnostics.filter)) return issue.severity === diagnostics.filter;
-    return issue.type === diagnostics.filter;
-  });
-
-  const statusText = diagnostics.summary.critical
-    ? "Есть критические ошибки"
-    : diagnostics.summary.warnings
-      ? "Есть предупреждения"
-      : "Данные заполнены корректно";
-  const statusClass = diagnostics.summary.critical ? "is-critical" : diagnostics.summary.warnings ? "is-warning" : diagnostics.summary.recommendations ? "is-recommendation" : "is-ok";
-  const listHtml = filteredIssues.length
-    ? filteredIssues.map(diagnosticIssueTemplate).join("")
-    : `
-      <article class="diagnostic-group is-ok">
-        <h3>Данные заполнены корректно</h3>
-        <p class="section-note">По выбранному фильтру проблем не найдено.</p>
-      </article>
-    `;
-
-  elements.dataDiagnostics.innerHTML = `
-    <div class="diagnostic-status ${statusClass}">${statusText}</div>
-    <div class="diagnostics-grid">
-      <article class="diagnostic-card ${statusClass}">
-        <strong>${diagnostics.summary.total}</strong>
-        <span>Всего проблем</span>
-      </article>
-      <article class="diagnostic-card ${diagnostics.summary.critical ? "is-critical" : "is-ok"}">
-        <strong>${diagnostics.summary.critical}</strong>
-        <span>Критические ошибки</span>
-      </article>
-      <article class="diagnostic-card ${diagnostics.summary.warnings ? "is-warning" : "is-ok"}">
-        <strong>${diagnostics.summary.warnings}</strong>
-        <span>Предупреждения</span>
-      </article>
-      <article class="diagnostic-card ${diagnostics.summary.recommendations ? "is-recommendation" : "is-ok"}">
-        <strong>${diagnostics.summary.recommendations}</strong>
-        <span>Рекомендации</span>
-      </article>
-    </div>
-    <div class="diagnostic-list">${listHtml}</div>
-  `;
-
-  elements.diagnosticFilters.querySelectorAll("[data-diagnostic-filter]").forEach(button => {
-    button.classList.toggle("is-active", button.dataset.diagnosticFilter === diagnostics.filter);
-  });
-}
-
-function severityRank(severity) {
-  if (severity === "critical") return 0;
-  if (severity === "warning") return 1;
-  return 2;
-}
-
-function filterDiagnostics(type) {
-  state.diagnostics.filter = type;
-  renderDiagnostics(state.diagnostics);
-}
-
-function diagnosticIssueTemplate(issue) {
-  const label = issue.severity === "critical"
-    ? "Критично"
-    : issue.severity === "warning"
-      ? "Предупреждение"
-      : "Рекомендация";
-  const tagClass = issue.severity === "critical"
-    ? "tag--red"
-    : issue.severity === "warning"
-      ? "tag--yellow"
-      : "tag--blue";
-
-  return `
-    <article class="diagnostic-issue is-${issue.severity}">
-      <div class="diagnostic-issue__meta">
-        <span class="tag ${tagClass}">${label}</span>
-        <span class="tag tag--blue">${diagnosticTypeLabel(issue.type)}</span>
-      </div>
-      <strong>${escapeHtml(issue.target)} - ${escapeHtml(issue.description)}</strong>
-      <p class="section-note"><strong>Рекомендация:</strong> ${escapeHtml(issue.recommendation)}</p>
-    </article>
-  `;
-}
-
-function diagnosticTypeLabel(type) {
-  if (type === "project") return "Проект";
-  if (type === "grant") return "Грант";
-  return "Связь";
-}
-
-async function handleWishSubmit(event) {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const feedback = {
-    action: "feedback",
-    fio: formData.get("fullName"),
-    role: formData.get("role"),
-    project: formData.get("project"),
-    message: formData.get("wish"),
-    priority: formData.get("priority"),
-    createdAt: new Date().toISOString()
-  };
-
-  try {
-    await submitFeedback(feedback);
-    state.connection.feedback = "Google Таблица";
-    addNotification("success", "Пожелание отправлено в таблицу");
-    event.target.reset();
-  } catch (error) {
-    console.warn("Feedback API unavailable:", error);
-    saveFeedbackLocally(feedback);
-    state.connection.feedback = "недоступно";
-    addNotification("warning", "Нет связи с таблицей. Пожелание сохранено в браузере");
-  }
-
-  renderConnectionStatus();
-  renderNotifications();
-  renderWishLog();
-}
-
-// submitFeedback отправляет пожелание НТС в Google Apps Script POST-запросом.
-async function submitFeedback(feedback) {
-  if (!API_CONFIG.enabled) throw new Error("API disabled");
-  const response = await fetch(API_CONFIG.baseUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    body: JSON.stringify(feedback)
-  });
-  if (!response.ok) throw new Error(`Feedback HTTP ${response.status}`);
-
-  try {
-    return await response.text();
-  } catch (readError) {
-    addNotification("warning", "Пожелание отправлено, но ответ сервера не удалось прочитать");
-    return "sent-without-readable-response";
-  }
-}
-
-// saveFeedbackLocally сохраняет пожелание в localStorage, если Google Таблица временно недоступна.
-function saveFeedbackLocally(feedback) {
-  const wishes = getSavedWishes();
-  wishes.unshift({
-    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-    createdAt: feedback.createdAt,
-    fullName: feedback.fio,
-    role: feedback.role,
-    project: feedback.project,
-    wish: feedback.message,
-    priority: feedback.priority
-  });
-  localStorage.setItem("ntsWishes", JSON.stringify(wishes));
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+function appendTsParam(url) { return `${url}${url.includes("?") ? "&" : "?"}_ts=${Date.now()}`; }
+function splitProjects(value) { return String(value || "").split(/[;,\n]/).map(v => v.trim()).filter(Boolean); }
+function detectDelimiter(text) { const line = text.split(/\r?\n/)[0] || ""; return (line.match(/;/g) || []).length >= (line.match(/,/g) || []).length ? ";" : ","; }
+function normalizeRisk(value) { const v = String(value || "").toLowerCase().trim(); if (["high", "высокий"].includes(v)) return "Высокий"; if (["medium", "средний"].includes(v)) return "Средний"; if (["low", "низкий"].includes(v)) return "Низкий"; return value || ""; }
+function normalizeBoolean(value) { if (typeof value === "boolean") return value; if (typeof value === "number") return value > 0; return ["true", "1", "да", "есть", "yes", "y"].includes(String(value || "").toLowerCase().trim()); }
+function hasMatchingGrant(projectGrantName, grants) { const target = normalizeForMatch(projectGrantName); return grants.some(g => normalizeForMatch(g.title).includes(target) || normalizeForMatch(g.operator).includes(target) || target.includes(normalizeForMatch(g.title))); }
+function normalizeForMatch(value) { return String(value || "").toLowerCase().replace(/ё/g, "е").replace(/[«»"']/g, "").replace(/\s+/g, " ").trim(); }
+function unique(items) { return [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru")); }
+function severityRank(s) { return s === "critical" ? 0 : s === "warning" ? 1 : 2; }
+function diagnosticTypeLabel(type) { if (type === "project") return "Проекты"; if (type === "grant") return "Гранты"; return "Связи"; }
+function statusTag(status) { if (status === "Готов к грантам") return `<span class="tag tag--green">${escapeHtml(status)}</span>`; if (status === "В зоне риска") return `<span class="tag tag--red">${escapeHtml(status)}</span>`; if (status === "Требует решения руководителя") return `<span class="tag tag--yellow">${escapeHtml(status)}</span>`; return `<span class="tag tag--blue">${escapeHtml(status)}</span>`; }
+function riskClass(risk) { if (risk === "Высокий") return "tag--red"; if (risk === "Средний") return "tag--yellow"; if (risk === "Низкий") return "tag--green"; return "tag--blue"; }
+function riskToFilterValue(risk) { if (risk === "Высокий") return "high"; if (risk === "Средний") return "medium"; if (risk === "Низкий") return "low"; return "all"; }
+function progressBar(value) { const val = Number(value) || 0; return `<div><strong>${val}%</strong><div class="progress-line"><span style="width:${val}%"></span></div></div>`; }
+function daysUntil(dateString) { if (!isValidDate(dateString)) return Infinity; const now = new Date(); now.setHours(0,0,0,0); const d = new Date(dateString); d.setHours(0,0,0,0); return Math.ceil((d - now) / 86400000); }
+function isValidDate(dateString) { return Boolean(dateString) && !Number.isNaN(new Date(dateString).getTime()); }
+function escapeHtml(value) { return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }

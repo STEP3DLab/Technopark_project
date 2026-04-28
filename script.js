@@ -173,7 +173,7 @@ const state = {
   connection: {
     projects: "demo-данные",
     grants: "demo-данные",
-    feedback: API_CONFIG.enabled ? "отправка в таблицу доступна" : "недоступна"
+    feedback: API_CONFIG.enabled ? "Google Таблица" : "недоступно"
   },
   connectionCounts: {
     projects: 0,
@@ -637,17 +637,17 @@ function renderDataStatus() {
 
 // renderConnectionStatus показывает человеку понятный источник данных и доступность отправки формы.
 function renderConnectionStatus() {
-  const feedbackOk = state.connection.feedback === "отправка в таблицу доступна";
+  const feedbackOk = state.connection.feedback === "Google Таблица";
   const cards = [
     { label: "Проекты", source: state.connection.projects, value: formatConnectionValue(state.connection.projects, state.connectionCounts.projects) },
     { label: "Гранты", source: state.connection.grants, value: formatConnectionValue(state.connection.grants, state.connectionCounts.grants) },
-    { label: "Пожелания НТС", source: feedbackOk ? "доступно" : "недоступно", value: feedbackOk ? "доступно" : "недоступно" }
+    { label: "Пожелания НТС", source: feedbackOk ? "Google Таблица" : "недоступно", value: feedbackOk ? "Google Таблица" : "недоступно" }
   ];
 
   elements.connectionStatus.innerHTML = `
     <div class="connection-card connection-card--title"><strong>Статус подключения</strong></div>
     ${cards.map(({ label, value, source }) => {
-      const className = source === "Google Таблица" || (label === "Пожелания НТС" && value === "доступно")
+      const className = source === "Google Таблица"
         ? "is-ok"
         : source === "локальный файл"
           ? "is-warning"
@@ -1590,13 +1590,13 @@ async function handleWishSubmit(event) {
 
   try {
     await submitFeedback(feedback);
-    state.connection.feedback = "отправка в таблицу доступна";
+    state.connection.feedback = "Google Таблица";
     addNotification("success", "Пожелание отправлено в таблицу");
     event.target.reset();
   } catch (error) {
     console.warn("Feedback API unavailable:", error);
     saveFeedbackLocally(feedback);
-    state.connection.feedback = "недоступна";
+    state.connection.feedback = "недоступно";
     addNotification("warning", "Нет связи с таблицей. Пожелание сохранено в браузере");
   }
 

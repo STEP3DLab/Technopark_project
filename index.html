@@ -3,300 +3,151 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Панель руководителя Технопарка РГСУ</title>
-  <meta name="description" content="Проекты, гранты, решения НТС и пожелания экспертного сообщества в единой управленческой системе Технопарка РГСУ.">
-  <meta name="theme-color" content="#0b1220">
+  <title>Панель руководителя Проектного центра «Технопарк РГСУ»</title>
+  <meta name="description" content="Проекты, гранты, дедлайны, риски и решения НТС в одном интерфейсе.">
+  <meta name="theme-color" content="#0f172a">
   <link rel="preconnect" href="https://docs.google.com">
   <link rel="preconnect" href="https://script.google.com">
-  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAP3XqMYXxc3Z85FhLlsFe-0vmVWODKjiOgw&s">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip-link" href="#overview">Перейти к обзору</a>
+<header class="topbar">
+  <a class="brand" href="#overview">Технопарк РГСУ</a>
+  <button id="menuToggle" class="menu-btn" aria-expanded="false" aria-label="Открыть меню">☰</button>
+  <nav id="mainNav" class="main-nav">
+    <a href="#overview">Обзор</a>
+    <a href="#projects">Проекты</a>
+    <a href="#funnel">Воронка</a>
+    <a href="#timeline">Календарь грантов</a>
+    <a href="#wishes">Пожелания НТС</a>
+    <a href="#connection">Связь с таблицей</a>
+  </nav>
+  <div class="top-actions">
+    <button id="refreshData" class="btn btn-ghost" type="button">Обновить данные</button>
+    <a class="btn btn-primary" href="#projects">Добавить проект</a>
+    <a class="btn btn-ghost" href="#wishes">Оставить пожелание НТС</a>
+  </div>
+</header>
 
-  <!-- Фиксированная шапка: быстрый доступ к ключевым разделам панели. -->
-  <header class="top-shell">
-    <a class="brand" href="#overview" aria-label="Панель руководителя Технопарка РГСУ">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAP3XqMYXxc3Z85FhLlsFe-0vmVWODKjiOgw&s" alt="РГСУ">
-      <span>
-        <strong>Технопарк РГСУ</strong>
-        <small>Панель руководителя</small>
-      </span>
-    </a>
-
-    <button class="menu-button" id="menuToggle" type="button" aria-label="Открыть меню" aria-expanded="false">Меню</button>
-
-    <nav class="main-nav" id="mainNav" aria-label="Разделы панели">
-      <a href="#overview">Обзор</a>
-      <a href="#projects">Проекты</a>
-      <a href="#grants">Гранты</a>
-      <a href="#funnel">Воронка</a>
-      <a href="#nts">Пожелания НТС</a>
-    </nav>
-
-    <div class="header-actions">
-      <button class="button ghost" id="refreshData" type="button">Обновить</button>
-      <a class="button primary" href="#nts">Добавить пожелание</a>
+<main>
+  <section class="hero" id="overview">
+    <div>
+      <h1>Панель руководителя Проектного центра «Технопарк РГСУ»</h1>
+      <p class="subtitle">Проекты, гранты, дедлайны, риски и решения НТС в одном интерфейсе</p>
+      <p id="syncStatus" class="sync-status">Данные загружаются…</p>
     </div>
-  </header>
+    <div id="kpiGrid" class="kpi-grid" aria-live="polite"></div>
+  </section>
 
-  <main>
-    <!-- Первый экран: статусная управленческая витрина для руководителя и НТС. -->
-    <section class="hero" id="overview">
-      <div class="hero-copy">
-        <p class="eyebrow">Проектный центр «Технопарк РГСУ»</p>
-        <h1>Панель руководителя Технопарка РГСУ</h1>
-        <p class="hero-text">Проекты, гранты, решения НТС и пожелания экспертного сообщества в единой управленческой системе</p>
-        <div class="hero-actions" aria-label="Быстрые действия">
-          <a class="button primary" href="#projects">Открыть проектный портфель</a>
-          <a class="button ghost" href="#nts">Добавить пожелание</a>
-          <a class="button ghost" href="#grants">Посмотреть гранты</a>
-          <a class="button ghost" href="#funnel">Перейти к воронке</a>
-        </div>
-      </div>
+  <section id="attention" class="panel">
+    <div class="section-head">
+      <h2>Что требует внимания руководителя</h2>
+      <span class="hint">Задачи на ближайшие 7 дней и блокеры</span>
+    </div>
+    <div id="attentionList" class="attention-list"></div>
+  </section>
 
-      <aside class="hero-panel" aria-label="Статус подключения">
-        <div class="sync-row">
-          <span class="sync-dot" id="syncDot"></span>
-          <p id="syncStatus">Загрузка данных из Google Таблицы...</p>
-        </div>
-        <div class="mini-grid">
-          <div><span>Источник</span><strong>Google Sheets</strong></div>
-          <div><span>Проекты</span><strong>gid 341683209</strong></div>
-        </div>
-      </aside>
-    </section>
+  <section id="projects" class="panel">
+    <div class="section-head">
+      <h2>Реестр проектов</h2>
+      <span id="projectCount" class="hint"></span>
+    </div>
 
-    <!-- Четыре ключевые карточки первого экрана. -->
-    <section class="feature-grid" aria-label="Ключевые модули">
-      <a class="feature-card" href="#projects"><span>01</span><strong>Проекты</strong><small>реестр, статусы, ТЗ, ответственные</small></a>
-      <a class="feature-card" href="#grants"><span>02</span><strong>Гранты</strong><small>дедлайны, суммы, подходящие проекты</small></a>
-      <a class="feature-card" href="#funnel"><span>03</span><strong>Воронка</strong><small>узкие места и следующий шаг</small></a>
-      <a class="feature-card" href="#nts"><span>04</span><strong>Пожелания НТС</strong><small>чат экспертных замечаний и решений</small></a>
-    </section>
+    <div class="filters">
+      <input id="searchInput" type="search" placeholder="Поиск по названию проекта">
+      <select id="statusFilter"><option value="all">Все статусы</option></select>
+      <select id="deadlineFilter">
+        <option value="all">Любой дедлайн</option>
+        <option value="14">14 дней</option>
+        <option value="30">30 дней</option>
+        <option value="60">60 дней</option>
+        <option value="90">90 дней</option>
+        <option value="none">Без дедлайна</option>
+      </select>
+      <label><input id="riskOnly" type="checkbox"> Только риски</label>
+      <label><input id="readyOnly" type="checkbox"> Готовы к гранту</label>
+      <button id="resetFilters" type="button" class="btn btn-ghost">Сбросить фильтры</button>
+    </div>
 
-    <!-- KPI для понимания ситуации за 30 секунд. -->
-    <section class="kpi-grid" aria-label="Сводные показатели">
-      <article class="kpi-card"><span>Всего проектов</span><strong id="kpiTotal">0</strong><small>в реестре</small></article>
-      <article class="kpi-card"><span>Активные</span><strong id="kpiActive">0</strong><small>в работе и подготовке</small></article>
-      <article class="kpi-card success"><span>Готовы к грантам</span><strong id="kpiReady">0</strong><small>готовность от 70%</small></article>
-      <article class="kpi-card warning"><span>Требуют внимания</span><strong id="kpiRisks">0</strong><small>нет ТЗ, ответственного или маршрута</small></article>
-    </section>
+    <div id="projectsMobile" class="projects-mobile"></div>
 
-    <!-- Панель внимания руководителя и блок НТС. -->
-    <section class="two-column executive-zone">
-      <article class="panel">
-        <div class="panel-head">
-          <div>
-            <p class="eyebrow">Руководителю</p>
-            <h2>Что требует внимания руководителя</h2>
-          </div>
-        </div>
-        <div class="attention-list" id="leaderAttention"></div>
-      </article>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Проект</th>
+            <th>Статус</th>
+            <th>Готовность</th>
+            <th>Ближайший дедлайн</th>
+            <th>Риск</th>
+          </tr>
+        </thead>
+        <tbody id="projectsTable"></tbody>
+      </table>
+    </div>
+  </section>
 
-      <article class="panel">
-        <div class="panel-head">
-          <div>
-            <p class="eyebrow">НТС</p>
-            <h2>К следующему заседанию НТС</h2>
-          </div>
-        </div>
-        <div class="attention-list" id="ntsAgenda"></div>
-      </article>
-    </section>
+  <section id="funnel" class="panel">
+    <div class="section-head">
+      <h2>Грантовая воронка</h2>
+      <span class="hint">Нажмите на этап, чтобы увидеть проекты</span>
+    </div>
+    <div id="funnelBoard" class="funnel"></div>
+    <div id="funnelDetails" class="funnel-details empty">Выберите этап воронки.</div>
+  </section>
 
-    <!-- Фильтры проектного портфеля. -->
-    <section class="toolbar" aria-label="Фильтры проектного портфеля">
-      <label>
-        <span>Поиск</span>
-        <input id="searchInput" type="search" placeholder="Проект, ответственный, грант, статус">
-      </label>
-      <label>
-        <span>Статус</span>
-        <select id="statusFilter"><option value="all">Все статусы</option></select>
-      </label>
-      <label>
-        <span>Ответственный</span>
-        <select id="ownerFilter"><option value="all">Все ответственные</option></select>
-      </label>
-      <label>
-        <span>Грантовая готовность</span>
-        <select id="readinessFilter">
-          <option value="all">Любая</option>
-          <option value="ready">Готов к подаче</option>
-          <option value="middle">Нужна доупаковка</option>
-          <option value="low">Ранняя стадия</option>
-          <option value="unknown">Нет данных</option>
+  <section id="timeline" class="panel">
+    <div class="section-head">
+      <h2>Календарь грантов</h2>
+      <span class="hint">Подготовка → Подача → Рассмотрение → Результат</span>
+    </div>
+    <div id="timelineBoard" class="timeline"></div>
+  </section>
+
+  <section id="wishes" class="panel">
+    <div class="section-head">
+      <h2>Пожелания НТС</h2>
+    </div>
+    <div class="wish-layout">
+      <form id="wishForm" class="wish-form">
+        <input name="author" required placeholder="ФИО">
+        <input name="role" placeholder="Роль / подразделение">
+        <select name="project" id="wishProject"><option value="">Проект (не выбран)</option></select>
+        <select name="type" required>
+          <option value="идея">идея</option>
+          <option value="риск">риск</option>
+          <option value="замечание">замечание</option>
+          <option value="предложение">предложение</option>
+          <option value="вопрос">вопрос</option>
         </select>
-      </label>
-      <label>
-        <span>Риски</span>
-        <select id="riskFilter">
-          <option value="all">Все</option>
-          <option value="risk">Есть риск</option>
-          <option value="unknown">Нет точных данных</option>
+        <select name="priority" required>
+          <option value="низкий">низкий</option>
+          <option value="средний" selected>средний</option>
+          <option value="высокий">высокий</option>
         </select>
-      </label>
-    </section>
-
-    <!-- Раздел проектов. -->
-    <section class="section" id="projects">
-      <div class="section-title">
-        <p class="eyebrow">Проектный портфель</p>
-        <h2>Проекты</h2>
-        <p>Карточки и таблица строятся по обновленному листу Google Таблицы. Неизвестные поля помечаются как «требует уточнения».</p>
-      </div>
-      <div class="project-grid" id="projectGrid"></div>
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Проект</th>
-              <th>Ответственный</th>
-              <th>Статус</th>
-              <th>Грант</th>
-              <th>Срок</th>
-              <th>Готовность</th>
-              <th>Следующее действие</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody id="projectTable"></tbody>
-        </table>
-      </div>
-      <form class="panel project-edit-form" id="projectEditForm" hidden>
-        <div class="panel-head">
-          <div>
-            <p class="eyebrow">Редактирование</p>
-            <h3 id="projectEditTitle">Редактирование проекта</h3>
-          </div>
-        </div>
-        <input id="editProjectId" type="hidden">
-        <div class="toolbar compact">
-          <label><span>Проект</span><input id="editProjectName" required></label>
-          <label><span>Ответственный</span><input id="editProjectOwner"></label>
-          <label><span>Статус</span><input id="editProjectStatus"></label>
-          <label><span>Грант / маршрут</span><input id="editProjectGrant"></label>
-          <label><span>Срок</span><input id="editProjectDeadline" type="date"></label>
-          <label><span>Готовность, %</span><input id="editProjectReadiness" type="number" min="0" max="100" step="1"></label>
-        </div>
-        <label><span>Следующее действие</span><input id="editProjectNextStep"></label>
-        <label><span>Примечание</span><textarea id="editProjectNote" rows="3"></textarea></label>
-        <p class="form-note" id="editProjectHint">Измените поля и сохраните — запись уйдет в Google Таблицу.</p>
-        <div class="hero-actions">
-          <button class="button primary" id="editProjectSubmit" type="submit">Сохранить изменения</button>
-          <button class="button secondary" id="editProjectCancel" type="button">Отмена</button>
-        </div>
+        <textarea name="message" required rows="4" placeholder="Текст пожелания"></textarea>
+        <button class="btn btn-primary" type="submit">Отправить пожелание</button>
+        <p id="wishStatus" class="hint">Форма готова к отправке в Apps Script.</p>
       </form>
-    </section>
+      <div id="wishFeed" class="wish-feed"></div>
+    </div>
+  </section>
 
-    <!-- Раздел грантов. -->
-    <section class="section" id="grants">
-      <div class="section-title grants-headline">
-        <div>
-          <p class="eyebrow">Грантовые маршруты</p>
-          <h2>Гранты</h2>
-          <p>Умный каталог с приоритетами, быстрыми фильтрами и фокусом на ближайшие дедлайны после 1 июня 2026 года.</p>
-        </div>
-        <div class="grants-quick-kpi" id="grantsQuickKpi" aria-label="Сводка по грантам"></div>
-      </div>
+  <section id="connection" class="panel connection">
+    <h2>Связь с таблицей</h2>
+    <p>Google Таблица: <a id="sheetLink" target="_blank" rel="noreferrer">открыть</a></p>
+    <p>Apps Script: <a id="scriptLink" target="_blank" rel="noreferrer">открыть</a></p>
+    <p class="hint">Если загрузка не работает: проверьте публикацию Apps Script URL и доступ к листам.</p>
+  </section>
+</main>
 
-      <div class="grants-toolbar" aria-label="Фильтры грантов">
-        <label>
-          <span>Поиск по маршруту</span>
-          <input id="grantSearchInput" type="search" placeholder="Маршрут, оператор, проект, сумма">
-        </label>
-        <label>
-          <span>Статус окна</span>
-          <select id="grantStatusFilter">
-            <option value="all">Все статусы</option>
-            <option value="actual">Актуальные</option>
-            <option value="urgent">Скоро дедлайн</option>
-            <option value="future">Поздние окна</option>
-            <option value="early">Ранние до 1 июня</option>
-            <option value="archive">Завершенные</option>
-            <option value="review">Требуют перепроверки</option>
-          </select>
-        </label>
-        <label>
-          <span>Сортировка</span>
-          <select id="grantSortSelect">
-            <option value="deadline_asc">Сначала ближайшие дедлайны</option>
-            <option value="priority_desc">Сначала приоритетные для запуска</option>
-            <option value="amount_desc">По убыванию суммы</option>
-            <option value="name_asc">По названию маршрута</option>
-          </select>
-        </label>
-      </div>
+<footer class="footer">
+  <a id="footerSheet" target="_blank" rel="noreferrer">Google Таблица</a>
+  <a id="footerScript" target="_blank" rel="noreferrer">Apps Script</a>
+  <a href="https://github.com/STEP3DLab/Technopark_project" target="_blank" rel="noreferrer">GitHub</a>
+  <a href="https://rgsu.net/" target="_blank" rel="noreferrer">Технопарк РГСУ</a>
+</footer>
 
-      <div class="grant-grid" id="grantGrid"></div>
-    </section>
-
-    <!-- Раздел воронки: путь проекта от идеи до результата. -->
-    <section class="section" id="funnel">
-      <div class="section-title">
-        <p class="eyebrow">Управленческая логика</p>
-        <h2>Воронка проектов</h2>
-        <p>Каждый этап показывает количество проектов, узкие места, следующий шаг и рекомендацию руководителю.</p>
-      </div>
-      <div class="funnel-board" id="funnelBoard"></div>
-    </section>
-
-    <!-- Раздел пожеланий НТС: форма как чат обратной связи. -->
-    <section class="section" id="nts">
-      <div class="section-title">
-        <p class="eyebrow">Научно-технический совет</p>
-        <h2>Пожелания НТС</h2>
-        <p>Пожелания, замечания, риски, идеи, вопросы и решения НТС сохраняются в лист «Пожелания НТС».</p>
-      </div>
-
-      <div class="feedback-layout">
-        <form class="feedback-form" id="ntsForm">
-          <label><span>ФИО</span><input name="author" required placeholder="Фамилия Имя Отчество"></label>
-          <label><span>Роль / статус</span><input name="role" placeholder="член НТС, эксперт, руководитель направления"></label>
-          <label><span>Проект</span><select name="project" id="feedbackProject"><option value="">Ко всему портфелю</option></select></label>
-          <div class="form-row">
-            <label>
-              <span>Тип сообщения</span>
-              <select name="type">
-                <option value="пожелание">пожелание</option>
-                <option value="замечание">замечание</option>
-                <option value="риск">риск</option>
-                <option value="идея">идея</option>
-                <option value="вопрос">вопрос</option>
-                <option value="решение НТС">решение НТС</option>
-              </select>
-            </label>
-            <label>
-              <span>Приоритет</span>
-              <select name="priority">
-                <option value="средний">средний</option>
-                <option value="низкий">низкий</option>
-                <option value="высокий">высокий</option>
-                <option value="критический">критический</option>
-              </select>
-            </label>
-          </div>
-          <label><span>Текст сообщения</span><textarea name="message" rows="6" required placeholder="Напишите пожелание, замечание, риск, идею или вопрос"></textarea></label>
-          <p class="form-note" id="formNote">Статус обработки будет установлен автоматически: новое.</p>
-          <button class="button primary wide" type="submit">Отправить пожелание</button>
-        </form>
-
-        <aside class="panel feedback-feed-panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Лента</p>
-              <h2>Последние сообщения</h2>
-            </div>
-          </div>
-          <div class="feedback-feed" id="feedbackFeed"></div>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

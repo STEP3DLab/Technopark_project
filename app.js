@@ -413,13 +413,16 @@ async function submitWish(event) {
   event.preventDefault();
   const formData = new FormData(els.wishForm);
   const payload = {
-    action: "addWish",
+    action: "add_nts_feedback",
+    formKey: "NTS_TECHNOPARK_2026",
     author: formData.get("author"),
     role: formData.get("role"),
     project: formData.get("project"),
-    type: formData.get("type"),
+    category: formData.get("type"),
     priority: formData.get("priority"),
     message: formData.get("message"),
+    source: "site",
+    userAgent: navigator.userAgent || "",
     createdAt: new Date().toISOString(),
   };
 
@@ -435,8 +438,8 @@ async function submitWish(event) {
     if (!response.ok || result.ok === false) throw new Error(result.error || "Ошибка отправки");
 
     els.wishForm.reset();
-    els.wishStatus.textContent = "Пожелание отправлено.";
-    state.wishes.unshift({ ...payload, date: new Date().toLocaleString("ru-RU") });
+    els.wishStatus.textContent = "Пожелание отправлено";
+    state.wishes.unshift({ ...payload, type: payload.category, date: new Date().toLocaleString("ru-RU") });
     renderWishes();
     renderKpi();
   } catch (e) {

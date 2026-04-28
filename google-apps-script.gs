@@ -32,8 +32,12 @@ function doGet(e) {
 function doPost(e) {
   try {
     const payload = JSON.parse((e.postData && e.postData.contents) || '{}');
+    const isLegacyNtsAction = payload.action === 'addWish';
+    if (isLegacyNtsAction) {
+      logDeprecatedPath_('addWish', 'add_nts_feedback', payload);
+    }
     const isProjectAction = ['add_project', 'update_project', 'add_package_row', 'update_package', 'update_nts_feedback_status'].indexOf(payload.action) >= 0;
-    const isNtsForm = payload.action === 'add_nts_feedback' || payload.formKey === CONFIG.FORM_KEY;
+    const isNtsForm = payload.action === 'add_nts_feedback' || isLegacyNtsAction || payload.formKey === CONFIG.FORM_KEY;
 
     if (isProjectAction && String(payload.confirmCode || '') !== CONFIG.CONFIRM_CODE) {
       return json_({ ok: false, error: 'Неверный код подтверждения' });
@@ -43,7 +47,7 @@ function doPost(e) {
       return json_({ ok: false, error: 'Неверный ключ формы НТС' });
     }
 
-    const action = payload.action || (isNtsForm ? 'add_nts_feedback' : '');
+    const action = (payload.action === 'addWish' ? 'add_nts_feedback' : payload.action) || (isNtsForm ? 'add_nts_feedback' : '');
     if (action === 'add_project') return json_(addProject_(payload));
     if (action === 'update_project') return json_(updateProject_(payload));
     if (action === 'add_package_row') return json_(addPackageRow_(payload));
@@ -54,6 +58,10 @@ function doPost(e) {
   } catch (error) {
     return json_({ ok: false, error: String(error && error.message ? error.message : error) });
   }
+}
+
+function logDeprecatedPath_(oldAction, nextAction, payload) {
+  console.warn('Deprecated action used: ' + oldAction + '. Use `' + nextAction + '` instead. Source=' + (payload.source || 'unknown'));
 }
 
 function setupSheets() {

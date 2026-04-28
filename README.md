@@ -40,6 +40,32 @@ URL Apps Script уже добавлен в `app.js` как стандартны�
 
 Сайт читает и редактирует актуальную структуру проекта из репозитория `STEP3DLab/Technopark_project`: листы `Реестр проектов` (gid=341683209), `Актуальные гранты`, `Пожелания НТС`. В разделе «Проекты» появилась кнопка «Редактировать»: изменения отправляются в Apps Script с действием `update_project`.
 
+## API contract
+
+Единый endpoint (POST/GET):  
+`https://script.google.com/macros/s/AKfycbwzbWEjEpb1ySylb--7VhqEHvaC05WB5jhcw-8xpAj811bIJurVB3CW-ElDsoeKnWOA/exec`
+
+### POST actions
+
+- `add_nts_feedback` — добавить пожелание НТС.
+  - Обязательные поля: `action`, `formKey` (или `confirmCode`), `author`, `role`, `project`, `priority`, `message`, `source`, `userAgent`.
+  - Тип пожелания передается как `category` (допустим также `type` для совместимости).
+  - Успешный ответ: `{ "ok": true, ... }`.
+- `add_project`, `update_project`, `add_package_row`, `update_package`, `update_nts_feedback_status` — служебные действия управления проектами (требуют `confirmCode`).
+
+### GET actions
+
+- `health`
+- `bootstrap`
+- `projects`
+- `grants`
+- `packages`
+- `list_nts_feedback`
+
+### Обратная совместимость (deprecated)
+
+В `google-apps-script.gs` `doPost` временно принимает старый action `addWish`, автоматически маршрутизирует его в `add_nts_feedback` и пишет warning в лог как deprecated-путь.
+
 ## Публикация на GitHub Pages
 
 1. Создайте репозиторий на GitHub.

@@ -8,28 +8,37 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar" id="top">
     <div class="container topbar__content">
-      <div>
-        <p class="eyebrow">Проектный центр</p>
+      <div class="topbar__text">
+        <p class="eyebrow">Проектный центр «Технопарк РГСУ»</p>
         <h1>Панель управления Технопарком РГСУ</h1>
-        <p class="subtitle">Компактная управленческая сводка по проектам, грантам и рискам</p>
+        <p class="subtitle">Проекты, гранты, НТС, риски и управленческие решения</p>
+        <p class="mission">Рабочая панель для контроля проектного портфеля, грантовой готовности и решений НТС</p>
       </div>
-      <nav class="topbar__actions" aria-label="Основная навигация">
-        <a class="button button--ghost" href="#projects">Проекты</a>
-        <a class="button button--ghost" href="#grants">Гранты</a>
-        <a class="button button--primary" href="#nts">Пожелание НТС</a>
+      <nav class="topbar__actions" aria-label="Основные действия">
+        <a class="button button--ghost" href="#projects">Открыть реестр проектов</a>
+        <a class="button button--ghost" href="#grants">Смотреть гранты</a>
+        <a class="button button--primary" href="#nts">Оставить пожелание НТС</a>
       </nav>
     </div>
   </header>
 
   <main class="container layout">
-    <section class="panel summary" aria-label="Ключевые показатели">
+    <section class="panel purpose" aria-label="Назначение панели">
       <div class="section-head">
-        <h2>Ситуация на сегодня</h2>
+        <h2>Краткое назначение панели</h2>
         <span class="update-badge" id="currentDate"></span>
       </div>
+      <p>Сводка для руководства: текущее количество проектов, грантовая готовность, качество данных, управленческие риски и действия по линии НТС.</p>
+    </section>
+
+    <section class="panel summary" aria-label="Ключевые показатели">
+      <div class="section-head">
+        <h2>KPI портфеля</h2>
+      </div>
       <div class="kpi-grid" id="kpiGrid"></div>
+      <p id="kpiWarning" class="section-note" hidden></p>
     </section>
 
     <section class="panel connection-strip" id="connectionStatus" aria-live="polite"></section>
@@ -63,7 +72,7 @@
         <h2>Проекты</h2>
       </div>
       <div class="filters" aria-label="Фильтры проектов">
-        <label>Поиск<input id="searchInput" type="search" placeholder="ID, проект, ответственный"></label>
+        <label>Поиск<input id="searchInput" type="search" placeholder="ID, проект, ответственный, маршрут"></label>
         <label>Статус<select id="statusFilter"><option value="all">Все</option></select></label>
         <label>Готовность<select id="readinessFilter"><option value="all">Любая</option><option value="high">80%+</option><option value="medium">50-79%</option><option value="low">До 50%</option></select></label>
         <label>Риск<select id="riskFilter"><option value="all">Все</option><option value="high">Высокий</option><option value="medium">Средний</option><option value="low">Низкий</option></select></label>
@@ -74,7 +83,14 @@
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>Проект</th><th>Стадия</th><th>Готовность</th><th>Статус</th><th>Риск</th><th>Действие</th>
+              <th>ID</th>
+              <th>Проект</th>
+              <th>Стадия</th>
+              <th>Готовность</th>
+              <th>Статус</th>
+              <th>Риск</th>
+              <th>Следующее действие</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="projectsTable"></tbody>
@@ -90,32 +106,36 @@
       </div>
       <div class="grant-toolbar">
         <label>Оператор<select id="grantOperatorFilter"><option value="all">Все</option></select></label>
-        <label>Поиск гранта<input id="grantSearchInput" type="search" placeholder="Название гранта"></label>
+        <label>Поиск гранта<input id="grantSearchInput" type="search" placeholder="Название маршрута"></label>
       </div>
       <div id="grantCalendar" class="grant-list"></div>
     </section>
 
-    <section class="two-column">
-      <section class="panel" id="risks">
-        <div class="section-head"><h2>Риски и действия</h2></div>
-        <div id="riskList"></div>
-      </section>
-
-      <section class="panel" id="nts">
-        <div class="section-head"><h2>Пожелания НТС</h2></div>
-        <p class="section-note">Пожелание будет сохранено в отдельный лист Google Таблицы.</p>
-        <form class="nts-form" id="ntsForm">
-          <label>ФИО<input name="fullName" type="text" required></label>
-          <label>Роль<select name="role" required><option value="">Выберите роль</option><option>Член НТС</option><option>Руководитель проекта</option><option>Эксперт</option><option>Координатор</option></select></label>
-          <label>Проект<select name="project" id="ntsProjectSelect" required></select></label>
-          <label>Приоритет<select name="priority" required><option>Высокий</option><option>Средний</option><option>Низкий</option></select></label>
-          <label class="nts-form__wide">Пожелание<textarea name="wish" rows="3" required></textarea></label>
-          <button class="button button--primary" type="submit">Отправить</button>
-        </form>
-        <div class="wish-log" id="wishLog"></div>
-      </section>
+    <section class="panel" id="risks">
+      <div class="section-head"><h2>Риски и действия</h2></div>
+      <div id="riskList"></div>
     </section>
+
+    <section class="panel" id="nts">
+      <div class="section-head"><h2>Пожелания НТС</h2></div>
+      <p class="section-note">Пожелание будет сохранено в отдельный лист Google Таблицы.</p>
+      <form class="nts-form" id="ntsForm">
+        <label>ФИО<input name="fullName" type="text" required></label>
+        <label>Роль<select name="role" required><option value="">Выберите роль</option><option>Член НТС</option><option>Руководитель проекта</option><option>Эксперт</option><option>Координатор</option></select></label>
+        <label>Проект<select name="project" id="ntsProjectSelect" required></select></label>
+        <label>Приоритет<select name="priority" required><option>Высокий</option><option>Средний</option><option>Низкий</option></select></label>
+        <label class="nts-form__wide">Пожелание<textarea name="wish" rows="4" required></textarea></label>
+        <button class="button button--primary" type="submit">Отправить</button>
+      </form>
+      <div class="wish-log" id="wishLog"></div>
+    </section>
+
+    <section class="panel quick-links" id="quickLinks"></section>
   </main>
+
+  <footer class="footer">
+    <div class="container">Проектный центр «Технопарк РГСУ» · Панель управления проектами, грантами и решениями НТС</div>
+  </footer>
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 

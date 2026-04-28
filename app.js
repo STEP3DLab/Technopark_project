@@ -473,7 +473,12 @@ function bindUi() {
     const isOpen = els.mainNav.classList.toggle("open");
     els.menuToggle.setAttribute("aria-expanded", String(isOpen));
   });
-  els.mainNav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => els.mainNav.classList.remove("open")));
+  els.mainNav.querySelectorAll("a").forEach((a) =>
+    a.addEventListener("click", () => {
+      els.mainNav.classList.remove("open");
+      els.menuToggle.setAttribute("aria-expanded", "false");
+    })
+  );
 
   [els.searchInput, els.statusFilter, els.deadlineFilter, els.riskOnly, els.readyOnly].forEach((el) => el.addEventListener("input", applyFiltersFromUI));
   els.resetFilters.addEventListener("click", () => {

@@ -1,6 +1,6 @@
 const API_CONFIG = {
   enabled: true,
-  baseUrl: "https://script.google.com/macros/s/AKfycbwzbWEjEpb1ySylb--7VhqEHvaC05WB5jhcw-8xpAj811bIJurVB3CW-ElDsoeKnWOA/exec",
+  baseUrl: "https://script.google.com/macros/s/AKfycbwiOYwnD7aozxYFzox4JokcHIZjR-OD7FUXcn16n0YqH1gdHoWqgqYXy2CmIJaiN9o/exec",
   endpoints: {
     projects: "?action=projects",
     grants: "?action=grants",

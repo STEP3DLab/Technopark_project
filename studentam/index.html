@@ -2,138 +2,62 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Будущий информационный сайт Технопарка и студенческого конструкторского бюро РГСУ.">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Технопарк РГСУ — страница в разработке</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#13274f">
+  <meta name="description" content="Студенческое конструкторское бюро «Технопарк» РГСУ: инженерные проекты, ИИ, промышленный дизайн, робототехника и БПЛА.">
+  <meta name="robots" content="index, follow">
+  <title>СКБ «Технопарк» — РГСУ</title>
   <style>
-    :root {
-      color-scheme: light;
-      --ink: #111827;
-      --muted: #5f6b7a;
-      --line: rgba(17, 24, 39, 0.10);
-      --accent: #2457d6;
-      --accent-soft: #eef3ff;
-      --surface: rgba(255, 255, 255, 0.88);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      overflow: hidden;
-      color: var(--ink);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background:
-        radial-gradient(circle at 16% 18%, rgba(36, 87, 214, 0.18), transparent 32%),
-        radial-gradient(circle at 85% 82%, rgba(97, 209, 255, 0.22), transparent 34%),
-        linear-gradient(145deg, #f8faff 0%, #edf3ff 52%, #f8fbff 100%);
-    }
-
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      border-radius: 999px;
-      pointer-events: none;
-    }
-
-    body::before {
-      width: 320px;
-      height: 320px;
-      top: -150px;
-      right: -90px;
-      background: rgba(36, 87, 214, 0.09);
-    }
-
-    body::after {
-      width: 230px;
-      height: 230px;
-      left: -90px;
-      bottom: -110px;
-      background: rgba(97, 209, 255, 0.13);
-    }
-
-    main {
-      position: relative;
-      z-index: 1;
-      width: min(760px, 100%);
-      padding: clamp(34px, 7vw, 72px);
-      border: 1px solid var(--line);
-      border-radius: 30px;
-      background: var(--surface);
-      box-shadow: 0 28px 80px rgba(36, 87, 214, 0.13);
-      backdrop-filter: blur(18px);
-      text-align: center;
-    }
-
-    .label {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 28px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.045em;
-      text-transform: uppercase;
-    }
-
-    .label::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(36, 87, 214, 0.10);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(38px, 7vw, 72px);
-      line-height: 0.98;
-      letter-spacing: -0.045em;
-      text-wrap: balance;
-    }
-
-    p {
-      max-width: 590px;
-      margin: 28px auto 0;
-      color: var(--muted);
-      font-size: clamp(17px, 2.4vw, 21px);
-      line-height: 1.55;
-      text-wrap: balance;
-    }
-
-    footer {
-      margin-top: 40px;
-      padding-top: 22px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    @media (max-width: 520px) {
-      main { border-radius: 24px; }
-      .label { font-size: 11px; }
-      h1 { line-height: 1.04; }
-    }
+    :root{color-scheme:light;--navy:#14284f;--navy-2:#0c1b38;--blue:#2d64e6;--blue-2:#4c7dff;--cyan:#55c6ff;--orange:#ff6640;--ink:#12203b;--muted:#65728a;--bg:#f6f8fc;--surface:rgba(255,255,255,.78);--line:rgba(20,40,79,.10);--shadow:0 26px 80px rgba(24,51,107,.13);--radius:28px;--ease:cubic-bezier(.2,.75,.15,1);--max:1220px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;color:var(--ink);background:radial-gradient(circle at 12% 2%,rgba(76,125,255,.10),transparent 28rem),radial-gradient(circle at 92% 18%,rgba(85,198,255,.10),transparent 28rem),var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}body.menu-open{overflow:hidden}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}canvas{display:block;max-width:100%}::selection{background:rgba(45,100,230,.20)}
+    .noise{position:fixed;inset:0;z-index:20;pointer-events:none;opacity:.055;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E")}.wrap{width:min(calc(100% - 40px),var(--max));margin-inline:auto}.section{padding:108px 0}.section-sm{padding:78px 0}
+    .site-header{position:fixed;z-index:50;top:14px;left:0;width:100%;pointer-events:none}.nav-shell{pointer-events:auto;width:min(calc(100% - 28px),1240px);margin:0 auto;height:68px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px;padding:0 14px 0 18px;border:1px solid rgba(255,255,255,.72);border-radius:22px;background:rgba(250,252,255,.76);box-shadow:0 12px 38px rgba(21,42,83,.08);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%)}
+    .brand{display:inline-flex;align-items:center;gap:12px;min-width:max-content}.brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:#fff;background:linear-gradient(145deg,var(--navy),var(--blue));box-shadow:0 8px 24px rgba(45,100,230,.24);position:relative;overflow:hidden}.brand-mark:before,.brand-mark:after{content:"";position:absolute;border-radius:999px;border:1px solid rgba(255,255,255,.7)}.brand-mark:before{width:22px;height:22px;transform:translate(-6px,-5px)}.brand-mark:after{width:16px;height:16px;transform:translate(8px,8px)}.brand-mark span{font-size:11px;font-weight:900;letter-spacing:-.05em;position:relative;z-index:2}.brand-copy{display:flex;flex-direction:column;line-height:1;gap:4px}.brand-copy strong{font-size:14px;letter-spacing:-.02em}.brand-copy small{color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .desktop-nav{justify-self:center;display:flex;align-items:center;gap:6px}.desktop-nav a{padding:11px 12px;border-radius:12px;color:#45516a;font-size:13px;font-weight:700;transition:background .25s ease,color .25s ease}.desktop-nav a:hover{background:#fff;color:var(--navy)}.nav-cta,.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 18px;border-radius:14px;border:1px solid transparent;font-weight:800;font-size:14px;cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s ease,background .25s ease,border-color .25s ease}.nav-cta,.btn-primary{color:#fff;background:linear-gradient(135deg,var(--navy),var(--blue));box-shadow:0 10px 26px rgba(45,100,230,.18)}.nav-cta:hover,.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(45,100,230,.27)}.btn-secondary{background:rgba(255,255,255,.72);border-color:var(--line);color:var(--navy)}.btn-secondary:hover{transform:translateY(-2px);background:#fff;border-color:rgba(45,100,230,.2)}.btn svg,.nav-cta svg{width:17px;height:17px}
+    .menu-btn{display:none;width:44px;height:44px;border:0;border-radius:12px;background:#fff;cursor:pointer;position:relative}.menu-btn span{position:absolute;left:12px;width:20px;height:2px;border-radius:9px;background:var(--navy);transition:.25s ease}.menu-btn span:nth-child(1){top:16px}.menu-btn span:nth-child(2){top:22px}.menu-btn span:nth-child(3){top:28px}.mobile-menu{position:fixed;inset:92px 14px auto;z-index:49;padding:18px;border:1px solid rgba(255,255,255,.8);border-radius:22px;background:rgba(250,252,255,.96);box-shadow:var(--shadow);backdrop-filter:blur(22px);opacity:0;transform:translateY(-10px) scale(.98);pointer-events:none;transition:.3s var(--ease)}.mobile-menu.open{opacity:1;transform:none;pointer-events:auto}.mobile-menu a{display:block;padding:14px 12px;border-bottom:1px solid var(--line);font-weight:800}.mobile-menu a:last-child{border-bottom:0}
+    .hero{min-height:100svh;padding:132px 0 54px;display:flex;align-items:center;overflow:hidden;position:relative}.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(20,40,79,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(20,40,79,.035) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,transparent,#000 16%,#000 72%,transparent 100%);pointer-events:none}.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(430px,.96fr);gap:clamp(36px,7vw,96px);align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:9px;margin-bottom:24px;padding:9px 13px;border-radius:999px;border:1px solid rgba(45,100,230,.12);background:rgba(255,255,255,.75);color:var(--blue);box-shadow:0 8px 30px rgba(20,40,79,.06);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 5px rgba(255,102,64,.12)}h1,h2,h3,p{margin-top:0}.hero h1{margin-bottom:24px;max-width:740px;color:var(--navy-2);font-size:clamp(52px,6.1vw,92px);line-height:.94;letter-spacing:-.062em;text-wrap:balance}.hero h1 .accent{color:transparent;background:linear-gradient(105deg,var(--blue) 0%,#315bd0 38%,var(--cyan) 100%);background-clip:text;-webkit-background-clip:text}.hero-lead{max-width:650px;margin-bottom:32px;color:#59667e;font-size:clamp(18px,1.55vw,22px);line-height:1.55;letter-spacing:-.015em}.hero-actions{display:flex;flex-wrap:wrap;gap:12px}.hero-meta{display:flex;flex-wrap:wrap;gap:20px 28px;margin-top:34px;padding-top:24px;border-top:1px solid var(--line)}.hero-meta div{min-width:140px}.hero-meta strong{display:block;color:var(--navy);font-size:22px;letter-spacing:-.04em}.hero-meta span{color:var(--muted);font-size:12px;line-height:1.35}
+    .scene-wrap{perspective:1200px;position:relative;min-height:590px}.scene-card{position:relative;height:590px;border-radius:34px;overflow:hidden;border:1px solid rgba(255,255,255,.68);background:radial-gradient(circle at 50% 42%,rgba(90,153,255,.24),transparent 29%),radial-gradient(circle at 78% 25%,rgba(85,198,255,.15),transparent 25%),linear-gradient(145deg,#13274f,#0d1b38 72%,#132c57);box-shadow:0 44px 100px rgba(18,39,79,.26);transform-style:preserve-3d;transition:transform .5s var(--ease)}.scene-card:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at 50% 50%,black,transparent 76%);opacity:.55}.scene-card:after{content:"";position:absolute;inset:1px;border-radius:33px;box-shadow:inset 0 0 80px rgba(75,124,255,.06),inset 0 0 0 1px rgba(255,255,255,.03);pointer-events:none}#tech3d{width:100%;height:100%;position:absolute;inset:0}.scene-label{position:absolute;top:22px;left:22px;display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.76);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.scene-label:before{content:"";width:7px;height:7px;border-radius:50%;background:#6ee7ff;box-shadow:0 0 18px #6ee7ff}.chip{position:absolute;min-width:92px;padding:12px 15px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;box-shadow:0 18px 40px rgba(0,0,0,.18);backdrop-filter:blur(12px);font-weight:800;font-size:13px;letter-spacing:-.01em;transform:translateZ(80px);animation:float 5.5s ease-in-out infinite}.chip small{display:block;margin-top:3px;color:rgba(255,255,255,.55);font-size:9px;text-transform:uppercase;letter-spacing:.08em}.chip-1{top:19%;right:8%;animation-delay:-.7s}.chip-2{top:54%;left:7%;animation-delay:-2.2s}.chip-3{bottom:12%;right:14%;animation-delay:-3.4s}.chip-4{top:34%;left:10%;animation-delay:-4.1s}.scene-foot{position:absolute;left:22px;right:22px;bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;color:rgba(255,255,255,.72)}.scene-foot strong{display:block;color:#fff;font-size:13px;letter-spacing:.02em}.scene-foot span{font-size:10px}.scene-index{font-size:11px;font-weight:900;letter-spacing:.18em}@keyframes float{0%,100%{transform:translate3d(0,0,80px)}50%{transform:translate3d(0,-12px,100px)}}
+    .section-head{display:grid;grid-template-columns:.7fr 1.3fr;gap:36px;align-items:end;margin-bottom:46px}.kicker{color:var(--blue);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.section-head h2,.split-copy h2,.cta-panel h2{margin:0;color:var(--navy-2);font-size:clamp(38px,4.6vw,66px);line-height:1;letter-spacing:-.055em;text-wrap:balance}.section-head p{max-width:640px;margin:0;color:var(--muted);font-size:17px;line-height:1.65}.lab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.lab-card{position:relative;min-height:430px;padding:28px;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.76);box-shadow:0 16px 48px rgba(23,47,95,.06);transition:transform .35s var(--ease),box-shadow .35s ease,border-color .35s ease}.lab-card:hover{transform:translateY(-8px);box-shadow:0 26px 70px rgba(23,47,95,.12);border-color:rgba(45,100,230,.18)}.lab-card:after{content:"";position:absolute;width:220px;height:220px;right:-95px;bottom:-100px;border-radius:50%;background:radial-gradient(circle,rgba(76,125,255,.18),transparent 68%);transition:transform .4s var(--ease)}.lab-card:hover:after{transform:scale(1.4)}.lab-num{display:flex;justify-content:space-between;align-items:center;margin-bottom:86px;color:var(--blue);font-size:12px;font-weight:900;letter-spacing:.1em}.lab-icon{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:#edf3ff;color:var(--blue)}.lab-icon svg{width:22px;height:22px}.lab-card h3{margin:0 0 12px;color:var(--navy);font-size:25px;line-height:1.05;letter-spacing:-.035em}.lab-card p{margin-bottom:22px;color:var(--muted);line-height:1.6;font-size:14px}.tags{display:flex;flex-wrap:wrap;gap:7px}.tag{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.72);color:#536078;font-size:11px;font-weight:800}
+    .process{color:#fff;background:radial-gradient(circle at 10% 10%,rgba(76,125,255,.25),transparent 35rem),radial-gradient(circle at 90% 90%,rgba(85,198,255,.13),transparent 32rem),var(--navy-2);overflow:hidden;position:relative}.process .section-head h2{color:#fff}.process .section-head p{color:rgba(255,255,255,.61)}.process .kicker{color:#78caff}.process-track{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative}.process-track:before{content:"";position:absolute;top:26px;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,rgba(116,192,255,.46),transparent)}.process-step{position:relative;padding:0 20px 12px 0}.step-dot{position:relative;z-index:2;width:52px;height:52px;display:grid;place-items:center;margin-bottom:26px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);box-shadow:0 12px 30px rgba(0,0,0,.16);color:#82ceff;font-weight:900;font-size:13px;backdrop-filter:blur(10px)}.process-step h3{margin:0 0 9px;font-size:18px;letter-spacing:-.025em}.process-step p{margin:0;color:rgba(255,255,255,.55);font-size:13px;line-height:1.55}
+    .split{display:grid;grid-template-columns:.95fr 1.05fr;gap:70px;align-items:center}.split-copy p{max-width:570px;margin:24px 0 0;color:var(--muted);font-size:17px;line-height:1.68}.benefit-list{margin-top:30px;display:grid;gap:10px}.benefit{display:flex;align-items:center;gap:13px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.65);font-weight:800;font-size:14px}.benefit i{width:25px;height:25px;border-radius:8px;display:grid;place-items:center;background:#eaf1ff;color:var(--blue);font-style:normal;font-size:13px}.project-stack{display:grid;gap:12px}.project-card{display:grid;grid-template-columns:74px 1fr auto;align-items:center;gap:18px;padding:18px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.78);box-shadow:0 12px 36px rgba(24,51,107,.055);transition:transform .3s var(--ease),box-shadow .3s ease}.project-card:hover{transform:translateX(-8px);box-shadow:0 20px 50px rgba(24,51,107,.10)}.project-visual{height:74px;border-radius:18px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:12px;background:linear-gradient(135deg,rgba(255,255,255,.14),transparent 50%),linear-gradient(145deg,var(--navy),var(--blue));position:relative;overflow:hidden}.project-visual:before,.project-visual:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.5);border-radius:50%}.project-visual:before{width:42px;height:42px;transform:translate(-15px,-12px)}.project-visual:after{width:28px;height:28px;transform:translate(18px,18px)}.project-copy strong{display:block;color:var(--navy);font-size:16px;letter-spacing:-.02em}.project-copy span{display:block;margin-top:5px;color:var(--muted);font-size:12px;line-height:1.45}.project-arrow{width:38px;height:38px;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;color:var(--blue)}
+    .join-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:42px}.join-card{padding:28px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.75)}.join-card span{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#edf3ff;color:var(--blue);font-weight:900;font-size:12px}.join-card h3{margin:22px 0 9px;font-size:19px;letter-spacing:-.03em}.join-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.58}.cta-panel{position:relative;overflow:hidden;padding:clamp(36px,6vw,72px);border-radius:34px;color:#fff;background:radial-gradient(circle at 85% 18%,rgba(85,198,255,.22),transparent 24rem),radial-gradient(circle at 8% 90%,rgba(76,125,255,.28),transparent 24rem),var(--navy-2);box-shadow:0 32px 90px rgba(15,34,69,.2)}.cta-panel:after{content:"";position:absolute;width:420px;height:420px;right:-210px;top:-210px;border-radius:50%;border:1px solid rgba(255,255,255,.12);box-shadow:0 0 0 50px rgba(255,255,255,.025),0 0 0 100px rgba(255,255,255,.018)}.cta-panel h2{max-width:780px;color:#fff}.cta-panel p{max-width:650px;margin:24px 0 32px;color:rgba(255,255,255,.64);font-size:17px;line-height:1.65}.cta-panel .btn-secondary{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14);color:#fff}.cta-panel .btn-secondary:hover{background:rgba(255,255,255,.16)}footer{padding:42px 0 34px}.footer-row{display:flex;justify-content:space-between;gap:24px;align-items:center;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.footer-brand{color:var(--navy);font-weight:900}.reveal{opacity:0;transform:translateY(22px);transition:opacity .75s var(--ease),transform .75s var(--ease)}.reveal.visible{opacity:1;transform:none}.reveal.delay-1{transition-delay:.08s}.reveal.delay-2{transition-delay:.16s}.cursor-glow{position:fixed;z-index:0;width:420px;height:420px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(76,125,255,.075),transparent 68%);transform:translate(-50%,-50%);transition:opacity .2s ease}
+    @media(max-width:1040px){.desktop-nav{display:none}.nav-shell{grid-template-columns:1fr auto}.nav-cta{display:none}.menu-btn{display:block}.hero{min-height:auto;padding-top:124px}.hero-grid{grid-template-columns:1fr;gap:54px}.hero-copy{max-width:840px}.scene-wrap{min-height:520px}.scene-card{height:520px}.lab-grid{grid-template-columns:1fr}.lab-card{min-height:auto}.lab-num{margin-bottom:54px}.process-track{grid-template-columns:repeat(2,1fr);gap:30px}.process-track:before{display:none}.split{grid-template-columns:1fr;gap:46px}.join-grid{grid-template-columns:1fr}}
+    @media(max-width:720px){.wrap{width:min(calc(100% - 28px),var(--max))}.section{padding:82px 0}.section-sm{padding:64px 0}.nav-shell{width:calc(100% - 20px);height:62px;border-radius:18px}.brand-copy small{display:none}.hero{padding:112px 0 40px}.hero h1{font-size:clamp(46px,14vw,72px)}.hero-lead{font-size:17px}.hero-actions{display:grid;grid-template-columns:1fr}.btn{width:100%}.hero-meta{display:grid;grid-template-columns:repeat(2,1fr)}.scene-wrap{min-height:440px}.scene-card{height:440px;border-radius:26px}.chip{min-width:78px;padding:9px 11px;font-size:11px;border-radius:13px}.chip-1{top:18%;right:5%}.chip-2{top:58%;left:5%}.chip-4{top:36%;left:7%}.scene-foot{left:16px;right:16px;bottom:14px}.section-head{grid-template-columns:1fr;gap:14px}.section-head h2,.split-copy h2,.cta-panel h2{font-size:clamp(36px,11vw,52px)}.process-track{grid-template-columns:1fr}.process-step{display:grid;grid-template-columns:54px 1fr;gap:16px;padding:0}.step-dot{margin:0}.project-card{grid-template-columns:62px 1fr}.project-visual{height:62px}.project-arrow{display:none}.cta-panel{border-radius:26px}.footer-row{flex-direction:column;align-items:flex-start}.cursor-glow{display:none}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.reveal{opacity:1;transform:none}}
   </style>
 </head>
 <body>
-  <main>
-    <div class="label">Технопарк РГСУ и студенческое конструкторское бюро</div>
-    <h1>Страница находится в разработке</h1>
-    <p>Здесь будет размещена информация для студентов РГСУ о лабораториях, проектах и возможностях участия.</p>
-    <footer>Проектный центр «Технопарк РГСУ»</footer>
+  <div class="noise" aria-hidden="true"></div><div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <header class="site-header"><div class="nav-shell">
+    <a class="brand" href="#top" aria-label="СКБ Технопарк РГСУ — на главную"><span class="brand-mark"><span>РГСУ</span></span><span class="brand-copy"><strong>СКБ «Технопарк»</strong><small>Российский государственный социальный университет</small></span></a>
+    <nav class="desktop-nav" aria-label="Основная навигация"><a href="#labs">Направления</a><a href="#process">Как работаем</a><a href="#projects">Проекты</a><a href="#join">Как попасть</a></nav>
+    <a class="nav-cta" href="#join">Стать участником<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div></header>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Мобильная навигация"><a href="#labs">Направления</a><a href="#process">Как работаем</a><a href="#projects">Проекты</a><a href="#join">Как попасть</a></nav>
+  <main id="top">
+    <section class="hero"><div class="wrap hero-grid">
+      <div class="hero-copy reveal visible"><div class="eyebrow"><i></i> Студенческое конструкторское бюро • РГСУ</div><h1>Идеи становятся <span class="accent">прототипами.</span></h1><p class="hero-lead">Среда для студентов, которые хотят проектировать, программировать, собирать, тестировать и доводить инженерные идеи до работающего результата.</p><div class="hero-actions"><a class="btn btn-primary" href="#labs">Выбрать направление<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn btn-secondary" href="#process">Как устроена работа</a></div><div class="hero-meta" aria-label="Ключевые направления"><div><strong>03</strong><span>инженерных направления</span></div><div><strong>01</strong><span>команда вокруг реальных задач</span></div><div><strong>∞</strong><span>пространство для экспериментов</span></div></div></div>
+      <div class="scene-wrap reveal delay-1" id="sceneWrap"><div class="scene-card" id="sceneCard"><canvas id="tech3d" aria-label="Интерактивная трехмерная инженерная визуализация"></canvas><div class="scene-label">Engineering core / interactive 3D</div><div class="chip chip-1">ИИ<small>алгоритмы</small></div><div class="chip chip-2">САПР<small>проектирование</small></div><div class="chip chip-3">БПЛА<small>системы</small></div><div class="chip chip-4">3D<small>прототипы</small></div><div class="scene-foot"><div><strong>СКБ / Технопарк</strong><span>двигайте курсором — объект реагирует</span></div><div class="scene-index">RGSU // 26</div></div></div></div>
+    </div></section>
+    <section class="section" id="labs"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Направления</div></div><div><h2>Три лаборатории. Одна проектная среда.</h2><p>Можно прийти со своей идеей или присоединиться к команде. Компетенции пересекаются: цифровая модель превращается в изделие, алгоритм — в сервис, а электроника — в работающую систему.</p></div></div><div class="lab-grid">
+      <article class="lab-card reveal"><div class="lab-num"><span>01 / ENGINEERING</span><span class="lab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17.5V6.5L12 2l8 4.5v11L12 22l-8-4.5Z" stroke="currentColor" stroke-width="1.6"/><path d="m4.5 7 7.5 4.5L19.5 7M12 11.5V21" stroke="currentColor" stroke-width="1.6"/></svg></span></div><h3>Промышленный дизайн и инжиниринг</h3><p>От обратного проектирования и цифровой геометрии до прототипа, оснастки и готовой детали.</p><div class="tags"><span class="tag">3D‑сканирование</span><span class="tag">САПР</span><span class="tag">Реверс</span><span class="tag">3D‑печать</span><span class="tag">Прототипирование</span></div></article>
+      <article class="lab-card reveal delay-1"><div class="lab-num"><span>02 / DIGITAL</span><span class="lab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v3M15 4h3a2 2 0 0 1 2 2v3M9 20H6a2 2 0 0 1-2-2v-3M15 20h3a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.6"/></svg></span></div><h3>Компьютерные науки и искусственный интеллект</h3><p>Программные продукты, анализ данных, компьютерное зрение, автоматизация и интеллектуальные сервисы.</p><div class="tags"><span class="tag">ИИ</span><span class="tag">Computer Vision</span><span class="tag">Python</span><span class="tag">Веб</span><span class="tag">Аналитика</span></div></article>
+      <article class="lab-card reveal delay-2"><div class="lab-num"><span>03 / ROBOTICS</span><span class="lab-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M8 8h8a4 4 0 0 1 4 4v4H4v-4a4 4 0 0 1 4-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M9 8V5m6 3V5M7 16v3m10-3v3M8 12h.01M16 12h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></div><h3>Робототехника и беспилотные системы</h3><p>Механика, электроника, управление и интеграция компонентов в робототехнические и беспилотные комплексы.</p><div class="tags"><span class="tag">Роботы</span><span class="tag">БПЛА</span><span class="tag">Электроника</span><span class="tag">Управление</span><span class="tag">Испытания</span></div></article>
+    </div></div></section>
+    <section class="section process" id="process"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Проектный цикл</div></div><div><h2>Не кружок. Работа от задачи до результата.</h2><p>Бюро строится вокруг проектной логики: понятная задача, роли в команде, быстрый прототип, испытание и демонстрируемый результат.</p></div></div><div class="process-track"><div class="process-step reveal"><div class="step-dot">01</div><div><h3>Задача</h3><p>Формулируем проблему, ограничения и критерий результата.</p></div></div><div class="process-step reveal delay-1"><div class="step-dot">02</div><div><h3>Команда</h3><p>Собираем нужные компетенции и распределяем роли.</p></div></div><div class="process-step reveal delay-2"><div class="step-dot">03</div><div><h3>Прототип</h3><p>Быстро проверяем ключевую гипотезу на рабочей версии.</p></div></div><div class="process-step reveal"><div class="step-dot">04</div><div><h3>Тест</h3><p>Проверяем, измеряем, фиксируем ошибки и улучшаем.</p></div></div><div class="process-step reveal delay-1"><div class="step-dot">05</div><div><h3>Результат</h3><p>Готовим демонстрацию, документацию и следующий этап.</p></div></div></div></div></section>
+    <section class="section" id="projects"><div class="wrap split"><div class="split-copy reveal"><div class="kicker">Формат задач</div><h2>Проекты, которые можно показать.</h2><p>Смысл СКБ — не в учебных упражнениях, а в осязаемом результате. Вы получаете опыт полного инженерного цикла и материал для портфолио.</p><div class="benefit-list"><div class="benefit"><i>✓</i> Работа с оборудованием и инженерным ПО</div><div class="benefit"><i>✓</i> Междисциплинарная команда</div><div class="benefit"><i>✓</i> Проектная документация и презентация результата</div><div class="benefit"><i>✓</i> Возможность развить собственную идею</div></div></div><div class="project-stack"><article class="project-card reveal"><div class="project-visual">01</div><div class="project-copy"><strong>Инженерные и медицинские тренажёры</strong><span>Конструкция, макеты, прототипирование, эргономика и испытания.</span></div><div class="project-arrow">↗</div></article><article class="project-card reveal delay-1"><div class="project-visual">02</div><div class="project-copy"><strong>Цифровые продукты и ИИ</strong><span>Веб‑системы, компьютерное зрение, аналитика и автоматизация.</span></div><div class="project-arrow">↗</div></article><article class="project-card reveal delay-2"><div class="project-visual">03</div><div class="project-copy"><strong>Реверсивный инжиниринг</strong><span>Сканирование, восстановление геометрии, модернизация и производство.</span></div><div class="project-arrow">↗</div></article><article class="project-card reveal"><div class="project-visual">04</div><div class="project-copy"><strong>Робототехника и БПЛА</strong><span>Механика, сенсоры, управление, интеграция и полевые испытания.</span></div><div class="project-arrow">↗</div></article></div></div></section>
+    <section class="section-sm" id="join"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Как попасть в СКБ</div></div><div><h2>Не обязательно уметь всё. Важно хотеть делать.</h2><p>Вход в проект может быть разным: с готовой компетенцией, с собственной идеей или просто с желанием научиться через реальную задачу.</p></div></div><div class="join-grid"><article class="join-card reveal"><span>01</span><h3>Выберите направление</h3><p>Определите, что ближе: инженерия, цифровые технологии или робототехника и БПЛА.</p></article><article class="join-card reveal delay-1"><span>02</span><h3>Расскажите, что умеете</h3><p>Коротко: курс, навыки, интересы, опыт и сколько времени готовы уделять проекту.</p></article><article class="join-card reveal delay-2"><span>03</span><h3>Получите первую задачу</h3><p>Начните с небольшого понятного блока и постепенно переходите к самостоятельной ответственности.</p></article></div></div></section>
+    <section class="section-sm"><div class="wrap"><div class="cta-panel reveal"><div class="kicker">СКБ • Технопарк РГСУ</div><h2>Есть идея? Соберём вокруг неё инженерную команду.</h2><p>Приносите задачу, концепцию или даже сырой набросок. Поможем разложить идею на инженерные блоки и понять, какой прототип можно сделать первым.</p><div class="hero-actions"><a class="btn btn-primary" href="#labs">Посмотреть направления</a><a class="btn btn-secondary" href="#top">Вернуться наверх</a></div></div></div></section>
   </main>
+  <footer><div class="wrap footer-row"><div><span class="footer-brand">СКБ «Технопарк» РГСУ</span> · Проектная инженерная среда для студентов</div><div>Москва · РГСУ · 2026</div></div></footer>
+  <script>
+    (()=>{const menuBtn=document.getElementById('menuBtn'),mobileMenu=document.getElementById('mobileMenu'),mobileLinks=mobileMenu.querySelectorAll('a');const setMenu=open=>{mobileMenu.classList.toggle('open',open);document.body.classList.toggle('menu-open',open);menuBtn.setAttribute('aria-expanded',String(open))};menuBtn.addEventListener('click',()=>setMenu(!mobileMenu.classList.contains('open')));mobileLinks.forEach(a=>a.addEventListener('click',()=>setMenu(false)));
+    const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}})},{threshold:.12,rootMargin:'0px 0px -8% 0px'});document.querySelectorAll('.reveal:not(.visible)').forEach(el=>observer.observe(el));
+    const cursor=document.getElementById('cursorGlow');window.addEventListener('pointermove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'},{passive:true});const wrap=document.getElementById('sceneWrap'),card=document.getElementById('sceneCard');if(matchMedia('(pointer:fine)').matches){wrap.addEventListener('pointermove',e=>{const r=wrap.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.style.transform=`rotateY(${x*7}deg) rotateX(${-y*7}deg)`});wrap.addEventListener('pointerleave',()=>card.style.transform='rotateY(0deg) rotateX(0deg)')}
+    const canvas=document.getElementById('tech3d'),ctx=canvas.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,TAU=Math.PI*2;let dpr=Math.min(devicePixelRatio||1,2),w=0,h=0,mx=0,my=0,targetMx=0,targetMy=0;const points=[],linePoints=[];for(let i=0;i<340;i++){const t=i/340*TAU,r=2.2+.62*Math.cos(3*t);points.push({x:r*Math.cos(2*t),y:r*Math.sin(2*t),z:.62*Math.sin(3*t)})}for(let lat=-3;lat<=3;lat++){const phi=lat*.33;for(let i=0;i<=72;i++){const t=i/72*TAU;linePoints.push({group:'lat'+lat,x:1.42*Math.cos(phi)*Math.cos(t),y:1.42*Math.sin(phi),z:1.42*Math.cos(phi)*Math.sin(t)})}}for(let lon=0;lon<8;lon++){const theta=lon/8*TAU;for(let i=0;i<=54;i++){const phi=-Math.PI/2+i/54*Math.PI;linePoints.push({group:'lon'+lon,x:1.42*Math.cos(phi)*Math.cos(theta),y:1.42*Math.sin(phi),z:1.42*Math.cos(phi)*Math.sin(theta)})}}
+    function resize(){const r=canvas.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}new ResizeObserver(resize).observe(canvas);resize();canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();targetMx=(e.clientX-r.left)/r.width-.5;targetMy=(e.clientY-r.top)/r.height-.5},{passive:true});canvas.addEventListener('pointerleave',()=>{targetMx=0;targetMy=0});function rotate(p,ax,ay,az){let{x,y,z}=p,c=Math.cos(ax),s=Math.sin(ax);[y,z]=[y*c-z*s,y*s+z*c];c=Math.cos(ay);s=Math.sin(ay);[x,z]=[x*c+z*s,-x*s+z*c];c=Math.cos(az);s=Math.sin(az);[x,y]=[x*c-y*s,x*s+y*c];return{x,y,z}}function project(p,scale){const camera=5.8,depth=camera-p.z,k=camera/depth;return{x:w/2+p.x*scale*k,y:h/2+p.y*scale*k,k,z:p.z}}function polyline(group,ax,ay,az,scale){const arr=linePoints.filter(p=>p.group===group);ctx.beginPath();arr.forEach((p,i)=>{const q=project(rotate(p,ax,ay,az),scale);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.stroke()}
+    function draw(time){const t=reduced?.8:time*.00028;mx+=(targetMx-mx)*.045;my+=(targetMy-my)*.045;const ax=-.28+my*.7+Math.sin(t*.7)*.04,ay=.55+t+mx*.9,az=.14+Math.sin(t*.35)*.08,scale=Math.min(w,h)*.128;ctx.clearRect(0,0,w,h);let glow=ctx.createRadialGradient(w*.5,h*.47,0,w*.5,h*.47,Math.min(w,h)*.34);glow.addColorStop(0,'rgba(90,158,255,.18)');glow.addColorStop(.38,'rgba(64,121,255,.08)');glow.addColorStop(1,'rgba(20,40,79,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);ctx.save();ctx.lineWidth=.85;ctx.strokeStyle='rgba(157,205,255,.16)';for(let lat=-3;lat<=3;lat++)polyline('lat'+lat,ax,ay,az,scale);for(let lon=0;lon<8;lon++)polyline('lon'+lon,ax,ay,az,scale);ctx.restore();for(let ring=0;ring<3;ring++){const tilt=-.55+ring*.55;ctx.beginPath();for(let i=0;i<=90;i++){const ang=i/90*TAU+t*(ring%2?-.7:.5),base={x:Math.cos(ang)*2.25,y:Math.sin(ang)*.58,z:Math.sin(ang)*1.1},q=project(rotate(base,ax+tilt*.18,ay+tilt*.35,az+tilt*.25),scale);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)}ctx.strokeStyle=ring===1?'rgba(91,201,255,.34)':'rgba(88,124,255,.22)';ctx.lineWidth=ring===1?1.15:.75;ctx.stroke()}const projected=points.map(p=>{const r=rotate(p,ax,ay,az);return{...project(r,scale),raw:r}}).sort((a,b)=>a.z-b.z);projected.forEach((q,i)=>{if(i%2===0){const alpha=Math.max(.08,Math.min(.58,(q.z+3.3)/6));ctx.beginPath();ctx.arc(q.x,q.y,1.1+q.k*.65,0,TAU);ctx.fillStyle=`rgba(113,203,255,${alpha})`;ctx.fill()}});const ordered=points.map(p=>project(rotate(p,ax,ay,az),scale));ctx.beginPath();ordered.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));ctx.closePath();const grad=ctx.createLinearGradient(w*.32,h*.25,w*.72,h*.72);grad.addColorStop(0,'rgba(125,220,255,.70)');grad.addColorStop(.48,'rgba(79,126,255,.58)');grad.addColorStop(1,'rgba(255,114,85,.34)');ctx.strokeStyle=grad;ctx.lineWidth=1.55;ctx.shadowColor='rgba(80,150,255,.38)';ctx.shadowBlur=12;ctx.stroke();ctx.shadowBlur=0;const core=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,scale*1.12);core.addColorStop(0,'rgba(157,225,255,.28)');core.addColorStop(.25,'rgba(76,125,255,.13)');core.addColorStop(1,'rgba(76,125,255,0)');ctx.fillStyle=core;ctx.beginPath();ctx.arc(w/2,h/2,scale*1.1,0,TAU);ctx.fill();if(!reduced)requestAnimationFrame(draw)}requestAnimationFrame(draw)})();
+  </script>
 </body>
 </html>

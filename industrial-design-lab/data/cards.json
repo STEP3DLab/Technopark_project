@@ -1,0 +1,210 @@
+[
+  {
+    "slug": "pletneva-costume",
+    "image": "/images/pletneva-costume.webp",
+    "width": 1080,
+    "height": 1456,
+    "crop": "portrait",
+    "position": "center 42%",
+    "title": "Сценический костюм Анны Плетнёвой",
+    "meta": "3D-моделирование · 3D-печать · фэшн-тех",
+    "outcome": "Модульный 3D-костюм от цифровой модели до готового образа",
+    "facts": [
+      "2 видео процесса",
+      "9 этапов в галерее"
+    ],
+    "alt": "Сценический костюм, разработанный и напечатанный для Анны Плетнёвой из группы Винтаж",
+    "source": "https://t.me/s/STEP_3D_Lab?before=399",
+    "type": "Декор / инсталляция",
+    "category": "Сцена и мода"
+  },
+  {
+    "slug": "sakharov-art",
+    "image": "/images/cases/sakharov-art/copper-detail.webp",
+    "width": 1152,
+    "height": 1536,
+    "crop": "portrait",
+    "position": "center 48%",
+    "title": "Интерьерные 3D-панно",
+    "meta": "3D-печать · интерьер",
+    "outcome": "Рельефные композиции, установленные на объекте",
+    "facts": [
+      "3D-печать",
+      "Монтаж на объекте"
+    ],
+    "alt": "Рельефное интерьерное панно Step3D на проспекте Академика Сахарова",
+    "type": "Декор / инсталляция",
+    "category": "Интерьеры"
+  },
+  {
+    "slug": "parshin-sculptures",
+    "image": "/images/cases/parshin-sculptures/animal-finished.webp",
+    "width": 1152,
+    "height": 1536,
+    "crop": "portrait",
+    "position": "center 48%",
+    "title": "Скульптуры Фёдора Паршина",
+    "meta": "Авторская скульптура · 3D-производство",
+    "outcome": "Крупноформатные формы от цифровой подготовки до готового объекта",
+    "facts": [
+      "Печать по сегментам",
+      "Ручная доводка"
+    ],
+    "alt": "Скульптор Фёдор Паршин рядом с готовой анималистической скульптурой",
+    "type": "Скульптура / арт-объект",
+    "category": "Скульптуры"
+  },
+  {
+    "slug": "std-award",
+    "image": "/images/cases/std-award/award-series.webp",
+    "width": 1536,
+    "height": 1152,
+    "crop": "wide",
+    "position": "center 50%",
+    "title": "Награда для премии СТД России",
+    "meta": "СТД России · полный цикл · 10 дней",
+    "outcome": "От идеи и дизайна до наград для церемонии",
+    "facts": [
+      "10 дней",
+      "Вручал Владимир Машков"
+    ],
+    "alt": "Серия готовых наград для премии Союза театральных деятелей России",
+    "source": "https://stdrf.ru/novosti/sostoyalos-vruchenie-premiy-predsedatelya-i-sopredsedatelya-std-rf/",
+    "type": "Кубок / награда",
+    "category": "Награды"
+  },
+  {
+    "slug": "rto-traveling-cup",
+    "image": "/images/cases/rto-traveling-cup/trophy.webp",
+    "width": 1152,
+    "height": 1536,
+    "crop": "portrait",
+    "position": "center 48%",
+    "title": "Переходящий кубок Спартакиады РТО",
+    "meta": "СТД России · награда · 3D-печать",
+    "outcome": "Кубок чемпиона для Театра «Ленком Марка Захарова»",
+    "facts": [
+      "Переходящий кубок",
+      "Реализовано в 2026"
+    ],
+    "alt": "Переходящий кубок Спартакиады Российского театрального общества, изготовленный Step3D",
+    "source": "https://stdrf.ru/novosti/itogi-pervoy-spartakiady-rto/",
+    "type": "Кубок / награда",
+    "category": "Награды"
+  },
+  {
+    "slug": "astronomer",
+    "image": "/images/real-astronomer-v2.webp",
+    "width": 800,
+    "height": 600,
+    "crop": "portrait",
+    "position": "center 45%",
+    "title": "Памятник астрономам",
+    "meta": "Скульптура · макетирование",
+    "outcome": "Готовый объект в городской среде",
+    "facts": [
+      "Цифровая скульптура",
+      "Реализовано"
+    ],
+    "alt": "Завершённый памятник астрономам в городской среде",
+    "source": "https://t.me/STEP_3D_Lab/340",
+    "type": "Скульптура / арт-объект",
+    "category": "Скульптуры"
+  },
+  {
+    "slug": "red7-art",
+    "image": "/images/red7-art-object-v2.webp",
+    "width": 1600,
+    "height": 900,
+    "crop": "wide contain",
+    "position": "center",
+    "title": "3D-арт для RED7",
+    "meta": "Параметрический дизайн · интерьер",
+    "outcome": "Четыре композиции и система навигации",
+    "facts": [
+      "4 композиции",
+      "Проект скрытого крепления"
+    ],
+    "alt": "Разработка интерьерного 3D-арт-объекта для премиального дома RED7",
+    "source": "https://red-7.ru/gallery/",
+    "type": "Декор / инсталляция",
+    "category": "Интерьеры",
+    "badge": "Проектная разработка"
+  },
+  {
+    "slug": "crown",
+    "image": "/images/real-crown-v2.webp",
+    "width": 800,
+    "height": 800,
+    "crop": "square",
+    "position": "center",
+    "title": "Корона «Миссис Вселенная»",
+    "meta": "Генеративный дизайн · уникальное изделие",
+    "outcome": "Авторское конкурсное изделие",
+    "facts": [
+      "Уникальное изделие",
+      "Ручная доводка"
+    ],
+    "alt": "Корона Step3D для участницы конкурса Миссис Вселенная",
+    "source": "https://t.me/STEP_3D_Lab/134",
+    "type": "Кубок / награда",
+    "category": "Награды"
+  },
+  {
+    "slug": "award",
+    "image": "/images/real-award-v2.webp",
+    "width": 600,
+    "height": 800,
+    "crop": "portrait",
+    "position": "center 44%",
+    "title": "Авторская награда",
+    "meta": "Дизайн · 3D-печать",
+    "outcome": "Индивидуальная пластика и готовое изделие",
+    "facts": [
+      "Авторская форма",
+      "Готовое изделие"
+    ],
+    "alt": "Розовая 3D-печатная награда в форме совы",
+    "source": "https://t.me/STEP_3D_Lab/157",
+    "type": "Кубок / награда",
+    "category": "Награды"
+  },
+  {
+    "slug": "mosque",
+    "image": "/images/real-mosque-v2.webp",
+    "width": 600,
+    "height": 800,
+    "crop": "portrait",
+    "position": "center 58%",
+    "title": "Архитектурный макет мечети",
+    "meta": "Макет · ручная отделка",
+    "outcome": "Детализированный физический макет",
+    "facts": [
+      "Масштабирование",
+      "Ручная сборка"
+    ],
+    "alt": "Детализированный макет мечети работы Step3D и Фёдора Паршина",
+    "source": "https://t.me/STEP_3D_Lab/172",
+    "type": "Реплика / миниатюра",
+    "category": "Макеты"
+  },
+  {
+    "slug": "mask",
+    "image": "/images/real-mask-v2.webp",
+    "width": 800,
+    "height": 600,
+    "crop": "wide",
+    "position": "center 38%",
+    "title": "Сценическая маска",
+    "meta": "Промдизайн · 3D-печать",
+    "outcome": "Готовый аксессуар, проверенный примеркой",
+    "facts": [
+      "3D-печать",
+      "Проверено примеркой"
+    ],
+    "alt": "Примерка 3D-печатной сценической маски",
+    "source": "https://t.me/STEP_3D_Lab/113",
+    "type": "Декор / инсталляция",
+    "category": "Сцена и мода"
+  }
+]

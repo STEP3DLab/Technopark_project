@@ -41,6 +41,13 @@ for page in pages:
     for field in doc.xpath('//form//input|//form//select|//form//textarea'):
         if not field.get('aria-label') and not doc.xpath('//label[@for=$id]', id=field.get('id')):
             errors.append(f'{label}: unlabeled field {field.get("id")}')
+    for form in doc.xpath('//form'):
+        if form.get('id') == 'brief-form' and not form.xpath('.//fieldset[@disabled]'):
+            errors.append(f'{label}: form must fail closed without JavaScript')
+    if doc.xpath('//link[contains(@href, "step3d-base.css")]'):
+        errors.append(f'{label}: legacy CSS must not be loaded')
+    if doc.xpath('//header//button[@class="menu-button"]/preceding-sibling::nav'):
+        errors.append(f'{label}: mobile menu toggle must precede nav in tab order')
     for schema in doc.xpath('//script[@type="application/ld+json"]/text()'):
         try:
             json.loads(schema)

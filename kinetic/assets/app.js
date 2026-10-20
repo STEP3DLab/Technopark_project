@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
+import { createFallback } from './fallback.js';
 import { RoomEnvironment } from 'three/addons/RoomEnvironment.js';
 
 const $ = (s) => document.querySelector(s);
@@ -26,6 +27,7 @@ let envTarget, stage, cameraTween = null, lastTime = 0, motionClock = 0, firstFr
 const selectable = [], coverMaterials = [], kneeCaps = [], markers = [];
 const materialBase = new Map();
 let modelStats = {};
+let fallbackView=null, frameId=0, activeColor='ceramic';
 
 function toast(message) {
   const el = $('#toast'); el.textContent = message; el.classList.add('show');
@@ -71,7 +73,7 @@ function selectPart(id, focus=false) {
   $('#detail-copy').textContent=part.copy;
   $$('.part-row,.hotspot').forEach(el=>el.classList.toggle('selected',el.dataset.part===id));
   if(focus&&mode==='explore'&&['pylon','knee'].includes(id)&&progress<.4) setProgress(.48);
-  if(focus) $('#parts-panel').hidden=true;
+  if(focus) {$('#parts-panel').hidden=true;$('#parts-button').setAttribute('aria-expanded','false');$('#all-parts').setAttribute('aria-expanded','false');if(document.activeElement?.classList.contains('part-row'))$('#all-parts').focus();}
 }
 
 function carbonTexture() {
@@ -312,11 +314,13 @@ function resize() {
 function moveCamera(view) {
   const positions={three:[8,2.5,11],front:[0,1.7,14],side:[14,1.7,.01],back:[.01,1.7,-14]};
   const target=new THREE.Vector3(...positions[view]);
+  if(fallbackView)return;
   cameraTween={from:camera.position.clone(),to:target,start:performance.now(),duration:reducedMotion?1:850};
-  $$('.view-presets button').forEach(el=>el.classList.toggle('selected',el.dataset.view===view));
+  $$('.view-presets button').forEach(el=>{el.classList.toggle('selected',el.dataset.view===view);el.setAttribute('aria-pressed',String(el.dataset.view===view));});
 }
 
 function animate(time) {
+  if(document.hidden){lastTime=time;frameId=requestAnimationFrame(animate);return;}
   const dt=Math.min((time-lastTime)/1000||.016,.05);lastTime=time;
   if(playing){
     if(mode==='motion'){motionClock+=dt*.9;manualAngle=(1-Math.cos(motionClock))*33;}
@@ -325,6 +329,7 @@ function animate(time) {
   }
   const speed=reducedMotion?1:1-Math.exp(-dt*7);
   animatedProgress=lerp(animatedProgress,progress,speed);animatedAngle=lerp(animatedAngle,mode==='motion'?manualAngle:0,speed);
+  if(fallbackView){fallbackView.update({progress:animatedProgress,angle:animatedAngle,zoom:userZoom,xray,labels,selected});fallbackView.setColor(activeColor);viewport.classList.add('ready');frameId=requestAnimationFrame(animate);return;}
   const opening=smooth(0,.55,animatedProgress),spread=smooth(.48,1,animatedProgress);
   coverRight.position.set(opening*1.03+spread*.28,spread*-.12,opening*.05);
   coverRight.rotation.set(0,opening*.48,-opening*.14);
@@ -352,17 +357,17 @@ function animate(time) {
     marker.el.style.opacity=hidden?'0':'1';marker.el.style.pointerEvents=hidden?'none':'auto';marker.el.setAttribute('aria-hidden',String(hidden));marker.el.tabIndex=hidden?-1:0;
   });
   if(firstFrame){viewport.classList.add('ready');firstFrame=false;}
-  requestAnimationFrame(animate);
+  frameId=requestAnimationFrame(animate);
 }
 
 function initScene() {
   scene=new THREE.Scene();
   camera=new THREE.OrthographicCamera(-5,5,5,-5,.1,80);camera.position.set(8,2.5,11);camera.lookAt(0,0,0);
-  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<600?1.5:2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);viewport.append(renderer.domElement);
   const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();envTarget=pmrem.fromScene(room,.04);scene.environment=envTarget.texture;room.dispose();pmrem.dispose();
   scene.add(new THREE.HemisphereLight(0xffffff,0xb8c2aa,2.0));
-  const key=new THREE.DirectionalLight(0xffffff,4.3);key.position.set(4,7,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=6;key.shadow.camera.bottom=-6;key.shadow.normalBias=.025;key.shadow.bias=-.0001;scene.add(key);
+  const key=new THREE.DirectionalLight(0xffffff,4.3);key.position.set(4,7,5);key.castShadow=true;key.shadow.mapSize.set(innerWidth<600?1024:2048,innerWidth<600?1024:2048);key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=6;key.shadow.camera.bottom=-6;key.shadow.normalBias=.025;key.shadow.bias=-.0001;scene.add(key);
   const rim=new THREE.DirectionalLight(0xe8f5dc,3);rim.position.set(-5,3,-4);scene.add(rim);
   const fill=new THREE.DirectionalLight(0xffffff,.8);fill.position.set(0,0,7);scene.add(fill);
   buildModel();addStage();
@@ -373,7 +378,7 @@ function initScene() {
     else setProgress((mode==='motion'?manualAngle/70:progress)+d*.0007);
   },{passive:false,capture:true});
   controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.enablePan=false;controls.minPolarAngle=.18;controls.maxPolarAngle=Math.PI-.18;controls.minZoom=.62;controls.maxZoom=2.0;controls.rotateSpeed=.65;controls.target.set(0,0,0);
-  controls.addEventListener('start',()=>{cameraTween=null;});
+  controls.addEventListener('start',()=>{cameraTween=null;$$('.view-presets button').forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-pressed','false');});});
   let previousDistance=null;
   renderer.domElement.addEventListener('touchstart',e=>{if(e.touches.length===2)previousDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);},{passive:true});
   renderer.domElement.addEventListener('touchmove',e=>{if(e.touches.length===2&&previousDistance){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);userZoom=clamp(userZoom*d/previousDistance,.62,2);previousDistance=d;}},{passive:true});
@@ -386,7 +391,7 @@ function initScene() {
     const r=renderer.domElement.getBoundingClientRect(),pointer=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),ray=new THREE.Raycaster();ray.setFromCamera(pointer,camera);
     const hits=ray.intersectObjects(selectable,false);if(hits.length){const id=hits[0].object.userData.part;selectPart(id,true);if(id==='covers'&&mode==='explore')setProgress(progress>.3?0:.48);}
   });
-  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;toast('Графический контекст потерян. Перезагрузите страницу.');});
+  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;cancelAnimationFrame(frameId);startFallback();toast('3D приостановлено. Доступна интерактивная схема.');});
   resize();new ResizeObserver(resize).observe(viewport);selectPart('covers');requestAnimationFrame(animate);
 }
 
@@ -401,32 +406,42 @@ $('#auto-play').addEventListener('click',()=>{playing=!playing;if(mode==='explor
 $$('[data-progress]').forEach(b=>b.addEventListener('click',()=>setProgress(mode==='motion'?(b.dataset.progress==='0.48'?.5:Number(b.dataset.progress)):Number(b.dataset.progress))));
 $$('[data-color]').forEach(b=>b.addEventListener('click',()=>{
   const colors={ceramic:0xd5ddcc,graphite:0x303c34,lime:0xb3d95e},names={ceramic:'Керамика',graphite:'Графит',lime:'Лайм'};
-  coverMaterials.forEach(m=>m.color.setHex(colors[b.dataset.color]));
+  activeColor=b.dataset.color;coverMaterials.forEach(m=>m.color.setHex(colors[activeColor]));
   $$('[data-color]').forEach(el=>{el.classList.toggle('selected',el===b);el.setAttribute('aria-pressed',String(el===b));});$('#finish-name').textContent=names[b.dataset.color];
 }));
 $('#xray-button').addEventListener('click',()=>{xray=!xray;coverMaterials.forEach(m=>{m.transparent=xray;m.opacity=xray?.17:1;m.depthWrite=!xray;m.needsUpdate=true;});$('#xray-button').classList.toggle('active',xray);$('#xray-button').setAttribute('aria-pressed',String(xray));});
 $('#labels-button').addEventListener('click',()=>{labels=!labels;$('#labels-button').classList.toggle('active',labels);$('#labels-button').setAttribute('aria-pressed',String(labels));});
-const toggleParts=()=>{$('#parts-panel').hidden=!$('#parts-panel').hidden;};
-$('#parts-button').addEventListener('click',toggleParts);$('#all-parts').addEventListener('click',toggleParts);$('#close-parts').addEventListener('click',()=>$('#parts-panel').hidden=true);
+let panelOpener=null;
+function closeParts(){ $('#parts-panel').hidden=true;$('#parts-button').setAttribute('aria-expanded','false');$('#all-parts').setAttribute('aria-expanded','false');panelOpener?.focus(); }
+const toggleParts=e=>{if(!$('#parts-panel').hidden){closeParts();return;}panelOpener=e.currentTarget;$('#parts-panel').hidden=false;$('#parts-button').setAttribute('aria-expanded','true');$('#all-parts').setAttribute('aria-expanded','true');$('#close-parts').focus();};
+$('#parts-button').addEventListener('click',toggleParts);$('#all-parts').addEventListener('click',toggleParts);$('#close-parts').addEventListener('click',closeParts);
 $('#zoom-in').addEventListener('click',()=>{userZoom=clamp(userZoom+.18,.62,2);});$('#zoom-out').addEventListener('click',()=>{userZoom=clamp(userZoom-.18,.62,2);});
-function reset(){setMode('explore');setProgress(0);userZoom=1;xray=false;coverMaterials.forEach(m=>{m.transparent=false;m.opacity=1;m.depthWrite=true;m.needsUpdate=true;});$('#xray-button').classList.remove('active');$('#xray-button').setAttribute('aria-pressed','false');moveCamera('three');$('#parts-panel').hidden=true;toast('Исходный вид');}
+function reset(){setMode('explore');setProgress(0);manualAngle=0;motionClock=0;playDirection=1;userZoom=1;xray=false;labels=true;$('#labels-button').classList.add('active');$('#labels-button').setAttribute('aria-pressed','true');$$('[data-color]')[0].click();coverMaterials.forEach(m=>{m.transparent=false;m.opacity=1;m.depthWrite=true;m.needsUpdate=true;});$('#xray-button').classList.remove('active');$('#xray-button').setAttribute('aria-pressed','false');moveCamera('three');$('#parts-panel').hidden=true;toast('Исходный вид');}
 $('#reset').addEventListener('click',reset);
 $$('[data-view]').forEach(b=>b.addEventListener('click',()=>moveCamera(b.dataset.view)));
 $('#help-button').addEventListener('click',()=>$('#help-dialog').showModal());$('#about-button').addEventListener('click',()=>$('#about-dialog').showModal());
 $$('dialog').forEach(d=>{d.querySelector('.dialog-close').addEventListener('click',()=>d.close());d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});});
 $('#fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{toast('Полный экран недоступен в этом окне');}});
 document.addEventListener('keydown',e=>{
-  if(e.target instanceof HTMLInputElement||$$('dialog').some(d=>d.open))return;
-  if(e.code==='Space'){e.preventDefault();$('#auto-play').click();}
+  if(e.target.closest?.('input,textarea,select,[contenteditable=true]')||$$('dialog').some(d=>d.open)||e.altKey||e.ctrlKey||e.metaKey)return;
+  if(e.code==='Space'&&!e.target.closest?.('button,a')){e.preventDefault();$('#auto-play').click();}
   if(e.code==='KeyR')reset();
-  if(e.key==='Escape')$('#parts-panel').hidden=true;
-  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();setProgress((mode==='motion'?manualAngle/70:progress)+.05);}
-  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();setProgress((mode==='motion'?manualAngle/70:progress)-.05);}
+  if(e.key==='Escape'&&!$('#parts-panel').hidden)closeParts();
+  if(e.target===viewport&&(e.key==='ArrowRight'||e.key==='ArrowDown')){e.preventDefault();setProgress((mode==='motion'?manualAngle/70:progress)+.05);}
+  if(e.target===viewport&&(e.key==='ArrowLeft'||e.key==='ArrowUp')){e.preventDefault();setProgress((mode==='motion'?manualAngle/70:progress)-.05);}
 });
 updateProgressUI();
-try {initScene();} catch(error) {
-  console.error('KINETIC initialization failed',error);
-  $('#loading').innerHTML='<div class="error-state">Для интерактивной модели нужен WebGL. Включите аппаратное ускорение в браузере и обновите страницу.<button onclick="location.reload()">Попробовать снова</button></div>';
+function startFallback() {
+  if(fallbackView)return;
+  renderer?.domElement.remove();
+  fallbackView=createFallback(viewport,id=>{selectPart(id,true);if(id==='covers'&&mode==='explore')setProgress(progress>.3?0:.48);});
+  selectPart(selected);updateProgressUI();frameId=requestAnimationFrame(animate);
 }
-
-window.kinetic={getState:()=>({mode,progress,animatedProgress,angle:manualAngle,animatedAngle,playing,selected,xray,labels,zoom:userZoom,stats:modelStats,webgl:!!renderer?.getContext(),camera:camera?.position.toArray()}),setProgress,setMode,reset};
+try {
+  if(new URLSearchParams(location.search).has('schematic'))startFallback();else initScene();
+} catch(error) {
+  console.warn('KINETIC: interactive schematic enabled.',error.message);
+  startFallback();
+}
+window.kinetic={getState:()=>({mode,progress,animatedProgress,angle:manualAngle,animatedAngle,playing,selected,xray,labels,zoom:userZoom,color:activeColor,stats:modelStats,webgl:!fallbackView&&!!renderer?.getContext(),schematic:!!fallbackView,camera:camera?.position.toArray()}),setProgress,setMode,reset,selectPart,moveCamera,pause:()=>{playing=false;updateProgressUI();}};
+window.dispatchEvent(new Event('kinetic-ready'));

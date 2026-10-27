@@ -29,13 +29,15 @@ function updateEmail(){
   if(!emailLink||!hint||$('[data-step="3"]')?.hidden)return;
   const text=$('#brief-preview')?.textContent||'';
   if(!text.trim())return;
+  if($('#copy-to-email'))$('#copy-to-email').textContent='1. Скопировать запрос';
+  if($('#handoff-copy-status'))$('#handoff-copy-status').textContent='';
   const subject='СЛОЙ LAB — запрос по объекту';
   const body='Здравствуйте! Прошу обсудить возможность и состав работ по объекту.\n\n'+text+'\n\nПожалуйста, уточните необходимые исходные данные и дальнейшие шаги.';
   const complete=`mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   // Some mail clients impose short URI limits. Never silently discard part of the visitor's brief.
   if(complete.length>1800){
     emailLink.href=`mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Здравствуйте! Прошу обсудить объект в рамках проекта СЛОЙ LAB.\n\n[Вставьте скопированный бриф или приложите скачанный TXT.]')}`;
-    hint.textContent='Сначала скопируйте запрос кнопкой ниже или скачайте TXT. Затем откройте письмо и вставьте текст либо приложите файл. Адресат: '+recipient+'.';
+    hint.textContent='Сначала нажмите «Скопировать запрос» или скачайте TXT. Затем откройте письмо и вставьте текст либо приложите файл. Адресат: '+recipient+'.';
   }else{
     emailLink.href=complete;
     hint.textContent='Текст запроса будет добавлен в письмо. Адресат: '+recipient+'. Проверьте письмо и завершите отправку в своей почте.';
@@ -48,6 +50,26 @@ emailLink?.addEventListener('click',()=>{
 });
 $('#copy-brief')?.addEventListener('click',()=>signal('brief_copy','brief'));
 $('#download-brief')?.addEventListener('click',()=>signal('brief_download','brief'));
+$('#copy-to-email')?.addEventListener('click',async()=>{
+  const text=$('#brief-preview')?.textContent||'';
+  const status=$('#handoff-copy-status');
+  if(!text.trim()||!status)return;
+  try{
+    await navigator.clipboard.writeText(text);
+    status.textContent='Запрос скопирован. Откройте письмо, вставьте текст и отправьте его партнёру.';
+    $('#copy-to-email').textContent='1. Запрос скопирован ✓';
+    emailLink?.focus({preventScroll:true});
+  }catch{
+    $('#brief-raw').open=true;
+    const range=document.createRange();range.selectNodeContents($('#brief-preview'));
+    const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+    status.textContent='Автоматическое копирование недоступно. Текст запроса выделен ниже: скопируйте его средствами браузера или скачайте TXT.';
+  }
+});
+form?.addEventListener('input',()=>{
+  if($('#copy-to-email'))$('#copy-to-email').textContent='1. Скопировать запрос';
+  if($('#handoff-copy-status'))$('#handoff-copy-status').textContent='';
+});
 
 // A service landing page can carry a non-personal, allowlisted choice into the form.
 const requested=new URLSearchParams(location.search).get('service');

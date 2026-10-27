@@ -4,7 +4,7 @@
     "schemaVersion": 1,
     "asOf": "2026-10-27",
     "generatedAt": "2026-10-27",
-    "sheetUrl": null,
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/1ZyorxcS0C8UeLz2lNYO_YOHBySGTN9i1GGJ-gL6TB2E/edit",
     "repoUrl": "https://github.com/STEP3DLab/Technopark_project/tree/main/expert-monitor",
     "siteUrl": "https://step3dlab.github.io/Technopark_project/expert-monitor/",
     "scope": "35 районных судов Москвы, Мосгорсуд и основные арбитражные/вышестоящие суды; Московская область — дополнительный контур",
@@ -29,14 +29,24 @@
     "automation": {
       "sourceCheck": "hourly",
       "browserRefreshSeconds": 60,
-      "researchTaskStatus": "not_configured",
-      "sendingEnabled": false
+      "researchTaskStatus": "enabled",
+      "sendingEnabled": false,
+      "researchCadence": "ежечасно; 7 районных судов за цикл, полный проход по 35 судам за 5 успешных запусков",
+      "sourceWorkflowVerified": true
     },
     "coverage": {
       "districtCourts": 35,
       "courtDirectory": 43,
       "records": 12,
       "openedContactPages": 6
+    },
+    "reviewState": {
+      "courtCursor": 0,
+      "notifiedIds": [
+        "proc-0373100096726000033"
+      ],
+      "initialResearchAt": "2026-10-27",
+      "initialNoticeAt": "2026-10-27"
     }
   },
   "courts": [

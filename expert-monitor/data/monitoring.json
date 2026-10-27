@@ -1,5 +1,5 @@
 {
-  "lastRunAt": "2026-10-27T21:55:33.129Z",
+  "lastRunAt": "2026-10-27T22:13:37Z",
   "lastSuccessfulSearchAt": null,
   "status": "degraded",
   "mode": "public-source-links",
@@ -10,9 +10,9 @@
       "name": "Суды Москвы — поиск дел",
       "url": "https://mos-gorsud.ru/search",
       "status": "error",
-      "checkedAt": "2026-10-27T21:55:33.129Z",
+      "checkedAt": "2026-10-27T22:13:37Z",
       "httpStatus": null,
-      "error": "Семь очередных районных форм и общая поисковая страница были недоступны (timeout / access), определения не просмотрены.",
+      "error": "<urlopen error timed out>",
       "lastSuccessAt": null
     },
     {
@@ -20,31 +20,31 @@
       "name": "Картотека арбитражных дел",
       "url": "https://kad.arbitr.ru/",
       "status": "manual_required",
-      "checkedAt": "2026-10-27T21:55:33.129Z",
-      "httpStatus": 200,
-      "error": "Страница КАД доступна; тематическая выдача и последующие определения через web не извлечены. Это не означает отсутствие дел.",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Проверить номер дела, последние определения, кандидатуры экспертов и срок ответа. Публичный запрос не заменяет проверку карточки.",
       "lastSuccessAt": null
     },
     {
       "id": "as-moscow",
       "name": "АС Москвы — официальный сайт",
       "url": "https://msk.arbitr.ru/",
-      "status": "error",
-      "checkedAt": "2026-10-27T21:55:33.129Z",
-      "httpStatus": 403,
-      "error": "Web-проверка официального сайта вернула 403; карточки дел не изучены.",
-      "lastSuccessAt": "2026-10-27T21:54:35Z",
+      "status": "ok",
+      "checkedAt": "2026-10-27T22:13:37Z",
+      "httpStatus": 200,
+      "error": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-10-27T22:13:37Z",
       "contentHash": "a3c2c21c97f2732f0503ceed365581d067cde715b30aebb5a061bdd51f661f6b"
     },
     {
       "id": "as-region",
       "name": "АС Московской области — официальный сайт",
       "url": "https://asmo.arbitr.ru/",
-      "status": "error",
-      "checkedAt": "2026-10-27T21:55:33.129Z",
-      "httpStatus": 403,
-      "error": "Web-проверка официального сайта вернула 403; карточки дел не изучены.",
-      "lastSuccessAt": "2026-10-27T21:54:35Z",
+      "status": "ok",
+      "checkedAt": "2026-10-27T22:13:37Z",
+      "httpStatus": 200,
+      "error": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-10-27T22:13:37Z",
       "contentHash": "e556ecd72b55e9f44abaf759786394de3f2c4bf02df793b6d00f7e2a04a3173e"
     },
     {
@@ -52,9 +52,9 @@
       "name": "ЕИС — государственные закупки",
       "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
       "status": "manual_required",
-      "checkedAt": "2026-10-27T21:55:33.129Z",
+      "checkedAt": null,
       "httpStatus": null,
-      "error": "ЕИС по отслеживаемым процедурам не доступна через web; юридически значимые изменения не подтверждены.",
+      "error": "Самостоятельный канал закупок; не все судебные экспертизы являются закупками. Проверить извещение, сроки, требования и обеспечение.",
       "lastSuccessAt": null
     },
     {
@@ -72,19 +72,19 @@
       "name": "Управление Судебного департамента — справочник",
       "url": "https://usd--msk.sudrf.ru/modules.php?name=sud",
       "status": "error",
-      "checkedAt": "2026-10-27T21:54:35Z",
+      "checkedAt": "2026-10-27T22:13:37Z",
       "httpStatus": null,
-      "error": "Перенаправление на другой домен: требуется ручная проверка",
+      "error": "The read operation timed out",
       "lastSuccessAt": null
     },
     {
       "id": "kontur",
       "name": "Контур.Закупки — дополнительный поиск",
       "url": "https://zakupki.kontur.ru/",
-      "status": "ok",
-      "checkedAt": "2026-10-27T21:55:33.129Z",
-      "httpStatus": 200,
-      "error": "Вторичный источник: B2210261132311 подробная карточка закрыта 26.10 16:06, список заказчика показывает 29.10; первичная площадка недоступна.",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Источник сигналов и ориентиров. Текущую стадию и документацию подтверждать в ЕИС/на площадке.",
       "lastSuccessAt": null
     },
     {
@@ -110,19 +110,5 @@
   ],
   "newCandidates": [],
   "verifiedRecords": 20,
-  "automaticSending": false,
-  "lastResearchSummary": {
-    "date": "2026-10-28",
-    "arbitrationVerifiedRequests": 0,
-    "arbitrationCompleteness": "not_verified",
-    "districtAttempted": 7,
-    "districtVerified": 0,
-    "courtCursor": 28,
-    "changedIds": [
-      "proc-B2210261132311",
-      "proc-388-930"
-    ],
-    "newOpenConfirmed": 0,
-    "note": "Срок ранее анонсированной закупки Реновации оспорен: подробная карточка завершена 26.10, каталог указывает 29.10; по текущей подробной карточке закрыта. Bidzaar показывает 09:00 без TZ, Контур 12:00 МСК; свежей первичной верификации нет."
-  }
+  "automaticSending": false
 }

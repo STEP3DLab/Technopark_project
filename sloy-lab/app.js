@@ -1,11 +1,13 @@
 const $ = (selector, root=document) => root.querySelector(selector);
 const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
 const header = $('.header');
+const preferredScrollBehavior=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
 function setMenu(open, returnFocus=false){
   header.classList.toggle('menu-open',open);
   $('.menu-toggle').setAttribute('aria-expanded',String(open));
   $('.menu-toggle').setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');
-  if(returnFocus) $('.menu-toggle').focus();
+  if(open) $('.nav a')?.focus({preventScroll:true});
+  else if(returnFocus) $('.menu-toggle').focus();
 }
 $('.menu-toggle').addEventListener('click',()=>setMenu(!header.classList.contains('menu-open')));
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&header.classList.contains('menu-open'))setMenu(false,true);});
@@ -14,7 +16,7 @@ function focusTarget(target){
   const heading=target.matches('details')?$('summary',target):$('h1,h2,h3',target)||target;
   if(!heading.matches('summary'))heading.tabIndex=-1;
   heading.focus({preventScroll:true});
-  target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+  target.scrollIntoView({behavior:preferredScrollBehavior(),block:'start'});
 }
 document.addEventListener('click',event=>{
   const link=event.target.closest('a[href^="#"]');if(!link)return;
@@ -24,11 +26,13 @@ document.addEventListener('click',event=>{
 let navScheduled=false;
 function updateSectionNav(){
   navScheduled=false;
-  const links=$$('.section-nav a');const threshold=header.offsetHeight+$('.section-nav').offsetHeight+40;
+  const nav=$('.section-nav');if(!nav)return;
+  const links=$$('.section-nav a').filter(link=>document.getElementById(link.dataset.section));if(!links.length)return;
+  const threshold=header.offsetHeight+nav.offsetHeight+40;
   let active=links[0];
   links.forEach(link=>{if(document.getElementById(link.dataset.section).getBoundingClientRect().top<=threshold)active=link;});
   links.forEach(link=>{if(link===active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
-  const nav=$('.section-nav'),left=active.offsetLeft,right=left+active.offsetWidth;
+  const left=active.offsetLeft,right=left+active.offsetWidth;
   if(left<nav.scrollLeft)nav.scrollLeft=left-16;else if(right>nav.scrollLeft+nav.clientWidth)nav.scrollLeft=right-nav.clientWidth+16;
 }
 window.addEventListener('scroll',()=>{if(!navScheduled){navScheduled=true;requestAnimationFrame(updateSectionNav);}},{passive:true});
@@ -89,7 +93,7 @@ function setStep(step){
   $('#form-status').textContent='';
   const heading=$(`#step-${step}-title`);heading.focus({preventScroll:true});
   const rect=heading.getBoundingClientRect();
-  if(rect.top<header.offsetHeight+$('.section-nav').offsetHeight+24||rect.bottom>innerHeight-48)heading.scrollIntoView({block:'start',behavior:'smooth'});
+  if(rect.top<header.offsetHeight+($('.section-nav')?.offsetHeight||0)+24||rect.bottom>innerHeight-48)heading.scrollIntoView({block:'start',behavior:preferredScrollBehavior()});
 }
 function fieldError(id,message){
   const el=$(`#${id}`),error=$(`#${id}-error`);error.textContent=message;error.hidden=!message;
@@ -142,7 +146,7 @@ $('#brief-form').addEventListener('submit',event=>{
   clearTaskError();
   const date=new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow'}).format(new Date());
   const rows=[['Дата',date],['Объект',$('#object-type').value],['Город',$('#city').value.trim()],['Площадь',$('#area').value?new Intl.NumberFormat('ru-RU').format(Number($('#area').value))+' м²':'Требует уточнения'],['Формат',selectedPackage],['Задачи',tasks.length?tasks.join('; '):'По описанию'],['Желаемый срок',$('#deadline').value],['Исходные документы',$('#documents').value],['Вопрос / вводные',comment||'Требуют обсуждения.']];
-  const next='Передайте бриф коллегам. Затем согласуйте документы и доступ, точность и программу работ, сроки и состав выдачи, стоимость и ответственных специалистов.';
+  const next='Направьте запрос экспертному партнёру МСК-Эксперт: info@sud-mskexpert.ru. Затем согласуйте возможность выполнения работ, исходные документы, программу, стоимость, сроки, состав выдачи и ответственного исполнителя.';
   const note='Бриф сформирован локально. Не отправлен и не является договором или заявкой, принятой в работу.';
   briefText=['СЛОЙ — бриф объекта','Концепция лаборатории МСК Эксперт × Технопарк РГСУ','',...rows.map(([label,value])=>`${label}: ${value}`),'',next,'',note].join('\n');
   $('#brief-result').replaceChildren(createBriefList(rows));$('#brief-preview').textContent=briefText;
@@ -224,7 +228,7 @@ $('#reset-view').addEventListener('click',()=>scene?.reset());
 $('#zoom-in').addEventListener('click',()=>scene?.zoomBy(1.15));$('#zoom-out').addEventListener('click',()=>scene?.zoomBy(1/1.15));
 $('#section-range').addEventListener('input',event=>scene?.setSection(event.target.value));
 $('#retry-scene').addEventListener('click',()=>void startScene());
-function setHelp(open){$('#viewer-help').setAttribute('aria-expanded',String(open));$('#viewer-help-panel').hidden=!open;if(open){$('#viewer-help-panel').tabIndex=-1;$('#viewer-help-panel').focus({preventScroll:true});$('#viewer-help-panel').scrollIntoView({block:'nearest',behavior:'smooth'});}}
+function setHelp(open){$('#viewer-help').setAttribute('aria-expanded',String(open));$('#viewer-help-panel').hidden=!open;if(open){$('#viewer-help-panel').tabIndex=-1;$('#viewer-help-panel').focus({preventScroll:true});$('#viewer-help-panel').scrollIntoView({block:'nearest',behavior:preferredScrollBehavior()});}}
 $('#viewer-help').addEventListener('click',()=>setHelp($('#viewer-help-panel').hidden));
 $('#close-help').addEventListener('click',()=>{setHelp(false);$('#viewer-help').focus();});
 const viewer=$('#viewer'),dialog=$('#scene-dialog'),placeholder=document.createComment('3D viewer home');viewer.before(placeholder);
@@ -241,4 +245,36 @@ $('#expand-view').addEventListener('click',()=>{
 });
 dialog.addEventListener('cancel',event=>{event.preventDefault();closeViewer();});
 dialog.addEventListener('click',event=>{if(event.target===dialog)closeViewer();});
-syncState(sceneState);void startScene();
+syncState(sceneState);setSceneControls(false);
+
+// Keep the brief responsive before loading the optional 3D engine. An explicit
+// interaction starts immediately; merely approaching the viewer waits for idle.
+let initialSceneStarted=false, sceneIdleHandle=null, sceneIdleUsesTimeout=false, sceneObserver=null;
+function beginInitialScene(){
+  if(initialSceneStarted)return;
+  initialSceneStarted=true;
+  sceneObserver?.disconnect();
+  if(sceneIdleHandle!==null){
+    if(sceneIdleUsesTimeout)clearTimeout(sceneIdleHandle);
+    else window.cancelIdleCallback?.(sceneIdleHandle);
+    sceneIdleHandle=null;
+  }
+  viewer.removeEventListener('pointerdown',beginInitialScene);
+  viewer.removeEventListener('focusin',beginInitialScene);
+  void startScene();
+}
+function queueInitialScene(){
+  if(initialSceneStarted||sceneIdleHandle!==null)return;
+  const run=()=>{sceneIdleHandle=null;beginInitialScene();};
+  sceneIdleUsesTimeout=typeof window.requestIdleCallback!=='function';
+  sceneIdleHandle=sceneIdleUsesTimeout?setTimeout(run,100):window.requestIdleCallback(run,{timeout:700});
+}
+viewer.addEventListener('pointerdown',beginInitialScene,{passive:true});
+viewer.addEventListener('focusin',beginInitialScene);
+if('IntersectionObserver' in window){
+  sceneObserver=new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting))queueInitialScene();
+  },{rootMargin:'160px'});
+  sceneObserver.observe(viewer);
+}else queueInitialScene();
+

@@ -1,0 +1,157 @@
+{
+  "retrieved": "2026-10-27",
+  "authors": [
+    "Alexander Kapitanov",
+    "Karina Kvanchiani",
+    "Alexander Nagaev",
+    "Elizaveta Petrova"
+  ],
+  "paper": "https://arxiv.org/abs/2305.14527",
+  "notice": "Slovo uses a custom public attribution/share-alike license derived from, but not identical to, CC BY-SA 4.0. Source labels do not constitute review of avatar reconstruction.",
+  "samples": [
+    {
+      "id": "hello",
+      "label": "Привет!",
+      "dataset": "Slovo",
+      "file": "f17a6060-6ced-4bd1-9886-8578cfbb864f.mp4",
+      "source_archive": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+      "archive_path": "train/f17a6060-6ced-4bd1-9886-8578cfbb864f.mp4",
+      "annotation": {
+        "attachment_id": "f17a6060-6ced-4bd1-9886-8578cfbb864f",
+        "text": "Привет!",
+        "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+        "height": "1280",
+        "width": "720",
+        "length": "63.0",
+        "train": "True"
+      },
+      "bytes": 480247,
+      "sha256": "b8bfec2fab2990aac8c1fee2a34fd441461c28a873fe448ba03aeabe65977444",
+      "license": "LicenseRef-Slovo-Public-License",
+      "license_url": "https://github.com/ai-forever/slovo/blob/main/license/en_us.pdf",
+      "source_repository": "https://github.com/ai-forever/slovo",
+      "changes": "None; original trimmed MP4 extracted byte-for-byte from the official archive.",
+      "linguistic_review": "Source dataset label only; not independently reviewed for this project."
+    },
+    {
+      "id": "yes",
+      "label": "да",
+      "dataset": "Slovo",
+      "file": "2b1b2857-02ca-4e0e-86dc-a525e075eb98.mp4",
+      "source_archive": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+      "archive_path": "train/2b1b2857-02ca-4e0e-86dc-a525e075eb98.mp4",
+      "annotation": {
+        "attachment_id": "2b1b2857-02ca-4e0e-86dc-a525e075eb98",
+        "text": "да",
+        "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+        "height": "1280",
+        "width": "720",
+        "length": "30.0",
+        "train": "True"
+      },
+      "bytes": 179718,
+      "sha256": "e2e3bebf464f31c51055b7bc562a6ad551c3755736e41054a83eeeb03b5ebb0b",
+      "license": "LicenseRef-Slovo-Public-License",
+      "license_url": "https://github.com/ai-forever/slovo/blob/main/license/en_us.pdf",
+      "source_repository": "https://github.com/ai-forever/slovo",
+      "changes": "None; original trimmed MP4 extracted byte-for-byte from the official archive.",
+      "linguistic_review": "Source dataset label only; not independently reviewed for this project."
+    },
+    {
+      "id": "good",
+      "label": "хорошо",
+      "dataset": "Slovo",
+      "file": "b98ab14d-6d5e-4567-8815-9f8146aba461.mp4",
+      "source_archive": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+      "archive_path": "train/b98ab14d-6d5e-4567-8815-9f8146aba461.mp4",
+      "annotation": {
+        "attachment_id": "b98ab14d-6d5e-4567-8815-9f8146aba461",
+        "text": "хорошо",
+        "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+        "height": "1280",
+        "width": "720",
+        "length": "47.0",
+        "train": "True"
+      },
+      "bytes": 411763,
+      "sha256": "0e6d28b9da94fc420d08a0100bea16a3ab70eeb3f186b32f628dca476bbceb04",
+      "license": "LicenseRef-Slovo-Public-License",
+      "license_url": "https://github.com/ai-forever/slovo/blob/main/license/en_us.pdf",
+      "source_repository": "https://github.com/ai-forever/slovo",
+      "changes": "None; original trimmed MP4 extracted byte-for-byte from the official archive.",
+      "linguistic_review": "Source dataset label only; not independently reviewed for this project."
+    },
+    {
+      "id": "question",
+      "label": "вопрос",
+      "dataset": "Slovo",
+      "file": "cc59e1b2-5778-47bb-a452-779033da61b0.mp4",
+      "source_archive": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+      "archive_path": "train/cc59e1b2-5778-47bb-a452-779033da61b0.mp4",
+      "annotation": {
+        "attachment_id": "cc59e1b2-5778-47bb-a452-779033da61b0",
+        "text": "вопрос",
+        "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+        "height": "1280",
+        "width": "720",
+        "length": "48.0",
+        "train": "True"
+      },
+      "bytes": 398604,
+      "sha256": "20c8236d8a8040ca3a46bb811cea6983333e6840ad0f29f86524b7a934f6b2b4",
+      "license": "LicenseRef-Slovo-Public-License",
+      "license_url": "https://github.com/ai-forever/slovo/blob/main/license/en_us.pdf",
+      "source_repository": "https://github.com/ai-forever/slovo",
+      "changes": "None; original trimmed MP4 extracted byte-for-byte from the official archive.",
+      "linguistic_review": "Source dataset label only; not independently reviewed for this project."
+    },
+    {
+      "id": "friend",
+      "label": "друг",
+      "dataset": "Slovo",
+      "file": "d44e58eb-81b2-4a68-8957-d601f4b04d2c.mp4",
+      "source_archive": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+      "archive_path": "train/d44e58eb-81b2-4a68-8957-d601f4b04d2c.mp4",
+      "annotation": {
+        "attachment_id": "d44e58eb-81b2-4a68-8957-d601f4b04d2c",
+        "text": "друг",
+        "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+        "height": "1280",
+        "width": "720",
+        "length": "41.0",
+        "train": "True"
+      },
+      "bytes": 358125,
+      "sha256": "e1984a3081f22374a2ed23cdecf73d49c9daac9deb17efd48ff20b5ab975d12a",
+      "license": "LicenseRef-Slovo-Public-License",
+      "license_url": "https://github.com/ai-forever/slovo/blob/main/license/en_us.pdf",
+      "source_repository": "https://github.com/ai-forever/slovo",
+      "changes": "None; original trimmed MP4 extracted byte-for-byte from the official archive.",
+      "linguistic_review": "Source dataset label only; not independently reviewed for this project."
+    },
+    {
+      "id": "work",
+      "label": "работать",
+      "dataset": "Slovo",
+      "file": "49f5caa7-ad17-4fbc-a119-5318c0dd96af.mp4",
+      "source_archive": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+      "archive_path": "train/49f5caa7-ad17-4fbc-a119-5318c0dd96af.mp4",
+      "annotation": {
+        "attachment_id": "49f5caa7-ad17-4fbc-a119-5318c0dd96af",
+        "text": "работать",
+        "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+        "height": "1280",
+        "width": "720",
+        "length": "49.0",
+        "train": "True"
+      },
+      "bytes": 447134,
+      "sha256": "eaefd9bb58bf9bec09cb03cff7cd7d080abba44211bb046dce4798c71e4fc6ac",
+      "license": "LicenseRef-Slovo-Public-License",
+      "license_url": "https://github.com/ai-forever/slovo/blob/main/license/en_us.pdf",
+      "source_repository": "https://github.com/ai-forever/slovo",
+      "changes": "None; original trimmed MP4 extracted byte-for-byte from the official archive.",
+      "linguistic_review": "Source dataset label only; not independently reviewed for this project."
+    }
+  ]
+}

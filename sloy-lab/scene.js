@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
 
 /** Procedural demonstration building. All geometry is illustrative, not a survey. */
-export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} } = {}) {
+export function initScene({ canvas, onReady = () => {}, onModeChange = () => {}, onStateChange = () => {} } = {}) {
   const noop = () => {};
   const unavailable = () => {
     if (canvas) {
@@ -10,7 +10,7 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
       canvas.parentElement?.classList.add('scene-unavailable');
     }
     onReady(false);
-    return { setMode: noop, reset: noop, toggleRotation: () => false, setSection: noop, resize: noop, destroy: noop };
+    return { setMode: noop, reset: noop, toggleRotation: () => false, setPlaying: noop, zoomBy: noop, getState: () => ({ mode: 'points', section: 55, playing: false, zoom: 1 }), setSection: noop, resize: noop, destroy: noop };
   };
   if (!canvas) return unavailable();
   let renderer;
@@ -31,7 +31,8 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
   let activePointer = null;
   let dragOrigin = null;
   let width = 1, height = 1, elapsed = 0, lastTime = 0, raf = 0, destroyed = false;
-  let sectionValue = 62;
+  let sectionValue = 55;
+  let ready = false, contextLost = false;
 
   renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
@@ -201,6 +202,7 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
     new THREE.Vector3(-7.5, 0, 5.5), new THREE.Vector3(-7.5, 0, -5.5)
   ]);
   const scan = new THREE.LineSegments(scanGeometry, new THREE.LineBasicMaterial({ color: '#91af25', transparent: true, opacity: 0.65 }));
+  scan.position.y = 0.4;
   scene.add(scan);
 
   // Survey-style terrain: subtle ground grid, datum corners, and a physical plinth.
@@ -261,11 +263,18 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
   heatFace(13.8,10.95,0,5.85,-5.11,Math.PI,1);
   heatFace(9.9,10.95,-7.12,5.85,0,-Math.PI/2,2);
 
+  function getState() {
+    return { mode, section: sectionValue, playing: spinning, zoom: wanted.zoom };
+  }
+  function notifyState() {
+    if (ready && !destroyed) onStateChange(getState());
+  }
   function setMode(next) {
-    if (!['points','model','deviation','section'].includes(next)) return;
+    if (destroyed || !['points','model','deviation','section'].includes(next)) return;
+    if (ready && mode === next) return;
     mode = next;
     points.visible = next === 'points';
-    scan.visible = next === 'points' && !motion.matches;
+    scan.visible = next === 'points';
     heatmap.visible = next === 'deviation';
     architecture.visible = true;
     outlines.visible = true;
@@ -282,16 +291,19 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
     sun.castShadow = next !== 'points';
     base.material.opacity = next === 'points' ? 0.38 : 0.8;
     canvas.dataset.mode = next;
-    onModeChange(next);
+    if (ready) onModeChange(next);
+    notifyState();
     render();
   }
   function setSection(value) {
+    if (destroyed) return;
     sectionValue = Math.max(0, Math.min(100, Number(value) || 0));
     clippingPlane.constant = 0.5 + sectionValue/100 * 12.15;
+    notifyState();
     render();
   }
   function resize() {
-    if (destroyed) return;
+    if (destroyed || contextLost) return;
     const bounds = canvas.getBoundingClientRect();
     width = Math.max(1, bounds.width);
     height = Math.max(1, bounds.height);
@@ -308,19 +320,35 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
     camera.lookAt(target);
   }
   function render() {
-    if (destroyed) return;
+    if (destroyed || contextLost) return;
     updateCamera();
     renderer.render(scene,camera);
   }
   function reset() {
+    if (destroyed) return;
     Object.assign(wanted,home);
     Object.assign(orbit,home);
-    setSection(62);
-    render();
+    setSection(55);
+  }
+  function setPlaying(value) {
+    if (destroyed) return spinning;
+    if (spinning && !value && activePointer === null) wanted.azimuth = orbit.azimuth;
+    spinning = Boolean(value);
+    notifyState();
+    return spinning;
   }
   function toggleRotation() {
-    spinning = !spinning;
-    return spinning;
+    return setPlaying(!spinning);
+  }
+  function zoomBy(factor) {
+    if (destroyed || !Number.isFinite(factor) || factor <= 0) return wanted.zoom;
+    wanted.zoom = THREE.MathUtils.clamp(wanted.zoom * factor,0.72,1.65);
+    notifyState();
+    return wanted.zoom;
+  }
+  function motionChanged() {
+    // A system preference change pauses motion; deliberate Play still works afterwards.
+    setPlaying(false);
   }
   function down(event) {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -346,7 +374,7 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
   function wheel(event) {
     if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
-    wanted.zoom = THREE.MathUtils.clamp(wanted.zoom * Math.exp(-event.deltaY*0.002),0.72,1.65);
+    zoomBy(Math.exp(-event.deltaY*0.002));
   }
   function key(event) {
     let handled = true;
@@ -354,8 +382,8 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
     else if(event.key==='ArrowRight') wanted.azimuth += 0.14;
     else if(event.key==='ArrowUp') wanted.polar = Math.max(0.46,wanted.polar-0.1);
     else if(event.key==='ArrowDown') wanted.polar = Math.min(1.43,wanted.polar+0.1);
-    else if(event.key==='+' || event.key==='=') wanted.zoom = Math.min(1.65,wanted.zoom*1.1);
-    else if(event.key==='-') wanted.zoom = Math.max(0.72,wanted.zoom/1.1);
+    else if(event.key==='+' || event.key==='=') zoomBy(1.1);
+    else if(event.key==='-') zoomBy(1/1.1);
     else if(event.key==='Home') reset();
     else handled = false;
     if(handled) event.preventDefault();
@@ -369,12 +397,15 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
   canvas.addEventListener('lostpointercapture',up);
   canvas.addEventListener('wheel',wheel,{ passive:false });
   canvas.addEventListener('keydown',key);
-  canvas.addEventListener('webglcontextlost',event => {
+  function contextLostHandler(event) {
     event.preventDefault();
+    contextLost = true;
     canvas.dataset.webgl = 'lost';
     canvas.parentElement?.classList.add('scene-unavailable');
     onReady(false);
-  });
+  }
+  canvas.addEventListener('webglcontextlost',contextLostHandler);
+  motion.addEventListener('change',motionChanged);
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(canvas);
   const observer = new IntersectionObserver(entries => { inView = entries[0]?.isIntersecting ?? true; }, {rootMargin:'160px'});
@@ -382,24 +413,37 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
   function animate(now) {
     if (destroyed) return;
     raf = requestAnimationFrame(animate);
-    if (document.hidden || !inView) { lastTime = now; return; }
+    if (document.hidden || !inView || contextLost) { lastTime = now; return; }
     // A 30fps cap leaves mobile devices room for page interactions.
     if (now-lastTime < 31) return;
     const delta = Math.min((now-lastTime)/1000,0.08);
     lastTime = now;
-    elapsed += delta;
-    if(spinning && activePointer === null && !motion.matches) wanted.azimuth += delta*0.022;
-    orbit.azimuth += (wanted.azimuth-orbit.azimuth)*0.18;
-    orbit.polar += (wanted.polar-orbit.polar)*0.18;
-    orbit.zoom += (wanted.zoom-orbit.zoom)*0.18;
-    if (!motion.matches) scan.position.y = 0.4+(elapsed*0.85)%11.8;
-    render();
+    let changed = false;
+    if (spinning) {
+      elapsed += delta;
+      if (activePointer === null) wanted.azimuth += delta*0.022;
+      if (mode === 'points') {
+        scan.position.y = 0.4+(elapsed*0.85)%11.8;
+        changed = true;
+      }
+    }
+    // Snap tiny residuals so a paused or reduced-motion scene becomes truly idle.
+    for (const axis of ['azimuth','polar','zoom']) {
+      const difference = wanted[axis]-orbit[axis];
+      if (difference !== 0) {
+        orbit[axis] = Math.abs(difference) < 0.0001 ? wanted[axis] : orbit[axis]+difference*0.18;
+        changed = true;
+      }
+    }
+    if (changed) render();
   }
   function destroy() {
+    if (destroyed) return;
     destroyed = true;
     cancelAnimationFrame(raf);
     resizeObserver.disconnect(); observer.disconnect();
-    for (const [type,listener] of [['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up],['lostpointercapture',up],['wheel',wheel],['keydown',key]]) canvas.removeEventListener(type,listener);
+    for (const [type,listener] of [['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up],['lostpointercapture',up],['wheel',wheel],['keydown',key],['webglcontextlost',contextLostHandler]]) canvas.removeEventListener(type,listener);
+    motion.removeEventListener('change',motionChanged);
     scene.traverse(object => { object.geometry?.dispose(); });
     const uniqueMaterials = new Set();
     scene.traverse(object => { if(object.material) (Array.isArray(object.material)?object.material:[object.material]).forEach(m=>uniqueMaterials.add(m)); });
@@ -411,6 +455,9 @@ export function initScene({ canvas, onReady = () => {}, onModeChange = () => {} 
   resize();
   raf = requestAnimationFrame(animate);
   canvas.dataset.webgl = 'ready';
+  ready = true;
+  onModeChange(mode);
+  notifyState();
   onReady({ points:pointPositions.length/3 });
-  return { setMode,reset,toggleRotation,setSection,resize,destroy };
+  return { setMode,reset,toggleRotation,setPlaying,zoomBy,getState,setSection,resize,destroy };
 }

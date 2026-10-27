@@ -1,12 +1,13 @@
 /** Local CPU 3D renderer for browsers without WebGL. Geometry is illustrative. */
-export function initFallbackScene({ canvas, onReady = () => {}, onModeChange = () => {} }) {
-  const ctx = canvas.getContext('2d', { alpha: true });
-  if (!ctx) { onReady(false); return { setMode(){}, setSection(){}, reset(){}, resize(){}, toggleRotation(){return false;}, destroy(){} }; }
+export function initFallbackScene({ canvas, onReady = () => {}, onModeChange = () => {}, onStateChange = () => {} } = {}) {
+  const ctx = canvas?.getContext('2d', { alpha: true });
+  if (!ctx) { onReady(false); return { setMode(){}, setSection(){}, reset(){}, resize(){}, toggleRotation(){return false;}, setPlaying(){}, zoomBy(){}, getState(){return {mode:'points',section:55,playing:false,zoom:1};}, destroy(){} }; }
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const home = { yaw:0.67, pitch:0.51, zoom:1 };
   const current = {...home}, wanted = {...home};
-  let mode='points', section=62, auto=!reduced.matches, width=600, height=580, ratio=1, scale=25;
+  let mode='points', section=55, auto=!reduced.matches, width=600, height=580, ratio=1, scale=25;
   let pointer=null, lastX=0,lastY=0, visible=true, destroyed=false, frame=0,lastTime=0, time=0;
+  let ready=false;
   let syaw=0,cyaw=1,spitch=0,cpitch=1;
   const surfaces=[], lines=[], cloud=[], patches=[];
   const palette = ['#3b695c','#507d64','#6d8d60','#8da565','#afb86a'];
@@ -143,11 +144,9 @@ export function initFallbackScene({ canvas, onReady = () => {}, onModeChange = (
       ctx.globalAlpha=1;
       ctx.strokeStyle='rgba(45,79,61,.13)';ctx.lineWidth=.48;ctx.beginPath();
       for(const[a,b]of lines){const pa=project(a),pb=project(b);ctx.moveTo(pa[0],pa[1]);ctx.lineTo(pb[0],pb[1]);}ctx.stroke();
-      if(!reduced.matches){
-        const y=.4+(time*.55)%11.7;
-        const ring=[[-7.45,y,-5.5],[7.45,y,-5.5],[7.45,y,-.5],[-1.45,y,-.5],[-1.45,y,5.5],[-7.45,y,5.5]];
-        path(ring);ctx.strokeStyle='rgba(142,166,44,.7)';ctx.lineWidth=1.1;ctx.stroke();
-      }
+      const y=.4+(time*.55)%11.7;
+      const ring=[[-7.45,y,-5.5],[7.45,y,-5.5],[7.45,y,-.5],[-1.45,y,-.5],[-1.45,y,5.5],[-7.45,y,5.5]];
+      path(ring);ctx.strokeStyle='rgba(142,166,44,.7)';ctx.lineWidth=1.1;ctx.stroke();
     }else{
       const candidates=mode==='deviation'?surfaces.concat(patches):surfaces;
       const ordered=[];
@@ -176,24 +175,44 @@ export function initFallbackScene({ canvas, onReady = () => {}, onModeChange = (
     const zero=project([0,0,0]);ctx.font='9px monospace';ctx.textAlign='center';
     for(const axis of axes){const end=project(axis.p),dx=(end[0]-zero[0])*.75,dy=(end[1]-zero[1])*.75;ctx.strokeStyle=axis.c;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(corner.x,corner.y);ctx.lineTo(corner.x+dx,corner.y+dy);ctx.stroke();ctx.fillStyle=axis.c;ctx.fillText(axis.t,corner.x+dx*1.25,corner.y+dy*1.25+3);}
   }
-  function resize(){const b=canvas.getBoundingClientRect();width=Math.max(1,b.width);height=Math.max(1,b.height);ratio=Math.min(window.devicePixelRatio||1,1.5);canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);render();}
-  function setMode(next){if(!['points','model','deviation','section'].includes(next))return;mode=next;canvas.dataset.mode=next;onModeChange(next);render();}
-  function setSection(value){section=clamp(Number(value)||0,0,100);render();}
-  function reset(){Object.assign(current,home);Object.assign(wanted,home);section=62;render();}
-  function toggleRotation(){auto=!auto;return auto;}
+  function getState(){return {mode,section,playing:auto,zoom:wanted.zoom};}
+  function notifyState(){if(ready&&!destroyed)onStateChange(getState());}
+  function resize(){if(destroyed)return;const b=canvas.getBoundingClientRect();width=Math.max(1,b.width);height=Math.max(1,b.height);ratio=Math.min(window.devicePixelRatio||1,1.5);canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);render();}
+  function setMode(next){if(destroyed||!['points','model','deviation','section'].includes(next)||(ready&&mode===next))return;mode=next;canvas.dataset.mode=next;if(ready)onModeChange(next);notifyState();render();}
+  function setSection(value){if(destroyed)return;section=clamp(Number(value)||0,0,100);notifyState();render();}
+  function reset(){if(destroyed)return;Object.assign(current,home);Object.assign(wanted,home);section=55;notifyState();render();}
+  function setPlaying(value){if(destroyed)return auto;if(auto&&!value&&pointer===null)wanted.yaw=current.yaw;auto=Boolean(value);notifyState();return auto;}
+  function toggleRotation(){return setPlaying(!auto);}
+  function zoomBy(factor){if(destroyed||!Number.isFinite(factor)||factor<=0)return wanted.zoom;wanted.zoom=clamp(wanted.zoom*factor,.72,1.65);notifyState();return wanted.zoom;}
+  function motionChanged(){setPlaying(false);}
   function down(e){if(e.pointerType==='mouse'&&e.button!==0)return;pointer=e.pointerId;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture?.(e.pointerId);canvas.style.cursor='grabbing';}
   function move(e){if(pointer!==e.pointerId)return;wanted.yaw-=(e.clientX-lastX)*.006;wanted.pitch=clamp(wanted.pitch+(e.clientY-lastY)*.004,.15,1.05);lastX=e.clientX;lastY=e.clientY;}
   function up(e){if(pointer!==e.pointerId)return;pointer=null;canvas.style.cursor='grab';}
-  function wheel(e){if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();wanted.zoom=clamp(wanted.zoom*Math.exp(-e.deltaY*.002),.7,1.5);}
-  function key(e){let valid=true;if(e.key==='ArrowLeft')wanted.yaw-=.12;else if(e.key==='ArrowRight')wanted.yaw+=.12;else if(e.key==='ArrowUp')wanted.pitch=clamp(wanted.pitch+.1,.15,1.05);else if(e.key==='ArrowDown')wanted.pitch=clamp(wanted.pitch-.1,.15,1.05);else if(e.key==='+'||e.key==='=')wanted.zoom=clamp(wanted.zoom*1.1,.7,1.5);else if(e.key==='-')wanted.zoom=clamp(wanted.zoom/1.1,.7,1.5);else if(e.key==='Home')reset();else valid=false;if(valid)e.preventDefault();}
+  function wheel(e){if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();zoomBy(Math.exp(-e.deltaY*.002));}
+  function key(e){let valid=true;if(e.key==='ArrowLeft')wanted.yaw-=.12;else if(e.key==='ArrowRight')wanted.yaw+=.12;else if(e.key==='ArrowUp')wanted.pitch=clamp(wanted.pitch+.1,.15,1.05);else if(e.key==='ArrowDown')wanted.pitch=clamp(wanted.pitch-.1,.15,1.05);else if(e.key==='+'||e.key==='=')zoomBy(1.1);else if(e.key==='-')zoomBy(1/1.1);else if(e.key==='Home')reset();else valid=false;if(valid)e.preventDefault();}
   const events=[['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up],['lostpointercapture',up],['wheel',wheel],['keydown',key]];
   events.forEach(([name,fn])=>canvas.addEventListener(name,fn,name==='wheel'?{passive:false}:undefined));
+  reduced.addEventListener('change',motionChanged);
   canvas.style.cursor='grab';canvas.style.touchAction='pan-y';canvas.style.display='block';
   canvas.dataset.webgl='canvas';canvas.dataset.renderer='canvas';canvas.parentElement?.classList.remove('scene-unavailable');
   const ro=new ResizeObserver(resize);ro.observe(canvas);
   const io=new IntersectionObserver(entries=>{visible=entries[0]?.isIntersecting??true;},{rootMargin:'150px'});io.observe(canvas);
-  function animate(now){if(destroyed)return;frame=requestAnimationFrame(animate);if(document.hidden||!visible){lastTime=now;return;}if(now-lastTime<40)return;const dt=Math.min((now-lastTime)/1000,.1);lastTime=now;time+=dt;if(auto&&pointer===null&&!reduced.matches)wanted.yaw+=dt*.018;current.yaw+=(wanted.yaw-current.yaw)*.22;current.pitch+=(wanted.pitch-current.pitch)*.22;current.zoom+=(wanted.zoom-current.zoom)*.22;render();}
-  function destroy(){destroyed=true;cancelAnimationFrame(frame);ro.disconnect();io.disconnect();events.forEach(([name,fn])=>canvas.removeEventListener(name,fn));}
-  resize();setMode('points');frame=requestAnimationFrame(animate);onReady({points:cloud.length,renderer:'canvas'});
-  return{setMode,setSection,reset,toggleRotation,resize,destroy};
+  function animate(now){
+    if(destroyed)return;
+    frame=requestAnimationFrame(animate);
+    if(document.hidden||!visible){lastTime=now;return;}
+    if(now-lastTime<40)return;
+    const dt=Math.min((now-lastTime)/1000,.1);lastTime=now;
+    let changed=false;
+    if(auto){time+=dt;if(pointer===null)wanted.yaw+=dt*.018;if(mode==='points')changed=true;}
+    // Stop drawing after manual movement settles; paused scenes do not consume Canvas work.
+    for(const axis of ['yaw','pitch','zoom']){
+      const difference=wanted[axis]-current[axis];
+      if(difference!==0){current[axis]=Math.abs(difference)<.0001?wanted[axis]:current[axis]+difference*.22;changed=true;}
+    }
+    if(changed)render();
+  }
+  function destroy(){if(destroyed)return;destroyed=true;cancelAnimationFrame(frame);ro.disconnect();io.disconnect();events.forEach(([name,fn])=>canvas.removeEventListener(name,fn));reduced.removeEventListener('change',motionChanged);}
+  resize();setMode('points');frame=requestAnimationFrame(animate);ready=true;onModeChange(mode);notifyState();onReady({points:cloud.length,renderer:'canvas'});
+  return{setMode,setSection,reset,toggleRotation,setPlaying,zoomBy,getState,resize,destroy};
 }

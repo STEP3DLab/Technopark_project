@@ -1,16 +1,51 @@
 const $ = (selector, root=document) => root.querySelector(selector);
 const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
-
 const header = $('.header');
-$('.menu-toggle').addEventListener('click', event => {
-  const expanded = header.classList.toggle('menu-open');
-  event.currentTarget.setAttribute('aria-expanded', String(expanded));
-  event.currentTarget.setAttribute('aria-label', expanded ? 'Закрыть меню' : 'Открыть меню');
+function setMenu(open, returnFocus=false){
+  header.classList.toggle('menu-open',open);
+  $('.menu-toggle').setAttribute('aria-expanded',String(open));
+  $('.menu-toggle').setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');
+  if(returnFocus) $('.menu-toggle').focus();
+}
+$('.menu-toggle').addEventListener('click',()=>setMenu(!header.classList.contains('menu-open')));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&header.classList.contains('menu-open'))setMenu(false,true);});
+function focusTarget(target){
+  if(target.matches('details'))target.open=true;
+  const heading=target.matches('details')?$('summary',target):$('h1,h2,h3',target)||target;
+  if(!heading.matches('summary'))heading.tabIndex=-1;
+  heading.focus({preventScroll:true});
+  target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+}
+document.addEventListener('click',event=>{
+  const link=event.target.closest('a[href^="#"]');if(!link)return;
+  const target=document.getElementById(link.getAttribute('href').slice(1));if(!target)return;
+  event.preventDefault();setMenu(false);history.replaceState(null,'',link.getAttribute('href'));focusTarget(target);
 });
-$$('.nav a').forEach(link => link.addEventListener('click', () => {
-  header.classList.remove('menu-open');
-  $('.menu-toggle').setAttribute('aria-expanded', 'false');
-  $('.menu-toggle').setAttribute('aria-label', 'Открыть меню');
+let navScheduled=false;
+function updateSectionNav(){
+  navScheduled=false;
+  const links=$$('.section-nav a');const threshold=header.offsetHeight+$('.section-nav').offsetHeight+40;
+  let active=links[0];
+  links.forEach(link=>{if(document.getElementById(link.dataset.section).getBoundingClientRect().top<=threshold)active=link;});
+  links.forEach(link=>{if(link===active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
+  const nav=$('.section-nav'),left=active.offsetLeft,right=left+active.offsetWidth;
+  if(left<nav.scrollLeft)nav.scrollLeft=left-16;else if(right>nav.scrollLeft+nav.clientWidth)nav.scrollLeft=right-nav.clientWidth+16;
+}
+window.addEventListener('scroll',()=>{if(!navScheduled){navScheduled=true;requestAnimationFrame(updateSectionNav);}},{passive:true});
+window.addEventListener('resize',updateSectionNav);updateSectionNav();
+const intentData={
+  all:{ids:[],text:'Выберите ситуацию — подсветим подходящие услуги. Состав работ уточняется с командой.'},
+  measure:{ids:['measure','scan'],text:'Для обмеров: цифровая съёмка и комплект планов, фасадов или разрезов. Конкретную выдачу согласуем по вашей задаче.'},
+  compare:{ids:['compare','scan'],text:'Для сравнения с проектом: съёмка и карта геометрических расхождений. Понадобится проектная документация.'},
+  renovate:{ids:['bim','measure'],text:'Для реконструкции: обмеры и модель существующего состояния. Подберите состав вместе с проектировщиком.'},
+  expert:{ids:['expert','scan'],text:'Для строительного спора: начните с вопросов эксперту. Он определит программу исследования и необходимость сканирования.'}
+};
+$$('[data-intent]').forEach(button=>button.addEventListener('click',()=>{
+  const selected=button.dataset.intent,data=intentData[selected];
+  $$('[data-intent]').forEach(item=>{const active=item===button;item.setAttribute('aria-pressed',String(active));item.classList.toggle('active',active);});
+  $$('.service').forEach(item=>item.classList.toggle('recommended',data.ids.some(id=>item.id===`service-${id}`)));
+  if(data.ids.length)$(`#service-${data.ids[0]}`).open=true;
+  $('#intent-message').textContent=data.text;
 }));
 
 // Synthetic drawings explain service outputs; no client data or measured results are used.
@@ -26,6 +61,8 @@ function selectCase(index, focus=false){
   $('#case-label').textContent=`СЦЕНАРИЙ / 0${index+1}`;$('#case-visual').innerHTML=data.visual;
   $('#case-panel').setAttribute('aria-labelledby',`case-tab-${index}`);
   $$('[data-case]').forEach((button,i)=>{button.setAttribute('aria-selected',String(i===index));button.tabIndex=i===index?0:-1;});
+  const destinations=[['#service-compare','Состав работ по сравнению ↗'],['#service-measure','Что входит в обмеры ↗'],['sample-report.html','Посмотреть структуру отчёта ↗']];
+  $('#case-link').href=destinations[index][0];$('#case-link').textContent=destinations[index][1];
   if(focus) $(`#case-tab-${index}`).focus();
 }
 $$('[data-case]').forEach(button=>{
@@ -38,59 +75,170 @@ $('#scanner-leica').innerHTML=artHead+'<path d="m148 155-49 68m53-68 50 68m-51-6
 $('#scanner-chc').innerHTML=artHead+'<path d="M139 141v61q0 16 18 16h29" stroke="#465e3c" stroke-width="17" fill="none"/><path d="M139 156v45q0 8 13 8" stroke="#8caa72" stroke-width="3" fill="none"/><rect x="112" y="82" width="76" height="72" rx="13" fill="url(#body)" stroke="#b1c1a6"/><path d="M112 99h76v23h-76" fill="#8db849"/><rect x="129" y="122" width="42" height="21" rx="3" fill="#364c37"/><path d="M134 127h32v11h-32" fill="#6f9d8b"/><ellipse cx="150" cy="82" rx="39" ry="11" fill="#7e9c61"/><path d="M125 80V50h50v30" fill="url(#metal)"/><ellipse cx="150" cy="50" rx="25" ry="8" fill="#c5d2b8"/><ellipse cx="150" cy="49" rx="18" ry="5" fill="#5a744b"/><path d="M111 62C59 51 59 93 111 82m79-20c49-11 49 31 0 20" stroke="#a6bd91" fill="none" stroke-dasharray="2 5"/></svg>';
 $('#scanner-xgrids').innerHTML=artHead+'<path d="M135 149v62q0 12 14 12h29" stroke="#3a4a3b" stroke-width="16" fill="none"/><path d="m116 151 4-68 34-20 40 23-7 67-35 15Z" fill="url(#metal)" stroke="#82957a"/><path d="m120 83 34 21 40-18M154 104l-2 64" stroke="#90a384" fill="none"/><path d="M135 69V48q20-17 39 1v21" fill="#455a46" stroke="#91a186"/><ellipse cx="154" cy="48" rx="20" ry="7" fill="#71916a"/><circle cx="137" cy="117" r="12" fill="#263d31" stroke="#8b9f7f"/><circle cx="137" cy="117" r="6" fill="#537c6d"/><circle cx="134" cy="114" r="2" fill="#bad6bc"/><rect x="163" y="112" width="15" height="26" rx="3" fill="#1f3429"/><path d="M104 66C60 60 60 101 103 92m99-26c42-6 42 35 0 26" stroke="#a6bd91" fill="none" stroke-dasharray="2 5"/></svg>';
 
-// The brief stays in memory. No analytics, network submission, storage, or fake success response.
-let currentStep=1, briefText='', selectedPackage='Не выбран';
-function setStep(step){currentStep=step;$$('[data-step]').forEach(el=>el.hidden=Number(el.dataset.step)!==step);$$('[data-progress]').forEach(el=>el.classList.toggle('active',Number(el.dataset.progress)===step));$('#form-status').textContent='';const heading=$(`[data-step="${step}"] h3`);heading.tabIndex=-1;heading.focus({preventScroll:true});}
-function validateObject(){for(const el of [$('#object-type'),$('#area'),$('#city')])if(!el.reportValidity())return false;return true;}
+// This concept assembles a document locally. User input is never interpreted as markup.
+let currentStep=1, briefText='', selectedPackage='Индивидуальный состав', downloadURL='';
+function tasksSelected(){return $$('input[name="task"]:checked').map(el=>el.value);}
+function updateScope(){
+  const tasks=tasksSelected();
+  $('#scope-summary').textContent=tasks.length?`${selectedPackage}: ${tasks.join(' · ')}`:'Состав работ пока не выбран';
+}
+function setStep(step){
+  currentStep=step;
+  $$('[data-step]').forEach(el=>el.hidden=Number(el.dataset.step)!==step);
+  $$('[data-progress]').forEach(el=>{const active=Number(el.dataset.progress)===step;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
+  $('#form-status').textContent='';
+  const heading=$(`#step-${step}-title`);heading.focus({preventScroll:true});
+  const rect=heading.getBoundingClientRect();
+  if(rect.top<header.offsetHeight+$('.section-nav').offsetHeight+24||rect.bottom>innerHeight-48)heading.scrollIntoView({block:'start',behavior:'smooth'});
+}
+function fieldError(id,message){
+  const el=$(`#${id}`),error=$(`#${id}-error`);error.textContent=message;error.hidden=!message;
+  if(message)el.setAttribute('aria-invalid','true');else el.removeAttribute('aria-invalid');
+}
+function validateObject(){
+  const errors={
+    'object-type':$('#object-type').value?'':'Выберите тип объекта.',
+    area:!$('#area').value||Number.isFinite(Number($('#area').value))&&Number($('#area').value)>=1&&Number($('#area').value)<=10000000?'':'Укажите площадь от 1 до 10 000 000 м² или оставьте поле пустым.',
+    city:$('#city').value.trim()?'':'Укажите город или населённый пункт.'
+  };
+  if($('#area').validity.badInput)errors.area='Укажите площадь числом или оставьте поле пустым.';
+  Object.entries(errors).forEach(([id,message])=>fieldError(id,message));
+  const first=Object.keys(errors).find(id=>errors[id]);
+  if(first){if(currentStep!==1)setStep(1);$(`#${first}`).focus();return false;}return true;
+}
+['object-type','area','city'].forEach(id=>$(`#${id}`).addEventListener('input',()=>fieldError(id,'')));
+function clearTaskError(){
+  $('#task-error').hidden=true;$('#task-error').textContent='';$('#task-group').removeAttribute('aria-invalid');
+  $$('input[name="task"],#comment').forEach(el=>el.removeAttribute('aria-invalid'));
+}
 $('#next-step').addEventListener('click',()=>{if(validateObject())setStep(2);});
 $('#prev-step').addEventListener('click',()=>setStep(1));
 $('#edit-brief').addEventListener('click',()=>setStep(1));
-$$('[data-service]').forEach(link=>link.addEventListener('click',()=>{$$('input[name="task"]').forEach(input=>input.checked=input.value===link.dataset.service);if(currentStep===3)setStep(1);}));
-$$('[data-package]').forEach(link=>link.addEventListener('click',()=>{selectedPackage=link.dataset.package;const mapping={'Геометрия':['3D-сканирование','Обмеры и документация'],'Аналитика':['3D-сканирование','Проект и факт'],'Экспертиза':['Строительная экспертиза']};$$('input[name="task"]').forEach(input=>input.checked=mapping[selectedPackage].includes(input.value));if(currentStep===3)setStep(1);}));
+$('#change-scope').addEventListener('click',()=>setStep(2));
+$$('input[name="task"]').forEach(input=>input.addEventListener('change',()=>{selectedPackage='Индивидуальный состав';updateScope();clearTaskError();}));
+$('#comment').addEventListener('input',clearTaskError);
+$$('[data-service]').forEach(link=>link.addEventListener('click',()=>{
+  selectedPackage='Индивидуальный состав';
+  $$('input[name="task"]').forEach(input=>input.checked=input.value===link.dataset.service);
+  clearTaskError();updateScope();setStep(1);
+}));
+const packageTasks={'Геометрия':['3D-сканирование','Обмеры и документация'],'Аналитика':['3D-сканирование','Проект и факт'],'Экспертиза':['Строительная экспертиза']};
+$$('[data-package]').forEach(link=>link.addEventListener('click',()=>{
+  selectedPackage=link.dataset.package;
+  $$('input[name="task"]').forEach(input=>input.checked=packageTasks[selectedPackage].includes(input.value));
+  clearTaskError();updateScope();setStep(1);
+}));
+function createBriefList(rows){
+  const dl=document.createElement('dl');
+  rows.forEach(([label,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);});return dl;
+}
 $('#brief-form').addEventListener('submit',event=>{
-  event.preventDefault();if(currentStep===1){if(validateObject())setStep(2);return;}
-  const tasks=$$('input[name="task"]:checked').map(el=>el.value);
-  if(!tasks.length&&!$('#comment').value.trim()){$('#form-status').textContent='Выберите хотя бы одну задачу или опишите ваш вопрос.';return;}
-  briefText=['СЛОЙ — бриф объекта','Концепция лаборатории МСК Эксперт × Технопарк РГСУ','',`Дата: ${new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow'}).format(new Date())}`,`Объект: ${$('#object-type').value}`,`Город: ${$('#city').value.trim()}`,`Площадь: ${$('#area').value?$('#area').value+' м²':'требует уточнения'}`,`Формат: ${selectedPackage}`,`Задачи: ${tasks.length?tasks.join('; '):'по описанию'}`,'','Вопрос / вводные:',$('#comment').value.trim()||'Требуют обсуждения.','','Для уточнения с командой:','— документы и доступ к объекту;','— требуемая точность и программа работ;','— сроки, форматы и состав выдачи;','— стоимость и ответственные специалисты.','','Бриф сформирован локально. Не отправлен и не является договором или заявкой, принятой в работу.'].join('\n');
-  $('#brief-preview').textContent=briefText;setStep(3);
+  event.preventDefault();if(!validateObject())return;if(currentStep===1){setStep(2);return;}
+  const tasks=tasksSelected(),comment=$('#comment').value.trim();
+  if(!tasks.length&&!comment){
+    $('#task-error').textContent='Выберите хотя бы одну задачу или опишите ваш вопрос ниже.';$('#task-error').hidden=false;
+    $('#task-group').setAttribute('aria-invalid','true');$('input[name="task"]').setAttribute('aria-invalid','true');$('#comment').setAttribute('aria-invalid','true');$('input[name="task"]').focus();return;
+  }
+  clearTaskError();
+  const date=new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow'}).format(new Date());
+  const rows=[['Дата',date],['Объект',$('#object-type').value],['Город',$('#city').value.trim()],['Площадь',$('#area').value?new Intl.NumberFormat('ru-RU').format(Number($('#area').value))+' м²':'Требует уточнения'],['Формат',selectedPackage],['Задачи',tasks.length?tasks.join('; '):'По описанию'],['Желаемый срок',$('#deadline').value],['Исходные документы',$('#documents').value],['Вопрос / вводные',comment||'Требуют обсуждения.']];
+  const next='Передайте бриф коллегам. Затем согласуйте документы и доступ, точность и программу работ, сроки и состав выдачи, стоимость и ответственных специалистов.';
+  const note='Бриф сформирован локально. Не отправлен и не является договором или заявкой, принятой в работу.';
+  briefText=['СЛОЙ — бриф объекта','Концепция лаборатории МСК Эксперт × Технопарк РГСУ','',...rows.map(([label,value])=>`${label}: ${value}`),'',next,'',note].join('\n');
+  $('#brief-result').replaceChildren(createBriefList(rows));$('#brief-preview').textContent=briefText;
+  const title=document.createElement('h1');title.textContent='СЛОЙ — бриф объекта';
+  const sub=document.createElement('p');sub.textContent='Концепция лаборатории МСК Эксперт × Технопарк РГСУ';
+  const nextP=document.createElement('p');nextP.textContent=next;
+  const noteP=document.createElement('p');noteP.textContent=note;
+  $('#brief-print-area').replaceChildren(title,sub,createBriefList(rows),nextP,noteP);
+  if(downloadURL)URL.revokeObjectURL(downloadURL);
+  downloadURL=URL.createObjectURL(new Blob(['\uFEFF'+briefText],{type:'text/plain;charset=utf-8'}));$('#download-brief').href=downloadURL;
+  setStep(3);
 });
-$('#download-brief').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob(['\uFEFF'+briefText],{type:'text/plain;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='sloy-object-brief.txt';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('#form-status').textContent='Файл брифа подготовлен для скачивания.';});
-$('#copy-brief').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(briefText);$('#form-status').textContent='Текст брифа скопирован.';}catch{const range=document.createRange();range.selectNodeContents($('#brief-preview'));const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);$('#form-status').textContent='Текст выделен. Используйте команду «Копировать» вашего браузера.';}});
+$('#download-brief').addEventListener('click',()=>{$('#form-status').textContent='Файл брифа подготовлен для скачивания.';});
+$('#copy-brief').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(briefText);$('#form-status').textContent='Текст брифа скопирован.';}
+  catch{$('#brief-raw').open=true;const range=document.createRange();range.selectNodeContents($('#brief-preview'));const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);$('#form-status').textContent='Текст выделен. Используйте команду «Копировать» вашего браузера.';}
+});
+$('#print-brief').addEventListener('click',()=>{document.body.classList.add('printing-brief');window.print();});
+window.addEventListener('afterprint',()=>document.body.classList.remove('printing-brief'));
 
-let scene=null;
-const modeText={points:['Измерить. Сопоставить. Обосновать.','Цифровая фиксация видимой геометрии'],model:['От облака точек — к структуре.','Условная модель существующего здания'],deviation:['Увидеть разницу. Понять масштаб.','Цветовая иллюстрация, не реальные измерения'],section:['Заглянуть внутрь геометрии.','Перемещайте плоскость сечения ползунком']};
-function syncMode(mode){$$('.viewer-modes [data-mode]').forEach(button=>{const active=button.dataset.mode===mode;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});$('#deviation-legend').hidden=mode!=='deviation';$('#section-control').hidden=mode!=='section';$('#scene-note-title').textContent=modeText[mode][0];$('#scene-note-sub').textContent=modeText[mode][1];}
-function sceneUnavailable(){document.querySelector('.viewer-main').classList.add('scene-unavailable');$('#scene-status').textContent='Схематичная модель · WebGL недоступен';$$('.viewer-modes [data-mode],#rotate-btn,#reset-view').forEach(button=>button.disabled=true);}
-let sceneReady=false;
-function onSceneReady(state){
-  if(!state)return;
-  sceneReady=true;
-  document.querySelector('.viewer-main').classList.remove('scene-unavailable');
-  $('#scene-status').textContent=`${new Intl.NumberFormat('ru-RU').format(state.points)} точек · вращайте модель`;
+let scene=null, sceneReady=false, transitioning=false;
+let sceneState={mode:'points',section:55,playing:!matchMedia('(prefers-reduced-motion: reduce)').matches,zoom:1};
+const modeText={
+  points:['Измерить. Сопоставить. Обосновать.','Цифровая фиксация видимой геометрии','Облако точек: цифровой слепок видимых поверхностей.'],
+  model:['От облака точек — к структуре.','Условная модель существующего здания','Модель: структура и поверхности существующего здания.'],
+  deviation:['Увидеть разницу. Понять масштаб.','Цветовая иллюстрация, не реальные измерения','Отклонения: условная цветовая карта различий с проектом.'],
+  section:['Заглянуть внутрь геометрии.','Перемещайте плоскость сечения ползунком','Разрез: регулируйте высоту, чтобы увидеть внутреннюю геометрию.']
+};
+function syncMode(mode){
+  $$('.viewer-modes [data-mode]').forEach(button=>{const active=button.dataset.mode===mode;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});
+  $('#deviation-legend').hidden=mode!=='deviation';$('#section-control').hidden=mode!=='section';
+  $('#scene-note-title').textContent=modeText[mode][0];$('#scene-note-sub').textContent=modeText[mode][1];$('#viewer-mode-description').textContent=modeText[mode][2];
 }
-try{
-  const {initScene}=await import('./scene.js');
-  scene=initScene({canvas:$('#building-canvas'),onReady:onSceneReady,onModeChange:syncMode});
-}catch(error){console.info('Переход на резервный 3D-режим:',error.message);}
-if(!sceneReady){
-  try{
-    scene?.destroy();
-    const original=$('#building-canvas');
-    const replacement=original.cloneNode(false);
-    replacement.removeAttribute('style');replacement.removeAttribute('data-webgl');
-    original.replaceWith(replacement);
-    const {initFallbackScene}=await import('./scene-fallback.js');
-    scene=initFallbackScene({canvas:replacement,onReady:onSceneReady,onModeChange:syncMode});
-  }catch(error){console.warn('Резервная сцена недоступна:',error.message);}
+function syncState(state){
+  sceneState={...state};syncMode(state.mode);
+  $('#section-range').value=state.section;$('#section-value').value=`${Math.round(state.section)}%`;
+  $('#zoom-value').value=`${Math.round(state.zoom*100)}%`;
+  $('#zoom-in').disabled=!sceneReady||state.zoom>=1.65;$('#zoom-out').disabled=!sceneReady||state.zoom<=.72;
+  const button=$('#rotate-btn');button.setAttribute('aria-pressed',String(state.playing));button.setAttribute('aria-label',state.playing?'Приостановить анимацию':'Включить анимацию');button.title=state.playing?'Пауза анимации':'Включить анимацию';button.textContent=state.playing?'Ⅱ':'▷';
 }
-if(sceneReady)scene.setSection(55);else sceneUnavailable();
+function setSceneControls(enabled){$$('.viewer-modes [data-mode],#rotate-btn,#reset-view,#zoom-in,#zoom-out,#section-range').forEach(el=>el.disabled=!enabled);}
+function freshCanvas(){
+  const original=$('#building-canvas'),replacement=original.cloneNode(false);
+  replacement.removeAttribute('style');replacement.removeAttribute('data-webgl');replacement.removeAttribute('data-renderer');original.replaceWith(replacement);return replacement;
+}
+async function startScene(forceCanvas=false){
+  if(transitioning)return;transitioning=true;
+  const restore=scene?.getState?.()||{...sceneState};sceneReady=false;setSceneControls(false);
+  $('#retry-scene').hidden=true;$('#scene-status').textContent=forceCanvas?'Восстанавливаем модель…':'Подготовка модели…';
+  scene?.destroy();scene=null;
+  const onReady=state=>{
+    if(!state){if(sceneReady&&!transitioning){sceneReady=false;void startScene(true);}return;}
+    sceneReady=true;
+    $('.viewer-main').classList.remove('scene-unavailable');
+    $('#scene-status').textContent=`${new Intl.NumberFormat('ru-RU').format(state.points)} точек · вращайте модель`;
+  };
+  const callbacks={onReady,onModeChange:syncMode,onStateChange:syncState};
+  if(!forceCanvas){
+    try{const {initScene}=await import('./scene.js?v=2');scene=initScene({canvas:freshCanvas(),...callbacks});}
+    catch(error){console.info('Переход на совместимую 3D-сцену:',error.message);}
+  }
+  if(!sceneReady){
+    scene?.destroy();scene=null;
+    try{const {initFallbackScene}=await import('./scene-fallback.js?v=2');scene=initFallbackScene({canvas:freshCanvas(),...callbacks});}
+    catch(error){console.warn('Не удалось открыть 3D-сцену:',error.message);}
+  }
+  if(sceneReady&&scene){
+    scene.setMode(restore.mode);scene.setSection(restore.section);scene.setPlaying(restore.playing);scene.zoomBy(restore.zoom/scene.getState().zoom);
+    setSceneControls(true);syncState(scene.getState());
+  }else{
+    scene?.destroy();scene=null;syncState(restore);
+    $('.viewer-main').classList.add('scene-unavailable');$('#scene-status').textContent='Не удалось загрузить интерактивную модель.';$('#retry-scene').hidden=false;setSceneControls(false);
+  }
+  transitioning=false;
+}
 $$('.viewer-modes [data-mode]').forEach(button=>button.addEventListener('click',()=>scene?.setMode(button.dataset.mode)));
-const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-function syncRotation(active){$('#rotate-btn').setAttribute('aria-pressed',String(active));$('#rotate-btn').setAttribute('aria-label',active?'Приостановить вращение':'Включить вращение');$('#rotate-btn').textContent=active?'Ⅱ':'▷';}
-syncRotation(!reduceMotion);
-$('#rotate-btn').addEventListener('click',()=>syncRotation(scene?.toggleRotation()??false));
-$('#reset-view').addEventListener('click',()=>{scene?.reset();scene?.setSection(55);$('#section-range').value=55;$('#section-value').value='55%';});
-$('#section-range').addEventListener('input',event=>{scene?.setSection(event.target.value);$('#section-value').value=event.target.value+'%';});
-function expandViewer(force){const viewer=$('#viewer');const expanded=typeof force==='boolean'?force:!viewer.classList.contains('expanded');viewer.classList.toggle('expanded',expanded);$('#expand-view').setAttribute('aria-pressed',String(expanded));$('#expand-view').setAttribute('aria-label',expanded?'Свернуть 3D-сцену':'Развернуть 3D-сцену');document.body.style.overflow=expanded?'hidden':'';requestAnimationFrame(()=>scene?.resize());if(!expanded)$('#expand-view').focus({preventScroll:true});}
-$('#expand-view').addEventListener('click',()=>expandViewer());
-document.addEventListener('keydown',event=>{if(event.key==='Escape'){if($('#viewer').classList.contains('expanded'))expandViewer(false);if(header.classList.contains('menu-open'))$('.menu-toggle').click();}if(event.key==='Tab'&&$('#viewer').classList.contains('expanded')){const focusable=$$('button:not(:disabled),canvas,input:not([hidden])',$('#viewer')).filter(el=>el.getClientRects().length);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+$('#rotate-btn').addEventListener('click',()=>scene?.toggleRotation());
+$('#reset-view').addEventListener('click',()=>scene?.reset());
+$('#zoom-in').addEventListener('click',()=>scene?.zoomBy(1.15));$('#zoom-out').addEventListener('click',()=>scene?.zoomBy(1/1.15));
+$('#section-range').addEventListener('input',event=>scene?.setSection(event.target.value));
+$('#retry-scene').addEventListener('click',()=>void startScene());
+function setHelp(open){$('#viewer-help').setAttribute('aria-expanded',String(open));$('#viewer-help-panel').hidden=!open;if(open){$('#viewer-help-panel').tabIndex=-1;$('#viewer-help-panel').focus({preventScroll:true});$('#viewer-help-panel').scrollIntoView({block:'nearest',behavior:'smooth'});}}
+$('#viewer-help').addEventListener('click',()=>setHelp($('#viewer-help-panel').hidden));
+$('#close-help').addEventListener('click',()=>{setHelp(false);$('#viewer-help').focus();});
+const viewer=$('#viewer'),dialog=$('#scene-dialog'),placeholder=document.createComment('3D viewer home');viewer.before(placeholder);
+let savedOverflow='';
+function closeViewer(){
+  if(!dialog.open)return;
+  dialog.close();viewer.classList.remove('expanded');placeholder.after(viewer);document.body.style.overflow=savedOverflow;
+  $('#expand-view').setAttribute('aria-pressed','false');$('#expand-view').setAttribute('aria-label','Развернуть 3D-сцену');$('#expand-view').focus({preventScroll:true});requestAnimationFrame(()=>scene?.resize());
+}
+$('#expand-view').addEventListener('click',()=>{
+  if(dialog.open){closeViewer();return;}
+  savedOverflow=document.body.style.overflow;dialog.append(viewer);viewer.classList.add('expanded');dialog.showModal();document.body.style.overflow='hidden';
+  $('#expand-view').setAttribute('aria-pressed','true');$('#expand-view').setAttribute('aria-label','Свернуть 3D-сцену');$('#building-canvas').focus({preventScroll:true});requestAnimationFrame(()=>scene?.resize());
+});
+dialog.addEventListener('cancel',event=>{event.preventDefault();closeViewer();});
+dialog.addEventListener('click',event=>{if(event.target===dialog)closeViewer();});
+syncState(sceneState);void startScene();

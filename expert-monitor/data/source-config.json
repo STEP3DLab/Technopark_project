@@ -1,0 +1,102 @@
+[
+  {
+    "id": "moscow-search",
+    "name": "Суды Москвы — поиск дел",
+    "url": "https://mos-gorsud.ru/search",
+    "type": "court_search",
+    "status": "manual_required",
+    "notes": "Официальный портал 35 районных судов и Мосгорсуда. Поисковая форма требует интерактивной проверки; доступ к отдельным карточкам нестабилен.",
+    "autoFetch": true,
+    "extractLinks": true
+  },
+  {
+    "id": "kad",
+    "name": "Картотека арбитражных дел",
+    "url": "https://kad.arbitr.ru/",
+    "type": "court_search",
+    "status": "manual_required",
+    "notes": "Проверить номер дела, последние определения, кандидатуры экспертов и срок ответа. Публичный запрос не заменяет проверку карточки.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "as-moscow",
+    "name": "АС Москвы — официальный сайт",
+    "url": "https://msk.arbitr.ru/",
+    "type": "court_official",
+    "status": "blocked",
+    "notes": "При исследовании получен HTTP 403. Наличие страницы в поисковой выдаче не доказывает доступность запроса.",
+    "autoFetch": true,
+    "extractLinks": true
+  },
+  {
+    "id": "as-region",
+    "name": "АС Московской области — официальный сайт",
+    "url": "https://asmo.arbitr.ru/",
+    "type": "court_official",
+    "status": "blocked",
+    "notes": "Ближайший дополнительный контур. Текущий регламент работы с экспертами не удалось прочитать.",
+    "autoFetch": true,
+    "extractLinks": true
+  },
+  {
+    "id": "eis",
+    "name": "ЕИС — государственные закупки",
+    "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+    "type": "procurement_official",
+    "status": "manual_required",
+    "notes": "Самостоятельный канал закупок; не все судебные экспертизы являются закупками. Проверить извещение, сроки, требования и обеспечение.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "moscow-data",
+    "name": "Открытые данные судов Москвы",
+    "url": "https://data.mos-gorsud.ru/",
+    "type": "open_data",
+    "status": "manual_required",
+    "notes": "Официальный портал требует JavaScript; автоматическая выгрузка судебных актов в этой версии не подключена.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "official-directory",
+    "name": "Управление Судебного департамента — справочник",
+    "url": "https://usd--msk.sudrf.ru/modules.php?name=sud",
+    "type": "directory",
+    "status": "indexed_official",
+    "notes": "Список и публичные служебные контакты получены из индексированного официального справочника. Канал подачи уточняется отдельно.",
+    "autoFetch": true,
+    "extractLinks": false
+  },
+  {
+    "id": "kontur",
+    "name": "Контур.Закупки — дополнительный поиск",
+    "url": "https://zakupki.kontur.ru/",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "notes": "Источник сигналов и ориентиров. Текущую стадию и документацию подтверждать в ЕИС/на площадке.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "sudact",
+    "name": "СудАкт — копии судебных актов",
+    "url": "https://sudact.ru/",
+    "type": "secondary_decisions",
+    "status": "secondary",
+    "notes": "Архивный исследовательский источник. Завершённый акт не означает открытый заказ.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "reputation",
+    "name": "Reputation — копии судебных актов",
+    "url": "https://reputation.su/",
+    "type": "secondary_decisions",
+    "status": "secondary",
+    "notes": "Использованы только доступные части текстов; часть документов ограничена. Первоисточник — карточка суда.",
+    "autoFetch": false,
+    "extractLinks": false
+  }
+]

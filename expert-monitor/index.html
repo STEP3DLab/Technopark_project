@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#112b39">
+  <meta name="description" content="Рабочая панель МСК Эксперт: источники судебно-строительных экспертиз, реестр судов Москвы, проверка возможностей и подготовка коммерческих предложений.">
+  <meta name="robots" content="noindex,nofollow">
+  <title>МСК Эксперт — судебный мониторинг</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23112b39'/%3E%3Cpath d='M16 44V20h7l9 14 9-14h7v24h-8V33l-8 12-8-12v11z' fill='%236ce4c1'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <aside class="sidebar" id="sidebar" aria-label="Основная навигация">
+    <a class="brand" href="#overview" aria-label="МСК Эксперт, обзор">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 25V7h5l6 9 6-9h5v18h-6V16l-5 8-5-8v9z"/></svg></span>
+      <span><strong>МСК ЭКСПЕРТ</strong><small>СУДЕБНЫЙ МОНИТОРИНГ</small></span>
+    </a>
+    <div class="workspace"><span class="workspace-letter">М</span><span><b>Рабочее пространство</b><small>Москва и ближайшие суды</small></span><span class="workspace-dot" aria-hidden="true"></span></div>
+    <p class="nav-label">НАВИГАЦИЯ</p>
+    <nav id="navigation">
+      <button type="button" data-view="overview" class="nav-item active" aria-current="page"><span data-icon="dashboard"></span>Обзор<span class="nav-key">01</span></button>
+      <button type="button" data-view="opportunities" class="nav-item"><span data-icon="briefcase"></span>Возможности<span class="nav-count" id="nav-opportunities">—</span></button>
+      <button type="button" data-view="courts" class="nav-item"><span data-icon="court"></span>Справочник судов</button>
+      <button type="button" data-view="sources" class="nav-item"><span data-icon="radar"></span>Источники и обновления</button>
+      <button type="button" data-view="proposals" class="nav-item"><span data-icon="document"></span>Мои предложения<span class="nav-count" id="nav-drafts">0</span></button>
+    </nav>
+    <div class="sidebar-note"><span data-icon="shield"></span><div><strong>Решение — за экспертом</strong><p>Каждый сигнал проверяется по первоисточнику перед подготовкой предложения.</p></div></div>
+    <div class="sidebar-bottom"><button type="button" data-view="guide" class="nav-item"><span data-icon="help"></span>Как это работает</button><div class="sidebar-footer"><span class="avatar">МЭ</span><span><b>МСК Эксперт</b><small>Панель исследования · v1.0</small></span></div></div>
+  </aside>
+  <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-left"><button type="button" class="icon-button mobile-menu" id="mobile-menu" aria-label="Открыть меню" aria-controls="sidebar" aria-expanded="false"><span data-icon="menu"></span></button><span class="breadcrumb">Рабочее пространство<span>/</span><b id="breadcrumb-view">Обзор</b></span></div>
+      <div class="topbar-actions"><span class="snapshot-tag" id="snapshot-tag"><span class="status-dot neutral"></span>Загрузка базы</span><button type="button" class="icon-button" id="refresh-button" aria-label="Обновить опубликованные данные" title="Обновить опубликованные данные"><span data-icon="refresh"></span></button><a class="sheet-button" id="sheet-link" href="#" hidden target="_blank" rel="noopener noreferrer"><span data-icon="table"></span>Google-таблица<span data-icon="external"></span></a></div>
+    </header>
+    <main id="main" tabindex="-1">
+      <section class="loading-screen" aria-live="polite"><div class="loading-orbit" aria-hidden="true"></div><h1>Открываем рабочую панель</h1><p>Загружаем реестр и статусы источников…</p></section>
+    </main>
+    <footer class="page-footer"><span>МСК Эксперт · Открытые источники, проверяемые решения</span><span id="footer-sync">Загрузка опубликованного среза</span></footer>
+  </div>
+  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title"><div id="detail-content"></div></dialog>
+  <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-title"><div class="confirm-inner"><h2 id="confirm-title">Заменить локальные данные?</h2><p>Заметки и черновики в этом браузере будут заменены содержимым выбранной резервной копии.</p><div class="button-row"><button type="button" class="button secondary" data-action="cancel-import">Отмена</button><button type="button" class="button primary" data-action="confirm-import">Восстановить</button></div></div></dialog>
+  <input type="file" id="backup-input" accept="application/json,.json" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><div class="noscript">Для работы панели включите JavaScript. Исходные данные доступны в файле <a href="data/registry.json">registry.json</a>.</div></noscript>
+</body>
+</html>

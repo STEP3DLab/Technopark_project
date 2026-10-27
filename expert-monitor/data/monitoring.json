@@ -1,0 +1,112 @@
+{
+  "lastRunAt": "2026-10-27T17:40:33Z",
+  "lastSuccessfulSearchAt": null,
+  "status": "degraded",
+  "mode": "offline",
+  "summary": "Проверка источников и обнаружение ссылок. КАД, процессуальные статусы и сроки проверяются отдельно.",
+  "sources": [
+    {
+      "id": "moscow-search",
+      "name": "Суды Москвы — поиск дел",
+      "url": "https://mos-gorsud.ru/search",
+      "status": "not_checked",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "kad",
+      "name": "Картотека арбитражных дел",
+      "url": "https://kad.arbitr.ru/",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Проверить номер дела, последние определения, кандидатуры экспертов и срок ответа. Публичный запрос не заменяет проверку карточки.",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "as-moscow",
+      "name": "АС Москвы — официальный сайт",
+      "url": "https://msk.arbitr.ru/",
+      "status": "not_checked",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "as-region",
+      "name": "АС Московской области — официальный сайт",
+      "url": "https://asmo.arbitr.ru/",
+      "status": "not_checked",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "eis",
+      "name": "ЕИС — государственные закупки",
+      "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Самостоятельный канал закупок; не все судебные экспертизы являются закупками. Проверить извещение, сроки, требования и обеспечение.",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "moscow-data",
+      "name": "Открытые данные судов Москвы",
+      "url": "https://data.mos-gorsud.ru/",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Официальный портал требует JavaScript; автоматическая выгрузка судебных актов в этой версии не подключена.",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "official-directory",
+      "name": "Управление Судебного департамента — справочник",
+      "url": "https://usd--msk.sudrf.ru/modules.php?name=sud",
+      "status": "not_checked",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "kontur",
+      "name": "Контур.Закупки — дополнительный поиск",
+      "url": "https://zakupki.kontur.ru/",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Источник сигналов и ориентиров. Текущую стадию и документацию подтверждать в ЕИС/на площадке.",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "sudact",
+      "name": "СудАкт — копии судебных актов",
+      "url": "https://sudact.ru/",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Архивный исследовательский источник. Завершённый акт не означает открытый заказ.",
+      "lastSuccessAt": null
+    },
+    {
+      "id": "reputation",
+      "name": "Reputation — копии судебных актов",
+      "url": "https://reputation.su/",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "Использованы только доступные части текстов; часть документов ограничена. Первоисточник — карточка суда.",
+      "lastSuccessAt": null
+    }
+  ],
+  "newCandidates": [],
+  "verifiedRecords": 12,
+  "automaticSending": false
+}

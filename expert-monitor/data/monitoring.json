@@ -1,18 +1,18 @@
 {
-  "lastRunAt": "2026-10-27T17:40:33Z",
+  "lastRunAt": "2026-10-27T17:55:46Z",
   "lastSuccessfulSearchAt": null,
   "status": "degraded",
-  "mode": "offline",
+  "mode": "public-source-links",
   "summary": "Проверка источников и обнаружение ссылок. КАД, процессуальные статусы и сроки проверяются отдельно.",
   "sources": [
     {
       "id": "moscow-search",
       "name": "Суды Москвы — поиск дел",
       "url": "https://mos-gorsud.ru/search",
-      "status": "not_checked",
-      "checkedAt": null,
+      "status": "error",
+      "checkedAt": "2026-10-27T17:55:46Z",
       "httpStatus": null,
-      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
+      "error": "<urlopen error timed out>",
       "lastSuccessAt": null
     },
     {
@@ -29,21 +29,23 @@
       "id": "as-moscow",
       "name": "АС Москвы — официальный сайт",
       "url": "https://msk.arbitr.ru/",
-      "status": "not_checked",
-      "checkedAt": null,
-      "httpStatus": null,
-      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
-      "lastSuccessAt": null
+      "status": "ok",
+      "checkedAt": "2026-10-27T17:55:46Z",
+      "httpStatus": 200,
+      "error": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-10-27T17:55:46Z",
+      "contentHash": "a3c2c21c97f2732f0503ceed365581d067cde715b30aebb5a061bdd51f661f6b"
     },
     {
       "id": "as-region",
       "name": "АС Московской области — официальный сайт",
       "url": "https://asmo.arbitr.ru/",
-      "status": "not_checked",
-      "checkedAt": null,
-      "httpStatus": null,
-      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
-      "lastSuccessAt": null
+      "status": "ok",
+      "checkedAt": "2026-10-27T17:55:46Z",
+      "httpStatus": 200,
+      "error": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-10-27T17:55:46Z",
+      "contentHash": "e556ecd72b55e9f44abaf759786394de3f2c4bf02df793b6d00f7e2a04a3173e"
     },
     {
       "id": "eis",
@@ -69,10 +71,10 @@
       "id": "official-directory",
       "name": "Управление Судебного департамента — справочник",
       "url": "https://usd--msk.sudrf.ru/modules.php?name=sud",
-      "status": "not_checked",
-      "checkedAt": null,
+      "status": "error",
+      "checkedAt": "2026-10-27T17:55:46Z",
       "httpStatus": null,
-      "error": "Сетевой доступ в среде сборки не выполнен; это не результат проверки источника",
+      "error": "Перенаправление на другой домен: требуется ручная проверка",
       "lastSuccessAt": null
     },
     {

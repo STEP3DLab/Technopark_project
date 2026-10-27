@@ -1,9 +1,27 @@
 /**
- * A softly lit, illustrated 2.5D human built around measured landmarks.
+ * A Canvas 2D character with softly shaded, illustrated forms.
  * All signing joint centres and facial contours follow the source recording.
  * Skin, clothing, hair, irises and lighting are decorative appearance; there
  * is no gesture synthesis, automatic blink, inferred gaze or gap filling.
  */
+const OUTFITS = Object.freeze({
+  teal: Object.freeze({
+    body: ['#21595c', '#327c77', '#438f84', '#327e79', '#245b63'],
+    sleeve: ['#285e63', '#387f79', '#4b9487', '#3c817b'],
+    collar: '#1f5359', stitch: '#a4d3bd', shade: '#143b45', glow: '#d0ebd7',
+  }),
+  indigo: Object.freeze({
+    body: ['#353c68', '#505a8a', '#6975a3', '#56608f', '#394469'],
+    sleeve: ['#3c456f', '#596391', '#7581ab', '#606b98'],
+    collar: '#353c63', stitch: '#c4cae3', shade: '#242d4b', glow: '#d9e0f3',
+  }),
+  slate: Object.freeze({
+    body: ['#314b5b', '#4b6878', '#638292', '#506f80', '#354f62'],
+    sleeve: ['#395366', '#536f80', '#728d9a', '#5c7788'],
+    collar: '#304959', stitch: '#c1d5df', shade: '#233849', glow: '#deebef',
+  }),
+});
+
 export class CanvasAvatar {
   constructor(container) {
     this.container = container;
@@ -19,6 +37,7 @@ export class CanvasAvatar {
     this.width = 1;
     this.height = 1;
     this.scene = 'light';
+    this.outfit = 'teal';
     this.faceMap = new Map();
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(container);
@@ -69,6 +88,11 @@ export class CanvasAvatar {
 
   setScene(theme) {
     this.scene = /dark|night|тем/i.test(String(theme)) ? 'dark' : 'light';
+    this.render();
+  }
+
+  setAppearance({ outfit } = {}) {
+    if (Object.hasOwn(OUTFITS, outfit)) this.outfit = outfit;
     this.render();
   }
 
@@ -212,13 +236,13 @@ export class CanvasAvatar {
     const middle = this.mix(a, b, .48);
     const g = c.createLinearGradient(middle[0] - nx * radius * sign, middle[1] - ny * radius * sign,
       middle[0] + nx * radius * sign, middle[1] + ny * radius * sign);
-    g.addColorStop(0, '#ba8066'); g.addColorStop(.22, '#dfaa87');
-    g.addColorStop(.48, '#f0c5a4'); g.addColorStop(.78, '#e5b08e'); g.addColorStop(1, '#cc9375');
+    g.addColorStop(0, '#bd876e'); g.addColorStop(.22, '#e1ae90');
+    g.addColorStop(.48, '#f2cbb0'); g.addColorStop(.78, '#e6b496'); g.addColorStop(1, '#cf997d');
     return g;
   }
 
   drawTorso(p, face) {
-    const c = this.ctx, s = this.shoulder;
+    const c = this.ctx, s = this.shoulder, palette = OUTFITS[this.outfit];
     const [left, right] = [p[11], p[12]].sort((a, b) => a[0] - b[0]);
     const cx = (left[0] + right[0]) / 2, cy = (left[1] + right[1]) / 2;
     const chin = face(152);
@@ -234,8 +258,7 @@ export class CanvasAvatar {
     shadow.addColorStop(0, '#76503e5b'); shadow.addColorStop(.6, '#76503e00');
     this.capsule(neckTop, neckBase, s * .084, s * .107, shadow);
     const cloth = c.createLinearGradient(left[0] - s * .12, cy, right[0] + s * .14, cy + s * .2);
-    cloth.addColorStop(0, '#154c50'); cloth.addColorStop(.22, '#267d78');
-    cloth.addColorStop(.48, '#358e85'); cloth.addColorStop(.77, '#287a75'); cloth.addColorStop(1, '#174f57');
+    [0, .22, .48, .77, 1].forEach((stop, i) => cloth.addColorStop(stop, palette.body[i]));
     const neckL = [neckX - s * .13, collarY], neckR = [neckX + s * .13, collarY];
     c.beginPath(); c.moveTo(...neckL);
     c.bezierCurveTo(cx - s * .24, collarY + s * .018, left[0] - s * .035, left[1] - s * .055, left[0] - s * .083, left[1] + s * .055);
@@ -247,26 +270,36 @@ export class CanvasAvatar {
     c.bezierCurveTo(right[0] + s * .015, right[1] - s * .04, cx + s * .23, collarY + s * .025, ...neckR);
     c.quadraticCurveTo(neckX, collarY + s * .105, ...neckL);
     c.closePath(); c.fillStyle = cloth; c.fill();
+    c.strokeStyle = palette.shade + '32'; c.lineWidth = Math.max(.6, s * .004); c.stroke();
     c.save(); c.clip();
     const sheen = c.createRadialGradient(cx - s * .17, cy + s * .06, 0, cx, cy + s * .22, s * 1.06);
-    sheen.addColorStop(0, '#a4dfc42a'); sheen.addColorStop(.65, '#9ad6c400'); sheen.addColorStop(1, '#092e3b35');
+    sheen.addColorStop(0, palette.glow + '19'); sheen.addColorStop(.65, palette.glow + '00'); sheen.addColorStop(1, palette.shade + '35');
     c.fillStyle = sheen; c.fillRect(cx - s, collarY - s * .1, s * 2, lower - collarY + s);
     for (const side of [-1, 1]) {
       c.beginPath(); c.moveTo(cx + side * s * .46, cy + s * .26);
       c.quadraticCurveTo(cx + side * s * .34, cy + s * .36, cx + side * s * .32, cy + s * .46);
-      c.strokeStyle = '#103e421c'; c.lineWidth = Math.max(1, s * .018); c.stroke();
+      c.strokeStyle = palette.shade + '1c'; c.lineWidth = Math.max(1, s * .018); c.stroke();
       c.beginPath(); c.moveTo(cx + side * s * .38, cy + s * .3);
       c.bezierCurveTo(cx + side * s * .25, cy + s * .62, waistX + side * s * .34, lower - s * .13, waistX + side * s * .29, lower + s * .05);
-      c.strokeStyle = '#092e3b18'; c.lineWidth = s * .025; c.stroke();
+      c.strokeStyle = palette.shade + '18'; c.lineWidth = s * .025; c.stroke();
       c.beginPath(); c.moveTo(cx + side * s * .27, cy + s * .76);
       c.quadraticCurveTo(waistX + side * s * .2, cy + s * .87, waistX + side * s * .21, lower);
-      c.strokeStyle = '#a0d9c416'; c.lineWidth = Math.max(1, s * .009); c.stroke();
+      c.strokeStyle = palette.stitch + '16'; c.lineWidth = Math.max(1, s * .009); c.stroke();
+    }
+    // A quiet embroidered equality mark belongs to the character's clothing.
+    // Its placement is relative to the recorded shoulders, not the camera.
+    c.save(); c.translate(cx + s * .235, cy + s * .23);
+    c.rotate(Math.atan2(right[1] - left[1], right[0] - left[0]));
+    c.strokeStyle = palette.stitch + 'b3'; c.lineWidth = Math.max(.8, s * .009);
+    for (const y of [-.018, .018]) {
+      c.beginPath(); c.moveTo(-s * .033, s * y); c.lineTo(s * .033, s * y); c.stroke();
     }
     c.restore();
+    c.restore();
     c.beginPath(); c.moveTo(...neckL); c.quadraticCurveTo(neckX, collarY + s * .105, ...neckR);
-    c.strokeStyle = '#124b50'; c.lineWidth = s * .036; c.stroke();
+    c.strokeStyle = palette.collar; c.lineWidth = s * .036; c.stroke();
     c.beginPath(); c.moveTo(neckL[0], neckL[1] + s * .012); c.quadraticCurveTo(neckX, collarY + s * .11, neckR[0], neckR[1] + s * .012);
-    c.strokeStyle = '#69afa093'; c.lineWidth = Math.max(.65, s * .009); c.stroke();
+    c.strokeStyle = palette.stitch + '75'; c.lineWidth = Math.max(.65, s * .007); c.stroke();
   }
 
   drawHead(p, face) {
@@ -295,7 +328,7 @@ export class CanvasAvatar {
       c.strokeStyle = '#9c66594b'; c.lineWidth = Math.max(.6, w * .022); c.stroke();
     }
     const skin = c.createRadialGradient(-w * .42, -h * .5, w * .02, -w * .06, -h * .1, h * 1.35);
-    skin.addColorStop(0, '#f7d9bd'); skin.addColorStop(.4, '#edc3a2'); skin.addColorStop(.78, '#dba685'); skin.addColorStop(1, '#b77c65');
+    skin.addColorStop(0, '#f8dbc4'); skin.addColorStop(.4, '#efc6aa'); skin.addColorStop(.78, '#dba98c'); skin.addColorStop(1, '#bc856e');
     c.beginPath(); c.moveTo(0, -h * 1.025);
     c.bezierCurveTo(w * .65, -h * 1.05, w * 1.02, -h * .64, w * .96, -h * .05);
     c.bezierCurveTo(w * .94, h * .42, w * .59, h * .89, w * .22, h * .98);
@@ -307,9 +340,18 @@ export class CanvasAvatar {
     c.save(); c.clip();
     for (const side of [-1, 1]) {
       const cheek = c.createRadialGradient(side * w * .56, h * .24, 0, side * w * .56, h * .24, w * .48);
-      cheek.addColorStop(0, '#d7826b23'); cheek.addColorStop(1, '#d7826b00');
+      cheek.addColorStop(0, '#d7826b1e'); cheek.addColorStop(1, '#d7826b00');
       c.fillStyle = cheek; c.fillRect(-w, -h, w * 2, h * 2.2);
     }
+    const jaw = c.createLinearGradient(0, h * .47, 0, h * 1.1);
+    jaw.addColorStop(0, '#a4776100'); jaw.addColorStop(.67, '#a4776108'); jaw.addColorStop(1, '#855b4936');
+    c.fillStyle = jaw; c.fillRect(-w, h * .46, w * 2, h * .68);
+    const cheekbone = c.createRadialGradient(-w * .5, h * .1, 0, -w * .5, h * .1, w * .5);
+    cheekbone.addColorStop(0, '#fff0da32'); cheekbone.addColorStop(1, '#fff0da00');
+    c.fillStyle = cheekbone; c.fillRect(-w, -h * .5, w * 2, h * 1.2);
+    const chinLight = c.createRadialGradient(-w * .06, h * .76, 0, -w * .06, h * .76, w * .34);
+    chinLight.addColorStop(0, '#fff0dd24'); chinLight.addColorStop(1, '#fff0dd00');
+    c.fillStyle = chinLight; c.fillRect(-w, h * .3, w * 2, h * .75);
     c.restore();
     // Swept fringe stops above the measured brow region.
     c.beginPath(); c.moveTo(-w * .98, -h * .19);
@@ -320,6 +362,15 @@ export class CanvasAvatar {
     c.bezierCurveTo(-w * .13, -h * .76, -w * .37, -h * .66, -w * .74, -h * .6);
     c.quadraticCurveTo(-w * .82, -h * .35, -w * .98, -h * .19);
     c.closePath(); c.fillStyle = hair; c.fill();
+    c.save(); c.clip();
+    // Broad, low-contrast locks read as sculpted hair at both phone and
+    // presentation sizes. None covers the recorded brow or eyelid contours.
+    for (const offset of [0, .09, .18]) {
+      c.beginPath(); c.moveTo(-w * (.9 - offset * .25), -h * (.65 + offset));
+      c.bezierCurveTo(-w * .5, -h * (1.13 + offset * .28), w * .04, -h * (1.2 - offset * .2), w * (.34 + offset), -h * (1.03 - offset * .16));
+      c.strokeStyle = offset === 0 ? '#b79d8350' : '#b79d8324'; c.lineWidth = Math.max(.6, w * .025); c.stroke();
+    }
+    c.restore();
     c.beginPath(); c.moveTo(-w * .85, -h * .64);
     c.bezierCurveTo(-w * .65, -h * .98, -w * .16, -h * 1.12, w * .11, -h * 1.08);
     c.strokeStyle = '#b6967d38'; c.lineWidth = Math.max(.8, w * .058); c.stroke();
@@ -343,16 +394,16 @@ export class CanvasAvatar {
       c.beginPath(); c.moveTo(bridge[0] - nx * n * .18, bridge[1] - ny * n * .18);
       c.quadraticCurveTo(nose[0] - nx * n * .9, nose[1] - ny * n * .9, nose[0], nose[1] + n * .27);
       c.quadraticCurveTo(nose[0] + nx * n * .75, nose[1] + ny * n * .75, nose[0] + nx * n, nose[1] + ny * n);
-      c.strokeStyle = '#a66c513b'; c.lineWidth = Math.max(.6, w * .025); c.stroke();
+      c.strokeStyle = '#a66c5132'; c.lineWidth = Math.max(.6, w * .025); c.stroke();
       c.beginPath(); c.moveTo(bridge[0] + nx * n * .12, bridge[1] + ny * n * .12);
       c.quadraticCurveTo(nose[0] + nx * n * .1, nose[1] - n * .4, nose[0] + nx * n * .4, nose[1] - n * .08);
-      c.strokeStyle = '#fff1d554'; c.lineWidth = Math.max(.75, w * .055); c.stroke();
+      c.strokeStyle = '#fff1dc45'; c.lineWidth = Math.max(.75, w * .044); c.stroke();
     }
     const mouth = [61, 40, 37, 0, 267, 270, 291, 321, 314, 17, 84, 91].map(face);
     if (mouth.every(Boolean) && this.smoothPath(mouth)) {
       const ys = mouth.map(v => v[1]);
       const lip = c.createLinearGradient(0, Math.min(...ys), 0, Math.max(...ys) + .1);
-      lip.addColorStop(0, '#a46661'); lip.addColorStop(.5, '#b8786c'); lip.addColorStop(1, '#dba18c');
+      lip.addColorStop(0, '#9f6c61'); lip.addColorStop(.5, '#bc8775'); lip.addColorStop(1, '#dca590');
       c.fillStyle = lip; c.fill();
       c.strokeStyle = '#9d66523d'; c.lineWidth = Math.max(.45, w * .01); c.stroke();
     }
@@ -390,7 +441,7 @@ export class CanvasAvatar {
   }
 
   drawArm({ a, b, d, hand }) {
-    const c = this.ctx, s = this.shoulder;
+    const c = this.ctx, s = this.shoulder, palette = OUTFITS[this.outfit];
     const sleeveEnd = this.mix(a, b, .53);
     let wristRadius = s * .03;
     if (hand?.length === 21 && hand.every(v => this.valid(v))) {
@@ -401,8 +452,8 @@ export class CanvasAvatar {
     }
     // Skin begins underneath the sleeve hem, not at the covered shoulder:
     // painting it through the shirt left a visible skin strip at the armhole.
-    this.capsule(this.mix(a, b, .38), b, s * .075, s * .062, this.skinGradient(a, b, s * .09), '#92624b30');
-    this.capsule(b, d, s * .065, wristRadius, this.skinGradient(b, d, s * .075), '#92624b30');
+    this.capsule(this.mix(a, b, .38), b, s * .075, s * .062, this.skinGradient(a, b, s * .09));
+    this.capsule(b, d, s * .065, wristRadius, this.skinGradient(b, d, s * .075));
     const length = this.distance(a, sleeveEnd) || 1;
     const ux = (sleeveEnd[0] - a[0]) / length, uy = (sleeveEnd[1] - a[1]) / length;
     let nx = -uy, ny = ux;
@@ -414,21 +465,26 @@ export class CanvasAvatar {
     const outerTop = at(-s * .025, s * .113), innerTop = at(-s * .045, -s * .11);
     const outerCuff = at(length + s * .006, s * .096), innerCuff = at(length - s * .006, -s * .092);
     const cloth = c.createLinearGradient(a[0] - nx * s * .12, a[1] - ny * s * .12, a[0] + nx * s * .13, a[1] + ny * s * .13);
-    cloth.addColorStop(0, '#174e54'); cloth.addColorStop(.27, '#2c7e78'); cloth.addColorStop(.68, '#40998c'); cloth.addColorStop(1, '#2d7c77');
+    [0, .27, .68, 1].forEach((stop, i) => cloth.addColorStop(stop, palette.sleeve[i]));
     c.beginPath(); c.moveTo(...outerTop);
-    c.bezierCurveTo(...at(length * .22, s * .142), ...at(length * .82, s * .111), ...outerCuff);
+    c.bezierCurveTo(...at(length * .22, s * .126), ...at(length * .82, s * .111), ...outerCuff);
     c.quadraticCurveTo(...at(length + s * .024, s * .013), ...innerCuff);
     c.bezierCurveTo(...at(length * .72, -s * .102), ...at(length * .29, -s * .108), ...innerTop);
-    c.bezierCurveTo(...at(-s * .125, -s * .038), ...at(-s * .117, s * .075), ...outerTop);
+    c.bezierCurveTo(...at(-s * .096, -s * .038), ...at(-s * .091, s * .075), ...outerTop);
     c.closePath(); c.fillStyle = cloth; c.fill();
     c.beginPath(); c.moveTo(...outerCuff); c.quadraticCurveTo(...at(length + s * .024, s * .013), ...innerCuff);
-    c.strokeStyle = '#0d414d50'; c.lineWidth = Math.max(.65, s * .008); c.stroke();
+    c.strokeStyle = palette.shade + '50'; c.lineWidth = Math.max(.65, s * .008); c.stroke();
     c.beginPath(); c.moveTo(...at(length - s * .016, s * .096));
     c.quadraticCurveTo(...at(length + s * .004, s * .013), ...at(length - s * .025, -s * .089));
-    c.strokeStyle = '#9ad6bd48'; c.lineWidth = Math.max(.5, s * .005); c.stroke();
+    c.strokeStyle = palette.stitch + '48'; c.lineWidth = Math.max(.5, s * .005); c.stroke();
     c.beginPath(); c.moveTo(...at(length * .2, -s * .035));
     c.quadraticCurveTo(...at(length * .51, -s * .036), ...at(length * .79, -s * .057));
-    c.strokeStyle = '#103e4623'; c.lineWidth = Math.max(.7, s * .013); c.stroke();
+    c.strokeStyle = palette.shade + '23'; c.lineWidth = Math.max(.7, s * .013); c.stroke();
+    // A curved shoulder seam gives the sleeve a textile construction rather
+    // than a separate cylindrical arm. It follows the upper-arm direction.
+    c.beginPath(); c.moveTo(...at(-s * .012, -s * .105));
+    c.bezierCurveTo(...at(-s * .033, -s * .033), ...at(-s * .016, s * .054), ...at(s * .024, s * .114));
+    c.strokeStyle = palette.stitch + '25'; c.lineWidth = Math.max(.5, s * .005); c.stroke();
   }
 
   drawHand(points) {
@@ -446,7 +502,7 @@ export class CanvasAvatar {
       (points[0][1] + points[5][1] + points[9][1] + points[17][1]) / 4];
     const skin = c.createRadialGradient(palmCenter[0] - radius, palmCenter[1] - radius, 0,
       palmCenter[0], palmCenter[1], Math.max(radius * 3, palmWidth * .73, palmLength * .73));
-    skin.addColorStop(0, '#f3cdab'); skin.addColorStop(.5, '#e8b794'); skin.addColorStop(1, '#cd9676');
+    skin.addColorStop(0, '#f4cfb3'); skin.addColorStop(.5, '#e8ba9c'); skin.addColorStop(1, '#cf9c7e');
     // The projected palm can be strongly foreshortened. A rounded skin
     // envelope around wrist, thumb base and MCP landmarks preserves its
     // volume without moving any joint centre or fingertip. An inward-smoothed
@@ -460,6 +516,15 @@ export class CanvasAvatar {
     const palm = [...lower.slice(0, -1), ...upper.slice(0, -1)];
     if (this.path(palm, true)) {
       c.fillStyle = skin; c.fill(); c.strokeStyle = skin; c.lineWidth = radius * 1.45; c.stroke();
+      c.save(); c.clip();
+      const thumbPad = this.mix(points[1], points[5], .4);
+      const padLight = c.createRadialGradient(thumbPad[0], thumbPad[1], 0, thumbPad[0], thumbPad[1], Math.max(radius * 2.8, palmLength * .6));
+      padLight.addColorStop(0, '#ffe1c333'); padLight.addColorStop(1, '#ffe1c300');
+      c.fillStyle = padLight;
+      const xs = palm.map(p => p[0]), ys = palm.map(p => p[1]);
+      c.fillRect(Math.min(...xs) - radius, Math.min(...ys) - radius,
+        Math.max(...xs) - Math.min(...xs) + radius * 2, Math.max(...ys) - Math.min(...ys) + radius * 2);
+      c.restore();
     }
     const fingers = [
       { ids: [1, 2, 3, 4], factor: 1.15 }, { ids: [5, 6, 7, 8], factor: 1 },
@@ -472,7 +537,7 @@ export class CanvasAvatar {
       // Continuous shading and no outlines around individual phalanges avoid
       // the segmented-pipe appearance while retaining all joint centres.
       const grad = this.skinGradient(chain[0], chain[3], r * 1.15);
-      for (let i = 0; i < 3; i++) this.capsule(chain[i], chain[i + 1], r * [1, .95, .84][i], r * [.95, .84, .72][i], grad);
+      for (let i = 0; i < 3; i++) this.capsule(chain[i], chain[i + 1], r * [1, .95, .85][i], r * [.95, .85, .75][i], grad);
       for (let j = 1; j < 3; j++) {
         const before = chain[j - 1], joint = chain[j], after = chain[j + 1];
         const l = this.distance(before, after) || 1, px = -(after[1] - before[1]) / l, py = (after[0] - before[0]) / l;

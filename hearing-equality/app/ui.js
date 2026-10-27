@@ -1,3 +1,5 @@
+import { readStudioSettings, createStudioLink } from './studio-settings.js?v=0.3';
+
 let handlers = {};
 let dictionary = [];
 let selectedId = null;
@@ -12,6 +14,11 @@ let lastPlaybackStatus = '';
 let returnFocus = null;
 let inertElements = [];
 let announceTimer = 0;
+let outfit = 'teal';
+let toastTimer = 0;
+let tourActive = false;
+let tourStep = '';
+let helpReturnFocus = null;
 
 const $ = (id) => document.getElementById(id);
 const text = (value, fallback = '') => typeof value === 'string' ? value : fallback;
@@ -43,7 +50,8 @@ function labelButton(id, label) {
 }
 function formatTime(value) {
   const seconds = Math.max(0, Number.isFinite(value) ? value : 0);
-  return Math.floor(seconds / 60) + ':' + String(Math.floor(seconds % 60)).padStart(2, '0');
+  const tenths = Math.floor(seconds * 10 + 1e-5);
+  return Math.floor(tenths / 600) + ':' + String(Math.floor(tenths / 10) % 60).padStart(2, '0') + ',' + tenths % 10;
 }
 function announce(value) {
   const status = $('a11y-status');
@@ -179,21 +187,69 @@ export function setLoop(value) {
   $('loop-button')?.classList.toggle('active', loop);
   labelButton('loop-button', loop ? 'Повтор включён' : 'По кругу');
 }
+export function setTour({ active = false, index = 0, total = 0, label = '', next = '' } = {}) {
+  const lostFocus = !active && $('tour-stop') === document.activeElement;
+  tourActive = Boolean(active);
+  if ($('tour-status')) $('tour-status').hidden = !tourActive;
+  $('tour-button')?.setAttribute('aria-pressed', String(tourActive));
+  if ($('tour-button')) $('tour-button').disabled = !dictionary.length || tourActive;
+  put('tour-progress', 'Демопоказ · ' + (index + 1) + ' из ' + total + ' · ' + label);
+  put('tour-next', next ? 'Далее: ' + next : 'Последний пример');
+  const step = active ? index + ':' + label : '';
+  if (step && step !== tourStep) announce('Демопоказ. Пример ' + (index + 1) + ' из ' + total + ': ' + label + '.');
+  tourStep = step;
+  if (lostFocus) $('play-button').focus({ preventScroll: true });
+}
+export function showToast(message) {
+  const toast = $('toast');
+  if (!toast) { announce(message); return; }
+  clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.hidden = false;
+  announce(message);
+  toastTimer = setTimeout(() => { toast.hidden = true; }, 5000);
+}
+function setAppearance(value) {
+  outfit = ['teal', 'indigo', 'slate'].includes(value) ? value : 'teal';
+  document.querySelectorAll('button[data-outfit]').forEach((button) => {
+    const selected = button.dataset.outfit === outfit;
+    button.setAttribute('aria-pressed', String(selected));
+    button.classList.toggle('active', selected);
+  });
+  preference('outfit', outfit);
+  dispatch('onAppearance', { outfit });
+}
+function toggleAppearance(force) {
+  const panel = $('appearance-panel');
+  if (!panel) return;
+  const open = force ?? panel.hidden;
+  panel.hidden = !open;
+  $('appearance-button')?.setAttribute('aria-expanded', String(open));
+  window.dispatchEvent(new Event('resize'));
+}
+function openHelp() {
+  const dialog = $('help-dialog');
+  if (!dialog || dialog.open) return;
+  helpReturnFocus = document.activeElement;
+  dispatch('onHelp');
+  dialog.showModal();
+  $('help-close')?.focus();
+}
 function finishScrub() {
   if (!scrubbing) return;
   scrubbing = false;
   dispatch('onScrubEnd');
 }
 async function share() {
-  const url = new URL(window.location.href);
-  if (selectedId) url.searchParams.set('word', selectedId);
-  else url.searchParams.delete('word');
-  url.hash = '';
+  const url = createStudioLink(window.location.href, {
+    word: selectedId, mode: currentMode, speed: $('speed-select').value, scene, outfit,
+  });
   try {
-    await navigator.clipboard.writeText(url.href);
-    setMessage('Ссылка на выбранное слово скопирована.', 'success');
+    await navigator.clipboard.writeText(url);
+    showToast('Ссылка скопирована вместе с настройками сцены.');
   } catch {
-    setMessage('Ссылка на выбранное слово находится в адресной строке — её можно скопировать.', 'info');
+    history.replaceState(null, '', url);
+    showToast('Ссылка с настройками — в адресной строке. Скопируйте её.');
   }
 }
 
@@ -215,6 +271,10 @@ export function initUI(callbacks = {}) {
   $('message-box').removeAttribute('role');
   $('playback-status')?.removeAttribute('aria-live');
   $('playback-status')?.removeAttribute('role');
+  // One live region is also audible in presentation mode; the visual toast
+  // must not repeat the same announcement a second time.
+  $('toast')?.removeAttribute('role');
+  $('toast')?.removeAttribute('aria-live');
   $('selection-word').tabIndex = -1;
   $('viewer-card').tabIndex = -1;
   $('text-form').addEventListener('submit', (event) => {
@@ -235,12 +295,34 @@ export function initUI(callbacks = {}) {
   $('replay-button').addEventListener('click', () => dispatch('onReplay'));
   $('prev-button')?.addEventListener('click', () => dispatch('onStep', -1));
   $('next-button')?.addEventListener('click', () => dispatch('onStep', 1));
+  $('frame-prev')?.addEventListener('click', () => dispatch('onFrame', -1));
+  $('frame-next')?.addEventListener('click', () => dispatch('onFrame', 1));
+  $('tour-button')?.addEventListener('click', () => {
+    showTab('demo');
+    dispatch('onTour');
+    $('viewer-card').focus({ preventScroll: true });
+  });
+  $('tour-stop')?.addEventListener('click', () => dispatch('onTourStop'));
   $('loop-button')?.addEventListener('click', () => dispatch('onLoop', !loop));
   $('theme-toggle')?.addEventListener('click', () => setScene(scene === 'dark' ? 'light' : 'dark'));
   $('focus-button')?.addEventListener('click', () => setPresentation(!presentation));
   $('share-button')?.addEventListener('click', share);
-  const storedSpeed = Number(preference('speed'));
-  if ([.5, .75, 1].includes(storedSpeed)) $('speed-select').value = String(storedSpeed);
+  $('appearance-button')?.addEventListener('click', () => toggleAppearance());
+  document.querySelectorAll('button[data-outfit]').forEach((button) => button.addEventListener('click', () => setAppearance(button.dataset.outfit)));
+  $('help-button')?.addEventListener('click', openHelp);
+  $('help-close')?.addEventListener('click', () => $('help-dialog').close());
+  $('help-dialog')?.addEventListener('close', () => {
+    if (helpReturnFocus?.isConnected && !helpReturnFocus.closest('[hidden]')) helpReturnFocus.focus({ preventScroll: true });
+    helpReturnFocus = null;
+  });
+  $('help-dialog')?.addEventListener('click', (event) => {
+    const dialog = $('help-dialog');
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+  });
+  const initial = readStudioSettings(location.search, { speed: preference('speed'), scene: preference('scene'), outfit: preference('outfit') });
+  $('speed-select').value = String(initial.speed);
   dispatch('onSpeed', Number($('speed-select').value));
   $('speed-select').addEventListener('change', (event) => {
     const value = Number(event.target.value);
@@ -293,6 +375,13 @@ export function initUI(callbacks = {}) {
     window.dispatchEvent(new Event('resize'));
   });
   document.addEventListener('keydown', (event) => {
+    if ($('help-dialog')?.open) return;
+    if (event.key === 'Escape' && $('appearance-panel') && !$('appearance-panel').hidden) {
+      event.preventDefault();
+      toggleAppearance(false);
+      $('appearance-button').focus({ preventScroll: true });
+      return;
+    }
     if (event.key === 'Escape' && presentation) {
       event.preventDefault();
       setPresentation(false);
@@ -301,7 +390,10 @@ export function initUI(callbacks = {}) {
     if (event.defaultPrevented || event.isComposing || event.ctrlKey || event.metaKey || event.altKey ||
         editable(event.target) || $('panel-demo').hidden) return;
     const code = event.code;
-    if (code === 'KeyF' && !event.repeat) {
+    if (event.key === '?' && !event.repeat) {
+      event.preventDefault();
+      openHelp();
+    } else if (code === 'KeyF' && !event.repeat) {
       event.preventDefault();
       setPresentation(!presentation);
     } else if (ready && code === 'Space' && !event.repeat && !interactive(event.target)) {
@@ -313,19 +405,25 @@ export function initUI(callbacks = {}) {
     } else if (ready && code === 'KeyL' && !event.repeat) {
       event.preventDefault();
       dispatch('onLoop', !loop);
+    } else if (ready && ['BracketLeft', 'BracketRight'].includes(code)) {
+      event.preventDefault();
+      dispatch('onFrame', code === 'BracketLeft' ? -1 : 1);
     } else if (ready && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
       if (event.target instanceof Element && event.target.closest('[role="tab"],[role="slider"]')) return;
       event.preventDefault();
       dispatch('onSeekDelta', (event.key === 'ArrowLeft' ? -1 : 1) * (event.shiftKey ? .5 : .1));
     }
   });
-  setScene(preference('scene') || 'dark');
+  setScene(initial.scene);
+  setAppearance(initial.outfit);
+  dispatch('onMode', initial.mode);
   setLoop(false);
   updateCount();
 }
 
 export function setItems(items = []) {
   dictionary = Array.isArray(items) ? items : [];
+  if ($('tour-button')) $('tour-button').disabled = !dictionary.length || tourActive;
   put('dictionary-count', String(dictionary.length));
   const buttons = $('example-buttons');
   buttons.replaceChildren();
@@ -394,7 +492,7 @@ export function setSelection(item = {}) {
   announce(selectedId ? 'Выбрано слово «' + label + '».' : label);
 }
 
-export function setPlayback({ playing = false, progress = 0, time = 0, duration = 0, buffering = false, repeating = false } = {}) {
+export function setPlayback({ playing = false, progress = 0, time = 0, duration = 0, buffering = false, repeating = false, advancing = false, tourPaused = false, frame = 0, frames = 0 } = {}) {
   const clamped = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
   if (!scrubbing) {
     $('progress-input').value = String(Math.round(clamped * 1000));
@@ -403,12 +501,15 @@ export function setPlayback({ playing = false, progress = 0, time = 0, duration 
   $('progress-input').setAttribute('aria-valuetext', time.toFixed(1) + ' из ' + duration.toFixed(1) + ' секунды');
   put('time-current', formatTime(time));
   put('time-duration', formatTime(duration));
+  put('frame-position', frames ? 'Кадр ' + String(frame).padStart(2, '0') + ' / ' + frames : 'Кадры —');
+  if ($('frame-prev')) $('frame-prev').disabled = !ready || frame <= 1;
+  if ($('frame-next')) $('frame-next').disabled = !ready || frame >= frames;
   $('play-icon').toggleAttribute('hidden', Boolean(playing));
   $('pause-icon').toggleAttribute('hidden', !playing);
-  const label = playing ? 'Приостановить' : time > 0 && time >= duration - .025 ? 'Воспроизвести снова' : 'Воспроизвести';
+  const label = playing ? 'Приостановить' : tourPaused ? 'Продолжить демопоказ' : time > 0 && time >= duration - .025 ? 'Воспроизвести снова' : 'Воспроизвести';
   labelButton('play-button', label);
   $('viewer-card').dataset.playing = String(playing);
-  const status = !ready ? 'Загрузка' : repeating ? 'Повтор через мгновение' : buffering && playing ? 'Загрузка видео' : playing ? 'Воспроизведение' :
+  const status = !ready ? 'Загрузка' : advancing ? 'Следующий пример…' : repeating ? 'Повтор через мгновение' : buffering && playing ? 'Загрузка видео' : playing ? 'Воспроизведение' : tourPaused ? 'Демопоказ на паузе' :
     duration > 0 && time >= duration - .025 ? 'Просмотр завершён' : time > 0 ? 'На паузе' : 'Готов к показу';
   if (status !== lastPlaybackStatus) {
     put('playback-status', status);
@@ -439,7 +540,7 @@ export function setReady(value, message = 'Подготавливаем ават
   const caption = $('viewer-empty').querySelector(':scope > span');
   if (caption) caption.textContent = kind === 'empty' ? 'Выберите слово из набора справа или ниже' :
     kind === 'error' ? 'Проверьте соединение и повторите выбор' : 'Это займёт несколько секунд';
-  ['play-button', 'replay-button', 'progress-input', 'loop-button'].forEach((id) => {
+  ['play-button', 'replay-button', 'progress-input', 'loop-button', 'frame-prev', 'frame-next'].forEach((id) => {
     if ($(id)) $(id).disabled = !ready;
   });
   ['prev-button', 'next-button'].forEach((id) => { if ($(id)) $(id).disabled = dictionary.length < 2; });

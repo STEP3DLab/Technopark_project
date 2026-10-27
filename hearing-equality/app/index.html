@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#102d3b">
   <meta name="description" content="Равенство по слуху — студия демонстрации аватара. Шесть слов русского жестового языка, воспроизведение движения и сравнение с исходным видео.">
-  <title>Равенство по слуху — студия аватара</title>
-  <link rel="stylesheet" href="./styles.css?v=0.2">
+  <title>Равенство по слуху — студия аватара · v0.3</title>
+  <link rel="stylesheet" href="./styles.css?v=0.3">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Перейти к содержимому</a>
@@ -16,13 +16,13 @@
         <span class="brand-mark" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 30 30" fill="none"><path d="M7 10.5h16M7 19.5h16" stroke="currentColor" stroke-width="3.7" stroke-linecap="round"/><path d="M24 6v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".36"/></svg></span>
         <span class="brand-name">Равенство <span>по слуху</span></span>
       </a>
-      <div class="header-meta"><span class="header-project">Технопарк РГСУ</span><span class="header-divider" aria-hidden="true"></span><span class="header-topic">Русский жестовый язык</span><button id="share-button" class="icon-button" type="button" aria-label="Скопировать ссылку на выбранное слово" title="Скопировать ссылку"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m10 14 4-4m-6 6-1 1a4.24 4.24 0 0 1-6-6l4-4a4.24 4.24 0 0 1 6 0m2 10a4.24 4.24 0 0 0 6 0l4-4a4.24 4.24 0 0 0-6-6l-1 1" transform="translate(1 0) scale(.9)" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+      <div class="header-meta"><span class="header-project">Технопарк РГСУ</span><span class="header-divider" aria-hidden="true"></span><span class="header-topic">Русский жестовый язык</span><button id="share-button" class="icon-button" type="button" aria-label="Скопировать ссылку на сцену" title="Скопировать ссылку на сцену"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m10 14 4-4m-6 6-1 1a4.24 4.24 0 0 1-6-6l4-4a4.24 4.24 0 0 1 6 0m2 10a4.24 4.24 0 0 0 6 0l4-4a4.24 4.24 0 0 0-6-6l-1 1" transform="translate(1 0) scale(.9)" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
     </header>
 
     <main id="main-content">
       <section class="intro" aria-labelledby="page-title">
         <div class="intro-copy-group"><h1 id="page-title">Аватар <span>в движении.</span></h1><p class="intro-copy">Выберите слово. Рассмотрите жест. Сравните с исходным видео.</p></div>
-        <div class="demo-badge"><span class="status-dot" aria-hidden="true"></span><span>Демонстратор · 6 слов</span></div>
+        <div class="demo-badge"><span class="status-dot" aria-hidden="true"></span><span>Демонстратор <b>v0.3</b> · 6 слов</span></div>
       </section>
 
       <nav class="tabs" role="tablist" aria-label="Разделы студии">
@@ -39,12 +39,22 @@
               <button id="mode-reference" class="mode-button" data-mode="reference" type="button" aria-pressed="false">Исходное видео</button>
               <button id="mode-compare" class="mode-button" data-mode="compare" type="button" aria-pressed="false">Сравнить</button>
             </div>
-            <div class="scene-tools" role="group" aria-label="Настройки сцены"><span class="presentation-badge">Демонстратор РЖЯ · 2D</span>
+            <div class="scene-tools" role="group" aria-label="Настройки сцены"><span class="presentation-badge">Студия РЖЯ · v0.3</span>
+              <button id="appearance-button" class="icon-button appearance-button" type="button" aria-label="Внешний вид аватара" title="Внешний вид аватара" aria-expanded="false" aria-controls="appearance-panel"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 4-5 3 2 5 3-1v9h8v-9l3 1 2-5-5-3c-.5 2-2 3-4 3s-3.5-1-4-3Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
               <button id="theme-toggle" class="icon-button" type="button" aria-label="Фон сцены: переключить на светлый" title="Фон сцены" aria-pressed="false"><span data-label class="sr-only">Светлый фон</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42m0-14.14-1.42 1.42M6.35 17.65l-1.42 1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
               <button id="focus-button" class="icon-button focus-button" type="button" aria-label="Режим показа" title="Режим показа · F" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 21h6m-3-4v4M7 8h3M7 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="focus-label" data-label>Режим показа</span></button>
+              <button id="help-button" class="icon-button help-button" type="button" aria-label="Как управлять студией" title="Как управлять студией"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M9.7 9a2.4 2.4 0 0 1 4.7.6c0 1.7-2.4 1.8-2.4 3.5m0 2.8v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
               <button id="fullscreen-button" class="icon-button fullscreen-button" type="button" aria-label="На весь экран" title="На весь экран"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
           </div>
+          <section id="appearance-panel" class="appearance-panel" aria-labelledby="appearance-title" hidden>
+            <div class="appearance-heading"><h3 id="appearance-title">Образ аватара</h3><p>Выберите цвет одежды</p></div>
+            <div class="outfit-options" role="group" aria-label="Цвет одежды аватара">
+              <button type="button" class="outfit-option" data-outfit="teal" aria-pressed="true" title="Цвет одежды: морской"><span class="outfit-swatch" style="--swatch:#278f88" aria-hidden="true"></span><span>Морской</span></button>
+              <button type="button" class="outfit-option" data-outfit="indigo" aria-pressed="false" title="Цвет одежды: индиго"><span class="outfit-swatch" style="--swatch:#7478b7" aria-hidden="true"></span><span>Индиго</span></button>
+              <button type="button" class="outfit-option" data-outfit="slate" aria-pressed="false" title="Цвет одежды: графит"><span class="outfit-swatch" style="--swatch:#6e8795" aria-hidden="true"></span><span>Графит</span></button>
+            </div>
+          </section>
           <div id="scene-message" class="scene-message" data-kind="error" hidden><p id="scene-message-text"></p></div>
           <div class="viewer-body" id="viewer-body">
             <div class="stage-background" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -54,12 +64,14 @@
             <div id="reference-stage" class="reference-stage" hidden><video id="reference-video" playsinline preload="metadata" aria-label="Исходная запись жеста"></video></div>
             <div class="viewer-empty" id="viewer-empty"><div class="loading-mark" aria-hidden="true"><span></span><span></span><span></span></div><p id="viewer-empty-text">Подготавливаем аватара</p><span>Движение появится здесь</span></div>
           </div>
+          <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
           <div class="player-controls">
+            <div id="tour-status" class="tour-status" hidden><div class="tour-status-copy"><span class="tour-indicator" aria-hidden="true"><i></i><i></i><i></i></span><span id="tour-progress">Демопоказ · 1 из 6</span></div><button id="tour-stop" type="button">Завершить <span aria-hidden="true">×</span></button></div>
             <div class="stage-bottom">
               <div class="selection-copy"><div class="selection-label"><span class="selection-overline">Сейчас на экране</span><span id="selection-index" class="selection-index">01 / 06</span></div><h2 id="selection-word" tabindex="-1">Выберите слово</h2></div>
-              <div class="clip-details"><span id="playback-status" class="playback-status" role="status" aria-live="polite">Готово к показу</span><a id="selection-source" class="source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Запись из Slovo <span aria-hidden="true">↗</span></a></div>
+              <div class="clip-details"><span id="playback-status" class="playback-status" role="status" aria-live="polite">Готово к показу</span><span id="frame-position" class="frame-position">Кадр — / —</span><a id="selection-source" class="source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Запись из Slovo <span aria-hidden="true">↗</span></a></div>
             </div>
-            <div class="timeline-row"><span id="time-current" class="time-label">0:00</span><input id="progress-input" class="progress-input" type="range" min="0" max="1000" step="1" value="0" aria-label="Позиция воспроизведения" aria-valuetext="0 секунд" disabled><span id="time-duration" class="time-label">0:00</span></div>
+            <div class="timeline-row"><span id="time-current" class="time-label">0:00</span><input id="progress-input" class="progress-input" type="range" min="0" max="1000" step="1" value="0" aria-label="Позиция воспроизведения" aria-valuetext="0 секунд" disabled><span id="time-duration" class="time-label">0:00</span><div class="frame-controls" role="group" aria-label="Покадровый просмотр"><button id="frame-prev" class="icon-button frame-button" type="button" aria-label="Предыдущий кадр" title="Предыдущий кадр · [" disabled><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 6H5v12h2m9-11-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="frame-next" class="icon-button frame-button" type="button" aria-label="Следующий кадр" title="Следующий кадр · ]" disabled><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 6h2v12h-2M8 7l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
             <div class="transport-row">
               <div class="transport-left" role="group" aria-label="Воспроизведение">
                 <button id="prev-button" class="icon-button nav-button" type="button" aria-label="Предыдущее слово" title="Предыдущее слово"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 5v14m12-14-9 7 9 7V5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -72,23 +84,39 @@
               <div class="speed-control"><label for="speed-select">Скорость</label><select id="speed-select" aria-label="Скорость воспроизведения"><option value="0.5">0,5×</option><option value="0.75">0,75×</option><option value="1" selected>1×</option></select></div>
             </div>
           </div>
+          <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title" aria-describedby="help-description">
+            <div class="help-heading"><div><p class="eyebrow">Управление студией</p><h2 id="help-title">Рассмотрите каждое движение</h2></div><button id="help-close" class="icon-button" type="button" aria-label="Закрыть справку"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+            <p id="help-description">Выберите слово или запустите демопоказ. Переключайтесь между аватаром и исходной записью, меняйте скорость и ставьте движение на паузу.</p>
+            <dl class="shortcut-list">
+              <div><dt><kbd>Пробел</kbd></dt><dd>Воспроизведение и пауза</dd></div>
+              <div><dt><kbd>←</kbd><kbd>→</kbd></dt><dd>Назад и вперёд на 0,1 секунды</dd></div>
+              <div><dt><kbd>[</kbd><kbd>]</kbd></dt><dd>Предыдущий и следующий кадр</dd></div>
+              <div><dt><kbd>R</kbd></dt><dd>Повторить слово сначала</dd></div>
+              <div><dt><kbd>L</kbd></dt><dd>Включить повтор по кругу</dd></div>
+              <div><dt><kbd>F</kbd></dt><dd>Открыть режим показа</dd></div>
+              <div><dt><kbd>?</kbd></dt><dd>Открыть справку по управлению</dd></div>
+              <div><dt><kbd>Esc</kbd></dt><dd>Выйти из режима показа или справки</dd></div>
+            </dl>
+            <p class="help-note">В текстовых полях клавиши работают как обычно. Ссылка сохраняет выбранное слово и настройки студии.</p>
+          </dialog>
         </div>
 
         <aside class="input-panel" aria-label="Выбор слова">
-          <div class="section-heading"><p class="eyebrow">Ваше сообщение</p><h2>Начните со слова</h2><p class="section-description">Выберите пример или введите его название.</p></div>
-          <div class="example-section"><div class="small-section-heading"><h3>Доступные слова</h3><span>6 примеров</span></div><div id="example-buttons" class="example-buttons"><p class="empty-examples">Загружаем слова…</p></div></div>
-          <div class="input-separator"><span>или введите</span></div>
+          <div class="section-heading"><p class="eyebrow">Шесть движений · Один аватар</p><h2>Выберите слово</h2><p class="section-description">Рассмотрите движение в своём темпе.</p></div>
+          <div class="tour-launch"><button id="tour-button" class="tour-button" type="button" aria-label="Показать все 6 слов" aria-pressed="false"><span class="tour-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m7 6 9 6-9 6V6Z" fill="currentColor"/><path d="M19 6v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span class="tour-button-copy"><strong>Демопоказ</strong><span>Показать все 6 слов</span></span><svg class="tour-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><p>Шесть отдельных примеров, один за другим.</p></div>
+          <div class="example-section"><div class="small-section-heading"><h3>Или выберите одно слово</h3><span>РЖЯ</span></div><div id="example-buttons" class="example-buttons"><p class="empty-examples">Загружаем слова…</p></div></div>
+          <div class="input-separator"><span>найти по названию</span></div>
           <form id="text-form">
             <label for="text-input" class="sr-only">Слово из демонстрационного словаря</label>
-            <div class="text-input-wrap"><textarea id="text-input" name="text" rows="2" maxlength="160" placeholder="Например, «Привет»" spellcheck="false" aria-describedby="input-hint"></textarea><span id="char-count" class="char-count" aria-hidden="true">0 / 160</span></div>
+            <div class="text-input-wrap"><textarea id="text-input" name="text" rows="1" maxlength="160" placeholder="Например, «Привет»" spellcheck="false" aria-describedby="input-hint"></textarea><span id="char-count" class="char-count" aria-hidden="true">0 / 160</span></div>
             <p class="input-hint" id="input-hint">В этой версии доступны шесть слов.</p>
-            <button id="submit-button" class="primary-button" type="submit"><span>Показать движение</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button id="submit-button" class="primary-button" type="submit"><span>Показать жест</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </form>
           <div id="message-box" class="message-box" data-kind="info" role="status" aria-live="polite" aria-atomic="true"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.2" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4m0-6.3v.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><p id="message-text">Начните с любого примера. Можно замедлить движение или включить повтор.</p></div>
           <button type="button" id="open-dictionary" class="text-button">Словарь и источники <span aria-hidden="true">↗</span></button>
           <div class="research-note"><p id="selection-status" class="selection-status">Исследовательский прототип. Визуализация ещё не прошла проверку специалистом РЖЯ.</p><p>Подробности — в разделе «Как устроено».</p></div>
         </aside>
-        <div class="keyboard-hints" aria-label="Горячие клавиши"><span><kbd>Пробел</kbd> Пауза</span><span><kbd>←</kbd><kbd>→</kbd> Перемотка</span><span><kbd>R</kbd> Повторить</span><span><kbd>F</kbd> Режим показа</span><span><kbd>Esc</kbd> Выйти</span></div>
+        <div class="keyboard-hints" aria-label="Горячие клавиши"><span><kbd>Пробел</kbd> Пауза</span><span><kbd>←</kbd><kbd>→</kbd> Перемотка</span><span><kbd>[</kbd><kbd>]</kbd> По кадрам</span><span><kbd>F</kbd> Режим показа</span></div>
       </section>
 
       <section id="panel-dictionary" class="tab-panel dictionary-panel" role="tabpanel" aria-labelledby="tab-dictionary" hidden>
@@ -99,14 +127,16 @@
 
       <section id="panel-about" class="tab-panel about-panel" role="tabpanel" aria-labelledby="tab-about" hidden>
         <div class="panel-heading"><div><p class="eyebrow">Равенство по слуху</p><h2>От записи — к аватару</h2><p>Этот демонстратор помогает исследовать воспроизведение жестов и удобство взаимодействия с цифровым персонажем.</p></div></div>
+<div class="version-note"><span class="version-label">Новое в v0.3</span><p>Последовательный демопоказ, три цвета одежды, просмотр по кадрам и ссылка с настройками студии.</p></div>
         <div class="process-grid"><article class="process-card"><span class="process-index">01</span><h3>Выбираем слово</h3><p>Текст сопоставляется с одной из шести доступных записей демонстрационного словаря.</p></article><article class="process-card"><span class="process-index">02</span><h3>Воссоздаём движение</h3><p>Аватар использует измеренные координаты тела, лица и кистей. Его можно сравнить с исходным видео.</p></article><article class="process-card"><span class="process-index">03</span><h3>Проверяем понимание</h3><p>Следующий этап — оценка переводчиком РЖЯ и участниками сообщества глухих.</p></article></div>
         <div class="about-detail-grid"><article class="about-detail"><h3>Что уже можно исследовать</h3><ul><li>Форму кистей и траекторию движения</li><li>Читаемость аватара на разных экранах</li><li>Различия между исходным видео и визуализацией</li><li>Удобство замедления, сравнения и повтора</li></ul></article><article class="about-detail limitation-detail"><h3>Границы этой версии</h3><p>Это технический демонстратор шести слов. Свободного перевода предложений и подтверждённого понимания РЖЯ в этой версии нет.</p><p>Аватар Canvas 2D следует координатам, автоматически извлечённым MediaPipe. При потере кисти детектором её пальцы временно не показываются. Стилизованная внешность не является частью исходной записи.</p><p>Для реальных оповещений и ответственной коммуникации нужны проверенные переводы.</p></article></div>
         <article class="about-detail source-credit"><div><p class="eyebrow">Происхождение данных</p><h3>Движения из Slovo</h3></div><div><p>Alexander Kapitanov, Karina Kvanchiani, Alexander Nagaev, Elizaveta Petrova. <em>Slovo: Russian Sign Language Dataset.</em></p><p>Шесть исходных видеоклипов сохранены без изменения. Координаты автоматически извлечены с помощью MediaPipe; изображение аватара и переходы построены программно. Данные и их адаптация предоставляются по специальной публичной лицензии Slovo, как есть, без гарантии качества перевода. Авторы Slovo не заявлены проверяющими этого проекта.</p><div class="source-links"><a href="https://github.com/ai-forever/slovo" target="_blank" rel="noopener noreferrer">Исходный репозиторий ↗</a><a href="./assets/sources/SLOVO-LICENSE-en.pdf" target="_blank" rel="noopener noreferrer">Лицензия данных ↗</a><a href="./assets/sources/slovo-sources.json" target="_blank" rel="noopener noreferrer">Происхождение записей ↗</a><a href="https://github.com/STEP3DLab/Technopark_project/tree/main/hearing-equality" target="_blank" rel="noopener noreferrer">Код и план MVP ↗</a></div></div></article>
       </section>
     </main>
-    <footer class="site-footer"><span>Равенство по слуху <span class="footer-separator" aria-hidden="true">·</span> Технопарк РГСУ</span><span>Доступность начинается с понимания.</span></footer>
+    <footer class="site-footer"><span>Равенство по слуху <span class="footer-separator" aria-hidden="true">·</span> Технопарк РГСУ</span><span class="footer-version"><b>v0.3</b> Доступность начинается с понимания.</span></footer>
   </div>
+
   <div id="a11y-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-  <script type="module" src="./app.js?v=0.2"></script>
+  <script type="module" src="./app.js?v=0.3"></script>
 </body>
 </html>

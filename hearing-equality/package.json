@@ -1,6 +1,6 @@
 {
   "name": "hearing-equality-mvp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Равенство по слуху: исследовательский демонстратор текст → записанный жест → аватар",

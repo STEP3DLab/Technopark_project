@@ -1,6 +1,6 @@
-import { initUI, setItems, setSelection, setPlayback, setMessage, setReady, setMode, setLoop, revealViewer } from './ui.js?v=0.2';
+import { initUI, setItems, setSelection, setPlayback, setMessage, setReady, setMode, setLoop, setTour, showToast, revealViewer } from './ui.js?v=0.3';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
-import { CanvasAvatar } from './canvas-avatar.js?v=0.2';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.3';
 
 const video = document.getElementById('reference-video');
 const cache = new Map();
@@ -10,6 +10,7 @@ const state = {
   time: 0, playing: false, intent: false, speed: 1, mode: 'avatar', loop: false,
   last: 0, loadId: 0, playId: 0, raf: 0, loopTimer: 0, loopGap: false,
   buffering: false, failedVideo: false, scrubResume: false, request: null,
+  tour: null, tourId: 0,
 };
 let avatar;
 try {
@@ -32,7 +33,10 @@ function update() {
   setPlayback({
     playing: state.playing, time: state.time, duration: state.data.duration,
     progress: state.time / state.data.duration, buffering: state.buffering,
-    repeating: state.loopGap,
+    repeating: state.loopGap === 'repeat', advancing: state.loopGap === 'tour',
+    tourPaused: Boolean(state.tour && !state.playing),
+    frame: Math.min(state.data.frame_count, Math.floor(state.time * state.data.fps + 1e-5) + 1),
+    frames: state.data.frame_count,
   });
 }
 function cancelLoop() {
@@ -51,24 +55,72 @@ function pause() {
   state.raf = 0;
   update();
 }
+function refreshTour() {
+  const tour = state.tour;
+  setTour({ active: Boolean(tour), index: tour?.index ?? 0, total: state.catalog.length,
+    label: tour ? state.catalog[tour.index]?.text : '',
+    next: tour ? state.catalog[tour.index + 1]?.text : '' });
+}
+function stopTour(message = '', pausePlayback = true) {
+  if (!state.tour) return;
+  state.tour = null;
+  ++state.tourId;
+  cancelLoop();
+  if (pausePlayback) pause();
+  refreshTour();
+  if (message) showToast(message);
+}
+function advanceTour() {
+  if (!state.tour || !demoVisible()) return;
+  state.tour.pending = false;
+  state.tour.index += 1;
+  if (state.tour.index >= state.catalog.length) {
+    stopTour('Демопоказ завершён. Вы посмотрели все шесть примеров.');
+    return;
+  }
+  select(state.catalog[state.tour.index].id, true, { keepTour: true, explicit: true });
+}
+function startTour() {
+  if (!state.catalog.length) return;
+  stopTour('', false);
+  state.loop = false;
+  setLoop(false);
+  state.tour = { index: 0, pending: false };
+  ++state.tourId;
+  // Pressing this dedicated control explicitly requests the whole sequence,
+  // including when the system prefers reduced incidental animation.
+  select(state.catalog[0].id, true, { keepTour: true, explicit: true });
+  revealViewer(true);
+}
 function finish() {
   if (!state.data || !state.playing || state.loopGap) return;
   state.time = state.data.duration;
-  if (!state.loop || !demoVisible()) { pause(); return; }
-  // One repeat path for both renderers, with a short, readable interval.
-  state.loopGap = true;
+  if (!demoVisible()) { pause(); return; }
+  if (state.tour && state.tour.index >= state.catalog.length - 1) {
+    stopTour('Демопоказ завершён. Вы посмотрели все шесть примеров.');
+    return;
+  }
+  if (!state.loop && !state.tour) { pause(); return; }
+  // Separate recordings remain visibly separate. No movement is interpolated
+  // between words, and only one cancellable timer owns the next transition.
+  const gap = state.tour ? 'tour' : 'repeat';
+  state.loopGap = gap;
+  if (state.tour) state.tour.pending = true;
   video.pause();
   if (state.raf) cancelAnimationFrame(state.raf);
   state.raf = 0;
   update();
-  const loadId = state.loadId;
+  const loadId = state.loadId, tourId = state.tourId, playId = state.playId;
   state.loopTimer = setTimeout(() => {
     state.loopTimer = 0;
-    if (loadId !== state.loadId || !state.playing || !state.loop || !demoVisible()) return;
+    if (loadId !== state.loadId || tourId !== state.tourId || playId !== state.playId ||
+        !state.playing || !demoVisible()) return;
     state.loopGap = false;
+    if (gap === 'tour') { if (state.tour) advanceTour(); return; }
+    if (!state.loop) return;
     state.time = 0;
     play();
-  }, 550);
+  }, gap === 'tour' ? 900 : 550);
 }
 function tick(now) {
   state.raf = 0;
@@ -78,7 +130,10 @@ function tick(now) {
     // video buffering and seeks. No separate animation clock can drift ahead.
     if (activeVideo() && !video.seeking) state.time = Math.min(state.data.duration, video.currentTime);
   } else {
-    state.time += Math.min((now - state.last) / 1000, .1) * state.speed;
+    // Preserve the selected playback speed when rendering drops a frame.
+    // Visibility changes already pause playback, so hidden tabs cannot jump
+    // ahead on return. Capping every RAF delta made slow devices drift.
+    state.time += Math.max(0, (now - state.last) / 1000) * state.speed;
   }
   state.last = now;
   if (!usesVideo() && state.time >= state.data.duration) { finish(); return; }
@@ -88,6 +143,7 @@ function tick(now) {
 async function play() {
   if (!state.data || !demoVisible()) return;
   cancelLoop();
+  if (state.tour?.pending) { advanceTour(); return; }
   if (state.time >= state.data.duration - .025) state.time = 0;
   state.playing = true;
   state.intent = true;
@@ -122,6 +178,7 @@ function seek(ratio) {
   if (!state.data) return;
   const wasGap = state.loopGap;
   cancelLoop();
+  if (state.tour) state.tour.pending = false;
   state.time = Math.max(0, Math.min(1, ratio)) * state.data.duration;
   if (video.readyState >= 1 && activeVideo()) {
     video.currentTime = Math.min(state.time, video.duration || state.data.duration);
@@ -131,15 +188,16 @@ function seek(ratio) {
   if (wasGap && state.playing && usesVideo()) { play(); return; }
   if (state.playing && !state.raf) state.raf = requestAnimationFrame(tick);
 }
-async function select(id, autoplay = true) {
+async function select(id, autoplay = true, { keepTour = false, explicit = false } = {}) {
   const item = state.catalog.find((entry) => entry.id === id);
   if (!item) return;
+  if (!keepTour) stopTour('', false);
   const token = ++state.loadId;
   state.request?.abort();
   const request = new AbortController();
   state.request = request;
   pause();
-  state.intent = Boolean(autoplay && !reducedMotion.matches);
+  state.intent = Boolean(autoplay && (explicit || !reducedMotion.matches));
   state.item = null;
   state.selectionId = id;
   state.data = null;
@@ -150,6 +208,7 @@ async function select(id, autoplay = true) {
   setPlayback({ playing: false, time: 0, duration: 0, progress: 0 });
   setReady(false, 'Подготавливаем движение');
   setSelection({ ...item, sourceUrl: new URL(item.video, document.baseURI).href });
+  refreshTour();
   setMessage('');
   try {
     let data = cache.get(id);
@@ -173,12 +232,15 @@ async function select(id, autoplay = true) {
     if (state.intent && demoVisible()) await play();
   } catch (error) {
     if (token !== state.loadId || error.name === 'AbortError') return;
+    state.intent = false;
+    stopTour('', false);
     setReady(false, 'Не удалось загрузить движение', 'error');
     setMessage('Проверьте соединение и нажмите на выбранное слово ещё раз.', 'error');
     console.error(error);
   }
 }
 function submit(value) {
+  stopTour('', false);
   const item = matchText(value, state.catalog);
   if (item) { select(item.id); revealViewer(); return; }
   ++state.loadId;
@@ -206,6 +268,15 @@ initUI({
   onSelect: (id) => select(id),
   onPlayPause: () => state.playing ? pause() : play(),
   onReplay: () => { pause(); seek(0); play(); },
+  onTour: startTour,
+  onTourStop: () => stopTour('Демопоказ остановлен.'),
+  onFrame: (delta) => {
+    if (!state.data) return;
+    pause();
+    const frame = Math.min(state.data.frame_count - 1, Math.floor(state.time * state.data.fps + 1e-5));
+    const next = Math.max(0, Math.min(state.data.frame_count - 1, frame + delta));
+    seek(next / state.data.fps / state.data.duration);
+  },
   onStep: (step) => {
     if (!state.catalog.length) return;
     const position = state.catalog.findIndex((item) => item.id === state.selectionId);
@@ -214,9 +285,12 @@ initUI({
     select(state.catalog[next].id, state.playing || (!state.data && state.intent));
   },
   onLoop: (value) => {
+    const resume = state.playing;
+    if (value && state.tour) stopTour('Демопоказ завершён. Включён повтор одного слова.');
     state.loop = Boolean(value);
     setLoop(state.loop);
     if (!state.loop && state.loopGap) pause();
+    else if (state.loop && resume && !state.playing) play();
   },
   onSpeed: (speed) => {
     if ([.5, .75, 1].includes(speed)) {
@@ -248,6 +322,8 @@ initUI({
     if (wasPlaying) play();
   },
   onScene: (scene) => avatar?.setScene?.(scene),
+  onAppearance: (appearance) => avatar?.setAppearance?.(appearance),
+  onHelp: () => pause(),
   onTab: (tab) => { if (tab !== 'demo') pause(); },
 });
 setMode(state.mode);

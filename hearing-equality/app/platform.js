@@ -273,7 +273,16 @@ $('replay-analysis').onclick=async()=>{
   notice('capture-notice','Демонстрационный разбор: используем готовые координаты этой записи. Модель сейчас не запускается.');
   try{
     await ensureTemplates();if(token!==s.captureToken)return;
-    const motion=s.motions.get(id);inputVideo.currentTime=0;
+    let motion=s.motions.get(id);
+    if(!motion){
+      const item=s.catalog.find(x=>x.id===id);
+      if(!item)throw new Error('Исходная запись не найдена. Выберите пример ещё раз.');
+      const response=await fetch(item.motion);
+      if(!response.ok)throw new Error('Не удалось загрузить координаты записи. Повторите разбор.');
+      motion=validateMotion(await response.json());s.motions.set(id,motion);
+    }
+    if(token!==s.captureToken)return;
+    inputVideo.currentTime=0;
     await inputVideo.play();if(token!==s.captureToken){inputVideo.pause();return;}
     await new Promise((resolve,reject)=>{
       const started=performance.now();
@@ -380,7 +389,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.7',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.7.1',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{

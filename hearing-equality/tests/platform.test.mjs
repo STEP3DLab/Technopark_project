@@ -130,3 +130,12 @@ test('late completion of an old play request cannot pause newer playback',async(
  h.get('source-video').play=()=>Promise.resolve();await h.api.playAvatar();let pauses=0;h.get('source-video').pause=()=>pauses++;
  resolve();await old;assert.equal(pauses,0);assert.equal(h.api.s.playing,true);
 });
+test('a built-in video replay loads motion independently of the recognition library',async()=>{
+ const h=await harness();h.api.setMode('video');assert.equal(h.api.s.motions.has('hello'),false);
+ h.api.s.sampleId='hello';h.api.s.videoReady=true;
+ h.get('input-video').play=async()=>{h.get('input-video').currentTime=9;h.get('input-video').ended=true;};
+ await h.get('replay-analysis').onclick();
+ assert.equal(h.api.s.motions.has('hello'),true);assert.equal(h.api.s.templates.length,21);
+ assert.match(h.get('result-label').textContent,/ДЕМО/);assert.equal(h.api.ledger.summary().demo,1);assert.equal(h.api.ledger.summary().total,0);
+ assert.match(h.get('capture-notice').textContent,/разбор завершён/);
+});

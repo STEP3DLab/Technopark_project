@@ -1,6 +1,6 @@
 # Равенство по слуху — пространство диалога
 
-**Версия 0.7, 28.10.2026.** Исследовательский веб-прототип для показа на НТС: жесты, текст, голос, видео и цифровой аватар.
+**Версия 0.7.1, 28.10.2026.** Исследовательский веб-прототип для показа на НТС: жесты, текст, голос, видео и цифровой аватар.
 
 [Открыть приложение](https://step3dlab.github.io/Technopark_project/hearing-equality/app/) · [Студия v0.3](https://step3dlab.github.io/Technopark_project/hearing-equality/app/studio.html) · [Изменения v0.7](docs/RELEASE_V07.md) · [Проверка](docs/EVALUATION_V07.md) · [Анимация v0.6](docs/RELEASE_V06.md) · [Диалог v0.5](docs/RELEASE_V05.md) · [Показ на НТС за 3 минуты](docs/NTS_DEMO_SCRIPT.md)
 

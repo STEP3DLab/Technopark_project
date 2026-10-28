@@ -9,7 +9,7 @@ const manifest=JSON.parse(readFileSync(new URL('assets/sources/slovo-sources.jso
 const motionByUrl=new Map(manifest.samples.map(x=>{const path=`./assets/motion/${x.file.replace('.mp4','.json')}`;return[path,JSON.parse(readFileSync(new URL(path,root)))];}));
 const source=readFileSync(new URL('platform.js',root),'utf8').replace(/^import .*;\n/gm,'');
 async function harness(){
-  const elements=new Map(),timers=new Map();let timerId=0,heldVision=null,cameraDeferred=null,stopped=0;
+  const elements=new Map(),timers=new Map();let now=0,timerId=0,heldVision=null,cameraDeferred=null,stopped=0;
   class El{
     constructor(id=''){this.id=id;this.value=id==='speed'?'1':'';this.hidden=false;this.disabled=false;this.children=[];this.attrs={};this.listeners={};this.dataset={};this.videoWidth=640;this.videoHeight=480;this.readyState=4;this.duration=1.6;this.currentTime=0;this.textContent='';this.classList={add(){},remove(){},toggle(){}};}
     addEventListener(type,cb){(this.listeners[type]??=[]).push(cb);}
@@ -27,7 +27,7 @@ async function harness(){
   const stream={getTracks:()=>[{stop(){stopped++;}}]};
   const context=vm.createContext({document,CanvasAvatar:Avatar,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
     window:{addEventListener(){},speechSynthesis:{cancel(){}}},navigator:{mediaDevices:{getUserMedia:()=>cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}},
-    location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,performance:{now:()=>0},
+    location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,performance:{now:()=>now},
     matchMedia:()=>({matches:false}),requestAnimationFrame:()=>1,cancelAnimationFrame(){},
     setTimeout:cb=>{timers.set(++timerId,cb);return timerId;},clearTimeout:id=>timers.delete(id),
     loadVision:()=>heldVision?.promise||Promise.resolve(),resetVision:async()=>{},detect:()=>new Promise(()=>{}),
@@ -35,7 +35,7 @@ async function harness(){
   });
   const api=await vm.runInContext(`(async()=>{${source}\nreturn {s,selectWord,setMode,startCamera,stopCapture,recordGesture};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
-  return{api,get,timers,stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
+  return{api,get,timers,advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
 }
 test('scrub uses requested position rather than the position restored by pause',async()=>{
   const h=await harness();h.get('timeline').value='500';h.get('timeline').emit('input');
@@ -59,4 +59,11 @@ test('navigation cancels partial gesture without producing result',async()=>{
   const h=await harness();h.api.setMode('camera');h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};
   h.api.recordGesture();assert.ok(h.api.s.recordFrames);h.api.setMode('video');
   assert.equal(h.api.s.recordFrames,null);assert.equal(h.api.s.result,null);assert.equal(h.get('record-indicator').hidden,true);
+});
+
+test('a personal sample for an existing word joins its class instead of becoming an ambiguous label',async()=>{
+  const h=await harness();h.api.setMode('camera');h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};
+  h.get('custom-label').value='Вопрос';h.api.recordGesture(true);
+  h.api.s.recordFrames=motionByUrl.get('./assets/motion/cc59e1b2-5778-47bb-a452-779033da61b0.json').frames;
+  h.advance(3100);assert.equal(h.api.s.custom.length,1);assert.equal(h.api.s.custom[0].id,'question');
 });

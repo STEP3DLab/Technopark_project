@@ -177,7 +177,8 @@ function recordGesture(enroll=false){
       const sequence=makeSequence(frames,inputVideo.videoWidth/inputVideo.videoHeight);const issue=sequenceQuality(sequence);
       if(issue){notice('capture-notice',issue+' Образец не сохранён.','error');return;}
       const existing=s.custom.find(t=>t.text.toLocaleLowerCase('ru')===label.toLocaleLowerCase('ru'));
-      s.custom.push({id:existing?.id||`custom-${Date.now()}`,text:label,origin:'custom',sequence});
+      const known=matchText(label,s.catalog);
+      s.custom.push({id:known?.id||existing?.id||`custom-${Date.now()}`,text:known?.text||label,origin:'custom',sequence});
       $('custom-list').textContent=`Образцы этой сессии (${s.custom.length}/12): ${s.custom.map(t=>t.text).join(', ')}`;$('clear-custom').hidden=false;
       notice('capture-notice',`Образец «${label}» добавлен. Теперь нажмите «Записать жест» и повторите движение для распознавания.`,'success');
     }else{showResult(frames,inputVideo.videoWidth/inputVideo.videoHeight);notice('capture-notice','Запись завершена. Результат справа; на телефоне — ниже.');}

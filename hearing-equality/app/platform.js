@@ -1,0 +1,311 @@
+import { CanvasAvatar } from './canvas-avatar.js?v=0.3';
+import { createCatalog, matchText, validateMotion } from './catalog.js';
+import { makeSequence, classify, sequenceQuality } from './recognizer.js';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js';
+const $ = id => document.getElementById(id);
+const s = { mode:'text', catalog:[], motions:new Map(), templates:[], custom:[], selected:null,
+  data:null, time:0, playing:false, raf:0, last:0, compare:false, selectionToken:0,
+  stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0,
+  frame:null, analyzing:false, videoReady:false, sampleId:null, videoURL:null, result:null, speech:null };
+const avatar = new CanvasAvatar($('platform-avatar')); avatar.setScene('light'); avatar.setAppearance({outfit:'indigo'});
+const video = $('source-video'), inputVideo = $('input-video');
+let toastTimer, lastFocus;
+function toast(message) { $('toast').textContent=message; $('toast').hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').hidden=true,4500); }
+function notice(id,message,kind='') { const el=$(id);el.textContent=message;el.className=`notice ${kind}`;el.hidden=!message; }
+function format(seconds) { return `${Math.floor(seconds/60)}:${Math.floor(seconds%60).toString().padStart(2,'0')}`; }
+function renderPlayback() {
+  $('timeline').value=s.data?Math.round(s.time/s.data.duration*1000):0;
+  $('play-time').textContent=format(s.time);$('duration').textContent=format(s.data?.duration||0);
+  $('play').innerHTML=s.playing?'Ⅱ':'<svg><use href="#i-play"/></svg>';
+  $('play').setAttribute('aria-label',s.playing?'Пауза':'Воспроизвести');
+  $('play').disabled=!s.data; $('replay').disabled=!s.data;
+  avatar.showAt(s.time);
+}
+function pauseAvatar() {s.playing=false;cancelAnimationFrame(s.raf);s.raf=0;video.pause();renderPlayback();}
+function tick(now) {
+  if(!s.playing||!s.data)return;
+  s.time=s.compare?Math.min(s.data.duration,video.currentTime):Math.min(s.data.duration,s.time+(now-s.last)/1000*Number($('speed').value));
+  s.last=now;renderPlayback();
+  if(s.time>=s.data.duration-.01){pauseAvatar();return;}s.raf=requestAnimationFrame(tick);
+}
+async function playAvatar() {
+  if(!s.data||s.mode!=='text')return;
+  const token=s.selectionToken;
+  if(s.time>=s.data.duration-.03)s.time=0;
+  s.playing=true;
+  if(s.compare){
+    video.currentTime=s.time;video.playbackRate=Number($('speed').value);
+    try{await video.play();}catch{pauseAvatar();notice('text-notice','Видео не запускается. Попробуйте режим «Аватар».','error');return;}
+  }
+  if(token!==s.selectionToken||!s.playing||s.mode!=='text'){video.pause();return;}
+  s.last=performance.now();cancelAnimationFrame(s.raf);s.raf=requestAnimationFrame(tick);renderPlayback();
+}
+async function selectWord(id,autoplay=false) {
+  const item=s.catalog.find(x=>x.id===id);if(!item)return;
+  const token=++s.selectionToken;pauseAvatar();s.data=null;s.selected=item;s.time=0;avatar.clear();
+  $('active-word').textContent='Загрузка…';$('message').value=item.text;updateCount();
+  notice('text-notice','');renderPlayback();
+  for(const button of $('word-chips').children)button.setAttribute('aria-pressed',String(button.dataset.id===id));
+  try{
+    let data=s.motions.get(id);
+    if(!data){const r=await fetch(item.motion);if(!r.ok)throw new Error('Движение недоступно');data=validateMotion(await r.json());s.motions.set(id,data);}
+    if(token!==s.selectionToken)return;
+    s.data=data;avatar.load(data);video.src=item.video;video.load();$('active-word').textContent=item.text;renderPlayback();
+    if(autoplay){if(matchMedia('(max-width: 700px)').matches)document.querySelector('.avatar-card').scrollIntoView({block:'start'});playAvatar();}
+  }catch{if(token===s.selectionToken){$('active-word').textContent='Нет связи';notice('text-notice','Не удалось открыть движение. Проверьте соединение и выберите слово ещё раз.','error');}}
+}
+function updateCount(){$('char-count').textContent=`${$('message').value.length} / 200`;}
+$('message').addEventListener('input',updateCount);
+$('text-form').addEventListener('submit',e=>{
+  e.preventDefault();const item=matchText($('message').value,s.catalog);
+  if(item){selectWord(item.id,true);return;}
+  ++s.selectionToken;pauseAvatar();s.data=null;s.selected=null;s.time=0;avatar.clear();video.removeAttribute('src');video.load();
+  $('active-word').textContent='Нет в словаре';renderPlayback();
+  for(const button of $('word-chips').children)button.setAttribute('aria-pressed','false');
+  notice('text-notice','Для этого сообщения нет записи. Выберите одно из шести слов. Отрицания и предложения требуют отдельного перевода.','error');
+});
+$('play').onclick=()=>s.playing?pauseAvatar():playAvatar();
+$('replay').onclick=()=>{pauseAvatar();s.time=0;playAvatar();};
+$('timeline').addEventListener('input',()=>{const ratio=Number($('timeline').value)/1000;pauseAvatar();if(!s.data)return;s.time=ratio*s.data.duration;if(video.readyState>=1)video.currentTime=s.time;renderPlayback();});
+$('speed').onchange=()=>{video.playbackRate=Number($('speed').value);s.last=performance.now();};
+function setCompare(value){const resume=s.playing;pauseAvatar();s.compare=value;$('source-video').hidden=!value;$('stage').classList.toggle('compare',value);$('show-avatar').setAttribute('aria-pressed',String(!value));$('show-compare').setAttribute('aria-pressed',String(value));avatar.resize();if(resume)playAvatar();}
+$('show-avatar').onclick=()=>setCompare(false);$('show-compare').onclick=()=>setCompare(true);
+video.addEventListener('ended',pauseAvatar);
+video.addEventListener('error',()=>{if(s.compare&&s.data){pauseAvatar();notice('text-notice','Исходное видео недоступно. Можно посмотреть движение аватара.','error');}});
+function stopDictation(){if(s.speech){s.speech.abort();s.speech=null;}$('dictate').classList.remove('recording');$('dictate').setAttribute('aria-label','Ввести голосом');}
+$('dictate').onclick=()=>{
+  if(s.speech){stopDictation();return;}
+  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!Recognition){notice('text-notice','В этом браузере нет голосового ввода. Введите слово с клавиатуры.');return;}
+  pauseAvatar();const rec=new Recognition();s.speech=rec;rec.lang='ru-RU';rec.interimResults=false;rec.maxAlternatives=1;
+  $('dictate').classList.add('recording');$('dictate').setAttribute('aria-label','Остановить голосовой ввод');
+  notice('text-notice','Слушаю. Произнесите одно слово из словаря.');
+  rec.onresult=e=>{if(s.speech!==rec)return;$('message').value=e.results[0][0].transcript.slice(0,200);updateCount();notice('text-notice','Текст готов. Проверьте его и нажмите «Показать жест».');};
+  rec.onerror=e=>{if(s.speech!==rec)return;notice('text-notice',e.error==='not-allowed'?'Микрофон не разрешён. Можно ввести слово вручную.':'Не удалось распознать голос. Попробуйте ещё раз или введите слово.','error');};
+  rec.onend=()=>{if(s.speech===rec){s.speech=null;$('dictate').classList.remove('recording');$('dictate').setAttribute('aria-label','Ввести голосом');}};
+  try{rec.start();}catch{stopDictation();notice('text-notice','Не удалось запустить голосовой ввод. Введите текст вручную.','error');}
+};
+function speak(text){
+  if(!text?.trim()){toast('Сначала добавьте текст.');return;}
+  if(!window.speechSynthesis){toast('Озвучивание недоступно в этом браузере.');return;}
+  speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(text.trim());utterance.lang='ru-RU';utterance.rate=.9;
+  const voices=speechSynthesis.getVoices();const voice=voices.find(v=>/^ru/i.test(v.lang));if(voice)utterance.voice=voice;
+  utterance.onerror=e=>{if(e.error!=='interrupted'&&e.error!=='canceled')toast('Не удалось озвучить. Проверьте громкость и русский голос в настройках устройства.');};
+  speechSynthesis.speak(utterance);
+}
+$('speak').onclick=()=>speak(s.result?.text);
+$('add-word').onclick=()=>{if(!s.result)return;$('conversation').value=[$('conversation').value,s.result.text.replace(/[!.]$/,'')].filter(Boolean).join(' ').slice(0,500);toast('Слово добавлено. Сообщение можно отредактировать.');};
+$('speak-message').onclick=()=>speak($('conversation').value);
+$('clear-message').onclick=()=>{$('conversation').value='';window.speechSynthesis?.cancel();};
+function clearResult(){s.result=null;$('result-label').textContent='СЛОВО ПОЯВИТСЯ ЗДЕСЬ';$('result-word').textContent='Покажите один жест';$('result-description').textContent='Проверим сходство с образцами и предложим слово.';$('rankings').replaceChildren();$('speak').disabled=true;$('add-word').disabled=true;}
+function showResult(frames,aspect,origin='camera'){
+  const sequence=makeSequence(frames,aspect);const result=classify(sequence,[...s.templates,...s.custom]);
+  s.result=result.accepted?result.rankings[0]:null;
+  $('result-label').textContent=result.accepted?'ПРЕДПОЛОЖЕНИЕ ПО ДВИЖЕНИЮ':'НУЖНА ЕЩЁ ОДНА ПОПЫТКА';
+  $('result-word').textContent=s.result?.text||'Не распознано';
+  $('result-description').textContent=result.accepted?(s.result.origin==='custom'?'Совпадение с вашим образцом. Подпись задана пользователем; это не проверка РЖЯ.':'Ближайший образец из шести слов Slovo. Проверьте результат перед озвучиванием.'):result.issue;
+  $('speak').disabled=!s.result;$('add-word').disabled=!s.result;
+  $('rankings').replaceChildren();
+  for(const candidate of result.rankings.slice(0,3)){
+    const row=document.createElement('div');row.className='rank-row';const label=document.createElement('b');label.textContent=candidate.text;const metric=document.createElement('span');metric.textContent=`d = ${candidate.distance.toFixed(3)}`;row.append(label,metric);$('rankings').append(row);
+  }
+  if(result.rankings.length){const caption=document.createElement('div');caption.className='rank-caption';caption.textContent='Расстояние d: меньше — ближе к образцу. Это не вероятность.';$('rankings').append(caption);}
+  if(result.accepted&&origin==='camera'&&$('auto-speak').checked)speak(s.result.text);
+  return sequence;
+}
+async function ensureTemplates(){
+  if(s.templates.length===s.catalog.length&&s.catalog.length)return;
+  if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
+  const entries=await Promise.all(s.catalog.map(async item=>{
+    let data=s.motions.get(item.id);
+    if(!data){const r=await fetch(item.motion);if(!r.ok)throw new Error('Не удалось загрузить образцы.');data=validateMotion(await r.json());s.motions.set(item.id,data);}
+    return {id:item.id,text:item.text,origin:'slovo',sequence:makeSequence(data.frames,data.width/data.height)};
+  }));s.templates=entries;
+}
+function resetOverlay(){const canvas=$('landmarks');canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);}
+function cameraButtons(){const active=Boolean(s.stream);$('start-camera').hidden=active;$('stop-camera').hidden=!active;$('record').disabled=!active||Boolean(s.recordFrames)||!s.capturing;$('enroll').disabled=!active||Boolean(s.recordFrames)||!s.capturing;$('facing').disabled=active;}
+function stopCapture(){
+  ++s.captureToken;s.capturing=false;s.recordFrames=null;clearTimeout(s.recordTimer);s.recordTimer=0;
+  s.stream?.getTracks().forEach(track=>track.stop());s.stream=null;inputVideo.pause();inputVideo.srcObject=null;
+  $('record-indicator').hidden=true;$('tracking-state').textContent='Ожидает запуска';$('camera-placeholder').hidden=s.mode==='video'&&s.videoReady;
+  $('start-camera').disabled=false;cameraButtons();resetOverlay();
+  s.analyzing=false;$('analysis-progress').hidden=true;$('cancel-video').hidden=true;$('analyze-video').disabled=!s.videoReady;$('replay-analysis').disabled=!s.videoReady||!s.sampleId;
+}
+async function startCamera(){
+  stopCapture();clearResult();s.videoReady=false;$('camera-placeholder').hidden=false;s.sampleId=null;$('replay-analysis').disabled=true;const token=s.captureToken;
+  inputVideo.removeAttribute('src');inputVideo.load();$('start-camera').disabled=true;
+  notice('capture-notice','Подготавливаем камеру и модель. При первом запуске загрузка может занять до минуты.');
+  $('tracking-state').textContent='Загрузка модели…';
+  try{
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error('Камера недоступна. Откройте страницу по HTTPS в браузере телефона.');
+    const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:$('facing').value},width:{ideal:640},height:{ideal:480}}});
+    if(token!==s.captureToken){stream.getTracks().forEach(t=>t.stop());return;}
+    s.stream=stream;inputVideo.srcObject=stream;await inputVideo.play();
+    if(token!==s.captureToken)return;
+    $('camera-placeholder').hidden=true;$('capture-stage').classList.toggle('mirrored',$('facing').value==='user');cameraButtons();
+    await Promise.all([loadVision(),ensureTemplates()]);await resetVision();
+    if(token!==s.captureToken)return;
+    s.capturing=true;cameraButtons();
+    notice('capture-notice','Камера готова. Нажмите «Записать жест», затем покажите один жест за 3 секунды.');
+    cameraLoop(token);
+  }catch(error){if(token!==s.captureToken)return;stopCapture();const message=error.name==='NotAllowedError'?'Доступ к камере не разрешён. Разрешите его в настройках браузера или откройте режим видео.':error.name==='NotFoundError'?'Камера не найдена. Можно проверить режим видео.':error.message;notice('capture-notice',message,'error');}
+}
+async function cameraLoop(token){
+  if(!s.capturing||token!==s.captureToken)return;
+  try{
+    const frame=await detect(inputVideo);
+    if(token!==s.captureToken)return;
+    s.frame=frame;drawLandmarks($('landmarks'),frame,inputVideo.videoWidth,inputVideo.videoHeight);
+    $('tracking-state').textContent=frame.pose?`${Number(Boolean(frame.left))+Number(Boolean(frame.right))} / 2 кисти в кадре`:'Корпус не найден';
+    if(s.recordFrames)s.recordFrames.push(frame);
+  }catch(error){if(token===s.captureToken){stopCapture();notice('capture-notice',error.message,'error');}return;}
+  requestAnimationFrame(()=>cameraLoop(token));
+}
+function recordGesture(enroll=false){
+  if(!s.capturing||s.recordFrames)return;
+  const label=$('custom-label').value.trim();
+  if(enroll&&!label){toast('Введите подпись к вашему движению.');$('custom-label').focus();return;}
+  if(enroll&&s.custom.length>=12){toast('Доступно 12 собственных образцов. Удалите прежние, чтобы записать новые.');return;}
+  const token=s.captureToken;clearResult();s.recordFrames=[];cameraButtons();$('record-indicator').hidden=false;
+  const start=performance.now();
+  const update=()=>{
+    if(token!==s.captureToken||!s.recordFrames)return;
+    const remaining=Math.max(0,3-(performance.now()-start)/1000);$('record-count').textContent=remaining.toFixed(1)+' с';
+    if(remaining>0){s.recordTimer=setTimeout(update,80);return;}
+    const frames=s.recordFrames;s.recordFrames=null;$('record-indicator').hidden=true;cameraButtons();
+    if(enroll){
+      const sequence=makeSequence(frames,inputVideo.videoWidth/inputVideo.videoHeight);const issue=sequenceQuality(sequence);
+      if(issue){notice('capture-notice',issue+' Образец не сохранён.','error');return;}
+      const existing=s.custom.find(t=>t.text.toLocaleLowerCase('ru')===label.toLocaleLowerCase('ru'));
+      s.custom.push({id:existing?.id||`custom-${Date.now()}`,text:label,origin:'custom',sequence});
+      $('custom-list').textContent=`Образцы этой сессии (${s.custom.length}/12): ${s.custom.map(t=>t.text).join(', ')}`;$('clear-custom').hidden=false;
+      notice('capture-notice',`Образец «${label}» добавлен. Теперь нажмите «Записать жест» и повторите движение для распознавания.`,'success');
+    }else{showResult(frames,inputVideo.videoWidth/inputVideo.videoHeight);notice('capture-notice','Запись завершена. Результат справа; на телефоне — ниже.');}
+  };update();
+}
+$('start-camera').onclick=startCamera;
+$('stop-camera').onclick=()=>{stopCapture();notice('capture-notice','Камера выключена. Видеопоток не сохранялся.');};
+$('record').onclick=()=>recordGesture();$('enroll').onclick=()=>recordGesture(true);
+$('clear-custom').onclick=()=>{s.custom=[];$('custom-list').textContent='Образцы удалены.';$('clear-custom').hidden=true;clearResult();};
+function releaseFile(){if(s.videoURL){URL.revokeObjectURL(s.videoURL);s.videoURL=null;}}
+function waitMedia(event,action,timeout=12000){return new Promise((resolve,reject)=>{
+  let timer;const clean=()=>{clearTimeout(timer);inputVideo.removeEventListener(event,ok);inputVideo.removeEventListener('error',bad);};
+  const ok=()=>{clean();resolve();};const bad=()=>{clean();reject(new Error('Видео не поддерживается или не загрузилось. Попробуйте MP4 (H.264).'));};
+  inputVideo.addEventListener(event,ok,{once:true});inputVideo.addEventListener('error',bad,{once:true});timer=setTimeout(()=>{clean();reject(new Error('Не удалось прочитать видео вовремя. Попробуйте другой файл.'));},timeout);action();
+});}
+async function loadVideo(src,name,sampleId=null){
+  stopCapture();clearResult();s.videoReady=false;$('camera-placeholder').hidden=false;s.sampleId=sampleId;$('replay-analysis').disabled=true;const token=s.captureToken;$('capture-stage').classList.remove('mirrored');$('analyze-video').disabled=true;inputVideo.controls=true;
+  notice('capture-notice',`Открываем: ${name}`);
+  try{
+    await waitMedia('loadedmetadata',()=>{inputVideo.src=src;inputVideo.load();});
+    if(token!==s.captureToken)return;
+    if(!Number.isFinite(inputVideo.duration)||inputVideo.duration<.3||inputVideo.duration>15)throw new Error('Нужен короткий ролик с одним жестом: от 0,3 до 15 секунд.');
+    s.videoReady=true;$('replay-analysis').disabled=!s.sampleId;$('camera-placeholder').hidden=true;$('analyze-video').disabled=false;$('tracking-state').textContent=`${name} · ${inputVideo.duration.toFixed(1)} с`;
+    notice('capture-notice','Видео готово. Нажмите «Распознать видео». Файл обрабатывается в браузере и не загружается на сервер.');
+  }catch(error){if(token===s.captureToken){inputVideo.removeAttribute('src');inputVideo.load();notice('capture-notice',error.message,'error');}}
+}
+$('video-file').onchange=()=>{const file=$('video-file').files[0];if(!file)return;if(file.size>50*1024*1024){notice('capture-notice','Файл больше 50 МБ. Выберите короткий ролик.','error');return;}releaseFile();s.videoURL=URL.createObjectURL(file);loadVideo(s.videoURL,file.name);};
+$('cancel-video').onclick=()=>{stopCapture();$('camera-placeholder').hidden=!s.videoReady;inputVideo.controls=true;notice('capture-notice','Анализ отменён.');};
+$('analyze-video').onclick=async()=>{
+  if(!s.videoReady||s.analyzing)return;
+  inputVideo.pause();inputVideo.controls=false;clearResult();const token=++s.captureToken;s.analyzing=true;$('analyze-video').disabled=true;$('cancel-video').hidden=false;$('replay-analysis').disabled=true;$('analysis-progress').value=0;$('analysis-progress').hidden=false;
+  notice('capture-notice','Подготавливаем модель для анализа кадров. Первая загрузка может занять до минуты.');
+  const frames=[];
+  try{
+    await Promise.all([loadVision(),ensureTemplates()]);await resetVision();
+    if(token!==s.captureToken)return;
+    const count=Math.max(6,Math.ceil(inputVideo.duration*12));
+    for(let i=0;i<count;i++){
+      if(token!==s.captureToken)return;
+      const time=i/count*Math.max(0,inputVideo.duration-.04);
+      if(Math.abs(inputVideo.currentTime-time)>.001||inputVideo.readyState<2)await waitMedia('seeked',()=>{inputVideo.currentTime=time===0?.001:time;});
+      if(token!==s.captureToken)return;
+      const frame=await detect(inputVideo);
+      if(token!==s.captureToken)return;
+      frames.push(frame);drawLandmarks($('landmarks'),frame,inputVideo.videoWidth,inputVideo.videoHeight);
+      $('analysis-progress').value=(i+1)/count;$('tracking-state').textContent=`Кадр ${i+1} / ${count}`;
+      notice('capture-notice',`Анализируем движение: ${Math.round((i+1)/count*100)}%`);
+    }
+    showResult(frames,inputVideo.videoWidth/inputVideo.videoHeight,'video');
+    notice('capture-notice',`Обработано ${frames.length} кадров. Результат — сравнение с ограниченным набором образцов.`,'success');
+  }catch(error){if(token===s.captureToken)notice('capture-notice',error.message,'error');}
+  finally{if(token===s.captureToken){s.analyzing=false;inputVideo.controls=true;$('cancel-video').hidden=true;$('analyze-video').disabled=!s.videoReady;$('replay-analysis').disabled=!s.sampleId;$('analysis-progress').hidden=true;}}
+};
+
+// Explicitly labelled replay of previously extracted source coordinates.
+// It never claims to run vision inference or validate generalisation.
+$('replay-analysis').onclick=async()=>{
+  if(!s.videoReady||!s.sampleId||s.analyzing)return;
+  inputVideo.pause();inputVideo.controls=false;clearResult();
+  const token=++s.captureToken,id=s.sampleId;s.analyzing=true;
+  $('replay-analysis').disabled=true;$('analyze-video').disabled=true;$('cancel-video').hidden=false;
+  notice('capture-notice','Демонстрационный разбор: используем готовые координаты этой записи. Модель сейчас не запускается.');
+  try{
+    await ensureTemplates();if(token!==s.captureToken)return;
+    const motion=s.motions.get(id);inputVideo.currentTime=0;
+    await inputVideo.play();if(token!==s.captureToken){inputVideo.pause();return;}
+    await new Promise((resolve,reject)=>{
+      const started=performance.now();
+      const frame=()=>{
+        if(token!==s.captureToken){resolve();return;}
+        if(performance.now()-started>15000){reject(new Error('Видео не воспроизводится. Проверьте соединение.'));return;}
+        const at=Math.min(motion.frames.length-1,Math.floor(inputVideo.currentTime*motion.fps));
+        drawLandmarks($('landmarks'),motion.frames[at],inputVideo.videoWidth,inputVideo.videoHeight);
+        $('tracking-state').textContent=`Готовые координаты · кадр ${at+1} / ${motion.frames.length}`;
+        if(inputVideo.ended||inputVideo.currentTime>=motion.duration-.04){resolve();return;}
+        requestAnimationFrame(frame);
+      };frame();
+    });
+    if(token!==s.captureToken)return;
+    showResult(motion.frames,motion.width/motion.height,'reference');
+    $('result-label').textContent='ДЕМО · ИЗВЕСТНЫЙ ОБРАЗЕЦ';
+    $('result-description').textContent='Сопоставлены готовые координаты с тем же образцом. Это технический разбор, а не новое распознавание видео.';
+    notice('capture-notice','Демонстрационный разбор завершён. Для нового видео используйте «Распознать видео».');
+  }catch(error){if(token===s.captureToken)notice('capture-notice',error.message,'error');}
+  finally{if(token===s.captureToken){s.analyzing=false;inputVideo.pause();inputVideo.controls=true;$('replay-analysis').disabled=false;$('analyze-video').disabled=false;$('cancel-video').hidden=true;}}
+};
+
+function setMode(mode){
+  if(!['text','camera','video','about'].includes(mode))mode='text';
+  pauseAvatar();stopDictation();stopCapture();window.speechSynthesis?.cancel();s.mode=mode;s.videoReady=false;s.sampleId=null;$('replay-analysis').disabled=true;releaseFile();
+  inputVideo.removeAttribute('src');inputVideo.load();inputVideo.controls=false;$('analyze-video').disabled=true;
+  $('view-text').hidden=mode!=='text';$('view-capture').hidden=!['camera','video'].includes(mode);$('view-about').hidden=mode!=='about';
+  for(const button of document.querySelectorAll('[data-mode]')){if(button.dataset.mode===mode)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}
+  const labels={text:'Текст → жесты',camera:'Жесты → голос',video:'Перевод видео',about:'О проекте'};$('mode-crumb').textContent=labels[mode];
+  $('camera-controls').hidden=mode!=='camera';$('video-controls').hidden=mode!=='video';$('enroll-panel').hidden=mode!=='camera';
+  $('capture-step').textContent=mode==='video'?'03 / ВИДЕО → ТЕКСТ И ГОЛОС':'02 / ЖЕСТЫ → ТЕКСТ И ГОЛОС';
+  $('capture-title').textContent=mode==='video'?'Прочитайте движение':'Дайте жесту голос';$('capture-source-title').textContent=mode==='video'?'Видеозапись':'Камера';
+  $('placeholder-title').textContent=mode==='video'?'Жест в записи — тоже диалог':'Начнём с одного жеста';
+  $('placeholder-copy').textContent=mode==='video'?'Загрузите короткий ролик или выберите пример Slovo.':'Расположитесь по пояс в кадре. Лицо и обе кисти должны быть видны.';
+  $('capture-badge').textContent=mode==='video'?'Файл остаётся на вашем устройстве':'Видеопоток обрабатывается на устройстве';
+  $('capture-stage').classList.remove('mirrored');$('camera-placeholder').hidden=false;
+  notice('capture-notice','Для первого запуска модели нужен интернет. Сравниваются движения, а не смысл произвольной речи на РЖЯ.');
+  clearResult();avatar.resize();history.replaceState(null,'',`#${mode}`);
+}
+for(const button of document.querySelectorAll('[data-mode]'))button.onclick=()=>setMode(button.dataset.mode);
+const slides=[
+  {kicker:'01 / ПРОБЛЕМА И ИДЕЯ',title:'Общение доступно, когда диалог идёт в обе стороны.',copy:'Прототип объединяет разные способы коммуникации на одном экране: движение, текст, голос и цифровой аватар.',cards:[['Жест → слово','Камера телефона и экспериментальное сопоставление движений.'],['Слово → жест','Выбор записи РЖЯ и воспроизведение аватаром.'],['Видео → текст','Разбор короткой записи одного жеста.']],action:'Показать слово и аватар',mode:'text'},
+  {kicker:'02 / ЖИВОЙ ПОКАЗ',title:'Покажите жест. Получите слово. Дайте ему голос.',copy:'Откройте камеру, запишите один жест за 3 секунды и проверьте результат. Для репетиции можно записать собственный образец с подписью.',cards:[['Камера','Фронтальная — для себя. Основная — для собеседника.'],['Проверка','Показываем расстояние до образца и допускаем отказ.'],['Голос','Озвучиваем слово или собранное сообщение.']],action:'Перейти к камере',mode:'camera'},
+  {kicker:'03 / ВОСПРОИЗВОДИМАЯ ДЕМОНСТРАЦИЯ',title:'Тот же путь — для готового видео.',copy:'Встроенная запись позволяет показать обработку без камеры. Она входит в набор образцов: это проверка технической цепочки, а не независимая оценка качества.',cards:[['Видео','Короткий ролик с одним жестом.'],['Координаты','Траектории корпуса и кистей из MediaPipe.'],['Сопоставление','DTW сравнивает последовательности движений.']],action:'Открыть режим видео',mode:'video'},
+  {kicker:'04 / ЧТО ТРЕБУЕТ ПРОВЕРКИ',title:'От демонстратора — к измеримому пилоту.',copy:'Предложение для обсуждения с МТС: один сценарий доступного обслуживания, подготовленные сообщения и проверка на участниках, не входивших в обучающий набор.',cards:[['20 сообщений','Подготовить с переводчиком и носителями РЖЯ.'],['Новые участники','Измерить ошибки, отказы и задержку на телефонах.'],['Понимание','Проверить аватар и успешность диалога.']],action:'Открыть возможности и план',mode:'about'}
+];let slideIndex=0;
+function renderSlide(){const slide=slides[slideIndex];$('slide-kicker').textContent=slide.kicker;$('slide-title').textContent=slide.title;$('slide-copy').textContent=slide.copy;$('slide-cards').replaceChildren();for(const [title,copy] of slide.cards){const card=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');b.textContent=title;p.textContent=copy;card.append(b,p);$('slide-cards').append(card);}$('slide-action').textContent=slide.action;$('slide-count').textContent=`${slideIndex+1} / ${slides.length}`;$('prev-slide').disabled=slideIndex===0;$('next-slide').disabled=slideIndex===slides.length-1;}
+$('present').onclick=()=>{pauseAvatar();stopCapture();stopDictation();lastFocus=document.activeElement;renderSlide();$('presentation').showModal();};
+$('close-presentation').onclick=()=>$('presentation').close();$('presentation').addEventListener('close',()=>lastFocus?.focus());
+$('prev-slide').onclick=()=>{slideIndex=Math.max(0,slideIndex-1);renderSlide();};$('next-slide').onclick=()=>{slideIndex=Math.min(slides.length-1,slideIndex+1);renderSlide();};
+$('slide-action').onclick=()=>{$('presentation').close();setMode(slides[slideIndex].mode);$('mode-crumb').scrollIntoView({block:'start'});};
+$('presentation').addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();$('next-slide').click();}if(e.key==='ArrowLeft'){e.preventDefault();$('prev-slide').click();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseAvatar();stopDictation();const active=Boolean(s.stream)||s.analyzing;stopCapture();if(active)notice('capture-notice','Обработка остановлена: вкладка была скрыта. Запустите камеру или анализ заново.');window.speechSynthesis?.cancel();}});
+window.addEventListener('pagehide',()=>{stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
+window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
+try{
+  const response=await fetch('./assets/sources/slovo-sources.json');if(!response.ok)throw new Error();
+  s.catalog=createCatalog((await response.json()).samples);
+  for(const item of s.catalog){
+    const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);$('word-chips').append(word);
+    const clip=document.createElement('button');clip.textContent=item.text;clip.type='button';clip.onclick=()=>{releaseFile();$('video-file').value='';loadVideo(item.video,`Slovo / ${item.text}`,item.id);};$('video-examples').append(clip);
+  }
+  setMode(location.hash.slice(1)||'text');
+  const requested=new URLSearchParams(location.search).get('word');
+  await selectWord(s.catalog.some(x=>x.id===requested)?requested:'question');
+}catch{notice('text-notice','Не удалось загрузить словарь. Проверьте соединение и обновите страницу.','error');$('active-word').textContent='Нет связи';}

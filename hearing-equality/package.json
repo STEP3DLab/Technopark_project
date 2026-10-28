@@ -1,9 +1,9 @@
 {
   "name": "hearing-equality-mvp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
-  "description": "Равенство по слуху: исследовательский демонстратор текст → записанный жест → аватар",
+  "description": "Равенство по слуху: прототип двусторонней коммуникации: жесты, текст, голос, аватар",
   "scripts": {
     "test": "node --test tests/*.test.mjs"
   }

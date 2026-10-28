@@ -2,13 +2,15 @@ import { CanvasAvatar } from './canvas-avatar.js?v=0.6';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
 import { loadVision, detect, resetVision, drawLandmarks } from './vision.js';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.7';
+import { TrialProtocol } from './trial-protocol.js';
 const $ = id => document.getElementById(id);
-const s = { mode:'text', catalog:[], motions:new Map(), templates:[], custom:[], selected:null,
-  data:null, time:0, playing:false, raf:0, last:0, compare:false, selectionToken:0,
-  stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0,
+const s = { mode:'text', catalog:[], motions:new Map(), templates:[], templatesReady:false, custom:[], selected:null,
+  data:null, time:0, playing:false, raf:0, last:0, compare:false, selectionToken:0, playbackToken:0,
+  stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0, recordPending:false, trialContext:null,
   frame:null, analyzing:false, videoReady:false, sampleId:null, videoURL:null, result:null, speech:null };
 const ledger = new SessionLedger();
+const protocolRuns=[];let protocol=null;
 let pendingAttempt = null, confirmedAttempt = null, resetArmed = false;
 const dialogueAvatar = new CanvasAvatar($('dialogue-avatar'));
 dialogueAvatar.setScene('dark');dialogueAvatar.setAppearance({outfit:'indigo'});
@@ -26,7 +28,7 @@ function renderPlayback() {
   $('play').disabled=!s.data; $('replay').disabled=!s.data;
   avatar.showAt(s.time);dialogueAvatar.showAt(s.time);
 }
-function pauseAvatar() {s.playing=false;cancelAnimationFrame(s.raf);s.raf=0;video.pause();renderPlayback();}
+function pauseAvatar() {++s.playbackToken;s.playing=false;cancelAnimationFrame(s.raf);s.raf=0;video.pause();renderPlayback();}
 function tick(now) {
   if(!s.playing||!s.data)return;
   s.time=s.compare?Math.min(s.data.duration,video.currentTime):Math.min(s.data.duration,s.time+(now-s.last)/1000*Number($('speed').value));
@@ -35,13 +37,17 @@ function tick(now) {
 }
 async function playAvatar() {
   if(!s.data||!['text','dialogue'].includes(s.mode))return;
-  const token=s.selectionToken;
+  const token=s.selectionToken,playToken=++s.playbackToken;
   if(s.time>=s.data.duration-.03)s.time=0;
   s.playing=true;
   if(s.compare){
     video.currentTime=s.time;video.playbackRate=Number($('speed').value);
-    try{await video.play();}catch{pauseAvatar();notice('text-notice','Видео не запускается. Попробуйте режим «Аватар».','error');return;}
+    try{await video.play();}catch{
+      if(playToken!==s.playbackToken||token!==s.selectionToken||!s.playing)return;
+      pauseAvatar();notice('text-notice','Видео не запускается. Попробуйте режим «Аватар».','error');return;
+    }
   }
+  if(playToken!==s.playbackToken)return;
   if(token!==s.selectionToken||!s.playing||!['text','dialogue'].includes(s.mode)){video.pause();return;}
   s.last=performance.now();cancelAnimationFrame(s.raf);s.raf=requestAnimationFrame(tick);renderPlayback();
 }
@@ -115,7 +121,8 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
     const row=document.createElement('div');row.className='rank-row';const label=document.createElement('b');label.textContent=candidate.text;const metric=document.createElement('span');metric.textContent=`d = ${candidate.distance.toFixed(3)}`;row.append(label,metric);$('rankings').append(row);
   }
   if(result.rankings.length){const caption=document.createElement('div');caption.className='rank-caption';caption.textContent='Расстояние d: меньше — ближе к образцу. Это не вероятность.';$('rankings').append(caption);}
-  pendingAttempt=ledger.addAttempt({source:origin,accepted:result.accepted,predicted:s.result?.text||'',distance:result.rankings[0]?.distance,elapsedMs,frames:frames.length,personalSamples:s.custom.length>0});
+  pendingAttempt=ledger.addAttempt({source:origin,accepted:result.accepted,predicted:s.result?.text||'',predictedId:s.result?.id||'',protocol:origin==='camera'?s.trialContext:null,distance:result.rankings[0]?.distance,elapsedMs,frames:frames.length,personalSamples:s.custom.length>0});
+  if(origin==='camera'&&s.trialContext){protocol?.record(pendingAttempt,s.trialContext);s.trialContext=null;renderProtocol();}
   confirmedAttempt=null;
   $('visitor-text').value=s.result?.text||'';$('capture-confirm-text').value=s.result?.text||'';
   $('capture-confirm').disabled=false;$('capture-reject').disabled=false;
@@ -128,18 +135,20 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
   return sequence;
 }
 async function ensureTemplates(){
-  if(s.templates.length===s.catalog.length&&s.catalog.length)return;
+  if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const entries=await Promise.all(s.catalog.map(async item=>{
-    let data=s.motions.get(item.id);
-    if(!data){const r=await fetch(item.motion);if(!r.ok)throw new Error('Не удалось загрузить образцы.');data=validateMotion(await r.json());s.motions.set(item.id,data);}
-    return {id:item.id,text:item.text,origin:'slovo',sequence:makeSequence(data.frames,data.width/data.height)};
-  }));s.templates=entries;
+  const response=await fetch('./assets/recognition-library.json?v=0.7');
+  if(!response.ok)throw new Error('Не удалось загрузить образцы. Повторите запуск.');
+  const data=await response.json();
+  if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
+    data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
+    s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
+  s.templates=data.entries;s.templatesReady=true;
 }
 function resetOverlay(){const canvas=$('landmarks');canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);}
-function cameraButtons(){const active=Boolean(s.stream);$('dialogue-start').hidden=active;$('dialogue-stop').hidden=!active;$('dialogue-record').disabled=!active||Boolean(s.recordFrames)||!s.capturing;$('dialogue-facing').disabled=active;$('dialogue-start').disabled=$('start-camera').disabled;$('start-camera').hidden=active;$('stop-camera').hidden=!active;$('record').disabled=!active||Boolean(s.recordFrames)||!s.capturing;$('enroll').disabled=!active||Boolean(s.recordFrames)||!s.capturing;$('facing').disabled=active;}
+function cameraButtons(){const active=Boolean(s.stream);$('dialogue-start').hidden=active;$('dialogue-stop').hidden=!active;$('dialogue-record').disabled=!active||Boolean(s.recordFrames)||s.recordPending||!s.capturing;$('dialogue-facing').disabled=active;$('dialogue-start').disabled=$('start-camera').disabled;$('start-camera').hidden=active;$('stop-camera').hidden=!active;$('record').disabled=!active||Boolean(s.recordFrames)||s.recordPending||!s.capturing;$('enroll').disabled=!active||Boolean(s.recordFrames)||s.recordPending||!s.capturing;$('facing').disabled=active;}
 function stopCapture(){
-  ++s.captureToken;s.capturing=false;s.recordFrames=null;clearTimeout(s.recordTimer);s.recordTimer=0;
+  ++s.captureToken;s.capturing=false;s.recordFrames=null;s.recordPending=false;s.trialContext=null;clearTimeout(s.recordTimer);s.recordTimer=0;
   s.stream?.getTracks().forEach(track=>track.stop());s.stream=null;inputVideo.pause();inputVideo.srcObject=null;
   $('record-indicator').hidden=true;$('tracking-state').textContent='Ожидает запуска';$('body-check').textContent='Корпус: —';$('hands-check').textContent='Кисти: —';$('camera-placeholder').hidden=s.mode==='video'&&s.videoReady;
   $('start-camera').disabled=false;cameraButtons();resetOverlay();
@@ -160,7 +169,7 @@ async function startCamera(){
     await Promise.all([loadVision(),ensureTemplates()]);await resetVision();
     if(token!==s.captureToken)return;
     s.capturing=true;cameraButtons();
-    notice('capture-notice','Камера готова. Нажмите «Записать жест», затем покажите один жест за 3 секунды.');
+    notice('capture-notice','Камера готова. После нажатия — 2 секунды на подготовку и 3 секунды на один жест.');
     cameraLoop(token);
   }catch(error){if(token!==s.captureToken)return;stopCapture();const message=error.name==='NotAllowedError'?'Доступ к камере не разрешён. Разрешите его в настройках браузера или откройте режим видео.':error.name==='NotFoundError'?'Камера не найдена. Можно проверить режим видео.':error.message;notice('capture-notice',message,'error');}
 }
@@ -176,14 +185,20 @@ async function cameraLoop(token){
   requestAnimationFrame(()=>cameraLoop(token));
 }
 function recordGesture(enroll=false){
-  if(!s.capturing||s.recordFrames)return;
+  if(!s.capturing||s.recordFrames||s.recordPending)return;
+  if(!enroll&&s.mode==='camera'&&protocol&&!protocol.ended&&!protocol.context()){toast('Перейдите к следующей попытке серии.');return;}
   const label=$('custom-label').value.trim();
   if(enroll&&!label){toast('Введите подпись к вашему движению.');$('custom-label').focus();return;}
   if(enroll&&s.custom.length>=12){toast('Доступно 12 собственных образцов. Удалите прежние, чтобы записать новые.');return;}
-  const token=s.captureToken;clearResult();s.recordFrames=[];cameraButtons();$('record-indicator').hidden=false;
-  const start=performance.now();
+  const token=s.captureToken;clearResult();s.recordPending=true;s.trialContext=!enroll&&s.mode==='camera'?(protocol?.context()||null):null;cameraButtons();renderProtocol();$('record-indicator').hidden=false;
+  const requested=performance.now();let start=null;
   const update=()=>{
-    if(token!==s.captureToken||!s.recordFrames)return;
+    if(token!==s.captureToken||(!s.recordPending&&!s.recordFrames))return;
+    if(start===null){
+      const prep=2-(performance.now()-requested)/1000;
+      if(prep>0){$('record-count').textContent='Приготовьтесь · '+Math.ceil(prep);s.recordTimer=setTimeout(update,80);return;}
+      start=performance.now();s.recordPending=false;s.recordFrames=[];cameraButtons();
+    }
     const remaining=Math.max(0,3-(performance.now()-start)/1000);$('record-count').textContent=remaining.toFixed(1)+' с';
     if(remaining>0){s.recordTimer=setTimeout(update,80);return;}
     const frames=s.recordFrames;s.recordFrames=null;$('record-indicator').hidden=true;cameraButtons();
@@ -195,7 +210,8 @@ function recordGesture(enroll=false){
       s.custom.push({id:known?.id||existing?.id||`custom-${Date.now()}`,text:known?.text||label,origin:'custom',sequence});
       $('custom-list').textContent=`Образцы этой сессии (${s.custom.length}/12): ${s.custom.map(t=>t.text).join(', ')}`;$('clear-custom').hidden=false;
       notice('capture-notice',`Образец «${label}» добавлен. Теперь нажмите «Записать жест» и повторите движение для распознавания.`,'success');
-    }else{showResult(frames,inputVideo.videoWidth/inputVideo.videoHeight,'camera',performance.now()-start);notice('capture-notice','Запись завершена. Результат справа; на телефоне — ниже.');}
+    }else{showResult(frames,inputVideo.videoWidth/inputVideo.videoHeight,'camera',performance.now()-requested);notice('capture-notice','Запись завершена. Проверьте слово ниже или справа.');}
+    renderProtocol();
   };update();
 }
 $('start-camera').onclick=startCamera;
@@ -298,7 +314,7 @@ function setMode(mode){
   $('capture-badge').textContent=mode==='video'?'Файл остаётся на вашем устройстве':'Видеопоток обрабатывается на устройстве';
   $('capture-stage').classList.remove('mirrored');$('camera-placeholder').hidden=false;
   notice('capture-notice','Для первого запуска модели нужен интернет. Сравниваются движения, а не смысл произвольной речи на РЖЯ.');
-  clearResult();avatar.resize();dialogueAvatar.resize();updateResearch();history.replaceState(null,'',`#${mode}`);
+  clearResult();avatar.resize();dialogueAvatar.resize();updateResearch();renderProtocol();history.replaceState(null,'',`#${mode}`);
 }
 
 function renderHistory(){
@@ -314,7 +330,7 @@ function updateResearch(){
   const origins={camera:'Камера',video:'Свое видео','known-video':'Видео Slovo · демо',reference:'Готовые точки · демо'};
   const reviews={unreviewed:'Не оценено',correct:'Подтверждено',corrected:'Исправлено',incorrect:'Неверно'};
   for(const attempt of [...ledger.attempts].reverse()){
-    const tr=document.createElement('tr');for(const text of [attempt.id,origins[attempt.source]||attempt.source,attempt.predicted||'Нет совпадения',reviews[attempt.review],`${(attempt.elapsedMs/1000).toFixed(1)} с`]){const td=document.createElement('td');td.textContent=text;tr.append(td);}$('trial-rows').append(tr);
+    const tr=document.createElement('tr');for(const text of [attempt.id,origins[attempt.source]||attempt.source,attempt.protocol?.expectedText||'—',attempt.predicted||'Нет совпадения',reviews[attempt.review],`${(attempt.elapsedMs/1000).toFixed(1)} с`]){const td=document.createElement('td');td.textContent=text;tr.append(td);}$('trial-rows').append(tr);
   }
 }
 function confirmResult(text,{say=false,dialogue=false}={}){
@@ -364,20 +380,52 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report=ledger.exportReport(),blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.7',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
   if(!resetArmed){resetArmed=true;$('clear-session').textContent='Подтвердить сброс сессии';setTimeout(()=>{resetArmed=false;$('clear-session').textContent='Начать новую сессию';},6000);return;}
-  stopCapture();pauseAvatar();ledger.clear();clearResult();renderHistory();updateResearch();resetArmed=false;$('clear-session').textContent='Начать новую сессию';toast('Новая сессия начата.');
+  stopCapture();pauseAvatar();ledger.clear();protocolRuns.length=0;protocol=null;clearResult();renderProtocol();renderHistory();updateResearch();resetArmed=false;$('clear-session').textContent='Начать новую сессию';toast('Новая сессия начата.');
 };
+
+function renderProtocol(){
+  const active=protocol&&!protocol.ended;
+  $('protocol-start').disabled=Boolean(active)||!s.catalog.length;
+  $('protocol-resume').hidden=!active;
+  $('protocol-live').hidden=!active||s.mode!=='camera';
+  if(!protocol){$('protocol-summary').textContent='Серия ещё не начата. Ожидаемые слова задаются до записи.';return;}
+  const totals=protocol.summary();
+  $('protocol-summary').textContent=`${protocol.participantCode} · верно без исправлений: ${totals.correct} / ${totals.recorded} · ошибок: ${totals.wrong} · отказов: ${totals.rejected} · пропущено: ${totals.skipped} · осталось: ${totals.remaining}`;
+  if(active){$('protocol-prompt').textContent=`Попытка ${protocol.index+1} / ${totals.planned}: ${protocol.current.expectedText}`;$('protocol-next').disabled=protocol.current.status==='pending';$('protocol-skip').disabled=protocol.current.status!=='pending'||s.recordPending||Boolean(s.recordFrames);}
+}
+$('protocol-start').onclick=()=>{
+  if(!s.catalog.length||(protocol&&!protocol.ended))return;
+  protocol=new TrialProtocol(s.catalog,$('participant-code').value,Date.now());protocolRuns.push(protocol);setMode('camera');
+  notice('capture-notice','Включите камеру. Слово серии уже задано; после двух секунд подготовки будет записан жест.');
+};
+$('protocol-resume').onclick=()=>setMode('camera');
+$('protocol-next').onclick=()=>{if(protocol?.next()){clearResult();renderProtocol();if(protocol.ended){setMode('research');toast('Серия завершена. Отчёт можно скачать.');}}};
+$('protocol-skip').onclick=()=>{if(!s.recordPending&&!s.recordFrames&&protocol?.skip()){protocol.next();clearResult();renderProtocol();if(protocol.ended)setMode('research');}};
+$('protocol-finish').onclick=()=>{stopCapture();protocol?.finish();renderProtocol();setMode('research');};
+
+async function loadBenchmark(){
+  try{
+    const response=await fetch('./assets/evaluation-v07.json');if(!response.ok)throw new Error();
+    const report=await response.json(),now=report.current.summary,before=report.baseline.summary;
+    $('benchmark-correct').textContent=`${now.correct} / ${now.total}`;
+    $('benchmark-rejected').textContent=now.rejected;$('benchmark-wrong').textContent=now.wrong;
+    $('benchmark-note').textContent=`${report.holdout.clips} записей · ${report.holdout.signers} других исполнителей · шесть слов. Раньше: ${before.correct} верных, ${before.rejected} отказов, ${before.wrong} ошибочный ответ. Сейчас: ${report.current.templates} образец от ${report.current.signers} исполнителей. Пороги не менялись.`;
+    $('benchmark-rows').replaceChildren();
+    for(const row of report.current.rows){const tr=document.createElement('tr');for(const text of [row.expectedText,row.accepted?row.nearestText:'Отказ',row.correct?'Совпадение':row.accepted?'Ошибка':'Нет уверенного ответа']){const td=document.createElement('td');td.textContent=text;tr.append(td);}$('benchmark-rows').append(tr);}
+  }catch{$('benchmark-note').textContent='Не удалось загрузить сохранённый результат проверки. Отчёт доступен в репозитории.';}
+}
 
 for(const button of document.querySelectorAll('[data-mode]'))button.onclick=()=>setMode(button.dataset.mode);
 const slides=[
   {kicker:'01 / ЗАДАЧА',title:'Посетитель и сотрудник общаются в одном приложении',copy:'Прототип объединяет жестовый ввод, текстовый ответ и цифровой аватар. Исследуем один ограниченный сценарий встречи посетителя.',cards:[['Посетитель','Показывает жест или вводит сообщение.'],['Подтверждение','Проверяет предложенное слово до озвучивания.'],['Сотрудник','Отвечает текстом или словом из словаря аватара.']],action:'Открыть диалог',mode:'dialogue'},
   {kicker:'02 / СЦЕНАРИЙ',title:'Обе стороны видят историю разговора',copy:'В режиме диалога можно исправить распознанное слово, подтвердить реплику и показать ответ сотрудника. Неподготовленные сообщения остаются текстовыми.',cards:[['Вопрос','Слово есть в текущем наборе.'],['Да','Сотрудник может ответить аватаром.'],['Нужна помощь','Заготовка для пилота, пока только текст.']],action:'Показать сценарий',mode:'dialogue'},
   {kicker:'03 / ПРОТОТИП',title:'Шесть слов и собственные образцы',copy:'Доступны камера, короткое видео и сравнение аватара с оригиналом. Разбор готовых координат явно отмечен как демонстрация известного образца.',cards:[['Камера','Проверка устройства и видимости кистей.'],['Настройка','Несколько образцов одного движения.'],['Голос','Озвучивание после подтверждения.']],action:'Открыть видео',mode:'video'},
-  {kicker:'04 / ПРОВЕРКА',title:'Каждая попытка оставляет проверяемый результат',copy:'Экран испытания показывает предложения, отказы, исправления и время до результата. Известные демопримеры исключаются из сводки новых попыток.',cards:[['Попытки','Камера и загруженные записи.'],['Ручная оценка','Подтверждение, исправление или ошибка.'],['Отчёт','JSON текущей сессии без полных реплик диалога.']],action:'Открыть испытание',mode:'research'},
+  {kicker:'04 / ПРОВЕРКА',title:'Проверка на 12 отдельных видеозаписях',copy:'Четыре верных ответа, восемь отказов, ноль ошибочных ответов. Все 12 исполнителей отсутствуют в наборе образцов. Это ограниченная проверка по видео; испытание с камеры ещё впереди.',cards:[['Образцы','21 запись от трёх исполнителей.'],['Контрольная серия','12 заданий с заранее фиксированными словами.'],['Отчёт','Ошибки и исправления учитываются отдельно.']],action:'Открыть испытание',mode:'research'},
   {kicker:'05 / ПРЕДЛОЖЕНИЕ НТС',title:'Следующий этап — пилот с носителями РЖЯ',copy:'Предлагаем выбрать один сценарий, подготовить 20 полных сообщений и проверить их на новых участниках. Точность распознавания и понятность аватара пока не установлены.',cards:[['Материал','Переводчик и носители РЖЯ.'],['Метрики','Ошибки, отказы и время обработки.'],['Результат','Понимание сообщения и завершение диалога.']],action:'Открыть план пилота',mode:'about'}
 ];let slideIndex=0;
 function renderSlide(){const slide=slides[slideIndex];$('slide-kicker').textContent=slide.kicker;$('slide-title').textContent=slide.title;$('slide-copy').textContent=slide.copy;$('slide-cards').replaceChildren();for(const [title,copy] of slide.cards){const card=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');b.textContent=title;p.textContent=copy;card.append(b,p);$('slide-cards').append(card);}$('slide-action').textContent=slide.action;$('slide-count').textContent=`${slideIndex+1} / ${slides.length}`;$('prev-slide').disabled=slideIndex===0;$('next-slide').disabled=slideIndex===slides.length-1;}
@@ -390,8 +438,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseAvata
 window.addEventListener('pagehide',()=>{stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
 window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
 try{
-  const response=await fetch('./assets/sources/slovo-sources.json');if(!response.ok)throw new Error();
+  const response=await fetch('./assets/sources/slovo-sources.json?v=0.7');if(!response.ok)throw new Error();
   s.catalog=createCatalog((await response.json()).samples);
+  loadBenchmark();
   for(const item of s.catalog){
     const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);$('word-chips').append(word);
     const reply=document.createElement('button');reply.type='button';reply.textContent=item.text;reply.onclick=()=>{$('employee-text').value=item.text;};$('reply-chips').append(reply);

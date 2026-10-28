@@ -4,8 +4,8 @@ const clean = value => String(value ?? '').trim();
 const equivalent = (a,b) => clean(a).normalize('NFKC').toLocaleLowerCase('ru').replace(/[.!]+$/,'') === clean(b).normalize('NFKC').toLocaleLowerCase('ru').replace(/[.!]+$/,'');
 export class SessionLedger {
   constructor(){ this.attempts=[]; this.messages=[]; this.nextId=1; this.startedAt=new Date().toISOString(); }
-  addAttempt({source,accepted,predicted='',distance=null,elapsedMs=0,frames=0,personalSamples=false}){
-    const entry={id:this.nextId++,source,accepted:Boolean(accepted),predicted:clean(predicted),distance:Number.isFinite(distance)?distance:null,elapsedMs:Math.max(0,Number(elapsedMs)||0),frames:Math.max(0,Number(frames)||0),personalSamples:Boolean(personalSamples),review:'unreviewed',confirmedText:'',timestamp:new Date().toISOString()};
+  addAttempt({source,accepted,predicted='',predictedId='',distance=null,elapsedMs=0,frames=0,personalSamples=false,protocol=null}){
+    const entry={id:this.nextId++,source,accepted:Boolean(accepted),predicted:clean(predicted),predictedId,protocol:protocol?{...protocol}:null,objectiveMatch:protocol?Boolean(accepted&&predictedId===protocol.expectedId):null,distance:Number.isFinite(distance)?distance:null,elapsedMs:Math.max(0,Number(elapsedMs)||0),frames:Math.max(0,Number(frames)||0),personalSamples:Boolean(personalSamples),review:'unreviewed',confirmedText:'',timestamp:new Date().toISOString()};
     this.attempts.push(entry);return entry;
   }
   confirm(id,text){

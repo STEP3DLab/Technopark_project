@@ -5,9 +5,12 @@ import { readFileSync } from 'node:fs';
 import { createCatalog, matchText, validateMotion } from '../app/catalog.js';
 import { makeSequence, classify, sequenceQuality } from '../app/recognizer.js';
 import { SessionLedger, frameReadiness, DEMO_SOURCES } from '../app/session.js';
+import { TrialProtocol } from '../app/trial-protocol.js';
 const root=new URL('../app/',import.meta.url);
 const manifest=JSON.parse(readFileSync(new URL('assets/sources/slovo-sources.json',root)));
 const motionByUrl=new Map(manifest.samples.map(x=>{const path=`./assets/motion/${x.file.replace('.mp4','.json')}`;return[path,JSON.parse(readFileSync(new URL(path,root)))];}));
+const library=JSON.parse(readFileSync(new URL('assets/recognition-library.json',root)));
+const benchmark=JSON.parse(readFileSync(new URL('assets/evaluation-v07.json',root)));
 const source=readFileSync(new URL('platform.js',root),'utf8').replace(/^import .*;\n/gm,'');
 async function harness(){
   const elements=new Map(),timers=new Map();let now=0,timerId=0,heldVision=null,cameraDeferred=null,stopped=0;
@@ -26,15 +29,15 @@ async function harness(){
   const document={hidden:false,activeElement:null,getElementById:get,createElement:()=>new El(),querySelectorAll:()=>nav,querySelector:()=>new El(),addEventListener(){}};
   class Avatar{load(){}clear(){}resize(){}showAt(){}setScene(){}setAppearance(){}}
   const stream={getTracks:()=>[{stop(){stopped++;}}]};
-  const context=vm.createContext({document,CanvasAvatar:Avatar,SessionLedger,frameReadiness,DEMO_SOURCES,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
+  const context=vm.createContext({document,CanvasAvatar:Avatar,TrialProtocol,SessionLedger,frameReadiness,DEMO_SOURCES,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
     window:{addEventListener(){},speechSynthesis:{cancel(){}}},navigator:{mediaDevices:{getUserMedia:()=>cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}},
     location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,performance:{now:()=>now},
     matchMedia:()=>({matches:false}),requestAnimationFrame:()=>1,cancelAnimationFrame(){},
     setTimeout:cb=>{timers.set(++timerId,cb);return timerId;},clearTimeout:id=>timers.delete(id),
     loadVision:()=>heldVision?.promise||Promise.resolve(),resetVision:async()=>{},detect:()=>new Promise(()=>{}),
-    fetch:async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:motionByUrl.get(url)}),console,
+    fetch:async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:url.includes('recognition-library')?library:url.includes('evaluation-v07')?benchmark:motionByUrl.get(url)}),console,
   });
-  const api=await vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture};})()`,context);
+  const api=await vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
   return{api,get,timers,advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
 }
@@ -58,13 +61,13 @@ test('navigation during model loading stops camera and ignores late completion',
 });
 test('navigation cancels partial gesture without producing result',async()=>{
   const h=await harness();h.api.setMode('camera');h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};
-  h.api.recordGesture();assert.ok(h.api.s.recordFrames);h.api.setMode('video');
+  h.api.recordGesture();assert.equal(h.api.s.recordPending,true);assert.equal(h.api.s.recordFrames,null);h.advance(2100);assert.ok(h.api.s.recordFrames);h.api.setMode('video');
   assert.equal(h.api.s.recordFrames,null);assert.equal(h.api.s.result,null);assert.equal(h.get('record-indicator').hidden,true);
 });
 
 test('a personal sample for an existing word joins its class instead of becoming an ambiguous label',async()=>{
   const h=await harness();h.api.setMode('camera');h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};
-  h.get('custom-label').value='Вопрос';h.api.recordGesture(true);
+  h.get('custom-label').value='Вопрос';h.api.recordGesture(true);h.advance(2100);
   h.api.s.recordFrames=motionByUrl.get('./assets/motion/cc59e1b2-5778-47bb-a452-779033da61b0.json').frames;
   h.advance(3100);assert.equal(h.api.s.custom.length,1);assert.equal(h.api.s.custom[0].id,'question');
 });
@@ -88,4 +91,42 @@ test('a new manually entered reply after confirmation does not re-score the prev
   h.get('visitor-text').value='Спасибо';h.get('visitor-text').emit('input');h.get('visitor-text-only').click();
   assert.equal(h.api.ledger.messages.length,2);assert.equal(h.api.ledger.messages[1].kind,'manual');
   assert.equal(h.api.ledger.summary().reviewed,1);assert.equal(h.api.ledger.summary().corrected,1);
+});
+
+test('preparation countdown can be cancelled without creating an attempt',async()=>{
+ const h=await harness();h.api.setMode('camera');h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};
+ h.api.recordGesture();h.api.stopCapture();h.advance(6000);
+ assert.equal(h.api.s.recordFrames,null);assert.equal(h.api.s.recordPending,false);assert.equal(h.api.ledger.attempts.length,0);
+});
+test('fixed protocol target survives a rejected result and manual correction',async()=>{
+ const h=await harness();h.get('protocol-start').click();const p=h.api.protocolRuns[0],target=p.context();
+ h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};h.api.recordGesture();h.advance(2100);h.advance(3100);
+ assert.equal(p.summary().rejected,1);assert.equal(h.api.ledger.attempts[0].protocol.expectedId,target.expectedId);
+ h.api.confirmResult(target.expectedText);assert.equal(p.summary().correct,0);assert.equal(h.api.ledger.attempts[0].objectiveMatch,false);
+ h.get('protocol-next').click();assert.equal(p.index,1);
+ h.api.setMode('research');assert.equal(h.get('protocol-resume').hidden,false);h.get('protocol-resume').click();assert.equal(h.get('protocol-live').hidden,false);
+});
+test('recognition loads all training templates once and never imports evaluation examples',async()=>{
+ const h=await harness();await h.api.ensureTemplates();assert.equal(h.api.s.templates.length,21);assert.ok(h.api.s.templates.every(x=>x.split==='train'));
+ const heldoutUsers=new Set(benchmark.current.rows.map(x=>x.user_id));assert.ok(h.api.s.templates.every(x=>!heldoutUsers.has(x.user_id)));
+ const entries=h.api.s.templates;await h.api.ensureTemplates();assert.equal(h.api.s.templates,entries);
+});
+test('leaving the series for dialogue cannot silently score a hidden target',async()=>{
+ const h=await harness();h.get('protocol-start').click();const p=h.api.protocolRuns[0];h.api.setMode('dialogue');
+ h.api.s.capturing=true;h.api.s.stream={getTracks:()=>[]};h.api.recordGesture();h.advance(2100);h.advance(3100);
+ assert.equal(p.summary().recorded,0);assert.equal(h.api.ledger.attempts[0].protocol,null);
+});
+test('scrubbing during pending video play suppresses the expected abort error',async()=>{
+ const h=await harness();h.api.setCompare(true);let reject;
+ h.get('source-video').play=()=>new Promise((_,r)=>reject=r);
+ const pending=h.api.playAvatar();h.get('timeline').value='300';h.get('timeline').emit('input');
+ reject(new Error('The play() request was interrupted by a call to pause()'));await pending;
+ assert.equal(h.api.s.playing,false);assert.equal(h.api.s.time,h.api.s.data.duration*.3);
+ assert.doesNotMatch(h.get('text-notice').textContent,/Видео не запускается/);
+});
+test('late completion of an old play request cannot pause newer playback',async()=>{
+ const h=await harness();h.api.setCompare(true);let resolve;
+ h.get('source-video').play=()=>new Promise(r=>resolve=r);const old=h.api.playAvatar();h.api.pauseAvatar();
+ h.get('source-video').play=()=>Promise.resolve();await h.api.playAvatar();let pauses=0;h.get('source-video').pause=()=>pauses++;
+ resolve();await old;assert.equal(pauses,0);assert.equal(h.api.s.playing,true);
 });

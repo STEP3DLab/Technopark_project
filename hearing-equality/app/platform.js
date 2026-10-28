@@ -1,4 +1,4 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.6';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.8';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
 import { loadVision, detect, resetVision, drawLandmarks } from './vision.js';
@@ -389,7 +389,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.7.1',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.8',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
@@ -455,7 +455,7 @@ try{
     const reply=document.createElement('button');reply.type='button';reply.textContent=item.text;reply.onclick=()=>{$('employee-text').value=item.text;};$('reply-chips').append(reply);
     const clip=document.createElement('button');clip.textContent=item.text;clip.type='button';clip.onclick=()=>{releaseFile();$('video-file').value='';loadVideo(item.video,`Slovo / ${item.text}`,item.id);};$('video-examples').append(clip);
   }
-  setMode(location.hash.slice(1)||'dialogue');
+  setMode(location.hash.slice(1)||'text');
   const requested=new URLSearchParams(location.search).get('word');
   await selectWord(s.catalog.some(x=>x.id===requested)?requested:'question');
 }catch{notice('text-notice','Не удалось загрузить словарь. Проверьте соединение и обновите страницу.','error');$('active-word').textContent='Нет связи';}

@@ -1,4 +1,4 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.3';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.6';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
 import { loadVision, detect, resetVision, drawLandmarks } from './vision.js';
@@ -11,8 +11,8 @@ const s = { mode:'text', catalog:[], motions:new Map(), templates:[], custom:[],
 const ledger = new SessionLedger();
 let pendingAttempt = null, confirmedAttempt = null, resetArmed = false;
 const dialogueAvatar = new CanvasAvatar($('dialogue-avatar'));
-dialogueAvatar.setScene('light');dialogueAvatar.setAppearance({outfit:'indigo'});
-const avatar = new CanvasAvatar($('platform-avatar')); avatar.setScene('light'); avatar.setAppearance({outfit:'indigo'});
+dialogueAvatar.setScene('dark');dialogueAvatar.setAppearance({outfit:'indigo'});
+const avatar = new CanvasAvatar($('platform-avatar')); avatar.setScene('dark'); avatar.setAppearance({outfit:'indigo'});
 const video = $('source-video'), inputVideo = $('input-video');
 let toastTimer, lastFocus;
 function toast(message) { $('toast').textContent=message; $('toast').hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').hidden=true,4500); }

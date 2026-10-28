@@ -36,9 +36,10 @@
   const VIEW_NAMES = {overview:'Обзор',opportunities:'Возможности',courts:'Справочник судов',sources:'Источники и обновления',proposals:'Мои предложения',guide:'Как это работает'};
   const STATUS = {open_confirmed:'Приём подтверждён',needs_review:'Проверить актуальность',historical:'Архивный пример',closed:'Завершено'};
   const WORK_STATUS = {'new':'Не начата','review':'Проверяю','draft':'Готовлю предложение','hold':'Отложено'};
+  const U = window.ExpertMonitorUtils;
   const STORE_KEY = 'msk-expert-monitor-workspace-v1';
   const DATA_BASE = location.hostname.toLowerCase()==='step3dlab.github.io' ? 'https://raw.githubusercontent.com/STEP3DLab/Technopark_project/main/expert-monitor/data/' : './data/';
-  const state = {db:null,monitor:null,view:'overview',search:'',status:'all',region:'all',court:'all',courtType:'all',sourceType:'all',loading:false,loadError:null,monitorError:null,fetchedAt:null,form:null,detailId:null,returnFocus:null,importData:null};
+  const state = {db:null,monitor:null,view:'overview',search:'',status:'all',region:'all',court:'all',courtType:'all',sourceType:'all',loading:false,loadError:null,monitorError:null,fetchedAt:null,form:null,detailId:null,returnFocus:null,importData:null,workStatus:'all',due:'all',sort:'priority',filterViews:{}};
   let storageSnapshot=null;
   let storageConflict=false;
   let local = readLocal();
@@ -163,13 +164,23 @@
   function records() { return state.db?.opportunities||[]; }
   function getRecord(id) { return records().find(o=>o.id===id); }
   function courtName(record) { return record.court||state.db?.courts?.find(c=>c.id===record.courtId)?.name||'Суд не указан'; }
-  function sortedRecords() {
-    const order={open_confirmed:0,needs_review:1,historical:2,closed:3};
-    return [...records()].sort((a,b)=>order[statusKey(a)]-order[statusKey(b)]||(parsedDate(b.publishedAt)?.getTime()||0)-(parsedDate(a.publishedAt)?.getTime()||0));
-  }
+  function sortedRecords() { return U.sortItems(records(),state.sort); }
   function filterRecords() {
-    const q=state.search.trim().toLocaleLowerCase('ru-RU');
-    return sortedRecords().filter(o=>(state.status==='all'||statusKey(o)===state.status)&&(state.region==='all'||o.region===state.region)&&(state.court==='all'||courtName(o)===state.court)&&(state.sourceType==='all'||o.sourceType===state.sourceType)&&(!q||[o.title,o.caseNumber,courtName(o),o.category,o.summary].some(t=>plain(t).toLocaleLowerCase('ru-RU').includes(q))));
+    const terms=state.search.trim().toLocaleLowerCase('ru-RU').replace(/ё/g,'е').split(/\s+/).filter(Boolean);
+    return sortedRecords().filter(o=>{
+      const text=[o.title,o.caseNumber,courtName(o),o.category,o.summary,local.notes[o.id]?.text].map(plain).join(' ').toLocaleLowerCase('ru-RU').replace(/ё/g,'е');
+      return (state.status==='all'||statusKey(o)===state.status)&&(state.region==='all'||o.region===state.region)&&(state.court==='all'||courtName(o)===state.court)&&(state.sourceType==='all'||o.sourceType===state.sourceType)&&U.matchesWork(o,local.work,state.workStatus)&&(state.due==='all'||U.dueSoon(o,Number(state.due)))&&terms.every(t=>text.includes(t));
+    });
+  }
+  function filterSnapshot(){return Object.fromEntries(Object.keys(U.defaults).map(k=>[k,state[k]]));}
+  function focusQueue() {
+    const soon=records().filter(o=>U.dueSoon(o)).length;
+    const working=records().filter(o=>U.matchesWork(o,local.work,'active')).length;
+    const review=records().filter(o=>statusKey(o)==='needs_review').length;
+    return `<section class="focus-queue" aria-label="Приоритеты на сегодня"><div class="focus-intro"><p class="eyebrow">БЫСТРЫЙ СТАРТ</p><h2>На что обратить внимание</h2><p>Сроки — по опубликованному срезу, время московское.</p></div><button class="focus-item" data-action="quick-filter" data-preset="soon"><span class="focus-count">${soon}</span><span><b>Срок до 72 часов</b><small>Включая неподтверждённые сигналы</small></span>${icon('arrow')}</button><button class="focus-item" data-action="quick-filter" data-preset="review"><span class="focus-count">${review}</span><span><b>Проверить актуальность</b><small>Открыть материал и уточнить стадию</small></span>${icon('arrow')}</button><button class="focus-item" data-action="quick-filter" data-preset="work"><span class="focus-count">${working}</span><span><b>Моя работа</b><small>Проверка и подготовка предложения</small></span>${icon('arrow')}</button></section>`;
+  }
+  function workFilters(){
+    return `<div class="work-filters"><label>Моя работа<select class="select-field" id="work-status-filter">${[['all','Все рабочие статусы'],['active','В работе'],...Object.entries(WORK_STATUS)].map(([v,t])=>option(v,t,state.workStatus)).join('')}</select></label><label>Срок по источнику<select class="select-field" id="due-filter">${[['all','Любой срок'],['3','В ближайшие 72 часа'],['7','В ближайшие 7 дней']].map(([v,t])=>option(v,t,state.due)).join('')}</select></label><label>Порядок записей<select class="select-field" id="sort-filter">${[['priority','Сначала актуальные'],['deadline','Ближайший срок'],['newest','Новые публикации'],['checked','Недавно проверенные']].map(([v,t])=>option(v,t,state.sort)).join('')}</select></label><button class="button secondary small" data-action="reset-filters">${icon('refresh')}Сбросить фильтры</button></div>`;
   }
   function updateNav() {
     $('#nav-opportunities').textContent=state.db?number(records().filter(o=>statusKey(o)==='open_confirmed'||statusKey(o)==='needs_review').length):'—';
@@ -208,8 +219,9 @@
   function setView(view,{reset=true}={}) {
     if(!Object.hasOwn(VIEW_NAMES,view))view='overview';
     if(state.view==='proposals')captureForm();
+    state.filterViews[state.view]={...filterSnapshot(),courtType:state.courtType};
     state.view=view;
-    if(reset){state.search='';state.status='all';state.region='all';state.court='all';state.courtType='all';state.sourceType='all';}
+    if(reset)Object.assign(state,U.defaults,{courtType:'all'},state.filterViews[view]||{});
     if(location.hash!=='#'+view)history.replaceState(null,'','#'+view);
     closeMenu();render();window.scrollTo({top:0,behavior:'instant'});
   }
@@ -234,8 +246,8 @@
     return `<div class="amount">${esc(money(o.amountRub))}</div><div class="amount-label">${esc(o.amountLabel||labels[o.amountType]||'Тип суммы уточняется')}</div>`;
   }
   function leadRows(items) {
-    if(!items.length)return emptyState('Подходящих записей пока нет','Измените фильтр или проверьте первоисточники. Отсутствие записи в этом срезе не означает отсутствия дел в суде.');
-    return `<ul class="lead-list">${items.map(o=>`<li class="lead-row" data-open-id="${esc(o.id)}"><span class="lead-glyph">${icon('document')}</span><div class="lead-main"><div class="lead-top"><span class="case-number">${esc(o.caseNumber||'Публичный запрос')}</span>${statusTag(o)}${o.sourceType==='procurement_adjacent'?'<span class="tag blue">Смежная закупка</span>':''}${local.work[o.id]?`<span class="tag blue">${esc(WORK_STATUS[local.work[o.id]]||'В работе')}</span>`:''}</div><h3 class="lead-title"><button class="lead-open" type="button" data-action="open-detail" data-id="${esc(o.id)}">${esc(o.title||o.category||'Судебно-строительная экспертиза')}</button></h3><div class="lead-court">${icon('court')}<span>${esc(courtName(o))}</span></div><p class="lead-summary">${esc(shorten(o.summary,145))}</p></div><div class="lead-meta">${amountBlock(o)}<div class="lead-date">${o.deadline?'Срок: '+esc(shortDate(o.deadline)):'Акт / извещение: '+esc(shortDate(o.publishedAt))}</div>${urgent(o)?`<span class="tag urgent">До 7 дней</span>`:''}</div></li>`).join('')}</ul>`;
+    if(!items.length)return emptyState('Подходящих записей пока нет','Измените фильтры или проверьте первоисточники. Отсутствие записи в срезе не означает отсутствия дел в суде.',state.view==='opportunities'?'<button class="button secondary" data-action="reset-filters">Сбросить фильтры</button>':'');
+    return `<ul class="lead-list">${items.map(o=>`<li class="lead-row" data-open-id="${esc(o.id)}"><span class="lead-glyph">${icon('document')}</span><div class="lead-main"><div class="lead-top"><span class="case-number">${esc(o.caseNumber||'Публичный запрос')}</span>${statusTag(o)}${o.sourceType==='procurement_adjacent'?'<span class="tag blue">Смежная закупка</span>':''}${local.work[o.id]?`<span class="tag blue">${esc(WORK_STATUS[local.work[o.id]]||'В работе')}</span>`:''}</div><h3 class="lead-title"><button class="lead-open" type="button" data-action="open-detail" data-id="${esc(o.id)}">${esc(o.title||o.category||'Судебно-строительная экспертиза')}</button></h3><div class="lead-court">${icon('court')}<span>${esc(courtName(o))}</span></div><p class="lead-summary">${esc(shorten(o.summary,145))}</p></div><div class="lead-meta">${amountBlock(o)}<div class="lead-date">${o.deadline?'Срок: '+esc(shortDate(o.deadline)):'Акт / извещение: '+esc(shortDate(o.publishedAt))}</div>${U.dueSoon(o)?`<span class="tag urgent">Срок до 72 ч${statusKey(o)==='needs_review'?' · проверить':''}</span>`:urgent(o)?`<span class="tag urgent">До 7 дней</span>`:''}</div></li>`).join('')}</ul>`;
   }
   function overview() {
     const open=records().filter(o=>statusKey(o)==='open_confirmed').length;
@@ -243,7 +255,7 @@
     const sources=sourceRows().slice(0,4);
     return heading('Рабочая панель / судебно-строительная экспертиза','Судебный мониторинг','Проверяйте дела, оценивайте возможность участия и готовьте предложения на основе открытых источников.',`<button class="button secondary" data-action="export-csv">${icon('down')}Экспорт реестра</button><button class="button primary" data-view="opportunities">Открыть базу${icon('arrow')}</button>`)+
     `<section class="insight-banner"><div class="banner-copy"><div class="banner-chip">${icon('radar')}Москва · открытые судебные источники</div><h2>От судебного акта<br>к обоснованному предложению</h2><p>${open?'Подтверждённые запросы и сигналы для проверки собраны в одном рабочем пространстве.':'Собрана база для поиска заказов. Открытый приём предложений пока не подтверждён — начните с проверки сигналов.'}</p></div><div class="banner-art" aria-hidden="true"><i class="radar-ring r1"></i><i class="radar-ring r2"></i><i class="radar-ring r3"></i><i class="radar-ring r4"></i><i class="radar-axis"></i><i class="radar-axis a2"></i><i class="radar-sweep"></i><i class="radar-point"></i><i class="radar-point p2"></i><span class="radar-center">${icon('court')}</span><span class="radar-label">ПОИСК · ПРОВЕРКА · ПРЕДЛОЖЕНИЕ</span></div></section>`+metrics()+
-    `<div class="overview-grid"><section class="panel"><div class="panel-heading"><div><h2>Дела и опубликованные запросы<span class="panel-count">${number(records().length)}</span></h2><p>Сначала — подтверждённые возможности, затем сигналы для проверки</p></div><button class="link-button" data-view="opportunities">Вся база${icon('arrow')}</button></div><div class="subtle-note">${icon('info')}<span>Архивное определение показывает спрос на экспертизу. Оно не подтверждает, что суд сейчас принимает предложения.</span></div>${leadRows(items)}<div class="panel-bottom"><span>Срез: ${esc(formatDate(state.db.meta?.asOf))}</span><span>${items.length} из ${records().length} записей</span></div></section><aside class="side-stack"><section class="panel"><div class="compact-heading"><h2>Состояние источников</h2>${icon('radar')}</div><div class="source-summary">${sources.length?sources.map(s=>`<div class="source-line"><span class="status-dot ${sourceHealth(s).className==='healthy'?'':'warning'}"></span><span class="source-name">${esc(shorten(s.name||s.id,35))}</span>${sourceTag(s)}</div>`).join(''):'<p class="source-time">Журнал проверок ещё не опубликован.</p>'}<p class="source-time">${esc(monitoringTimeLabel('Последняя сетевая проверка'))}</p><button class="link-button" data-view="sources" style="margin-top:13px">Журнал и ограничения${icon('arrow')}</button></div></section><section class="task-card">${icon('document')}<h3>Предложение с привязкой к делу</h3><p>Добавьте свою цену, срок и квалификацию эксперта. Сохраните черновик для проверки перед отправкой.</p><button class="button" data-view="proposals">Подготовить предложение${icon('arrow')}</button></section><p class="legend-mini"><b>Обновление панели — каждую минуту.</b> Панель перечитывает опубликованный срез. Доступность и свежесть каждого первоисточника проверяются отдельно.</p></aside></div>`;
+    `${focusQueue()}<div class="overview-grid"><section class="panel"><div class="panel-heading"><div><h2>Дела и опубликованные запросы<span class="panel-count">${number(records().length)}</span></h2><p>Сначала — подтверждённые возможности, затем сигналы для проверки</p></div><button class="link-button" data-view="opportunities">Вся база${icon('arrow')}</button></div><div class="subtle-note">${icon('info')}<span>Архивное определение показывает спрос на экспертизу. Оно не подтверждает, что суд сейчас принимает предложения.</span></div>${leadRows(items)}<div class="panel-bottom"><span>Срез: ${esc(formatDate(state.db.meta?.asOf))}</span><span>${items.length} из ${records().length} записей</span></div></section><aside class="side-stack"><section class="panel"><div class="compact-heading"><h2>Состояние источников</h2>${icon('radar')}</div><div class="source-summary">${sources.length?sources.map(s=>`<div class="source-line"><span class="status-dot ${sourceHealth(s).className==='healthy'?'':'warning'}"></span><span class="source-name">${esc(shorten(s.name||s.id,35))}</span>${sourceTag(s)}</div>`).join(''):'<p class="source-time">Журнал проверок ещё не опубликован.</p>'}<p class="source-time">${esc(monitoringTimeLabel('Последняя сетевая проверка'))}</p><button class="link-button" data-view="sources" style="margin-top:13px">Журнал и ограничения${icon('arrow')}</button></div></section><section class="task-card">${icon('document')}<h3>Предложение с привязкой к делу</h3><p>Добавьте свою цену, срок и квалификацию эксперта. Сохраните черновик для проверки перед отправкой.</p><button class="button" data-view="proposals">Подготовить предложение${icon('arrow')}</button></section><p class="legend-mini"><b>Обновление панели — каждую минуту.</b> Панель перечитывает опубликованный срез. Доступность и свежесть каждого первоисточника проверяются отдельно.</p></aside></div>`;
   }
   function option(value,label,selected){return `<option value="${esc(value)}"${selected===value?' selected':''}>${esc(label)}</option>`;}
   function searchField(placeholder) { return `<label class="search-field">${icon('search')}<span class="sr-only">Поиск</span><input id="search-input" type="search" value="${esc(state.search)}" placeholder="${esc(placeholder)}" autocomplete="off"></label>`; }
@@ -252,7 +264,7 @@
     const courts=[...new Set(records().map(courtName))].sort((a,b)=>a.localeCompare(b,'ru'));
     const list=filterRecords();
     return heading('Реестр возможностей','Дела и запросы','Публичные материалы, связанные со строительными экспертизами. Откройте карточку, чтобы проверить акт и определить следующий шаг.',`<button class="button secondary" data-action="export-csv">${icon('down')}Скачать CSV</button>`)+
-    `<section class="panel"><div class="filter-bar">${searchField('Поиск по делу, суду или предмету экспертизы')}<label class="sr-only" for="region-filter">Регион</label><select class="select-field" id="region-filter">${option('all','Все регионы',state.region)}${regions.map(v=>option(v,v,state.region)).join('')}</select><label class="sr-only" for="court-filter">Суд</label><select class="select-field" id="court-filter">${option('all','Все суды',state.court)}${courts.map(v=>option(v,v,state.court)).join('')}</select><label class="sr-only" for="source-type-filter">Тип записи</label><select class="select-field" id="source-type-filter">${option('all','Все типы записей',state.sourceType)}${option('court_decision','Судебные дела',state.sourceType)}${option('procurement_adjacent','Смежные закупки',state.sourceType)}</select></div><div class="filter-chips" aria-label="Фильтр статуса">${[['all','Все записи'],...Object.entries(STATUS)].map(([key,label])=>`<button class="filter-chip ${state.status===key?'active':''}" type="button" data-action="filter-status" data-status="${esc(key)}" aria-pressed="${state.status===key}">${esc(label)}<span>${key==='all'?records().length:records().filter(o=>statusKey(o)===key).length}</span></button>`).join('')}</div><div id="lead-results">${leadRows(list)}</div><div class="panel-bottom"><span id="lead-result-count">Найдено ${number(list.length)} из ${number(records().length)}</span><span>Суммы — только с указанием их назначения</span></div></section><p class="result-caption">Клик по записи открывает первоисточники, содержание определения, ограничения проверки и локальные заметки.</p>`;
+    `<section class="panel"><div class="filter-bar">${searchField('Поиск по делу, суду, предмету или своей заметке')}<label class="sr-only" for="region-filter">Регион</label><select class="select-field" id="region-filter">${option('all','Все регионы',state.region)}${regions.map(v=>option(v,v,state.region)).join('')}</select><label class="sr-only" for="court-filter">Суд</label><select class="select-field" id="court-filter">${option('all','Все суды',state.court)}${courts.map(v=>option(v,v,state.court)).join('')}</select><label class="sr-only" for="source-type-filter">Тип записи</label><select class="select-field" id="source-type-filter">${option('all','Все типы записей',state.sourceType)}${option('court_decision','Судебные дела',state.sourceType)}${option('procurement_adjacent','Смежные закупки',state.sourceType)}</select></div>${workFilters()}<div class="filter-chips" aria-label="Фильтр статуса">${[['all','Все записи'],...Object.entries(STATUS)].map(([key,label])=>`<button class="filter-chip ${state.status===key?'active':''}" type="button" data-action="filter-status" data-status="${esc(key)}" aria-pressed="${state.status===key}">${esc(label)}<span>${key==='all'?records().length:records().filter(o=>statusKey(o)===key).length}</span></button>`).join('')}</div><div id="lead-results">${leadRows(list)}</div><div class="panel-bottom"><span id="lead-result-count" role="status" aria-live="polite">Найдено ${number(list.length)} из ${number(records().length)}</span><span>Суммы — только с указанием их назначения</span></div></section><p class="result-caption">Клик по записи открывает первоисточники, содержание определения, ограничения проверки и локальные заметки.</p>`;
   }
   function filteredCourts() {
     const q=state.search.trim().toLocaleLowerCase('ru-RU');
@@ -335,6 +347,16 @@
     $('#detail-content').innerHTML=`<header class="detail-header"><span>Карточка исследования</span><button class="icon-button" data-action="close-detail" aria-label="Закрыть карточку">${icon('close')}</button></header><div class="detail-body"><div class="lead-top"><span class="case-number">${esc(o.caseNumber||'Публичный запрос')}</span>${statusTag(o)}</div><h2 id="detail-title">${esc(o.title||'Судебно-строительная экспертиза')}</h2><p class="detail-court">${esc(courtName(o))} · ${esc(o.region||'Москва')}</p><p class="detail-description">${esc(plain(o.summary))}</p>${!isOpen?`<div class="detail-warning">${expired(o)&&o.status==='needs_review'?'Срок по найденным данным истёк. Запись исключена из актуальных сигналов. Проверьте в официальном извещении, было ли продление; исходный исследовательский статус сохранён в базе.':statusKey(o)==='historical'?'Это архивный пример. Он не подтверждает действующий запрос и возможность подачи предложения.':statusKey(o)==='closed'?'Эта запись завершена или срок приёма истёк. Используйте её для исследования спроса.':'Актуальный приём предложений не подтверждён. Сначала откройте материалы дела и проверьте дальнейшее движение.'}</div>`:''}<div class="detail-data-grid"><div><span class="small-label">Дата акта / извещения</span><span class="small-value">${esc(formatDate(o.publishedAt))}</span></div><div><span class="small-label">Проверено</span><span class="small-value">${esc(formatDate(o.checkedAt))}</span></div><div><span class="small-label">Срок подачи</span><span class="small-value">${esc(formatDate(o.deadline,typeof o.deadline==='string'&&/T\d{2}:\d{2}/.test(o.deadline)))}</span></div><div><span class="small-label">Заседание</span><span class="small-value">${esc(formatDate(o.hearingAt,typeof o.hearingAt==='string'&&/T\d{2}:\d{2}/.test(o.hearingAt)))}</span></div><div style="grid-column:1/-1">${amountBlock(o)}</div></div><section class="detail-section"><h3>Что следует из опубликованного материала</h3><p>${esc(plain(o.decisionSummary)||'Краткое содержание решения не заполнено. Изучите первоисточник.')}</p>${o.sourceExcerpt?`<blockquote>${esc(shorten(o.sourceExcerpt,650))}</blockquote>`:''}<div class="detail-actions">${external(o.sourceUrl,'Открыть источник','button secondary')}${o.documentUrl&&o.documentUrl!==o.sourceUrl?external(o.documentUrl,'Документ / определение','button secondary'):''}</div></section><section class="detail-section"><h3>Следующий шаг</h3><p>${esc(plain(o.nextAction)||'Проверить актуальный статус дела, наличие запроса и допустимый способ представления информации.')}</p></section><section class="detail-section"><h3>Основание и ограничения проверки</h3><p>${esc(verificationText(o.verification))}${o.primaryAccess?'<br>'+esc(o.primaryAccess):''}${o.dateBasis?'<br>Дата: '+esc(o.dateBasis):''}</p></section>${o.eligibilityNote?`<section class="detail-section"><h3>Условия допуска и предмет</h3><p>${esc(o.eligibilityNote)}</p></section>`:''}${Array.isArray(o.additionalSources)&&o.additionalSources.length?`<section class="detail-section"><h3>Дополнительная сверка</h3><div class="detail-actions">${o.additionalSources.map((url,i)=>external(url,'Источник '+(i+2),'button secondary small')).join('')}</div></section>`:''}<section class="detail-local"><h3>Моя работа с записью</h3><div class="field-grid"><div class="field"><label for="detail-work">Рабочий статус</label><select id="detail-work">${Object.entries(WORK_STATUS).map(([v,t])=>option(v,t,local.work[id]||'new')).join('')}</select></div><div class="field"><label for="detail-price">Моя цена, ₽</label><input id="detail-price" type="number" min="1" step="1" value="${esc(note.proposalRub||'')}" placeholder="Собственная оценка"></div><div class="field wide"><label for="detail-note">Заметка</label><textarea id="detail-note" placeholder="Что проверить, какие материалы запросить, что уточнить…">${esc(note.text||'')}</textarea><p class="field-hint">Сохраняется только в этом браузере, отдельно от публичной базы.</p></div></div></section></div><footer class="detail-footer"><button class="button secondary" data-action="save-note">${icon('save')}Сохранить заметку</button><button class="button primary" data-action="draft-from-detail">Подготовить КП${icon('arrow')}</button></footer>`;
     const dialog=$('#detail-dialog');if(!dialog.open)dialog.showModal();dialog.scrollTop=0;
   }
+  function detailDirty() {
+    if(!state.detailId||!$('#detail-note'))return false;
+    const n=local.notes[state.detailId]||{};
+    const price=$('#detail-price').value;
+    return $('#detail-note').value!==(n.text||'')||String(price)!==String(n.proposalRub||'')||$('#detail-work').value!==(local.work[state.detailId]||'new');
+  }
+  function closeDetail() {
+    if(detailDirty()&&!window.confirm('Закрыть карточку без сохранения заметки, цены и рабочего статуса?'))return;
+    $('#detail-dialog').close();
+  }
   function saveNote(showToast=true) {
     const id=state.detailId;if(!id||!$('#detail-note'))return;
     const value=$('#detail-price').value;
@@ -383,9 +405,17 @@
       event.preventDefault();const id=action.dataset.id;
       switch(action.dataset.action){
         case 'refresh':await loadData(true);break;
+        case 'quick-filter':{
+          const preset=action.dataset.preset;setView('opportunities');Object.assign(state,U.defaults);
+          if(preset==='soon'){state.due='3';state.sort='deadline';}
+          if(preset==='review')state.status='needs_review';
+          if(preset==='work')state.workStatus='active';
+          render();break;
+        }
+        case 'reset-filters':Object.assign(state,U.defaults);render();break;
         case 'filter-status':state.status=action.dataset.status;render();break;
         case 'open-detail':openDetail(id,action);break;
-        case 'close-detail':$('#detail-dialog').close();break;
+        case 'close-detail':closeDetail();break;
         case 'save-note':saveNote();break;
         case 'draft-from-detail':{saveNote(false);state.form=newForm(getRecord(state.detailId));$('#detail-dialog').close();setView('proposals');break;}
         case 'new-draft':state.form=newForm();render();break;
@@ -411,6 +441,7 @@
     if(event.target.closest('#proposal-form'))refreshPreview();
   });
   document.addEventListener('change',event=>{
+    if(['work-status-filter','due-filter','sort-filter'].includes(event.target.id)){state[{'work-status-filter':'workStatus','due-filter':'due','sort-filter':'sort'}[event.target.id]]=event.target.value;updateFilterResults();}
     if(event.target.id==='region-filter'){state.region=event.target.value;updateFilterResults();}
     if(event.target.id==='court-filter'){state.court=event.target.value;updateFilterResults();}
     if(event.target.id==='court-type-filter'){state.courtType=event.target.value;updateFilterResults();}
@@ -429,11 +460,12 @@
   $('#mobile-menu').addEventListener('click',()=>$('#sidebar').classList.contains('open')?closeMenu():openMenu());
   $('#sidebar-scrim').addEventListener('click',closeMenu);
   document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();});
-  $('#detail-dialog').addEventListener('click',event=>{if(event.target===$('#detail-dialog')){const r=$('#detail-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)$('#detail-dialog').close();}});
+  $('#detail-dialog').addEventListener('click',event=>{if(event.target===$('#detail-dialog')){const r=$('#detail-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDetail();}});
+  $('#detail-dialog').addEventListener('cancel',event=>{event.preventDefault();closeDetail();});
   $('#detail-dialog').addEventListener('close',()=>{const returnFocus=state.returnFocus;const previousId=state.detailId;state.detailId=null;state.returnFocus=null;if(state.view!=='proposals')render();const replacement=[...document.querySelectorAll('[data-action="open-detail"]')].find(el=>el.dataset.id===previousId);if(returnFocus?.isConnected)returnFocus.focus();else if(replacement)replacement.focus({preventScroll:true});else $('#main').focus({preventScroll:true});});
   window.addEventListener('storage',event=>{if(event.storageArea===localStorage&&(event.key===STORE_KEY||event.key===null)&&event.newValue!==storageSnapshot){storageConflict=true;showStorageConflict();}});
   window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(Object.hasOwn(VIEW_NAMES,v)&&v!==state.view)setView(v);});
-  window.addEventListener('beforeunload',event=>{if(state.view==='proposals'&&state.form){const f=captureForm();const saved=local.drafts.find(d=>d.id===f.id);if(f.caseNumber&&(!saved||['court','caseNumber','subject','price','days','expert','qualification','requisites','conditions','attachments'].some(k=>saved[k]!==f[k]))){event.preventDefault();event.returnValue='';}}});
+  window.addEventListener('beforeunload',event=>{if(detailDirty()){event.preventDefault();event.returnValue='';}if(state.view==='proposals'&&state.form){const f=captureForm();const saved=local.drafts.find(d=>d.id===f.id);if(f.caseNumber&&(!saved||['court','caseNumber','subject','price','days','expert','qualification','requisites','conditions','attachments'].some(k=>saved[k]!==f[k]))){event.preventDefault();event.returnValue='';}}});
   hydrateIcons();
   const initial=location.hash.slice(1);if(Object.hasOwn(VIEW_NAMES,initial))state.view=initial;
   updateNav();loadData();setInterval(()=>{if(!document.hidden)loadData();},60000);

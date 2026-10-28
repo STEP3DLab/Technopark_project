@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 import { createCatalog, matchText, validateMotion } from '../app/catalog.js';
 import { makeSequence, classify, sequenceQuality } from '../app/recognizer.js';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from '../app/session.js';
 const root=new URL('../app/',import.meta.url);
 const manifest=JSON.parse(readFileSync(new URL('assets/sources/slovo-sources.json',root)));
 const motionByUrl=new Map(manifest.samples.map(x=>{const path=`./assets/motion/${x.file.replace('.mp4','.json')}`;return[path,JSON.parse(readFileSync(new URL(path,root)))];}));
@@ -25,7 +26,7 @@ async function harness(){
   const document={hidden:false,activeElement:null,getElementById:get,createElement:()=>new El(),querySelectorAll:()=>nav,querySelector:()=>new El(),addEventListener(){}};
   class Avatar{load(){}clear(){}resize(){}showAt(){}setScene(){}setAppearance(){}}
   const stream={getTracks:()=>[{stop(){stopped++;}}]};
-  const context=vm.createContext({document,CanvasAvatar:Avatar,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
+  const context=vm.createContext({document,CanvasAvatar:Avatar,SessionLedger,frameReadiness,DEMO_SOURCES,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
     window:{addEventListener(){},speechSynthesis:{cancel(){}}},navigator:{mediaDevices:{getUserMedia:()=>cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}},
     location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,performance:{now:()=>now},
     matchMedia:()=>({matches:false}),requestAnimationFrame:()=>1,cancelAnimationFrame(){},
@@ -33,7 +34,7 @@ async function harness(){
     loadVision:()=>heldVision?.promise||Promise.resolve(),resetVision:async()=>{},detect:()=>new Promise(()=>{}),
     fetch:async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:motionByUrl.get(url)}),console,
   });
-  const api=await vm.runInContext(`(async()=>{${source}\nreturn {s,selectWord,setMode,startCamera,stopCapture,recordGesture};})()`,context);
+  const api=await vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
   return{api,get,timers,advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
 }
@@ -66,4 +67,25 @@ test('a personal sample for an existing word joins its class instead of becoming
   h.get('custom-label').value='Вопрос';h.api.recordGesture(true);
   h.api.s.recordFrames=motionByUrl.get('./assets/motion/cc59e1b2-5778-47bb-a452-779033da61b0.json').frames;
   h.advance(3100);assert.equal(h.api.s.custom.length,1);assert.equal(h.api.s.custom[0].id,'question');
+});
+
+test('a proposed result cannot be spoken until an explicit confirmation',async()=>{
+  const h=await harness();const motion=motionByUrl.get('./assets/motion/cc59e1b2-5778-47bb-a452-779033da61b0.json');
+  h.api.s.templates=[{id:'question',text:'Вопрос',origin:'slovo',sequence:makeSequence(motion.frames,motion.width/motion.height)}];
+  h.api.showResult(motion.frames,motion.width/motion.height,'camera',3100);
+  assert.equal(h.get('speak').disabled,true);assert.equal(h.api.ledger.summary().reviewed,0);
+  h.api.confirmResult('Вопрос',{dialogue:true});assert.equal(h.get('speak').disabled,false);assert.equal(h.api.ledger.summary().correct,1);assert.equal(h.api.ledger.messages.length,1);
+  h.api.confirmResult('Вопрос',{dialogue:true});assert.equal(h.api.ledger.messages.length,1);
+});
+test('arbitrary employee reply stays text-only and clears the previous gesture',async()=>{
+  const h=await harness();h.api.setMode('dialogue');h.get('employee-text').value='Повторите, пожалуйста';h.get('send-reply').click();
+  assert.equal(h.api.s.data,null);assert.equal(h.api.ledger.messages[0].kind,'manual');assert.equal(h.get('dialogue-active-word').textContent,'Ответ текстом');
+});
+
+test('a new manually entered reply after confirmation does not re-score the previous attempt',async()=>{
+  const h=await harness();h.api.setMode('dialogue');
+  h.api.showResult([],1,'camera',3000);h.api.confirmResult('Вопрос',{dialogue:true});
+  h.get('visitor-text').value='Спасибо';h.get('visitor-text').emit('input');h.get('visitor-text-only').click();
+  assert.equal(h.api.ledger.messages.length,2);assert.equal(h.api.ledger.messages[1].kind,'manual');
+  assert.equal(h.api.ledger.summary().reviewed,1);assert.equal(h.api.ledger.summary().corrected,1);
 });

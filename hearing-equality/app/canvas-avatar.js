@@ -2,12 +2,13 @@
  * Presentation interpolation is isolated from recognition and never overwrites assets.
  */
 import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.6';
+import { handMetrics, traceDigit } from './hand-geometry.js?v=0.9';
 const OUTFITS = Object.freeze({
   indigo:{body:'#243B71',light:'#5879B0',dark:'#0E1C3E',seam:'#94B3E5',accent:'#FFFFFF'},
   teal:{body:'#295655',light:'#386D68',dark:'#1D4143',seam:'#729C94',accent:'#C0DDD0'},
   slate:{body:'#404D5B',light:'#526372',dark:'#2B3846',seam:'#8D9FAB',accent:'#D9E3E5'},
 });
-const SKIN={base:'#E8EFF5',light:'#FFFFFF',shade:'#A1B6CD',line:'#5A7594',lip:'#283D5E'};
+const SKIN={base:'#E5EBF2',light:'#F7F9FC',shade:'#B1C1D4',line:'#607793'};
 
 export class CanvasAvatar {
   constructor(container) {
@@ -32,6 +33,11 @@ export class CanvasAvatar {
     this.faceMap = new Map();
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(container);
+    this.sampledTime = null;
+    this.onWindowResize = () => this.resize();
+    window.addEventListener?.('resize', this.onWindowResize);
+    this.onDprChange = () => { this.resize(); this.watchDpr(); };
+    this.watchDpr();
     this.resize();
   }
 
@@ -41,6 +47,7 @@ export class CanvasAvatar {
 
   load(data) {
     this.data = data;
+    this.frame = null; this.sampledTime = null;
     this.track = prepareMotion(data);
     this.note.hidden = !this.track.missing;
     this.note.textContent = this.track.missing ? 'Есть пропуски кисти · сравните с видео' : '';
@@ -91,22 +98,38 @@ export class CanvasAvatar {
     this.render();
   }
 
+  watchDpr() {
+    this.dprQuery?.removeEventListener?.('change', this.onDprChange);
+    this.dprQuery = window.matchMedia?.(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+    this.dprQuery?.addEventListener?.('change', this.onDprChange, {once:true});
+  }
+
   resize() {
     const rect = this.container.getBoundingClientRect();
-    this.visible=rect.width>=1&&rect.height>=1;
+    const wasVisible = this.visible;
+    this.visible = rect.width >= 1 && rect.height >= 1;
     if (!this.visible) return;
-    this.width = rect.width; this.height = rect.height;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.canvas.width = Math.round(rect.width * dpr);
-    this.canvas.height = Math.round(rect.height * dpr);
+    const bw = Math.round(rect.width * dpr), bh = Math.round(rect.height * dpr);
+    const changed = this.width !== rect.width || this.height !== rect.height || this.dpr !== dpr;
+    if (!changed && wasVisible) return;
+    this.width = rect.width; this.height = rect.height; this.dpr = dpr;
+    if (this.canvas.width !== bw) this.canvas.width = bw;
+    if (this.canvas.height !== bh) this.canvas.height = bh;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.render();
+    this.sampleFrame(); this.render();
+  }
+
+  sampleFrame() {
+    if (this.sampledTime === this.time && this.frame) return;
+    this.frame = sampleMotion(this.track, this.time);
+    this.sampledTime = this.time;
   }
 
   showAt(time) {
-    this.time=Math.max(0,Number(time)||0);
-    this.frame=sampleMotion(this.track,this.time);
-    this.render();
+    this.time = Math.max(0, Number(time) || 0);
+    if (!this.visible || (this.sampledTime === this.time && this.frame)) return;
+    this.sampleFrame(); this.render();
   }
 
   project(p) {
@@ -148,13 +171,11 @@ export class CanvasAvatar {
 
   drawStudio() {
     const c=this.ctx,dark=this.scene==='dark',w=this.width,h=this.height;
-    const g=c.createRadialGradient(w*.43,h*.26,0,w*.5,h*.43,Math.max(w,h)*.85);
-    g.addColorStop(0,dark?'#415D91':'#FFFFFF');g.addColorStop(.5,dark?'#243A66':'#E9F0F8');g.addColorStop(1,dark?'#0D1931':'#CBD9EB');
+    const g=c.createRadialGradient(w*.43,h*.2,0,w*.5,h*.35,Math.max(w,h)*.8);
+    g.addColorStop(0,dark?'#405A88':'#FFFFFF');
+    g.addColorStop(.5,dark?'#283F68':'#E8EFF7');
+    g.addColorStop(1,dark?'#132440':'#CFDCEB');
     c.fillStyle=g;c.fillRect(0,0,w,h);
-    // Architectural light planes echo the university's visual language.
-    c.beginPath();c.moveTo(w*.77,0);c.lineTo(w,0);c.lineTo(w,h*.57);c.closePath();
-    c.fillStyle=dark?'#5D8FD514':'#FFFFFF66';c.fill();
-    c.beginPath();c.moveTo(0,h*.82);c.lineTo(w*.32,h);c.lineTo(0,h);c.closePath();c.fillStyle=dark?'#0B183033':'#C0D0E326';c.fill();
   }
 
   path(points, close = false) {
@@ -208,9 +229,13 @@ export class CanvasAvatar {
   }
 
   skinGradient(a,b,radius) {
-    const c=this.ctx,l=this.distance(a,b)||1,nx=-(b[1]-a[1])/l,ny=(b[0]-a[0])/l,m=this.mix(a,b,.5);
+    const c=this.ctx,l=this.distance(a,b)||1,m=this.mix(a,b,.5);
+    let nx=-(b[1]-a[1])/l,ny=(b[0]-a[0])/l;
+    // The lit side always faces the same upper-left studio light.
+    if(nx*.65+ny*.76<0){nx=-nx;ny=-ny;}
     const g=c.createLinearGradient(m[0]-nx*radius,m[1]-ny*radius,m[0]+nx*radius,m[1]+ny*radius);
-    g.addColorStop(0,SKIN.shade);g.addColorStop(.22,SKIN.base);g.addColorStop(.58,SKIN.light);g.addColorStop(1,'#BDCCDC');return g;
+    g.addColorStop(0,SKIN.base);g.addColorStop(.3,SKIN.light);g.addColorStop(.68,SKIN.base);g.addColorStop(1,SKIN.shade);
+    return g;
   }
 
   drawTorso(p,face) {
@@ -220,29 +245,28 @@ export class CanvasAvatar {
     const collarY=chin?Math.min(cy-s*.065,chin[1]+s*.085):cy-s*.15;
     const nx=chin?chin[0]*.72+cx*.28:cx;
     const neckTop=chin?[chin[0],chin[1]-s*.065]:[nx,cy-s*.29];
-    this.capsule(neckTop,[nx,collarY+s*.1],s*.086,s*.105,SKIN.shade);
-    this.capsule([neckTop[0]-s*.018,neckTop[1]+s*.03],[nx-s*.018,collarY+s*.08],s*.068,s*.08,SKIN.base);
+    this.capsule(neckTop,[nx,collarY+s*.12],s*.086,s*.1,this.skinGradient(neckTop,[nx,collarY],s*.09));
     const hip=p[23]&&p[24]?(p[23][0]+p[24][0])/2:cx;
     const bottom=Math.max(p[23]?.[1]||0,p[24]?.[1]||0,cy+s*1.35,this.height+s*.2);
-    c.beginPath();c.moveTo(nx-s*.13,collarY);
-    c.bezierCurveTo(cx-s*.23,collarY,l[0]-s*.045,l[1]-s*.04,l[0]-s*.085,l[1]+s*.08);
-    c.bezierCurveTo(l[0]-s*.07,l[1]+s*.35,hip-s*.43,bottom-s*.3,hip-s*.43,bottom);
-    c.lineTo(hip+s*.43,bottom);
-    c.bezierCurveTo(hip+s*.43,bottom-s*.3,r[0]+s*.07,r[1]+s*.35,r[0]+s*.085,r[1]+s*.08);
-    c.bezierCurveTo(r[0]+s*.045,r[1]-s*.04,cx+s*.23,collarY,nx+s*.13,collarY);
-    c.quadraticCurveTo(nx,collarY+s*.1,nx-s*.13,collarY);c.closePath();
-    const suit=c.createLinearGradient(cx-s*.55,cy,cx+s*.5,bottom);suit.addColorStop(0,palette.light);suit.addColorStop(.22,palette.body);suit.addColorStop(.7,palette.dark);suit.addColorStop(1,palette.body);
+    c.beginPath();c.moveTo(nx-s*.14,collarY);
+    c.bezierCurveTo(cx-s*.3,collarY-s*.005,l[0]-s*.09,l[1]-s*.065,l[0]-s*.12,l[1]+s*.1);
+    c.bezierCurveTo(l[0]-s*.1,l[1]+s*.36,hip-s*.4,bottom-s*.4,hip-s*.42,bottom);
+    c.lineTo(hip+s*.42,bottom);
+    c.bezierCurveTo(hip+s*.4,bottom-s*.4,r[0]+s*.1,r[1]+s*.36,r[0]+s*.12,r[1]+s*.1);
+    c.bezierCurveTo(r[0]+s*.09,r[1]-s*.065,cx+s*.3,collarY-s*.005,nx+s*.14,collarY);
+    c.quadraticCurveTo(nx,collarY+s*.09,nx-s*.14,collarY);c.closePath();
+    const suit=c.createRadialGradient(cx-s*.32,cy-s*.05,s*.08,cx,cy+s*.25,s*1.4);
+    suit.addColorStop(0,palette.light);suit.addColorStop(.5,palette.body);suit.addColorStop(1,palette.dark);
     c.fillStyle=suit;c.fill();
     c.save();c.clip();
-    c.beginPath();c.moveTo(cx+s*.21,cy);c.bezierCurveTo(cx+s*.44,cy+s*.28,cx+s*.24,bottom,hip+s*.38,bottom);c.lineTo(hip+s*.7,bottom);c.lineTo(cx+s*.7,cy);c.fillStyle=palette.dark+'24';c.fill();
-    c.beginPath();c.moveTo(cx-s*.28,cy+s*.07);c.quadraticCurveTo(cx-s*.33,cy+s*.5,hip-s*.28,bottom);c.strokeStyle=palette.light+'40';c.lineWidth=s*.01;c.stroke();
+    const side=c.createLinearGradient(cx-s*.6,cy,cx+s*.6,cy);
+    side.addColorStop(0,'#FFFFFF00');side.addColorStop(.6,'#08182B00');side.addColorStop(1,'#08182B52');
+    c.fillStyle=side;c.fillRect(cx-s*.7,cy-s*.4,s*1.4,bottom-cy+s*.5);
     c.restore();
-    c.beginPath();c.moveTo(nx-s*.13,collarY);c.quadraticCurveTo(nx,collarY+s*.1,nx+s*.13,collarY);
-    c.strokeStyle=palette.dark;c.lineWidth=s*.038;c.stroke();
-    c.beginPath();c.moveTo(nx-s*.13,collarY-s*.008);c.quadraticCurveTo(nx,collarY+s*.087,nx+s*.13,collarY-s*.008);
-    c.strokeStyle=palette.seam;c.lineWidth=Math.max(.8,s*.006);c.stroke();
-    c.save();c.translate(cx+s*.235,cy+s*.23);c.rotate(Math.atan2(r[1]-l[1],r[0]-l[0]));
-    c.fillStyle=palette.accent;c.font=`600 ${Math.max(5,s*.041)}px Arial`;c.textAlign='center';c.fillText('РГСУ',0,0);c.strokeStyle=palette.seam;c.lineWidth=Math.max(.5,s*.004);c.beginPath();c.moveTo(-s*.06,s*.025);c.lineTo(s*.06,s*.025);c.stroke();c.restore();
+    c.beginPath();c.moveTo(nx-s*.14,collarY);c.quadraticCurveTo(nx,collarY+s*.09,nx+s*.14,collarY);
+    c.strokeStyle=palette.dark;c.lineWidth=s*.025;c.stroke();
+    c.beginPath();c.moveTo(nx-s*.14,collarY-s*.006);c.quadraticCurveTo(nx,collarY+s*.075,nx+s*.14,collarY-s*.006);
+    c.strokeStyle=palette.seam+'A0';c.lineWidth=Math.max(.6,s*.005);c.stroke();
   }
 
   drawHead(p,face) {
@@ -260,110 +284,108 @@ export class CanvasAvatar {
     }
     c.beginPath();c.moveTo(0,-h*1.09);c.bezierCurveTo(w*.79,-h*1.09,w*1.05,-h*.68,w,-h*.06);c.bezierCurveTo(w*.97,h*.45,w*.64,h*.94,w*.23,h*1.02);c.quadraticCurveTo(0,h*1.08,-w*.23,h*1.02);c.bezierCurveTo(-w*.64,h*.94,-w*.97,h*.45,-w,-h*.06);c.bezierCurveTo(-w*1.05,-h*.68,-w*.79,-h*1.09,0,-h*1.09);c.closePath();
     const shell=c.createRadialGradient(-w*.35,-h*.48,w*.06,0,-h*.08,h*1.35);
-    shell.addColorStop(0,'#FFFFFF');shell.addColorStop(.46,'#EDF3F8');shell.addColorStop(.72,'#C9D9E8');shell.addColorStop(1,'#7792B1');c.fillStyle=shell;c.fill();
+    shell.addColorStop(0,'#F8FAFC');shell.addColorStop(.46,'#E9EFF5');shell.addColorStop(.72,'#D2DEEA');shell.addColorStop(1,'#9AAFC5');c.fillStyle=shell;c.fill();
     c.save();c.clip();
     c.beginPath();c.moveTo(-w*.85,-h*.71);c.bezierCurveTo(-w*.56,-h*.98,w*.1,-h*1.05,w*.57,-h*.79);c.strokeStyle='#FFFFFFA0';c.lineWidth=w*.04;c.stroke();
     c.beginPath();c.moveTo(w*.79,-h*.52);c.bezierCurveTo(w*.95,h*.13,w*.52,h*.82,w*.1,h*.95);c.strokeStyle='#7C98B12A';c.lineWidth=w*.16;c.stroke();
     c.restore();
-    // Inset navy faceplate makes the character intentionally stylized.
-    c.beginPath();c.moveTo(-w*.7,-h*.45);c.bezierCurveTo(-w*.58,-h*.72,w*.55,-h*.72,w*.71,-h*.43);c.bezierCurveTo(w*.91,-h*.03,w*.68,h*.61,w*.28,h*.75);c.quadraticCurveTo(0,h*.84,-w*.28,h*.75);c.bezierCurveTo(-w*.69,h*.59,-w*.91,-h*.04,-w*.7,-h*.45);c.closePath();
-    const visor=c.createLinearGradient(-w,-h*.65,w,h*.85);visor.addColorStop(0,'#46668A');visor.addColorStop(.38,'#213B5B');visor.addColorStop(1,'#10253E');c.fillStyle=visor;c.fill();c.strokeStyle='#E3F2FF90';c.lineWidth=Math.max(.7,w*.015);c.stroke();
+    // A thin matte shell leaves the measured facial features unobstructed.
+    c.beginPath();c.moveTo(-w*.79,-h*.61);
+    c.bezierCurveTo(-w*.63,-h*.88,w*.61,-h*.88,w*.79,-h*.59);
+    c.bezierCurveTo(w*.95,-h*.04,w*.72,h*.67,w*.3,h*.86);
+    c.quadraticCurveTo(0,h*.96,-w*.3,h*.86);
+    c.bezierCurveTo(-w*.73,h*.67,-w*.95,-h*.04,-w*.79,-h*.61);c.closePath();
+    const visor=c.createLinearGradient(-w,-h,w,h);
+    visor.addColorStop(0,'#3F5879');visor.addColorStop(.45,'#223B5C');visor.addColorStop(1,'#142944');
+    c.fillStyle=visor;c.fill();c.strokeStyle='#E3F2FF40';c.lineWidth=Math.max(.6,w*.012);c.stroke();
     c.restore();
     if(!this.frame.face)return;
-    this.drawEye([33,160,158,133,153,144].map(face),w);this.drawEye([263,387,385,362,373,380].map(face),w);
-    for(const ids of [[70,63,105,66,107],[300,293,334,296,336]])if(this.smoothPath(ids.map(face),false)){c.strokeStyle='#D3E5F8';c.lineWidth=Math.max(.8,w*.035);c.stroke();}
-    // A minimal expression display, driven by the recorded mouth contour.
-    // Do not paint realistic lips onto the abstract character.
-    const upper=[78,81,13,311,308].map(face),lower=[78,178,14,402,308].map(face);
-    const mouthTop=face(13),mouthBottom=face(14);
-    if(mouthTop&&mouthBottom&&this.distance(mouthTop,mouthBottom)>w*.055){
-      if(this.smoothPath([...upper,...lower.slice(1,-1).reverse()])){c.fillStyle='#CDE6FA';c.fill();}
-    }else if(this.smoothPath(upper,false)){c.strokeStyle='#CDE6FA';c.lineWidth=Math.max(1,w*.045);c.stroke();}
+    this.drawEye([33,160,158,133,153,144].map(face),w);
+    this.drawEye([263,387,385,362,373,380].map(face),w);
+    for(const ids of [[70,63,105,66,107],[300,293,334,296,336]]){
+      if(this.smoothPath(ids.map(face),false)){c.strokeStyle='#B6CADF';c.lineWidth=Math.max(.8,w*.052);c.stroke();}
+    }
+    const nose=face(4),bridge=face(6);
+    if(nose&&bridge){
+      c.beginPath();c.moveTo(bridge[0],bridge[1]);
+      c.quadraticCurveTo(nose[0]-w*.045,nose[1]-w*.08,nose[0]-w*.105,nose[1]);
+      c.quadraticCurveTo(nose[0],nose[1]+w*.055,nose[0]+w*.09,nose[1]);c.closePath();
+      const shade=c.createLinearGradient(nose[0]-w*.12,0,nose[0]+w*.1,0);
+      shade.addColorStop(0,'#294460');shade.addColorStop(.48,'#7890A9');shade.addColorStop(1,'#3B5573');
+      c.fillStyle=shade;c.fill();
+    }
+    // Continuous outer and inner mouth contours: no threshold, invented smile,
+    // gaze or blinking. Only recorded landmarks drive the expression.
+    const outer=[61,40,37,0,267,270,291,321,314,17,84,91].map(face);
+    if(this.smoothPath(outer)){c.fillStyle='#617B98';c.fill();c.strokeStyle='#91A8C0';c.lineWidth=Math.max(.45,w*.016);c.stroke();}
+    const inner=[78,81,13,311,308,402,14,178].map(face);
+    if(this.smoothPath(inner)){c.fillStyle='#10243C';c.fill();}
   }
 
   drawEye(points,headRadius) {
     if(points.some(p=>!p))return;
-    const c=this.ctx,width=this.distance(points[0],points[3]);if(width<.3)return;
-    const center=this.mix(points[0],points[3],.5),opening=(this.distance(points[1],points[5])+this.distance(points[2],points[4]))/2;
-    const rotation=Math.atan2(points[3][1]-points[0][1],points[3][0]-points[0][0]);
-    c.save();c.translate(...center);c.rotate(rotation);
-    // Soft luminous shapes read as a digital face, not an imitation portrait.
-    c.beginPath();c.ellipse(0,0,width*.4,Math.max(.8,opening*.72),0,0,Math.PI*2);c.fillStyle='#E4F4FF';c.fill();
-    c.restore();
+    const c=this.ctx;
+    if(this.path(points,true)){c.fillStyle='#CBDCEB';c.fill();}
+    // The contour can close completely; no minimum opening or fabricated iris.
+    if(this.smoothPath(points.slice(0,4),false)){c.strokeStyle='#B9CFE3';c.lineWidth=Math.max(.4,headRadius*.017);c.stroke();}
   }
 
   drawArm({a,b,d,hand}) {
     const c=this.ctx,s=this.shoulder,palette=OUTFITS[this.outfit];
     const hp=hand?.map(v=>this.project(v));
-    const wristRadius=hp?.[5]&&hp?.[17]?Math.max(s*.024,Math.min(s*.04,this.distance(hp[5],hp[17])*.21)):s*.03;
-    const end=this.mix(b,d,.89),u=this.distance(a,b)||1,v=this.distance(b,end)||1;
-    const n1=[-(b[1]-a[1])/u,(b[0]-a[0])/u],n2=[-(end[1]-b[1])/v,(end[0]-b[0])/v];
-    const joint=[n1[0]+n2[0],n1[1]+n2[1]],jl=Math.hypot(...joint)||1;
-    joint[0]/=jl;joint[1]/=jl;
-    const offset=(p,n,r)=>[p[0]+n[0]*r,p[1]+n[1]*r];
-    const ar=s*.112,br=s*.073,dr=wristRadius*1.18;
-    const dl=offset(end,n2,dr),drp=offset(end,n2,-dr);
-    this.capsule(end,d,wristRadius*.97,wristRadius,SKIN.base);
-    // Ceramic limbs connect through shaded, rounded joints. The landmark path stays intact.
-    const material=(u,v,r)=>{const mid=this.mix(u,v,.5),len=this.distance(u,v)||1,n=[-(v[1]-u[1])/len,(v[0]-u[0])/len];const g=c.createLinearGradient(mid[0]-n[0]*r,mid[1]-n[1]*r,mid[0]+n[0]*r,mid[1]+n[1]*r);g.addColorStop(0,palette.dark);g.addColorStop(.35,palette.body);g.addColorStop(.7,palette.light);g.addColorStop(1,palette.body);return g;};
-    this.capsule(a,b,ar,br,this.skinGradient(a,b,ar));
-    this.capsule(b,end,br,dr,this.skinGradient(b,end,br));
-    const shoulderCap=this.mix(a,b,.19);
-    this.capsule(a,shoulderCap,ar*1.04,ar*.91,material(a,b,ar));
-    const highlight=[offset(this.mix(a,b,.14),n1,ar*.43),offset(b,joint,br*.4),offset(this.mix(b,end,.94),n2,dr*.3)];
-    if(this.smoothPath(highlight,false)){c.strokeStyle='#FFFFFF80';c.lineWidth=s*.012;c.stroke();}
-    c.beginPath();c.moveTo(...dl);c.lineTo(...drp);c.strokeStyle=palette.dark;c.lineWidth=Math.max(1,s*.018);c.stroke();
-    const cuff=this.mix(b,end,.96);c.beginPath();c.moveTo(...offset(cuff,n2,dr));c.lineTo(...offset(cuff,n2,-dr));c.strokeStyle=palette.seam;c.lineWidth=Math.max(.6,s*.004);c.stroke();
+    const wristRadius=hp?handMetrics(hp,s).wristRadius:s*.035;
+    const upperRadius=s*.118,elbowRadius=s*.073;
+    // Round connections share the measured elbow and wrist centres.
+    this.capsule(a,b,upperRadius,elbowRadius,this.skinGradient(a,b,upperRadius));
+    c.beginPath();c.arc(b[0],b[1],elbowRadius,0,Math.PI*2);
+    c.fillStyle=this.skinGradient(b,d,elbowRadius);c.fill();
+    this.capsule(b,d,elbowRadius,wristRadius,this.skinGradient(b,d,elbowRadius));
+    c.beginPath();c.arc(d[0],d[1],wristRadius,0,Math.PI*2);
+    c.fillStyle=this.skinGradient(b,d,elbowRadius);c.fill();
+    const sleeveEnd=this.mix(a,b,.34);
+    const sleeve=c.createLinearGradient(a[0]-upperRadius,a[1]-upperRadius,a[0]+upperRadius,a[1]+upperRadius);
+    sleeve.addColorStop(0,palette.light);sleeve.addColorStop(.45,palette.body);sleeve.addColorStop(1,palette.dark);
+    this.capsule(a,sleeveEnd,upperRadius*1.045,upperRadius*.8,sleeve);
   }
 
   drawHand(points) {
     if(!points||points.length!==21||points.some(p=>!p))return;
-    const c=this.ctx,s=this.shoulder,pw=this.distance(points[5],points[17]),pl=this.distance(points[0],points[9]);
-    const r=Math.max(.7,Math.min(s*.03,Math.max(pw*.12,pl*.085)));
-    const l=pl||1;let nx=-(points[9][1]-points[0][1])/l,ny=(points[9][0]-points[0][0])/l;
-    if((points[5][0]-points[17][0])*nx+(points[5][1]-points[17][1])*ny<0){nx=-nx;ny=-ny;}
-    const wr=Math.max(r*1.6,Math.min(s*.04,pw*.21));
+    const c=this.ctx,s=this.shoulder,pw=this.distance(points[5],points[17]);
+    const {fingerRadius:r,wristRadius:wr,wristNormal:[nx,ny]}=handMetrics(points,s);
     const wl=[points[0][0]-nx*wr,points[0][1]-ny*wr],wu=[points[0][0]+nx*wr,points[0][1]+ny*wr];
-    // Convex metacarpal envelope stays valid when the palm is edge-on.
-    // The thumb MCP belongs to its finger, not to the palm's outer envelope.
     const candidates=[wl,points[17],points[13],points[9],points[5],points[1],wu].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
     const cross=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
     const lower=[],upper=[];
     for(const p of candidates){while(lower.length>=2&&cross(lower.at(-2),lower.at(-1),p)<=0)lower.pop();lower.push(p);}
     for(const p of [...candidates].reverse()){while(upper.length>=2&&cross(upper.at(-2),upper.at(-1),p)<=0)upper.pop();upper.push(p);}
     const palm=[...lower.slice(0,-1),...upper.slice(0,-1)];
-    const fill=this.skinGradient(points[0],points[9],Math.max(pw*.5,s*.03)),outline=SKIN.line;
-    if(this.path(palm,true)){c.fillStyle=fill;c.fill();c.lineWidth=r*1.55;c.strokeStyle=fill;c.stroke();}
-    // Paint each complete digit as one connected, tapered ribbon. Joint caps
-    // are internal to the same path, eliminating triangular phalanx seams.
+    const fill=this.skinGradient(points[0],points[9],Math.max(pw*.5,s*.035));
+    // Rounded envelope and shared wrist width keep the hand attached in every turn.
+    if(this.path(palm,true)){
+      c.fillStyle=fill;c.fill();c.lineWidth=r*1.4;c.strokeStyle=fill;c.stroke();
+    }
+    // Pad at the thumb base is a surface detail, never a displaced landmark.
+    this.capsule(this.mix(points[0],points[1],.4),points[1],r*1.45,r*1.12,fill);
     const fingers=[{ids:[1,2,3,4],f:1.12},{ids:[5,6,7,8],f:1},{ids:[9,10,11,12],f:1.02},{ids:[13,14,15,16],f:.94},{ids:[17,18,19,20],f:.8}].sort((a,b)=>points[b.ids[2]][2]-points[a.ids[2]][2]);
     for(const finger of fingers){
       const chain=finger.ids.map(i=>points[i]),radius=r*finger.f;
-      const normals=chain.slice(0,3).map((p,i)=>{const q=chain[i+1],l=this.distance(p,q)||1;return[-(q[1]-p[1])/l,(q[0]-p[0])/l]});
-      const left=[],right=[];
-      for(let j=0;j<4;j++){
-        let n=j===0?normals[0]:j===3?normals[2]:[normals[j-1][0]+normals[j][0],normals[j-1][1]+normals[j][1]];
-        const len=Math.hypot(...n)||1;n=[n[0]/len,n[1]/len];
-        const rr=radius*[1,.94,.82,.7][j];
-        left.push([chain[j][0]+n[0]*rr,chain[j][1]+n[1]*rr]);right.push([chain[j][0]-n[0]*rr,chain[j][1]-n[1]*rr]);
-      }
-      if(this.smoothPath([...left,...right.reverse()])){
-        c.fillStyle=this.skinGradient(chain[0],chain[3],radius);c.fill();
-        c.strokeStyle=outline+'90';c.lineWidth=Math.max(.45,r*.13);c.stroke();
-      }
+      c.save();c.beginPath();traceDigit(c,chain,radius);
+      c.shadowColor='#172D4C38';c.shadowBlur=Math.max(.5,r*.35);c.shadowOffsetX=r*.13;c.shadowOffsetY=r*.18;
+      c.fillStyle=this.skinGradient(chain[0],chain[3],radius);c.fill();c.restore();
+      // One quiet crease per knuckle communicates bending without slicing the digit.
       for(let j=1;j<3;j++){
-        const p=chain[j],pre=chain[j-1],post=chain[j+1],len=this.distance(pre,post)||1,px=-(post[1]-pre[1])/len,py=(post[0]-pre[0])/len,rr=radius*(j===1?.6:.43);
-        c.beginPath();c.moveTo(p[0]-px*rr,p[1]-py*rr);c.quadraticCurveTo(p[0]+(post[0]-p[0])*.05,p[1]+(post[1]-p[1])*.05,p[0]+px*rr,p[1]+py*rr);c.strokeStyle=outline+'75';c.lineWidth=Math.max(.45,r*.12);c.stroke();
+        const at=chain[j],next=chain[j+1],len=this.distance(at,next);
+        if(len<radius*.2)continue;
+        const px=-(next[1]-at[1])/len,py=(next[0]-at[0])/len,rr=radius*(j===1?.55:.4);
+        c.beginPath();c.moveTo(at[0]-px*rr,at[1]-py*rr);c.lineTo(at[0]+px*rr,at[1]+py*rr);
+        c.strokeStyle=SKIN.line+'45';c.lineWidth=Math.max(.35,r*.1);c.stroke();
       }
-      const tip=chain[3],base=chain[2],tipLength=this.distance(base,tip);
-      if(tipLength>r*1.2){const nail=this.mix(base,tip,.76);c.save();c.translate(...nail);c.rotate(Math.atan2(tip[1]-base[1],tip[0]-base[0]));c.beginPath();c.ellipse(0,0,Math.min(tipLength*.2,r*.85),r*.42,0,0,Math.PI*2);c.fillStyle='#FFFFFFA0';c.fill();c.restore();}
     }
-    const center=this.mix(points[0],points[9],.52);c.beginPath();c.moveTo(points[1][0],points[1][1]);c.quadraticCurveTo(center[0],center[1],points[17][0],points[17][1]);c.strokeStyle=outline+'70';c.lineWidth=Math.max(.5,r*.14);c.stroke();
   }
 
   clear() {
-    this.data = null; this.track = null; this.frame = null; this.bounds = null; this.note.hidden=true;
+    this.data = null; this.track = null; this.frame = null; this.sampledTime = null; this.bounds = null; this.note.hidden=true;
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
-  dispose() { this.resizeObserver.disconnect(); this.clear(); this.canvas.remove(); this.note.remove(); }
+  dispose() { this.resizeObserver.disconnect(); window.removeEventListener?.('resize', this.onWindowResize); this.dprQuery?.removeEventListener?.('change', this.onDprChange); this.clear(); this.canvas.remove(); this.note.remove(); }
 }

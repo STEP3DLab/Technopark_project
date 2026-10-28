@@ -6,7 +6,7 @@
 <title>Равенство по слуху · пространство диалога</title>
 <link rel="stylesheet" href="platform.css?v=0.7">
 <link rel="stylesheet" href="dialogue.css?v=0.7">
-<link rel="stylesheet" href="rgsu.css?v=0.8">
+<link rel="stylesheet" href="rgsu.css?v=0.9">
 <link rel="icon" type="image/svg+xml" href="assets/brand/rgsu-blue.svg">
 </head>
 <body>
@@ -35,12 +35,12 @@
 <button aria-label="Испытание" data-short="Тест" data-mode="research"><svg><use href="#i-check"/></svg><span>Испытание<small>Серии и результаты</small></span></button>
 <button aria-label="О проекте" data-short="Проект" data-mode="about"><svg><use href="#i-grid"/></svg><span>О проекте<small>Возможности и пилот</small></span></button>
 </nav>
-<div class="rail-bottom"><div class="rail-card"><span class="dot"></span> Исследовательский прототип<p>Технологии, которые<br>помогают понимать друг друга.</p><b>РГСУ · Детский технопарк</b></div><a href="studio.html?outfit=indigo">Студия аватара v0.8 ↗</a><span>Версия 0.8 · октябрь 2026</span></div>
+<div class="rail-bottom"><div class="rail-card"><span class="dot"></span> Исследовательский прототип<p>Технологии, которые<br>помогают понимать друг друга.</p><b>РГСУ · Детский технопарк</b></div><a href="studio.html?outfit=indigo">Студия аватара v0.9 ↗</a><span>Версия 0.9 · октябрь 2026</span></div>
 </aside>
 <main id="workspace">
 <h1 class="sr-only">Равенство по слуху — прототип РГСУ</h1>
 <header class="topbar"><div class="breadcrumb">Лаборатория коммуникации <span>/</span> <b id="mode-crumb">Текст → жесты</b></div><button id="present" class="button ghost"><svg><use href="#i-screen"/></svg>Показ для НТС</button></header>
-<section class="intro" id="intro-banner"><div><div class="eyebrow"><span></span> РУССКИЙ ЖЕСТОВЫЙ ЯЗЫК</div><h1>Понимать<br> <em>друг друга.</em></h1><p>Жесты, текст и голос — в одном пространстве общения.</p></div><div class="intro-visual" aria-hidden="true"><span class="signal signal-one">Аа</span><div class="signal-line"></div><span class="signal signal-main">≈</span><div class="signal-line"></div><span class="signal signal-last"><i></i><i></i><i></i><i></i><i></i></span><div class="visual-caption">ТЕКСТ <span>↔</span> ЖЕСТ <span>↔</span> ГОЛОС</div></div><div class="intro-tag">Прототип для НТС <span>v0.8</span></div></section>
+<section class="intro" id="intro-banner"><div><div class="eyebrow"><span></span> РУССКИЙ ЖЕСТОВЫЙ ЯЗЫК</div><h1>Понимать<br> <em>друг друга.</em></h1><p>Жесты, текст и голос — в одном пространстве общения.</p></div><div class="intro-visual" aria-hidden="true"><span class="signal signal-one">Аа</span><div class="signal-line"></div><span class="signal signal-main">≈</span><div class="signal-line"></div><span class="signal signal-last"><i></i><i></i><i></i><i></i><i></i></span><div class="visual-caption">ТЕКСТ <span>↔</span> ЖЕСТ <span>↔</span> ГОЛОС</div></div><div class="intro-tag">Прототип для НТС <span>v0.9</span></div></section>
 
 <section id="view-dialogue" class="view" hidden>
 <div class="section-head"><div><span class="step-label">ДВУСТОРОННЯЯ КОММУНИКАЦИЯ</span><h2>Диалог посетителя и сотрудника</h2></div><span class="pill">Словарь: 6 слов + свои образцы</span></div>
@@ -66,13 +66,34 @@
 <form id="text-form"><label for="message" class="sr-only">Слово для аватара</label><textarea id="message" rows="3" maxlength="200" placeholder="Например, «Вопрос»">Вопрос</textarea><div class="input-bottom"><span id="char-count">6 / 200</span><button type="button" id="dictate" class="icon-button" aria-label="Ввести голосом"><svg><use href="#i-mic"/></svg></button></div><button class="button primary wide" id="translate" type="submit">Показать жест <svg><use href="#i-arrow"/></svg></button></form>
 <p class="hint">Выберите одно слово из набора. Перевод предложений пока не поддерживается.</p>
 <div id="text-notice" class="notice" role="status" hidden></div>
-<div class="divider"></div><div class="small-heading">Попробуйте готовый пример</div><div id="word-chips" class="word-chips"></div>
+
 <div class="privacy-note"><svg><use href="#i-mic"/></svg><span>Голосовой ввод зависит от браузера и может отправлять звук его службе распознавания.</span></div>
 </section>
-<section class="card avatar-card"><div class="card-top"><div><span class="live-dot"></span><h3>Цифровой аватар</h3></div><div class="segmented" aria-label="Вид сцены"><button id="show-avatar" aria-pressed="true">Аватар</button><button id="show-compare" aria-pressed="false">Сравнить</button></div></div>
-<div class="stage" id="stage"><div class="stage-label">РЖЯ <span>•</span> СТИЛИЗОВАННЫЙ АВАТАР</div><div id="platform-avatar" role="img" aria-label="Аватар, воспроизводящий выбранное движение"></div><video id="source-video" playsinline muted preload="metadata" hidden aria-label="Исходная запись Slovo"></video><div class="stage-word"><span>СЕЙЧАС НА ЭКРАНЕ</span><strong id="active-word">Загрузка…</strong></div><span class="stage-credit">Движение: Slovo</span></div>
-<div class="player"><button id="play" class="play-button" aria-label="Воспроизвести" disabled><svg><use href="#i-play"/></svg></button><div class="timeline"><label class="sr-only" for="timeline">Позиция воспроизведения</label><input type="range" id="timeline" min="0" max="1000" value="0" aria-label="Позиция воспроизведения"><div><span id="play-time">0:00</span><span id="duration">0:00</span></div></div><label class="speed"><span class="sr-only">Скорость</span><select id="speed"><option value="0.5">0,5×</option><option value="0.75">0,75×</option><option value="1" selected>1×</option></select></label><button id="replay" class="icon-button" aria-label="Повторить жест">↺</button></div>
-<div class="stage-foot"><span>Стилизованный показ. Понятность ещё требует проверки носителями РЖЯ.</span><a href="studio.html?outfit=indigo">Открыть студию ↗</a></div></section>
+<section class="card avatar-card" aria-label="Просмотр жеста">
+  <div class="card-top avatar-top">
+    <div class="avatar-heading"><span class="live-dot"></span><h3>Цифровой аватар</h3></div>
+    <div class="segmented" role="group" aria-label="Вид сцены">
+      <button id="show-avatar" type="button" aria-pressed="true">Аватар</button>
+      <button id="show-reference" type="button" aria-pressed="false">Видео</button>
+      <button id="show-compare" type="button" aria-pressed="false">Сравнить</button>
+    </div>
+    <button id="avatar-focus" class="button ghost avatar-focus" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="avatar-focus-dialog"><svg><use href="#i-screen"/></svg><span id="avatar-focus-label">Крупно</span></button>
+  </div>
+  <div class="stage-view-labels" aria-hidden="true"><span class="stage-label avatar-view-label">Стилизованный аватар · РЖЯ</span><span class="stage-label reference-view-label">Исходное видео · Slovo</span></div>
+  <div class="stage" id="stage"><div id="platform-avatar" role="img" aria-label="Аватар, воспроизводящий выбранное движение"></div><video id="source-video" playsinline muted preload="metadata" hidden aria-label="Исходная запись Slovo"></video></div>
+  <div class="stage-caption"><div class="stage-word"><span>Сейчас на экране</span><strong id="active-word">Загрузка…</strong></div><span class="stage-credit">Движение из записи Slovo</span></div>
+  <div class="player">
+    <button id="play" class="play-button" type="button" aria-label="Воспроизвести" disabled><svg><use href="#i-play"/></svg></button>
+    <div class="timeline"><label class="sr-only" for="timeline">Позиция воспроизведения</label><input type="range" id="timeline" min="0" max="1000" value="0" aria-label="Позиция воспроизведения" aria-valuetext="Движение ещё не загружено"><div class="scrub-meta"><span><span id="play-time">0:00,0</span> / <span id="duration">0:00,0</span></span><span id="frame-readout">Кадр — / —</span></div></div>
+    <div class="playback-tools">
+      <div class="frame-controls" role="group" aria-label="Покадровый просмотр"><button id="frame-prev" class="icon-button" type="button" aria-label="Предыдущий кадр" title="Предыдущий кадр" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6v12m11-12-7 6 7 6V6Z"/></svg></button><button id="frame-next" class="icon-button" type="button" aria-label="Следующий кадр" title="Следующий кадр" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6v12M7 6l7 6-7 6V6Z"/></svg></button></div>
+      <label class="speed"><span class="sr-only">Скорость</span><select id="speed"><option value="0.5">0,5×</option><option value="0.75">0,75×</option><option value="1" selected>1×</option></select></label>
+      <button id="replay" class="icon-button" type="button" aria-label="Повторить жест" title="Повторить жест" disabled>↺</button>
+    </div>
+  </div>
+  <div class="avatar-words"><div class="small-heading" id="avatar-words-label">Выберите жест</div><div id="word-chips" class="word-chips" role="group" aria-labelledby="avatar-words-label"></div></div>
+  <div class="stage-foot"><span>Понятность аватара ещё требует проверки носителями РЖЯ.</span><a href="studio.html?outfit=indigo">Студия ↗</a></div>
+</section>
 </div>
 <div class="workflow-strip"><div><span>1</span><p><b>Введите слово</b>или используйте голос</p></div><svg><use href="#i-arrow"/></svg><div><span>2</span><p><b>Откройте жест</b>из записанного словаря</p></div><svg><use href="#i-arrow"/></svg><div><span>3</span><p><b>Сравните движение</b>аватара и человека</p></div></div>
 </section>
@@ -100,6 +121,7 @@
 <footer class="footer"><span>Равенство по слуху <b>·</b> РГСУ / Детский технопарк</span><span>Создаём пространство для понимания</span></footer>
 </main></div>
 <div id="toast" class="toast" role="status" hidden></div>
+<dialog id="avatar-focus-dialog" aria-label="Крупный просмотр жеста"></dialog>
 <dialog id="presentation"><div class="presentation-top"><span>РАВЕНСТВО ПО СЛУХУ / НТС</span><button id="close-presentation" class="button ghost">Закрыть ✕</button></div><div class="presentation-body"><span id="slide-kicker" class="step-label"></span><h2 id="slide-title"></h2><p id="slide-copy"></p><div id="slide-cards" class="slide-cards"></div><button id="slide-action" class="button primary"></button></div><div class="presentation-bottom"><span id="slide-count"></span><div class="button-row"><button id="prev-slide" class="button ghost">← Назад</button><button id="next-slide" class="button primary">Далее →</button></div></div></dialog>
-<script type="module" src="platform.js?v=0.8"></script>
+<script type="module" src="platform.js?v=0.9"></script>
 </body></html>

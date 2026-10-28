@@ -1,4 +1,4 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.8';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.9';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
 import { loadVision, detect, resetVision, drawLandmarks } from './vision.js';
@@ -6,7 +6,7 @@ import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.7'
 import { TrialProtocol } from './trial-protocol.js';
 const $ = id => document.getElementById(id);
 const s = { mode:'text', catalog:[], motions:new Map(), templates:[], templatesReady:false, custom:[], selected:null,
-  data:null, time:0, playing:false, raf:0, last:0, compare:false, selectionToken:0, playbackToken:0,
+  data:null, time:0, playing:false, raf:0, last:0, compare:false, view:'avatar', selectionToken:0, playbackToken:0,
   stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0, recordPending:false, trialContext:null,
   frame:null, analyzing:false, videoReady:false, sampleId:null, videoURL:null, result:null, speech:null };
 const ledger = new SessionLedger();
@@ -19,19 +19,36 @@ const video = $('source-video'), inputVideo = $('input-video');
 let toastTimer, lastFocus;
 function toast(message) { $('toast').textContent=message; $('toast').hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').hidden=true,4500); }
 function notice(id,message,kind='') { const el=$(id);el.textContent=message;el.className=`notice ${kind}`;el.hidden=!message;if(id==='text-notice'&&s.mode==='dialogue'&&message)$('reply-status').textContent=message;if(id==='capture-notice'){const target=$('dialogue-guidance');target.textContent=message;target.className=`notice ${kind}`;target.hidden=!message;} }
-function format(seconds) { return `${Math.floor(seconds/60)}:${Math.floor(seconds%60).toString().padStart(2,'0')}`; }
+function format(seconds) {
+  const tenths=Math.floor(Math.max(0,Number(seconds)||0)*10+1e-6);
+  return `${Math.floor(tenths/600)}:${String(Math.floor(tenths/10)%60).padStart(2,'0')},${tenths%10}`;
+}
+function putText(id,value){const el=$(id),text=String(value);if(el.textContent!==text)el.textContent=text;}
+function putAttribute(id,name,value){const el=$(id),text=String(value);if(el.getAttribute(name)!==text)el.setAttribute(name,text);}
+function currentFrame(){return s.data?Math.min(s.data.frames.length-1,Math.max(0,Math.floor(s.time*s.data.fps+1e-6))):0;}
+let playbackUIState=null;
 function renderPlayback() {
-  $('timeline').value=s.data?Math.round(s.time/s.data.duration*1000):0;
-  $('play-time').textContent=format(s.time);$('duration').textContent=format(s.data?.duration||0);
-  $('play').innerHTML=s.playing?'Ⅱ':'<svg><use href="#i-play"/></svg>';
-  $('play').setAttribute('aria-label',s.playing?'Пауза':'Воспроизвести');
-  $('play').disabled=!s.data; $('replay').disabled=!s.data;
+  const progress=s.data?Math.round(s.time/s.data.duration*1000):0;
+  if(Number($('timeline').value)!==progress)$('timeline').value=progress;
+  putText('play-time',format(s.time));putText('duration',format(s.data?.duration||0));
+  // Replacing the play icon on every RAF churns DOM while the canvas is drawing.
+  if(playbackUIState!==s.playing){
+    $('play').innerHTML=s.playing?'Ⅱ':'<svg><use href="#i-play"/></svg>';
+    putAttribute('play','aria-label',s.playing?'Пауза':'Воспроизвести');playbackUIState=s.playing;
+  }
+  const ready=Boolean(s.data),frame=currentFrame(),frames=s.data?.frames.length||0;
+  for(const id of ['play','replay'])if($(id).disabled===ready)$(id).disabled=!ready;
+  const recordedPosition=ready?Math.max(0,Math.min(frames-1,s.time*s.data.fps)):0;
+  $('frame-prev').disabled=!ready||recordedPosition<=1e-6;$('frame-next').disabled=!ready||recordedPosition>=frames-1-1e-6;
+  putText('frame-readout',ready?`Кадр ${frame+1} / ${frames}`:'Кадр —');
+  putAttribute('timeline','aria-valuetext',ready?`${format(s.time)} из ${format(s.data.duration)} · кадр ${frame+1} из ${frames}`:'Нет движения');
   avatar.showAt(s.time);dialogueAvatar.showAt(s.time);
 }
 function pauseAvatar() {++s.playbackToken;s.playing=false;cancelAnimationFrame(s.raf);s.raf=0;video.pause();renderPlayback();}
 function tick(now) {
   if(!s.playing||!s.data)return;
-  s.time=s.compare?Math.min(s.data.duration,video.currentTime):Math.min(s.data.duration,s.time+(now-s.last)/1000*Number($('speed').value));
+  if(s.compare){if(!video.seeking)s.time=Math.min(s.data.duration,video.currentTime);}
+  else s.time=Math.min(s.data.duration,s.time+Math.max(0,(now-s.last)/1000)*Number($('speed').value));
   s.last=now;renderPlayback();
   if(s.time>=s.data.duration-.01){pauseAvatar();return;}s.raf=requestAnimationFrame(tick);
 }
@@ -79,8 +96,50 @@ $('play').onclick=()=>s.playing?pauseAvatar():playAvatar();
 $('replay').onclick=()=>{pauseAvatar();s.time=0;playAvatar();};
 $('timeline').addEventListener('input',()=>{const ratio=Number($('timeline').value)/1000;pauseAvatar();if(!s.data)return;s.time=ratio*s.data.duration;if(video.readyState>=1)video.currentTime=s.time;renderPlayback();});
 $('speed').onchange=()=>{video.playbackRate=Number($('speed').value);s.last=performance.now();};
-function setCompare(value){const resume=s.playing;pauseAvatar();s.compare=value;$('source-video').hidden=!value;$('stage').classList.toggle('compare',value);$('show-avatar').setAttribute('aria-pressed',String(!value));$('show-compare').setAttribute('aria-pressed',String(value));avatar.resize();if(resume)playAvatar();}
-$('show-avatar').onclick=()=>setCompare(false);$('show-compare').onclick=()=>setCompare(true);
+function setVisualMode(view){
+  if(!['avatar','compare','reference'].includes(view))return;
+  const resume=s.playing;pauseAvatar();s.view=view;s.compare=view!=='avatar';
+  video.hidden=!s.compare;$('stage').classList.toggle('compare',view==='compare');$('stage').classList.toggle('reference',view==='reference');
+  for(const name of ['avatar','compare','reference'])putAttribute(`show-${name}`,'aria-pressed',name===view);
+  if(video.readyState>=1)video.currentTime=s.time;
+  avatar.resize();renderPlayback();if(resume)playAvatar();
+}
+function setCompare(value){setVisualMode(value?'compare':'avatar');}
+$('show-avatar').onclick=()=>setVisualMode('avatar');$('show-compare').onclick=()=>setVisualMode('compare');$('show-reference').onclick=()=>setVisualMode('reference');
+function stepFrame(delta){
+  if(!s.data)return;
+  pauseAvatar();
+  const at=Math.max(0,Math.min(s.data.frames.length-1,s.time*s.data.fps));
+  // From an interpolated position, choose the immediately adjacent recorded frame.
+  const adjacent=delta<0?Math.ceil(at-1e-6)-1:Math.floor(at+1e-6)+1;
+  const next=Math.max(0,Math.min(s.data.frames.length-1,adjacent));
+  s.time=next/s.data.fps;
+  if(video.readyState>=1)video.currentTime=s.time;
+  renderPlayback();
+}
+$('frame-prev').onclick=()=>stepFrame(-1);$('frame-next').onclick=()=>stepFrame(1);
+// Move the live card rather than cloning media/canvas nodes or their controls.
+const focusDialog=$('avatar-focus-dialog'),avatarCard=document.querySelector('.avatar-card');
+let focusHome=null,focusNext=null,focusReturn=null;
+function restoreAvatarCard(){
+  if(!focusHome)return;
+  pauseAvatar();
+  focusHome.insertBefore(avatarCard,focusNext?.parentNode===focusHome?focusNext:null);
+  focusHome=null;focusNext=null;
+  putText('avatar-focus-label','Крупно');putAttribute('avatar-focus','aria-expanded',false);
+  avatar.resize();renderPlayback();focusReturn?.focus({preventScroll:true});focusReturn=null;
+}
+function openAvatarFocus(){
+  if(focusDialog.open){focusDialog.close();return;}
+  const resume=s.playing;pauseAvatar();
+  focusHome=avatarCard.parentNode;focusNext=avatarCard.nextSibling;focusReturn=document.activeElement||$('avatar-focus');
+  focusDialog.append(avatarCard);focusDialog.showModal();
+  putText('avatar-focus-label','Закрыть');putAttribute('avatar-focus','aria-expanded',true);
+  avatar.resize();renderPlayback();$('avatar-focus').focus({preventScroll:true});
+  if(resume)playAvatar();
+}
+$('avatar-focus').onclick=openAvatarFocus;
+focusDialog.addEventListener('close',restoreAvatarCard);
 video.addEventListener('ended',pauseAvatar);
 video.addEventListener('error',()=>{if(s.compare&&s.data){pauseAvatar();notice('text-notice','Исходное видео недоступно. Можно посмотреть движение аватара.','error');}});
 function stopDictation(){if(s.speech){s.speech.abort();s.speech=null;}$('dictate').classList.remove('recording');$('dictate').setAttribute('aria-label','Ввести голосом');}
@@ -306,6 +365,7 @@ $('replay-analysis').onclick=async()=>{
 };
 
 function setMode(mode){
+  if(focusDialog.open){focusDialog.close();restoreAvatarCard();}
   if(!['dialogue','research','text','camera','video','about'].includes(mode))mode='dialogue';
   pauseAvatar();stopDictation();stopCapture();window.speechSynthesis?.cancel();s.mode=mode;s.videoReady=false;s.sampleId=null;$('replay-analysis').disabled=true;releaseFile();
   inputVideo.removeAttribute('src');inputVideo.load();inputVideo.controls=false;$('analyze-video').disabled=true;
@@ -389,7 +449,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.8',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.9',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{

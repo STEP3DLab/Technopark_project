@@ -1,5 +1,5 @@
 {
-  "lastRunAt": "2026-10-28T10:37:47Z",
+  "lastRunAt": "2026-10-28T16:01:39Z",
   "lastSuccessfulSearchAt": null,
   "status": "degraded",
   "mode": "public-source-links",
@@ -10,7 +10,7 @@
       "name": "Суды Москвы — поиск дел",
       "url": "https://mos-gorsud.ru/search",
       "status": "error",
-      "checkedAt": "2026-10-28T10:37:47Z",
+      "checkedAt": "2026-10-28T16:01:39Z",
       "httpStatus": null,
       "error": "<urlopen error timed out>",
       "lastSuccessAt": null
@@ -30,10 +30,10 @@
       "name": "АС Москвы — официальный сайт",
       "url": "https://msk.arbitr.ru/",
       "status": "ok",
-      "checkedAt": "2026-10-28T10:37:47Z",
+      "checkedAt": "2026-10-28T16:01:39Z",
       "httpStatus": 200,
       "error": "Страница доступна; это не подтверждение полноты поиска дел",
-      "lastSuccessAt": "2026-10-28T10:37:47Z",
+      "lastSuccessAt": "2026-10-28T16:01:39Z",
       "contentHash": "a3c2c21c97f2732f0503ceed365581d067cde715b30aebb5a061bdd51f661f6b"
     },
     {
@@ -41,10 +41,10 @@
       "name": "АС Московской области — официальный сайт",
       "url": "https://asmo.arbitr.ru/",
       "status": "ok",
-      "checkedAt": "2026-10-28T10:37:47Z",
+      "checkedAt": "2026-10-28T16:01:39Z",
       "httpStatus": 200,
       "error": "Страница доступна; это не подтверждение полноты поиска дел",
-      "lastSuccessAt": "2026-10-28T10:37:47Z",
+      "lastSuccessAt": "2026-10-28T16:01:39Z",
       "contentHash": "e556ecd72b55e9f44abaf759786394de3f2c4bf02df793b6d00f7e2a04a3173e"
     },
     {
@@ -72,7 +72,7 @@
       "name": "Управление Судебного департамента — справочник",
       "url": "https://usd--msk.sudrf.ru/modules.php?name=sud",
       "status": "error",
-      "checkedAt": "2026-10-28T10:37:47Z",
+      "checkedAt": "2026-10-28T16:01:39Z",
       "httpStatus": null,
       "error": "Перенаправление на другой домен: требуется ручная проверка",
       "lastSuccessAt": null

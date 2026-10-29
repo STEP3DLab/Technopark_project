@@ -139,3 +139,10 @@ test('back-to-top uses focus and reduced-motion preferences, hidden while a moda
   b.fire('storage',{key:X.PREF_KEY,newValue:'{"motion":"reduce"}'});b.action('experience-top');assert.deepEqual(b.win.scrolled,{top:0,behavior:'instant'});assert.equal(b.doc.activeElement.id,'main');
   b.action('experience-help');assert.equal(b.nodes.get('experience-top').hidden,true);
 });
+test('closing help restores a visible control when Escape also closes the mobile sidebar',()=>{
+  const b=boot(),menu=new b.Node('button');menu.id='mobile-menu';menu.getBoundingClientRect=()=>({width:44,height:44,left:0,right:44,top:0,bottom:44});b.doc.body.appendChild(menu);
+  const opener=b.nodes.get('launch');opener.getBoundingClientRect=()=>({width:180,height:44,left:10,right:190,top:60,bottom:104});
+  b.action('experience-help');
+  opener.getBoundingClientRect=()=>({width:180,height:44,left:-240,right:-60,top:60,bottom:104});
+  b.nodes.get('experience-help-dialog').dispatch('cancel');assert.equal(b.doc.activeElement.id,'mobile-menu');
+});

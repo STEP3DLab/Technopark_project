@@ -187,6 +187,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
     await dispatchDocument('click', {target: new Node('button', {'data-action': action, ...(id ? {'data-id': id} : {})})});
   }
   return {document, storage, downloads, confirmations, location, registry, click,
+    keydown: event => dispatchDocument('keydown',event),
     clickElement: target => target.disabled ? Promise.resolve() : dispatchDocument('click', {target}),
     inputElement: (target, value) => {target.value = value; return dispatchDocument('input', {target});},
     changeElement: target => dispatchDocument('change', {target}),
@@ -1049,4 +1050,13 @@ test('Import preview changes with replacement mode and pre-import backup does no
   const copied=JSON.parse(await app.downloads[0].blob.text());assert.equal(copied.notes.old.text,'CURRENT_NOTE');
   assert.deepEqual(copied.favorites,[]);assert.deepEqual(app.stored(),initial);
   assert.equal(app.get('confirm-dialog').open,true);await app.click('cancel-import');assert.deepEqual(app.stored(),initial);
+});
+test('Escape closes the active modal without also hiding its mobile-menu focus origin',async()=>{
+  const app=await boot();await app.get('mobile-menu').dispatch('click');
+  assert.equal(app.get('sidebar').classList.contains('open'),true);
+  await app.click('experience-help');assert.equal(app.get('experience-help-dialog').open,true);
+  await app.keydown({key:'Escape',target:app.get('experience-help-dialog')});
+  assert.equal(app.get('sidebar').classList.contains('open'),true);
+  await app.get('experience-help-dialog').dispatch('cancel');assert.equal(app.get('experience-help-dialog').open,false);
+  await app.keydown({key:'Escape',target:app.get('mobile-menu')});assert.equal(app.get('sidebar').classList.contains('open'),false);
 });

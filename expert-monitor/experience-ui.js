@@ -110,7 +110,17 @@
       return opened.length>0;
     }
     function restoreFocus(){
-      const target=opener?.isConnected?opener:$('#main');target?.focus?.({preventScroll:true});opener=null;updateTop();
+      const visible=element=>{
+        if(!element?.isConnected)return false;
+        const rect=element.getBoundingClientRect?.();
+        if(!rect)return true;
+        const width=Number(win.innerWidth||root?.clientWidth)||Infinity,height=Number(win.innerHeight||root?.clientHeight)||Infinity;
+        return rect.width>0&&rect.height>0&&rect.right>0&&rect.bottom>0&&rect.left<width&&rect.top<height;
+      };
+      // Escape can close the mobile sidebar in the same event as this dialog.
+      // A connected opener may then be translated outside the viewport.
+      const menu=$('#mobile-menu'),target=visible(opener)?opener:visible(menu)?menu:$('#main');
+      target?.focus?.({preventScroll:true});opener=null;updateTop();
     }
     function renderResults(){
       const found=paletteResults($('#experience-query')?.value,A.records?.()||[]);

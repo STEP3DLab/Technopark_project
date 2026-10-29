@@ -858,7 +858,7 @@
   const Experience=window.ExpertExperienceUI.create({state,records,getRecord,setView,openDetail,notify,esc,icon,beforeNavigate:()=>{const dialogs=[...document.querySelectorAll('dialog')];return !dialogs.some(dialog=>dialog.open);},refresh:()=>loadData(true)});
   document.addEventListener('click',handleClick);
   document.addEventListener('input',event=>{
-    if(Selection.handleInput?.(event)||Estimates.handleInput(event)||Experience.handleInput(event))return;
+    if(Experience.handleInput(event)||Selection.handleInput?.(event)||Estimates.handleInput(event))return;
     if(event.target.id==='search-input'){state.search=event.target.value;clearTimeout(debounceTimer);debounceTimer=setTimeout(updateFilterResults,120);}
     if(['amount-min','amount-max'].includes(event.target.id)){state[event.target.id==='amount-min'?'minAmount':'maxAmount']=event.target.value;clearTimeout(debounceTimer);debounceTimer=setTimeout(updateFilterResults,120);}
     if(event.target.closest('#proposal-form')&&event.target.id!=='recordId')refreshPreview();
@@ -924,7 +924,7 @@
   $('#mobile-menu').addEventListener('click',()=>$('#sidebar').classList.contains('open')?closeMenu():openMenu());
   $('#sidebar-scrim').addEventListener('click',closeMenu);
   document.addEventListener('keydown',event=>{
-    if(event.key==='Escape')closeMenu();
+    if(event.key==='Escape'&&![...document.querySelectorAll('dialog')].some(dialog=>dialog.open))closeMenu();
     if(event.key==='Tab'&&$('#sidebar').classList.contains('open')){const items=[...$('#sidebar').querySelectorAll('a[href],button:not([disabled])')].filter(el=>el.offsetParent!==null);const first=items[0],last=items.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}
     if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)&&!document.querySelector('dialog[open]')){const field=$('#search-input');if(field){event.preventDefault();field.focus();}}
   });

@@ -165,7 +165,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   });
   context.window = context;
   vm.runInContext('globalThis.structuredClone = value => JSON.parse(JSON.stringify(value));', context);
-  for (const filename of ['monitor-utils.js', 'workspace-utils.js', 'app.js'])
+  for (const filename of ['monitor-utils.js', 'workspace-utils.js', 'export-utils.js', 'proposal-utils.js', 'app.js'])
     vm.runInContext(fs.readFileSync(path.join(APP_DIR, filename), 'utf8'), context, {filename});
   for (let i = 0; i < 6; i++) await new Promise(resolve => setImmediate(resolve));
   async function dispatchDocument(name, event) {
@@ -175,6 +175,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
     await dispatchDocument('click', {target: new Node('button', {'data-action': action, ...(id ? {'data-id': id} : {})})});
   }
   return {document, storage, downloads, confirmations, location, registry, click,
+    clickElement: target => dispatchDocument('click', {target}),
     setRegistryPayload(value) {responses.registry = value; registryParseError = false;},
     setRegistryParseError(value) {registryParseError = Boolean(value);},
     get: id => {const node = elements.get(id); assert.ok(node, 'Expected rendered element #' + id); return node;},
@@ -299,6 +300,8 @@ test('CSV export neutralizes spreadsheet formulas even after whitespace and pres
   });
   const app = await boot(initial, {records});
   await app.click('export-csv');
+  assert.equal(app.get('export-dialog').open, true);
+  await app.click('export-work-csv');
   const file = app.downloads.find(download => download.name.endsWith('.csv'));
   assert.ok(file?.blob);
   const content = await file.blob.text();
@@ -340,7 +343,8 @@ test('A decimal own price survives detail and draft saves and stays exact in pro
   assert.equal(app.get('price').checkValidity(), true);
   await app.input('price', app.get('price').value);
   const readable = value => value.replace(/[\u00a0\u202f]/g, ' ');
-  assert.match(readable(app.get('proposal-preview').textContent), /Предварительная стоимость: 125 000,50 ₽\./);
+  assert.match(readable(app.get('proposal-preview').innerHTML), /125 000,50 ₽/);
+  assert.doesNotMatch(readable(app.get('proposal-preview').innerHTML), /125 001 ₽/);
 
   await app.submit('proposal-form');
   assert.equal(app.stored().drafts.length, 1);
@@ -350,6 +354,185 @@ test('A decimal own price survives detail and draft saves and stays exact in pro
   const file = app.downloads.find(download => download.name.endsWith('.txt'));
   assert.ok(file?.blob);
   const text = readable(await file.blob.text());
-  assert.match(text, /Предварительная стоимость: 125 000,50 ₽\./);
+  assert.match(text, /Стоимость: 125 000,50 ₽/);
   assert.doesNotMatch(text, /125 001 ₽/);
+});
+
+const futureRecord = (id = 'workflow-record') => ({id, caseNumber: 'TEST-2099', title: 'PUBLIC_DEADLINE_RECORD',
+  status: 'needs_review', sourceType: 'court_decision', region: 'Москва',
+  deadline: '2099-12-31T10:00:00+03:00', publishedAt: '2026-10-29',
+  sourceUrl: 'https://court.example/case/2099', amountType: 'not_published', amountRub: null});
+const plannedTask = text => ({text, dueDate: '2099-11-30', updatedAt: '2026-10-29T09:00:00Z'});
+
+test('Completing and restoring a task preserves its text and date and updates the next-action overview', async () => {
+  const row = futureRecord();
+  const text = 'TASK_TO_COMPLETE_UNIQUE';
+  const app = await boot({...W.emptyWorkspace(), tasks: {[row.id]: plannedTask(text)}}, {records: [row]});
+  await app.view('overview');
+  assert.ok(app.get('main').innerHTML.includes(text));
+  await app.view('planner');
+  await app.click('toggle-task', row.id);
+  const completed = app.stored().tasks[row.id];
+  assert.equal(completed.text, text);
+  assert.equal(completed.dueDate, '2099-11-30');
+  assert.ok(Number.isFinite(Date.parse(completed.completedAt)));
+  assert.equal(app.get('nav-planner').textContent, '0');
+  await app.view('overview');
+  assert.ok(!app.get('main').innerHTML.includes(text), 'Completed tasks must leave next actions');
+
+  await app.view('planner');
+  await app.click('toggle-task', row.id);
+  assert.equal(app.stored().tasks[row.id].completedAt, undefined);
+  assert.equal(app.stored().tasks[row.id].text, text);
+  assert.equal(app.get('nav-planner').textContent, '1');
+  await app.view('overview');
+  assert.ok(app.get('main').innerHTML.includes(text));
+});
+
+test('A failed task completion write leaves the task pending in storage and next actions', async () => {
+  const row = futureRecord();
+  const text = 'TASK_WRITE_FAILURE_UNIQUE';
+  const app = await boot({...W.emptyWorkspace(), tasks: {[row.id]: plannedTask(text)}}, {records: [row]});
+  await app.view('planner');
+  app.storage.failWrites = true;
+  await app.click('toggle-task', row.id);
+  assert.equal(app.stored().tasks[row.id].completedAt, undefined);
+  assert.equal(app.stored().tasks[row.id].text, text);
+  assert.equal(app.get('nav-planner').textContent, '1');
+  await app.view('overview');
+  assert.ok(app.get('main').innerHTML.includes(text));
+});
+
+test('A task whose record left the registry remains visible and editable through the planner form', async () => {
+  const id = 'orphaned-record';
+  const app = await boot({...W.emptyWorkspace(), tasks: {[id]: plannedTask('ORPHAN_TASK_ORIGINAL')}}, {records: []});
+  await app.view('planner');
+  assert.ok(app.get('main').innerHTML.includes('ORPHAN_TASK_ORIGINAL'));
+  assert.ok(app.get('main').innerHTML.includes(id));
+  await app.click('edit-task', id);
+  assert.equal(app.get('task-dialog').open, true);
+  assert.equal(app.get('task-text').value, 'ORPHAN_TASK_ORIGINAL');
+  app.get('task-text').value = 'ORPHAN_TASK_REVISED';
+  app.get('task-date').value = '2099-12-01';
+  await app.submit('task-form');
+  assert.equal(app.stored().tasks[id].text, 'ORPHAN_TASK_REVISED');
+  assert.equal(app.stored().tasks[id].dueDate, '2099-12-01');
+  assert.equal(app.get('task-dialog').open, false);
+  assert.ok(app.get('main').innerHTML.includes('ORPHAN_TASK_REVISED'));
+});
+
+test('A failed orphan-task save exposes an in-dialog backup that preserves unsaved edits without changing storage', async () => {
+  const id = 'orphaned-emergency-task';
+  const initial = {...W.emptyWorkspace(),
+    tasks: {[id]: plannedTask('ORPHAN_TASK_SAVED'), kept: plannedTask('ANOTHER_SAVED_TASK')},
+    notes: {kept: {text: 'PRESERVED_NOTE', proposalRub: 125000.5}},
+    work: {kept: 'review'}, favorites: ['kept'], checks: {kept: {stage: true}},
+    company: {organization: 'PRESERVED_ORGANIZATION', contact: 'backup@example.org', signatory: 'PRESERVED_SIGNATORY'},
+    drafts: [{id: 'saved-draft', subject: 'PRESERVED_DRAFT', documentKind: 'procurement', documentMode: 'draft'}],
+    savedFilters: [{id: 'kept-filter', name: 'PRESERVED_FILTER', filters: {status: 'needs_review'}}]};
+  const app = await boot(initial, {records: []});
+  await app.view('planner');
+  await app.click('edit-task', id);
+  await app.input('task-text', 'ORPHAN_TASK_UNSAVED_RECOVERY');
+  await app.input('task-date', '2099-12-02');
+  app.storage.failWrites = true;
+  await app.submit('task-form');
+
+  assert.equal(app.get('task-dialog').open, true, 'The failed save must leave the task editor open');
+  assert.equal(app.get('task-text').value, 'ORPHAN_TASK_UNSAVED_RECOVERY');
+  assert.equal(app.get('task-date').value, '2099-12-02');
+  const feedback = app.get('task-content').querySelector('#task-save-state');
+  assert.ok(feedback && !feedback.hidden, 'The failure must be shown inside the open modal');
+  assert.equal(feedback.attrs.role, 'status');
+  assert.match(feedback.textContent, /не сохранил данные/);
+  assert.match(feedback.textContent, /резервную копию JSON/);
+  assert.deepEqual(app.stored(), initial, 'A failed write must preserve every stored field');
+
+  const backupButton = app.get('task-content').querySelector('[data-action="backup"]');
+  assert.ok(backupButton && !backupButton.hidden && !backupButton.disabled,
+    'Emergency recovery must be reachable inside the open modal');
+  assert.equal(backupButton.type, 'button', 'Backup must not submit the failing form again');
+  await app.clickElement(backupButton);
+  assert.equal(app.downloads.length, 1);
+  assert.ok(app.downloads[0].name.endsWith('.json'));
+  const backup = JSON.parse(await app.downloads[0].blob.text());
+  assert.equal(W.validBackup(backup), true, 'The emergency file must remain restorable');
+  assert.equal(backup.tasks[id].text, 'ORPHAN_TASK_UNSAVED_RECOVERY');
+  assert.equal(backup.tasks[id].dueDate, '2099-12-02');
+  assert.deepEqual(backup.tasks.kept, initial.tasks.kept);
+  for (const key of ['notes', 'work', 'favorites', 'checks', 'company', 'drafts', 'savedFilters'])
+    assert.deepEqual(backup[key], initial[key], 'Backup must retain the existing ' + key);
+  assert.deepEqual(app.stored(), initial, 'Downloading recovery data must not mutate storage');
+  assert.equal(app.get('task-dialog').open, true);
+  assert.equal((await app.beforeUnload()).prevented, true, 'A backup download must not mark the unsaved edit as saved');
+});
+
+test('Public deadlines and personal task calendar actions export separate datasets', async () => {
+  const row = futureRecord();
+  const privateText = 'PRIVATE_CALENDAR_TASK';
+  const initial = {...W.emptyWorkspace(), notes: {[row.id]: {text: 'PRIVATE_CALENDAR_NOTE', proposalRub: 987654.5}},
+    tasks: {[row.id]: plannedTask(privateText), orphan: plannedTask('PRIVATE_ORPHAN_TASK'),
+      completed: {...plannedTask('PRIVATE_COMPLETED_TASK'), completedAt: '2026-10-29T10:00:00Z'}}};
+  const app = await boot(initial, {records: [row]});
+  await app.view('planner');
+  await app.click('calendar-deadlines');
+  assert.equal(app.downloads.length, 1);
+  assert.ok(app.downloads[0].name.endsWith('.ics'));
+  const publicIcs = (await app.downloads[0].blob.text()).replace(/\r\n[ \t]/g, '');
+  assert.match(publicIcs, /PUBLIC_DEADLINE_RECORD/);
+  assert.match(publicIcs, /STATUS:TENTATIVE/);
+  assert.doesNotMatch(publicIcs, /PRIVATE_|987654|CLASS:PRIVATE/);
+
+  await app.click('calendar-tasks');
+  assert.equal(app.downloads.length, 2);
+  const privateIcs = (await app.downloads[1].blob.text()).replace(/\r\n[ \t]/g, '');
+  assert.match(privateIcs, /PRIVATE_CALENDAR_TASK/);
+  assert.match(privateIcs, /PRIVATE_ORPHAN_TASK/);
+  assert.match(privateIcs, /CLASS:PRIVATE/);
+  assert.doesNotMatch(privateIcs, /PRIVATE_COMPLETED_TASK|PRIVATE_CALENDAR_NOTE|987654/);
+  assert.doesNotMatch(privateIcs, /SUMMARY:Проверить срок:/);
+  assert.equal((privateIcs.match(/BEGIN:VEVENT/g) || []).length, 2);
+});
+
+test('CSV requires an explicit public or working export choice and public export omits local data', async () => {
+  const row = futureRecord();
+  const initial = {...W.emptyWorkspace(), notes: {[row.id]: {text: 'PRIVATE_CSV_NOTE', proposalRub: 987654.5}},
+    tasks: {[row.id]: plannedTask('PRIVATE_CSV_TASK')}, work: {[row.id]: 'review'}, favorites: [row.id]};
+  const app = await boot(initial, {records: [row]});
+  await app.click('export-csv');
+  assert.equal(app.get('export-dialog').open, true);
+  assert.equal(app.downloads.length, 0, 'Choosing export must not immediately download private data');
+  await app.click('export-public-csv');
+  assert.equal(app.downloads.length, 1);
+  const publicCsv = await app.downloads[0].blob.text();
+  assert.match(publicCsv, /PUBLIC_DEADLINE_RECORD/);
+  assert.doesNotMatch(publicCsv, /PRIVATE_CSV_|987654|Моя цена|Моя заметка/);
+
+  await app.click('export-csv');
+  await app.click('export-work-csv');
+  assert.equal(app.downloads.length, 2);
+  const workingCsv = await app.downloads[1].blob.text();
+  assert.match(workingCsv, /PRIVATE_CSV_NOTE/);
+  assert.match(workingCsv, /PRIVATE_CSV_TASK/);
+  assert.match(workingCsv, /987654\.5/);
+});
+
+test('Incomplete letter output is blocked without losing edits, while draft RTF remains downloadable', async () => {
+  const app = await boot();
+  await app.view('proposals');
+  await app.input('organization', 'UNSAVED_ORGANIZATION_FOR_LETTER');
+  await app.input('documentMode', 'letter');
+  await app.click('download-rtf');
+  await app.click('download-proposal');
+  assert.equal(app.downloads.length, 0, 'Incomplete letters must not be exported as finished documents');
+  assert.equal(app.get('organization').value, 'UNSAVED_ORGANIZATION_FOR_LETTER');
+  assert.equal((await app.beforeUnload()).prevented, true);
+
+  await app.input('documentMode', 'draft');
+  await app.click('download-rtf');
+  assert.equal(app.downloads.length, 1);
+  assert.ok(app.downloads[0].name.endsWith('.rtf'));
+  assert.match(app.downloads[0].blob.type, /^application\/rtf/);
+  assert.match(await app.downloads[0].blob.text(), /^\{\\rtf1/);
+  assert.equal((await app.beforeUnload()).prevented, true, 'Downloading a draft does not claim it was saved');
 });

@@ -35,10 +35,14 @@ jobs:
           node --check expert-monitor/app.js
           node --check expert-monitor/monitor-utils.js
           node --check expert-monitor/workspace-utils.js
+          node --check expert-monitor/export-utils.js
+          node --check expert-monitor/proposal-utils.js
       - name: Test filters, private workspace and application behavior
         run: |
           node expert-monitor/tests/test_filters.cjs
           node expert-monitor/tests/test_workspace.cjs
+          node expert-monitor/tests/test_exports.cjs
+          node expert-monitor/tests/test_proposals.cjs
           node expert-monitor/tests/test_app.cjs
       - name: Test public-source monitoring and validate the research registry
         run: |

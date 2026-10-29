@@ -36,17 +36,19 @@
     link: '<path d="m10 13 4-4M8 16l-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0M14 8l2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 0) scale(.92)"/>',
     filter: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
   };
-  const VIEW_NAMES = {overview:'Обзор',opportunities:'Возможности',courts:'Справочник судов',sources:'Источники и обновления',workspace:'Моя работа',proposals:'Мои предложения',guide:'Как это работает'};
+  const VIEW_NAMES = {overview:'Обзор',opportunities:'Возможности',courts:'Справочник судов',sources:'Источники и обновления',workspace:'Моя работа',planner:'Планировщик',proposals:'Мои предложения',guide:'Как это работает'};
   const STATUS = {open_confirmed:'Приём подтверждён',needs_review:'Проверить актуальность',historical:'Архивный пример',closed:'Завершено'};
   const WORK_STATUS = {new:'Не начата',review:'Проверяю',draft:'Готовлю КП',ready:'Готово к подаче',sent:'Подано вручную',won:'Работа получена',lost:'Не подходит',hold:'Отложено'};
   const U = window.ExpertMonitorUtils;
   const W = window.ExpertWorkspaceUtils;
+  const E = window.ExpertExportUtils;
+  const P = window.ExpertProposalUtils;
   const FILTER_DEFAULTS = {...U.defaults,favorite:'all',category:'all',minAmount:'',maxAmount:''};
   const UI_KEY = 'msk-expert-monitor-ui-v2';
   const CHECKS = {stage:'Проверены актуальная стадия и приём',scope:'Понятны предмет и объём работ',eligibility:'Проверены квалификация и условия допуска',materials:'Уточнены материалы и доступ к объекту',deadline:'Подтверждены дата и время подачи',channel:'Определён канал подачи документов'};
   const STORE_KEY = 'msk-expert-monitor-workspace-v1';
   const DATA_BASE = location.hostname.toLowerCase()==='step3dlab.github.io' ? 'https://raw.githubusercontent.com/STEP3DLab/Technopark_project/main/expert-monitor/data/' : './data/';
-  const state = {db:null,monitor:null,view:'overview',search:'',status:'all',region:'all',court:'all',courtType:'all',sourceType:'all',loading:false,loadError:null,monitorError:null,fetchedAt:null,dataFallback:false,form:null,detailId:null,returnFocus:null,importData:null,workStatus:'all',due:'all',sort:'priority',filterViews:{},favorite:'all',category:'all',minAmount:'',maxAmount:'',layout:'list',formBaseline:null,sourceConfig:null,pendingRecord:null};
+  const state = {db:null,monitor:null,view:'overview',search:'',status:'all',region:'all',court:'all',courtType:'all',sourceType:'all',loading:false,loadError:null,monitorError:null,fetchedAt:null,dataFallback:false,form:null,detailId:null,returnFocus:null,importData:null,workStatus:'all',due:'all',sort:'priority',filterViews:{},favorite:'all',category:'all',minAmount:'',maxAmount:'',layout:'list',formBaseline:null,sourceConfig:null,pendingRecord:null,plannerKind:'all',taskId:null,taskBaseline:null};
   let storageSnapshot=null;
   let storageConflict=false;
   let storageLoadError=false;
@@ -119,7 +121,12 @@
     try{localStorage.setItem(UI_KEY,JSON.stringify({layout:state.layout,views:state.filterViews}));}catch{}
   }
   function draftDirty() {return !!state.form&&W.isDraftDirty(captureForm(),state.formBaseline||newForm());}
-  function replaceDraft(form) {state.form={...form};state.formBaseline={...form};}
+  function replaceDraft(form) {
+    const base=newForm(getRecord(form.recordId));
+    state.form={...base,...form};
+    if(!form.documentKind)state.form.documentKind=getRecord(form.recordId)?.sourceType==='procurement_adjacent'?'procurement':getRecord(form.recordId)?.sourceType==='court_decision'?'court':'general';
+    state.formBaseline={...state.form};
+  }
   function allowDraftReplacement() {return !draftDirty()||window.confirm('Текущий текст предложения ещё не сохранён. Заменить его? Нажмите «Отмена», чтобы сначала сохранить черновик.');}
   function recordUrl(id) {const url=new URL(location.href);url.search='';url.hash='opportunities?record='+encodeURIComponent(id);return url.href;}
   function routeHash(view=state.view,id=state.detailId) {return '#'+view+(id?'?record='+encodeURIComponent(id):'');}
@@ -148,10 +155,11 @@
       const i=snapshot.drafts.findIndex(d=>d.id===draft.id);if(i>=0)snapshot.drafts[i]=draft;else snapshot.drafts.push(draft);
     }
     if(state.detailId&&$('#detail-note'))applyDetail(snapshot);
+    if(state.taskId&&$('#task-text')){const values=taskValues();if(values.text||values.dueDate){snapshot.tasks[state.taskId]={...snapshot.tasks[state.taskId],...values,updatedAt:new Date().toISOString()};if(taskDirty())delete snapshot.tasks[state.taskId].completedAt;}else delete snapshot.tasks[state.taskId];}
     snapshot.exportedAt=new Date().toISOString();return snapshot;
   }
 
-  function notify(message) { const t=$('#toast');t.textContent=message;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true;},5000); }
+  function notify(message) { for(const [dialog,feedback] of [['#task-dialog','#task-save-state'],['#detail-dialog','#detail-save-state']])if($(dialog)?.open&&$(feedback))$(feedback).textContent=message; const t=$('#toast');t.textContent=message;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true;},5000); }
   function download(name,content,type='text/plain;charset=utf-8') {
     const url=URL.createObjectURL(new Blob([content],{type})); const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
   }
@@ -225,10 +233,10 @@
     const d=deadlineDate(o);if(!d)return 'Срок не указан';
     const key=moscowDateKey(d),today=moscowDateKey(),tomorrow=moscowDateKey(new Date(Date.now()+86400000));
     const prefix=key===today?'Сегодня':key===tomorrow?'Завтра':shortDate(d);
-    const time=typeof o.deadline==='string'&&o.deadline.includes('T')?new Intl.DateTimeFormat('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}).format(d):'до конца дня';
+    const time=typeof o.deadline==='string'&&String(o.deadline).includes('T')?new Intl.DateTimeFormat('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}).format(d):'до конца дня';
     return prefix+' · '+time+' МСК';
   }
-  function localTaskTag(o) {const task=local.tasks[o.id];if(!task?.text&&!task?.dueDate)return '';const late=task.dueDate&&task.dueDate<moscowDateKey();return `<span class="tag ${late?'urgent':'blue'}">${icon('clock')}${esc(task.dueDate?shortDate(task.dueDate):'Следующий шаг')}${late?' · просрочено':''}</span>`;}
+  function localTaskTag(o) {const task=local.tasks[o.id];if((!task?.text&&!task?.dueDate)||task.completedAt)return '';const late=task.dueDate&&task.dueDate<moscowDateKey();return `<span class="tag ${late?'urgent':'blue'}">${icon('clock')}${esc(task.dueDate?shortDate(task.dueDate):'Следующий шаг')}${late?' · просрочено':''}</span>`;}
   function currentFilters() {return Object.entries(filterSnapshot()).filter(([k,v])=>v!==FILTER_DEFAULTS[k]);}
   function filterSummary() {
     const labels={search:'Поиск',status:'Статус',region:'Объект',court:'Получатель',sourceType:'Тип',workStatus:'Моя работа',due:'Срок',sort:'Порядок',favorite:'Избранное',category:'Профиль',minAmount:'Сумма от',maxAmount:'Сумма до'};
@@ -252,6 +260,7 @@
     $('#nav-opportunities').textContent=state.db?number(records().filter(o=>statusKey(o)==='open_confirmed'||statusKey(o)==='needs_review').length):'—';
     $('#nav-drafts').textContent=number(local.drafts.length);
     if($('#nav-work'))$('#nav-work').textContent=number(records().filter(o=>U.matchesWork(o,local.work,'active')).length);
+    if($('#nav-planner'))$('#nav-planner').textContent=number(Object.values(local.tasks).filter(t=>!t.completedAt).length);
     document.querySelectorAll('[data-view]').forEach(el=>{const active=el.dataset.view===state.view;if(el.classList.contains('nav-item')){el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}});
     $('#breadcrumb-view').textContent=VIEW_NAMES[state.view];
   }
@@ -292,7 +301,7 @@
         state.monitor=monitorResult.value;state.monitorError=null;
       }else state.monitorError='Не удалось загрузить журнал автоматических проверок.';
       updateMeta();
-      const editing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||$('#detail-dialog').open;
+      const editing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||$('#detail-dialog').open||$('#task-dialog').open||$('#export-dialog').open;
       if((!editing&&state.view!=='proposals')||!$('#main').querySelector('[data-page]'))render();
       if(state.pendingRecord&&state.db){const id=state.pendingRecord;state.pendingRecord=null;if(getRecord(id))openDetail(id);else notify('Запись по этой ссылке не найдена в текущем реестре.');}
       if(userInitiated)notify(state.loadError?'Новый срез не загружен. '+(state.db?'На экране предыдущие данные.':'Проверьте доступ к файлам данных.'):'Опубликованный срез перечитан. Дата исследования указана отдельно.');
@@ -345,9 +354,72 @@
     return `<div class="review-health"><div class="review-health-item">${icon('search')}<span><b>Содержательная проверка</b><span>${esc(researchLabel())}</span></span></div><div class="review-health-item">${icon('radar')}<span><b>Техническая проверка сайтов</b><span>${state.monitor?.mode==='offline'?'Нет сетевого результата':esc(formatDate(state.monitor?.lastRunAt,true))}</span></span></div>${state.view!=='sources'?`<button class="link-button" data-view="sources">Что удалось проверить${icon('arrow')}</button>`:''}</div>`;
   }
   function followupList(limit=6) {
-    const list=records().filter(o=>local.tasks[o.id]?.text||local.tasks[o.id]?.dueDate).sort((a,b)=>(local.tasks[a.id].dueDate||'9999').localeCompare(local.tasks[b.id].dueDate||'9999')).slice(0,limit);
+    const list=Object.entries(local.tasks).filter(([,t])=>!t.completedAt&&(t.text||t.dueDate)).sort(([,a],[,b])=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,limit);
     if(!list.length)return `<div class="followup-empty"><p>Назначьте следующий шаг и дату в карточке. Задачи появятся здесь.</p><button class="link-button" data-view="opportunities">Выбрать запись${icon('arrow')}</button></div>`;
-    return `<div class="followup-list">${list.map(o=>{const t=local.tasks[o.id],late=t.dueDate&&t.dueDate<moscowDateKey();return `<button class="followup-item" data-action="open-detail" data-id="${esc(o.id)}"><span class="followup-date ${late?'overdue':''}">${t.dueDate?esc(shortDate(t.dueDate)):'Без даты'}${late?'<small>просрочено</small>':''}</span><span><b>${esc(t.text||'Проверить запись')}</b><small>№ ${esc(o.caseNumber||'не указан')}</small></span>${icon('arrow')}</button>`;}).join('')}</div>`;
+    return `<div class="followup-list">${list.map(([id,t])=>{const o=getRecord(id),late=t.dueDate&&t.dueDate<moscowDateKey();return `<button class="followup-item" data-action="${o?'open-detail':'edit-task'}" data-id="${esc(id)}"><span class="followup-date ${late?'overdue':''}">${t.dueDate?esc(shortDate(t.dueDate)):'Без даты'}${late?'<small>просрочено</small>':''}</span><span><b>${esc(t.text||'Проверить запись')}</b><small>${o?'№ '+esc(o.caseNumber||'не указан'):'Запись вне текущего реестра'}</small></span>${icon('arrow')}</button>`;}).join('')}<button class="link-button" data-view="planner">Все задачи и сроки${icon('arrow')}</button></div>`;
+  }
+
+  function addDateDays(key,days) {const date=new Date(key+'T12:00:00Z');date.setUTCDate(date.getUTCDate()+days);return date.toISOString().slice(0,10);}
+  function agendaPeriod(entry) {
+    if(entry.task?.completedAt)return 'done';
+    if(!entry.date)return 'undated';
+    const today=moscowDateKey();
+    return entry.date<today?'overdue':entry.date===today?'today':entry.date<=addDateDays(today,7)?'week':'later';
+  }
+  function plannerEntries() {
+    const tasks=Object.entries(local.tasks).map(([id,task])=>({kind:'task',id,task,record:getRecord(id),date:task.dueDate||'',time:task.dueDate?Date.parse(task.dueDate+'T00:00:00+03:00'):Infinity}));
+    const deadlines=records().filter(o=>['open_confirmed','needs_review'].includes(statusKey(o))&&deadlineDate(o)).map(o=>({kind:'deadline',id:o.id,record:o,date:moscowDateKey(deadlineDate(o)),time:U.deadlineTime(o)}));
+    return [...tasks,...deadlines].sort((a,b)=>a.time-b.time||a.id.localeCompare(b.id,'ru'));
+  }
+  function agendaMarkup(entries) {
+    const terms=state.search.toLocaleLowerCase('ru-RU').replace(/ё/g,'е').trim().split(/\s+/).filter(Boolean);
+    const list=entries.filter(e=>(state.plannerKind==='all'||(state.plannerKind==='tasks'?e.kind==='task':e.kind==='deadline'))&&terms.every(t=>[e.record?.title,e.record?.caseNumber,e.task?.text,e.id].join(' ').toLocaleLowerCase('ru-RU').replace(/ё/g,'е').includes(t)));
+    if(!list.length)return emptyState('В этом отборе нет событий','Личные задачи задаются в карточке записи. Здесь также появятся будущие сроки из опубликованных источников.','<button class="button secondary" data-view="opportunities">Открыть реестр</button>');
+    return [['overdue','Просрочено'],['today','Сегодня'],['week','Ближайшие 7 дней'],['later','Позже'],['undated','Без даты'],['done','Выполнено']].map(([key,label])=>{
+      const group=list.filter(e=>agendaPeriod(e)===key);if(!group.length)return '';
+      const rows=group.map(e=>{
+        const o=e.record,done=!!e.task?.completedAt,title=o?.title||'Запись вне текущего реестра';
+        return `<li class="agenda-item ${done?'is-done':''}"><div class="agenda-date"><b>${e.date?esc(shortDate(e.date)):'—'}</b><small>${e.kind==='deadline'&&String(o.deadline).includes('T')?esc(new Intl.DateTimeFormat('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}).format(deadlineDate(o)))+' МСК':e.date?'Весь день':'Назначьте дату'}</small></div><div class="agenda-body"><div class="agenda-meta"><span class="tag ${e.kind==='task'?'blue':'warning'} agenda-kind">${e.kind==='task'?'Моя задача':'Срок из источника'}</span>${done?'<span class="tag healthy">Выполнено</span>':o?statusTag(o):''}${o?.caseNumber?`<span class="case-number">№ ${esc(o.caseNumber)}</span>`:''}</div>${o?`<button class="agenda-title lead-open" data-action="open-detail" data-id="${esc(e.id)}">${esc(title)}</button>`:`<h3 class="agenda-title">${esc(title)}</h3>`}<p class="agenda-action">${esc(e.kind==='task'?e.task.text||'Проверить запись':'Проверить актуальный приём и условия до указанного срока.')}</p>${!o?`<p class="field-hint">ID: ${esc(e.id)}. Задача сохранена; запись отсутствует в текущем опубликованном срезе.</p>`:''}${done?`<p class="field-hint">Завершено ${esc(formatDate(e.task.completedAt,true))}</p>`:''}</div><div class="agenda-actions">${e.kind==='task'?`<button class="button ${done?'ghost':'primary'} small" data-action="toggle-task" data-id="${esc(e.id)}">${icon(done?'refresh':'check')}${done?'Вернуть':'Завершить'}</button><button class="button secondary small" data-action="edit-task" data-id="${esc(e.id)}">${icon('edit')}Изменить</button>`:`<button class="button secondary small" data-action="open-detail" data-id="${esc(e.id)}">Открыть${icon('arrow')}</button><button class="icon-button" data-action="calendar-record" data-id="${esc(e.id)}" aria-label="Скачать срок записи ${esc(o.caseNumber||o.title)} в календарь">${icon('down')}</button>`}</div></li>`;
+      }).join('');
+      const heading=`<div class="agenda-heading"><h2>${label}</h2><span class="panel-count">${group.length}</span></div>`;
+      return key==='done'?`<details class="agenda-group" data-period="done"><summary>${heading}</summary><ul class="agenda-list">${rows}</ul></details>`:`<section class="agenda-group" data-period="${key}">${heading}<ul class="agenda-list">${rows}</ul></section>`;
+    }).join('');
+  }
+  function planner() {
+    const entries=plannerEntries(),pending=entries.filter(e=>e.kind==='task'&&!e.task.completedAt);
+    const metrics=[['Просроченные задачи',pending.filter(e=>agendaPeriod(e)==='overdue').length,'is-overdue'],['Мои задачи на сегодня',pending.filter(e=>agendaPeriod(e)==='today').length,'is-today'],['Сроки источников · 7 дней',entries.filter(e=>e.kind==='deadline'&&['today','week'].includes(agendaPeriod(e))).length,''],['Задачи без даты',pending.filter(e=>!e.date).length,'']];
+    return heading('Даты и следующие действия','Планировщик','Личные задачи и сроки из источников. Время — московское. Завершение задачи не меняет статус дела или закупки.',`<button class="button secondary" data-action="calendar-deadlines">${icon('down')}Сроки источников · .ics</button><button class="button primary" data-action="calendar-tasks">${icon('down')}Мои задачи · .ics</button>`)+`<div class="planner-summary">${metrics.map(([label,count,cls])=>`<div class="planner-summary-card ${cls}"><b>${count}</b><span>${label}</span></div>`).join('')}</div><section class="panel"><div class="planner-toolbar"><div class="view-switch" role="group" aria-label="События планировщика">${[['all','Все события'],['tasks','Мои задачи'],['deadlines','Сроки источников']].map(([value,label])=>`<button data-action="planner-kind" data-kind="${value}" class="${state.plannerKind===value?'active':''}" aria-pressed="${state.plannerKind===value}">${label}</button>`).join('')}</div>${searchField('Найти задачу, дело или предмет')}</div><div id="planner-results">${agendaMarkup(entries)}</div></section><div class="planner-note"><strong>Выгрузка в календарь.</strong> Каждая кнопка выгружает весь соответствующий список, независимо от поиска. В файле задач есть ваши формулировки; в файле сроков — только публичные сведения. Импортируйте .ics в свой календарь. Это разовая копия: изменения на сайте не синхронизируются, напоминания настраиваются в календаре. Выполненные задачи и истёкшие сроки не выгружаются. Даты из источников требуют подтверждения.</div>`;
+  }
+  function exportCalendar(kind,id=null) {
+    const includeTasks=kind==='tasks',items=id?records().filter(o=>o.id===id):records();
+    const result=E.createCalendar({records:items,tasks:includeTasks?local.tasks:{},includeDeadlines:!includeTasks,includeTasks,baseUrl:location.href,now:new Date()});
+    if(!result.events){notify(includeTasks?'Нет незавершённых задач с датой для календаря.':'Нет будущих сроков для выгрузки. Проверьте даты записей.');return;}
+    download('msk-expert-'+(includeTasks?'my-tasks':'source-deadlines')+'-'+moscowDateKey()+'.ics',result.content,'text/calendar;charset=utf-8');
+    notify('Событий в календарном файле: '+result.events+'. '+(includeTasks?'Файл содержит ваши личные задачи.':'Сроки нужно подтвердить у источника.'));
+  }
+  function taskValues() {return {text:$('#task-text')?.value||'',dueDate:$('#task-date')?.value||''};}
+  function taskDirty() {return !!state.taskId&&JSON.stringify(taskValues())!==JSON.stringify(state.taskBaseline);}
+  function openTask(id) {
+    const task=local.tasks[id];if(!task)return;
+    state.taskId=id;state.taskBaseline={text:task.text,dueDate:task.dueDate};
+    $('#task-content').innerHTML=`<h2 id="task-title">Следующее действие</h2><p>${esc(getRecord(id)?.title||'Запись вне текущего реестра')}</p><form id="task-form"><div class="field"><label for="task-text">Моя задача</label><textarea id="task-text" maxlength="2000" rows="4">${esc(task.text)}</textarea></div><div class="field"><label for="task-date">Дата, по Москве</label><input id="task-date" type="date" value="${esc(task.dueDate)}"></div><p class="field-hint">Изменение текста или даты вернёт выполненную задачу в работу. Пустые текст и дата удалят задачу.</p><p class="field-hint" id="task-save-state" role="status">Изменения сохранятся в этом браузере.</p><div class="dialog-actions"><button type="button" class="button ghost" data-action="backup">${icon('down')}Копия правок</button><button type="button" class="button secondary" data-action="close-task">Отмена</button><button type="submit" class="button primary">Сохранить задачу</button></div></form>`;
+    $('#task-dialog').showModal();$('#task-text').focus();
+  }
+  function closeTask() {if(taskDirty()&&!window.confirm('Закрыть задачу без сохранения изменений?'))return false;$('#task-dialog').close();return true;}
+  function saveTask() {
+    if(!state.taskId||!$('#task-form').reportValidity())return false;
+    const id=state.taskId,values=taskValues(),next=structuredClone(local);
+    if(values.text||values.dueDate){next.tasks[id]={...next.tasks[id],...values,updatedAt:new Date().toISOString()};if(taskDirty())delete next.tasks[id].completedAt;}
+    else delete next.tasks[id];
+    if(!persist(next))return false;
+    state.taskBaseline=values;$('#task-dialog').close();render();notify('Задача сохранена.');return true;
+  }
+  function toggleTask(id) {
+    if(!local.tasks[id])return;
+    const next=structuredClone(local),done=!!next.tasks[id].completedAt;
+    if(done)delete next.tasks[id].completedAt;else next.tasks[id].completedAt=new Date().toISOString();
+    next.tasks[id].updatedAt=new Date().toISOString();
+    if(persist(next)){render();$('#main').focus({preventScroll:true});notify(done?'Задача возвращена в работу.':'Задача выполнена. Вернуть её можно в группе «Выполнено».');}
   }
 
   function overview() {
@@ -380,7 +452,7 @@
   }
   function pipelineMarkup(list,groups=[['review','Отбор и проверка',['new','review']],['draft','Подготовка КП',['draft','ready']],['sent','Предложение подано',['sent']],['result','Результат и пауза',['won','lost','hold']]]) {
     if(!list.length)return emptyState('Добавьте первую запись в работу','В реестре нажмите звезду или откройте карточку и измените рабочий статус.','<button class="button primary" data-view="opportunities">Открыть реестр</button>');
-    return `<div class="pipeline-board">${groups.map(([key,label,steps])=>{const column=list.filter(o=>steps.includes(local.work[o.id]||'new'));return `<section class="pipeline-column" data-stage="${key}"><div class="pipeline-column-header"><h2>${label}</h2><span>${column.length}</span></div><div class="pipeline-column-body">${column.map(o=>`<article class="pipeline-card"><div class="lead-top"><span class="case-number">${esc(o.caseNumber||'Запрос')}</span>${favoriteButton(o)}</div><button class="lead-open" data-action="open-detail" data-id="${esc(o.id)}">${esc(o.title)}</button>${statusTag(o)}<p class="pipeline-deadline">${icon('clock')}${esc(deadlineLabel(o))}</p>${local.tasks[o.id]?.text?`<p class="pipeline-next">${esc(shorten(local.tasks[o.id].text,150))}</p>`:''}${localTaskTag(o)}${positiveMoney(local.notes[o.id]?.proposalRub)?`<p class="own-price">Моя цена: ${esc(money(local.notes[o.id].proposalRub))}</p>`:''}<div class="pipeline-card-actions"><label class="sr-only" for="stage-${esc(o.id)}">Этап записи ${esc(o.caseNumber)}</label><select class="select-field" id="stage-${esc(o.id)}" data-work-id="${esc(o.id)}">${Object.entries(WORK_STATUS).map(([v,t])=>option(v,t,local.work[o.id]||'new')).join('')}</select></div></article>`).join('')||'<p class="pipeline-empty">На этом этапе записей пока нет</p>'}</div></section>`;}).join('')}</div>`;
+    return `<div class="pipeline-board">${groups.map(([key,label,steps])=>{const column=list.filter(o=>steps.includes(local.work[o.id]||'new'));return `<section class="pipeline-column" data-stage="${key}"><div class="pipeline-column-header"><h2>${label}</h2><span>${column.length}</span></div><div class="pipeline-column-body">${column.map(o=>`<article class="pipeline-card"><div class="lead-top"><span class="case-number">${esc(o.caseNumber||'Запрос')}</span>${favoriteButton(o)}</div><button class="lead-open" data-action="open-detail" data-id="${esc(o.id)}">${esc(o.title)}</button>${statusTag(o)}<p class="pipeline-deadline">${icon('clock')}${esc(deadlineLabel(o))}</p>${local.tasks[o.id]?.text&&!local.tasks[o.id]?.completedAt?`<p class="pipeline-next">${esc(shorten(local.tasks[o.id].text,150))}</p>`:''}${localTaskTag(o)}${positiveMoney(local.notes[o.id]?.proposalRub)?`<p class="own-price">Моя цена: ${esc(money(local.notes[o.id].proposalRub))}</p>`:''}<div class="pipeline-card-actions"><label class="sr-only" for="stage-${esc(o.id)}">Этап записи ${esc(o.caseNumber)}</label><select class="select-field" id="stage-${esc(o.id)}" data-work-id="${esc(o.id)}">${Object.entries(WORK_STATUS).map(([v,t])=>option(v,t,local.work[o.id]||'new')).join('')}</select></div></article>`).join('')||'<p class="pipeline-empty">На этом этапе записей пока нет</p>'}</div></section>`;}).join('')}</div>`;
   }
 
   function filteredCourts() {
@@ -419,32 +491,32 @@
   }
 
   function newForm(record=null) {
-    return {id:'',recordId:record?.id||'',court:record?courtName(record):'',caseNumber:record?.caseNumber||'',subject:record?.title||'Судебная строительно-техническая экспертиза',organization:local.company.organization||'АНО «МСК-Эксперт»',requisites:local.company.requisites||'',contact:local.company.contact||'info@sud-mskexpert.ru · +7 (495) 648-50-91',expert:local.company.expert||'',qualification:local.company.qualification||'',price:record&&positiveMoney(local.notes[record.id]?.proposalRub)?String(local.notes[record.id].proposalRub):'',days:'',conditions:'',attachments:'Сведения об эксперте и квалификации; документы об образовании; подтверждение опыта по предмету исследования.',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+    return {id:'',recordId:record?.id||'',court:record?courtName(record):'',caseNumber:record?.caseNumber||'',subject:record?.title||'Судебная строительно-техническая экспертиза',organization:local.company.organization||'АНО «МСК-Эксперт»',requisites:local.company.requisites||'',contact:local.company.contact||'info@sud-mskexpert.ru · +7 (495) 648-50-91',expert:local.company.expert||'',qualification:local.company.qualification||'',price:record&&positiveMoney(local.notes[record.id]?.proposalRub)?String(local.notes[record.id].proposalRub):'',days:'',conditions:'',attachments:'Сведения об эксперте и квалификации; документы об образовании; подтверждение опыта по предмету исследования.',documentKind:record?.sourceType==='procurement_adjacent'?'procurement':record?'court':'general',documentMode:'draft',documentDate:moscowDateKey(),documentNumber:'',signatory:local.company.signatory||'',signatoryRole:local.company.signatoryRole||'',taxNote:local.company.taxNote||'',validUntil:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
   }
   function field(id,label,value,placeholder='',type='text',wide=false,hint='') {
-    return `<div class="field ${wide?'wide':''}"><label for="${esc(id)}">${esc(label)}</label><input id="${esc(id)}" name="${esc(id)}" type="${esc(type)}" value="${esc(value)}" placeholder="${esc(placeholder)}"${type==='number'?' min="1" max="1000000000000" step="'+(id==='price'?'any':'1')+'"':''}>${hint?`<p class="field-hint">${esc(hint)}</p>`:''}</div>`;
+    return `<div class="field ${wide?'wide':''}"><label for="${esc(id)}">${esc(label)}</label><input id="${esc(id)}" name="${esc(id)}" type="${esc(type)}" value="${esc(value)}" placeholder="${esc(placeholder)}"${type==='number'?' min="1" max="'+(id==='days'?'3650':'1000000000000')+'" step="'+(id==='price'?'any':'1')+'"':''}>${hint?`<p class="field-hint">${esc(hint)}</p>`:''}</div>`;
   }
   function area(id,label,value,placeholder='',hint='') {
     return `<div class="field wide"><label for="${esc(id)}">${esc(label)}</label><textarea id="${esc(id)}" name="${esc(id)}" placeholder="${esc(placeholder)}">${esc(value)}</textarea>${hint?`<p class="field-hint">${esc(hint)}</p>`:''}</div>`;
   }
-  function missingForm(f) {
-    const misses=[];if(!f.court?.trim())misses.push('суд');if(!f.caseNumber?.trim())misses.push('номер дела');if(!f.expert?.trim())misses.push('ФИО эксперта');if(!f.qualification?.trim())misses.push('квалификация');if(!f.requisites?.trim())misses.push('реквизиты');if(!positiveMoney(f.price))misses.push('цена');if(!Number.isFinite(Number(f.days))||Number(f.days)<=0)misses.push('срок');return misses;
-  }
-  function proposalText(f) {
-    const placeholder=(v,p)=>String(v||'').trim()||`[${p}]`;
-    const price=positiveMoney(f.price)?money(f.price):'[УКАЗАТЬ СТОИМОСТЬ]';
-    const days=Number(f.days)>0?`${f.days} календарных дней`:'[УКАЗАТЬ СРОК]';
-    const procurement=getRecord(f.recordId)?.sourceType==='procurement_adjacent';
-    const miss=missingForm(f);
-    return `ПРОЕКТ ДЛЯ ПРОВЕРКИ. НЕ ОТПРАВЛЕН.\n${miss.length?'Не заполнено: '+miss.join(', ')+'.\n':''}\n${procurement?'Заказчик: ':'В '}${placeholder(f.court,procurement?'НАИМЕНОВАНИЕ ЗАКАЗЧИКА':'НАИМЕНОВАНИЕ СУДА')}\n${procurement?'По закупке':'По делу'} № ${placeholder(f.caseNumber,procurement?'НОМЕР ЗАКУПКИ':'НОМЕР ДЕЛА')}\n\nИНФОРМАЦИЯ О ВОЗМОЖНОСТИ ПРОВЕДЕНИЯ ${procurement?'ИССЛЕДОВАНИЯ':'ЭКСПЕРТИЗЫ'}\n\n${placeholder(f.organization,'ПОЛНОЕ НАИМЕНОВАНИЕ ОРГАНИЗАЦИИ')} предлагает рассмотреть возможность проведения исследования по вопросу: ${placeholder(f.subject,'ПРЕДМЕТ ИССЛЕДОВАНИЯ')}.\n\nПредлагаемый ${procurement?'специалист':'эксперт'}: ${placeholder(f.expert,'ФИО СПЕЦИАЛИСТА')}.\nКвалификация и профильный опыт: ${placeholder(f.qualification,'ПОДТВЕРЖДЁННЫЕ СВЕДЕНИЯ О КВАЛИФИКАЦИИ')}.\n\nПредварительная стоимость: ${price}.\nПредлагаемый срок: ${days} после получения полного комплекта материалов и обеспечения доступа к объекту, если осмотр необходим.\n\nСтоимость, состав работ и срок подлежат уточнению после ознакомления с вопросами и доступными материалами. Налоговый режим и состав включённых расходов указываются в окончательном предложении.\n\n${f.conditions?.trim()?'Условия и состав работ:\n'+f.conditions.trim()+'\n\n':''}Приложения к окончательному предложению:\n${placeholder(f.attachments,'ПЕРЕЧЕНЬ ПОДТВЕРЖДАЮЩИХ ДОКУМЕНТОВ').replace(/[.]+$/,'')}.\n\nРеквизиты: ${placeholder(f.requisites,'ИНН / ОГРН / ЮРИДИЧЕСКИЙ АДРЕС')}.\nКонтакт для связи: ${placeholder(f.contact,'EMAIL И ТЕЛЕФОН')}.\n\n[ДОЛЖНОСТЬ, ФИО И ПОДПИСЬ УПОЛНОМОЧЕННОГО ЛИЦА]\n[ДАТА]\n\n${procurement?'Перед участием: проверить извещение, требования к участникам и предмету закупки, сроки, обеспечения и порядок подачи через ЭТП. Этот проект не заменяет заявку по установленной форме.':'Перед подачей: проверить актуальность дела, адресата, процессуальный канал и отсутствие конфликта интересов. Этот проект не подтверждает назначение эксперта судом.'}`;
-  }
+  function missingForm(f) {return P.missingFields(f);}
+  function proposalText(f) {return P.proposalText(f);}
   function draftsPanel() {
     return `<section class="panel"><div class="compact-heading"><h2>Сохранённые черновики</h2><span class="panel-count">${local.drafts.length}</span></div>${local.drafts.length?`<ul class="drafts-list">${[...local.drafts].sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))).map(d=>`<li class="draft-row">${icon('document')}<div><button class="draft-title" data-action="load-draft" data-id="${esc(d.id)}">${esc(d.caseNumber||'Без номера дела')}</button><p>${esc(shorten(d.court||'Суд не указан',60))}<br>${positiveMoney(d.price)?esc(money(d.price)):'Цена не задана'} · ${esc(shortDate(d.updatedAt))}</p></div><button class="icon-button" data-action="delete-draft" data-id="${esc(d.id)}" aria-label="Удалить черновик ${esc(d.caseNumber||'без номера')}">${icon('trash')}</button></li>`).join('')}</ul>`:`<div class="empty-state" style="padding:26px 20px"><p style="margin-bottom:0">После сохранения предложения появятся здесь.</p></div>`}</section>`;
   }
   function proposals() {
     if(!state.form)replaceDraft(newForm());const f=state.form;
-    return heading('Локальная рабочая область','Мои предложения','Подготовьте документ на основе проверенного дела. Черновики сохраняются в этом браузере и не отправляются получателям.',`<button class="button secondary" data-action="new-draft">${icon('plus')}Новый черновик</button>`)+
-    `<div class="proposal-layout"><section class="panel"><div class="panel-heading"><div><h2>Параметры предложения</h2><p>Ваша цена хранится отдельно от опубликованных сумм</p></div><span class="tag blue">Черновик</span></div><form class="proposal-form" id="proposal-form"><div class="proposal-status">${icon('info')}<span id="proposal-completeness">${missingForm(f).length?'Заполните: '+esc(missingForm(f).join(', '))+'.':'Основные поля заполнены. Проверьте документы и допустимый способ подачи.'}</span></div><div class="field-grid"><div class="field wide"><label for="recordId">Привязать к записи в базе</label><select name="recordId" id="recordId">${option('','Самостоятельное предложение',f.recordId)}${records().map(o=>option(o.id,(o.caseNumber||'Запрос')+' — '+shorten(o.title,78),f.recordId)).join('')}</select><p class="field-hint">Проверьте текущий приём предложений. Исторические и закрытые записи можно использовать как примеры для подготовки.</p></div>${field('court','Суд / получатель',f.court,'Полное наименование суда','text',true)}${field('caseNumber','Номер дела / закупки',f.caseNumber,'Например, А40-…/2026')}${field('subject','Предмет исследования',f.subject,'Вопросы, которые требует исследовать суд')}${field('price','Предлагаемая стоимость, ₽',f.price,'Ваша оценка','number',false,'Это собственный расчёт, а не сумма из акта.')}${field('days','Предлагаемый срок, дней',f.days,'Календарных дней','number')}</div><h3 class="form-section-title">Организация и эксперт</h3><div class="field-grid">${field('organization','Наименование организации',f.organization,'Юридическое наименование','text',true)}${field('expert','ФИО эксперта',f.expert,'Кандидатуру подтверждает организация','text',true)}${area('qualification','Квалификация и профильный опыт',f.qualification,'Образование, специальность, стаж и релевантные исследования','Укажите только сведения, которые подтверждаются документами.')}${area('requisites','Реквизиты организации',f.requisites,'ИНН, ОГРН, юридический адрес')}${field('contact','Контакт для связи',f.contact,'Email и телефон','text',true)}</div><h3 class="form-section-title">Объём и условия</h3><div class="field-grid">${area('conditions','Условия проведения исследования',f.conditions,'Материалы, вопросы, доступ к объекту, расходы, налоговый режим')}${area('attachments','Приложения',f.attachments,'Перечень документов к предложению')}</div><div class="form-actions"><button class="button primary" type="submit">${icon('save')}Сохранить черновик</button><button class="button secondary" type="button" data-action="copy-proposal">${icon('copy')}Скопировать</button><button class="button secondary" type="button" data-action="download-proposal">${icon('down')}Скачать TXT</button><button class="button secondary" type="button" data-action="print-proposal">${icon('print')}Печать / PDF</button></div></form></section><aside class="proposal-side">${draftsPanel()}<div class="local-note"><strong>Данные остаются у вас.</strong><br>Заметки, цены и реквизиты хранятся локально в браузере. Они не попадают в публичный репозиторий или Google-таблицу. Очистка данных браузера удалит черновики.<div class="button-row" style="margin-top:12px"><button class="button secondary small" data-action="backup">${icon('down')}Резервная копия</button><button class="button ghost small" data-action="import-backup">Восстановить</button></div></div><div class="preview-area section-gap"><div class="preview-toolbar"><h2>Предпросмотр документа</h2><span class="tag">Не отправлен</span></div><pre class="proposal-preview" id="proposal-preview">${esc(proposalText(f))}</pre></div></aside></div>`;
+    const missing=missingForm(f),linked=getRecord(f.recordId);
+    return heading('Документы / подготовка и оформление','Мои предложения','Соберите предложение, проверьте реквизиты и сохраните документ. Режим оформления не подтверждает подачу или актуальность источника.',`<button class="button secondary" data-action="preview-proposal">${icon('document')}К документу</button><button class="button secondary" data-action="new-draft">${icon('plus')}Новый черновик</button>`)+`
+    <div class="proposal-layout"><section class="panel"><div class="panel-heading"><div><h2>Параметры предложения</h2><p>Собственная цена и реквизиты остаются в вашем браузере</p></div><span class="tag blue">Личный документ</span></div>
+    <form class="proposal-form" id="proposal-form"><div class="proposal-status">${icon('info')}<span id="proposal-completeness" role="status">${missing.length?'Для оформления заполните: '+esc(missing.join(', '))+'.':'Поля заполнены. Проверьте фактические сведения, полномочия и канал подачи.'}</span></div>
+    <div class="field-grid"><div class="field"><label for="documentKind">Вид предложения</label><select id="documentKind" name="documentKind">${[['court','В суд — экспертиза'],['procurement','Заказчику — закупка'],['general','Самостоятельное предложение']].map(([v,t])=>option(v,t,f.documentKind)).join('')}</select></div><div class="field"><label for="documentMode">Вид документа при выгрузке</label><select id="documentMode" name="documentMode">${option('draft','Черновик с пометкой «Проект»',f.documentMode)}${option('letter','Оформленный документ',f.documentMode)}</select><p class="field-hint">Оформленный документ доступен после заполнения обязательных полей. Отправка выполняется отдельно.</p></div>
+    <div class="field wide"><label for="recordId">Связь с записью в базе</label><select name="recordId" id="recordId">${option('','Самостоятельное предложение',f.recordId)}${f.recordId&&!linked?option(f.recordId,'Запись вне текущего реестра · '+f.recordId,f.recordId):''}${records().map(o=>option(o.id,(o.caseNumber||'Запрос')+' — '+shorten(o.title,78),f.recordId)).join('')}</select><p class="field-hint">Тип и содержание сохранённого предложения сохраняются, даже если связанная запись отсутствует в новом срезе.</p></div>
+    ${field('documentDate','Дата документа',f.documentDate,'','date')}${field('documentNumber','Исходящий номер',f.documentNumber,'При наличии')}${field('court','Суд / получатель',f.court,'Полное наименование получателя','text',true)}${field('caseNumber','Номер дела / закупки',f.caseNumber,'Обязательно для суда и закупки')}${area('subject','Предмет исследования',f.subject,'Какие работы предлагаются')}${field('price','Предлагаемая стоимость, ₽',f.price,'Ваша оценка','number',false,'Собственный расчёт, отдельно от суммы из источника.')}${field('days','Предлагаемый срок, дней',f.days,'Целое число календарных дней','number')}${field('taxNote','Налоговая формулировка',f.taxNote,'Укажите применимый режим и НДС','text',true,'Используйте формулировку, согласованную с вашей бухгалтерией.')}${field('validUntil','Предложение действительно до',f.validUntil,'','date',false,'Необязательно. Это срок действия вашего предложения, а не срок подачи.')}</div>
+    <h3 class="form-section-title">Организация и специалист</h3><div class="field-grid">${field('organization','Наименование организации',f.organization,'Полное юридическое наименование','text',true)}${field('expert','ФИО эксперта / специалиста',f.expert,'Кандидатуру подтверждает организация','text',true)}${area('qualification','Квалификация и профильный опыт',f.qualification,'Образование, специальность, стаж и релевантные исследования','Укажите только сведения, которые подтверждаются документами.')}${area('requisites','Реквизиты организации',f.requisites,'ИНН, ОГРН, юридический адрес')}${field('contact','Контакт для связи',f.contact,'Email и телефон','text',true)}${field('signatoryRole','Должность подписанта',f.signatoryRole,'Например, директор')}${field('signatory','ФИО подписанта',f.signatory,'Уполномоченное лицо')}</div>
+    <h3 class="form-section-title">Объём и условия</h3><div class="field-grid">${area('conditions','Условия проведения исследования',f.conditions,'Материалы, вопросы, доступ к объекту и включённые расходы')}${area('attachments','Приложения',f.attachments,'Перечень документов к предложению')}</div><div class="form-actions"><button class="button primary" type="submit">${icon('save')}Сохранить черновик</button><button class="button secondary" type="button" data-action="copy-proposal">${icon('copy')}Текст</button><button class="button secondary" type="button" data-action="download-proposal">${icon('down')}TXT</button><button class="button secondary" type="button" data-action="download-rtf">${icon('document')}Для Word · RTF</button><button class="button secondary" type="button" data-action="print-proposal">${icon('print')}Печать / PDF</button></div></form></section>
+    <aside class="proposal-side">${draftsPanel()}<div class="local-note"><strong>Реквизиты повторно вводить не нужно.</strong><p>После сохранения организация, контакты, специалист, подписант и налоговая формулировка подставятся в новый черновик.</p><strong>Данные остаются у вас.</strong><p>Заметки, цены и реквизиты хранятся в этом браузере. Для переноса на другое устройство используйте резервную копию.</p><div class="button-row"><button class="button secondary small" data-action="backup">${icon('down')}Резервная копия</button><button class="button ghost small" data-action="import-backup">Восстановить</button></div></div><div class="local-note"><strong>Как получить документ</strong><p>RTF — редактируемый файл для Word и совместимых редакторов. «Печать / PDF» открывает печать отдельного документа; выберите сохранение в PDF. Фактическую подпись и приложения добавьте при оформлении.</p></div></aside></div>
+    <section class="preview-area proposal-preview-panel section-gap" id="proposal-document-panel"><div class="preview-toolbar"><h2>Предпросмотр документа</h2><div class="button-row"><button class="button secondary small" data-action="download-rtf">${icon('down')}RTF</button><button class="button secondary small" data-action="print-proposal">${icon('print')}Печать / PDF</button></div></div><div class="proposal-preview" id="proposal-preview">${P.proposalHtml(f)}</div></section>`;
   }
   function guide() {
     return heading('Методика и порядок работы','Как работает мониторинг','Одна последовательность: обнаружить сигнал, подтвердить статус, оценить работу и подготовить предложение.')+
@@ -456,7 +528,7 @@
       if(state.loadError)main.innerHTML=`<section class="error-box"><h1>База пока недоступна</h1><p>Не удалось загрузить опубликованные данные: ${esc(state.loadError)}.</p><p>Проверьте, что файлы <code>data/registry.json</code> и <code>data/monitoring.json</code> опубликованы рядом с панелью. Открывайте приложение через веб-сервер или GitHub Pages.</p><button class="button primary" data-action="refresh">${icon('refresh')}Повторить загрузку</button></section>`;
       return;
     }
-    const views={overview,opportunities,workspace,courts,sources,proposals,guide};
+    const views={overview,opportunities,workspace,planner,courts,sources,proposals,guide};
     main.innerHTML=`<div data-page="${esc(state.view)}">${state.loadError?`<div class="source-info-strip">${icon('info')}<div><h3>Показан предыдущий срез</h3><p>Последнее обновление не удалось. Проверьте первоисточники перед использованием данных.</p></div></div>`:''}${state.dataFallback?'<div class="source-info-strip freshness-warning"><div><h3>Резервная опубликованная копия</h3><p>Основной адрес данных недоступен. Показаны файлы последней публикации сайта; проверьте даты исследования и источников.</p></div></div>':''}${freshnessBanner()}${views[state.view]()}</div>`;
     hydrateIcons(main);updateMeta();showStorageConflict();
     if(storageLoadError)main.insertAdjacentHTML('afterbegin',`<div class="source-info-strip freshness-warning">${icon('shield')}<div><h3>Рабочие данные требуют восстановления</h3><p>Сохранённая копия не прочитана. Она остаётся в браузере и не перезаписывается.</p><button class="button secondary small" data-action="raw-backup">Скачать исходную копию</button></div></div>`);
@@ -467,6 +539,8 @@
       const list=filterRecords();$('#lead-results').innerHTML=resultsMarkup(list);if($('#filter-summary'))$('#filter-summary').innerHTML=filterSummary();$('#lead-result-count').textContent=`Найдено ${number(list.length)} из ${number(records().length)}`;
     }else if(state.view==='workspace'){
       const terms=state.search.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(Boolean);const list=records().filter(o=>(local.favorites.includes(o.id)||local.work[o.id]||local.tasks[o.id]?.text||local.tasks[o.id]?.dueDate)&&terms.every(t=>[o.title,o.caseNumber,local.tasks[o.id]?.text,local.notes[o.id]?.text].join(' ').toLowerCase().replace(/ё/g,'е').includes(t)));$('#workspace-results').innerHTML=pipelineMarkup(list);
+    }else if(state.view==='planner'){
+      $('#planner-results').innerHTML=agendaMarkup(plannerEntries());
     }else if(state.view==='courts'){
       const list=filteredCourts();$('#court-results').innerHTML=courtCards(list);$('#court-result-count').textContent=`В справочнике ${list.length} из ${state.db.courts.length} судов`;
     }
@@ -479,11 +553,11 @@
     const warning=expired(o)&&o.status==='needs_review'?'Срок по найденным данным истёк. Проверьте возможное продление в официальном извещении.':statusKey(o)==='historical'?'Архивный пример: не подтверждает действующий запрос и возможность подачи.':statusKey(o)==='closed'?'Запись завершена или срок истёк. Её можно использовать для исследования практики.':'Актуальный приём не подтверждён. Сначала проверьте первоисточник и дальнейшее движение дела или закупки.';
     $('#detail-content').innerHTML=`<header class="detail-header"><span>${o.sourceType==='procurement_adjacent'?'Смежная закупка':'Судебное дело'}</span><div class="button-row">${favoriteButton(o)}<button class="icon-button" data-action="copy-record-link" aria-label="Скопировать ссылку на карточку" title="Ссылка без личных данных">${icon('link')}</button><button class="icon-button" data-action="close-detail" aria-label="Закрыть карточку">${icon('close')}</button></div></header><div class="detail-body"><div class="lead-top"><span class="case-number">${esc(o.caseNumber||'Публичный запрос')}</span>${statusTag(o)}</div><h2 id="detail-title">${esc(o.title||'Судебно-строительная экспертиза')}</h2><p class="detail-court">${esc(courtName(o))}</p><p class="detail-region">${icon('pin')}${esc(o.region||'Место объекта не уточнено')}</p>${!isOpen?`<div class="detail-warning">${esc(warning)}</div>`:''}
     <div class="detail-data-grid"><div><span class="small-label">Срок по источнику</span><span class="small-value">${esc(o.deadline?formatDate(deadlineDate(o),true):'Не опубликован')}</span></div><div><span class="small-label">Дата проверки записи</span><span class="small-value">${esc(formatDate(o.checkedAt))}</span></div><div><span class="small-label">Дата акта / извещения</span><span class="small-value">${esc(formatDate(o.publishedAt))}</span></div><div><span class="small-label">Заседание</span><span class="small-value">${esc(formatDate(o.hearingAt))}</span></div><div class="detail-amount">${amountBlock(o)}</div></div>
-    <div class="detail-actions">${external(o.sourceUrl,'Открыть источник','button primary')}${o.documentUrl&&o.documentUrl!==o.sourceUrl?external(o.documentUrl,'Документ','button secondary'):''}${court?external(court.caseSearchUrl||court.website,'Карточка / поиск суда','button secondary'):''}<button class="button secondary" data-action="copy-record-summary">${icon('copy')}Скопировать справку</button></div>
+    <div class="detail-actions">${external(o.sourceUrl,'Открыть источник','button primary')}${deadlineDate(o)&&['open_confirmed','needs_review'].includes(statusKey(o))?`<button class="button secondary" data-action="calendar-record" data-id="${esc(o.id)}">${icon('clock')}Срок в календарь</button>`:''}${o.documentUrl&&o.documentUrl!==o.sourceUrl?external(o.documentUrl,'Документ','button secondary'):''}${court?external(court.caseSearchUrl||court.website,'Карточка / поиск суда','button secondary'):''}<button class="button secondary" data-action="copy-record-summary">${icon('copy')}Скопировать справку</button></div>
     <section class="detail-section"><h3>Суть записи</h3><p>${esc(plain(o.summary))}</p><h3>Следующий шаг по исследованию</h3><p>${esc(plain(o.nextAction)||'Уточнить актуальный статус, наличие запроса и допустимый способ подачи.')}</p></section>
     ${o.eligibilityNote?`<section class="detail-section"><h3>Условия допуска и предмет работ</h3><p>${esc(o.eligibilityNote)}</p></section>`:''}
     <details class="detail-section detail-evidence"><summary>Материал и основание проверки</summary><p>${esc(plain(o.decisionSummary)||'Полное содержание уточните по первоисточнику.')}</p>${o.sourceExcerpt?`<blockquote>${esc(shorten(o.sourceExcerpt,650))}</blockquote>`:''}<p>${esc(verificationText(o.verification))}</p>${o.primaryAccess?`<p>${esc(o.primaryAccess)}</p>`:''}${o.dateBasis?`<p>Основание даты: ${esc(o.dateBasis)}</p>`:''}${Array.isArray(o.additionalSources)?`<div class="detail-actions">${o.additionalSources.map((url,i)=>external(url,'Дополнительный источник '+(i+1),'button secondary small')).join('')}</div>`:''}</details>
-    <section class="detail-local"><div class="local-section-heading"><h3>Моя работа с записью</h3><span class="tag blue">Только в этом браузере</span></div><div class="record-local-meta"><div class="field"><label for="detail-work">Рабочий этап</label><select id="detail-work">${Object.entries(WORK_STATUS).map(([v,t])=>option(v,t,local.work[id]||'new')).join('')}</select></div><div class="field"><label for="detail-price">Моя цена, ₽</label><input id="detail-price" type="number" min="1" max="1000000000000" step="any" value="${esc(note.proposalRub||'')}" placeholder="Собственный расчёт"></div><div class="field wide"><label for="detail-task">Мой следующий шаг</label><input id="detail-task" maxlength="2000" value="${esc(task.text||'')}" placeholder="Например: проверить требования и связаться с заказчиком"></div><div class="field"><label for="detail-followup">Дата следующего действия</label><input id="detail-followup" type="date" value="${esc(task.dueDate||'')}"><p class="field-hint">Личная задача, отдельно от срока подачи. Отображается в обзоре; push-уведомления не отправляются.</p></div><div class="field wide"><label for="detail-note">Рабочая заметка</label><textarea id="detail-note" maxlength="20000" placeholder="Что выяснили, какие материалы запросить, решение по участию…">${esc(note.text||'')}</textarea></div></div><fieldset class="detail-checklist"><legend>Мой чек-лист проверки</legend><p class="field-hint">Личные отметки не изменяют статус публичного источника.</p>${Object.entries(CHECKS).map(([key,label])=>`<label class="check-row"><input type="checkbox" data-check="${key}"${checks[key]?' checked':''}><span>${esc(label)}</span></label>`).join('')}</fieldset></section></div><footer class="detail-footer"><span id="detail-save-state" role="status">${note.updatedAt?'Сохранено '+esc(formatDate(note.updatedAt,true)):'Изменения нужно сохранить'}</span><div class="button-row"><button class="button secondary" data-action="save-note">${icon('save')}Сохранить</button><button class="button primary" data-action="draft-from-detail">Подготовить КП${icon('arrow')}</button></div></footer>`;
+    <section class="detail-local"><div class="local-section-heading"><h3>Моя работа с записью</h3>${task.completedAt?'<span class="tag healthy">Задача выполнена</span>':''}<span class="tag blue">Только в этом браузере</span></div><div class="record-local-meta"><div class="field"><label for="detail-work">Рабочий этап</label><select id="detail-work">${Object.entries(WORK_STATUS).map(([v,t])=>option(v,t,local.work[id]||'new')).join('')}</select></div><div class="field"><label for="detail-price">Моя цена, ₽</label><input id="detail-price" type="number" min="1" max="1000000000000" step="any" value="${esc(note.proposalRub||'')}" placeholder="Собственный расчёт"></div><div class="field wide"><label for="detail-task">Мой следующий шаг</label><input id="detail-task" maxlength="2000" value="${esc(task.text||'')}" placeholder="Например: проверить требования и связаться с заказчиком"></div><div class="field"><label for="detail-followup">Дата следующего действия</label><input id="detail-followup" type="date" value="${esc(task.dueDate||'')}"><p class="field-hint">Личная задача, отдельно от срока подачи. Доступна в планировщике; её можно выгрузить в календарь.</p></div><div class="field wide"><label for="detail-note">Рабочая заметка</label><textarea id="detail-note" maxlength="20000" placeholder="Что выяснили, какие материалы запросить, решение по участию…">${esc(note.text||'')}</textarea></div></div><fieldset class="detail-checklist"><legend>Мой чек-лист проверки</legend><p class="field-hint">Личные отметки не изменяют статус публичного источника.</p>${Object.entries(CHECKS).map(([key,label])=>`<label class="check-row"><input type="checkbox" data-check="${key}"${checks[key]?' checked':''}><span>${esc(label)}</span></label>`).join('')}</fieldset></section></div><footer class="detail-footer"><span id="detail-save-state" role="status">${note.updatedAt?'Сохранено '+esc(formatDate(note.updatedAt,true)):'Изменения нужно сохранить'}</span><div class="button-row"><button class="button ghost" data-action="backup">${icon('down')}Копия правок</button><button class="button secondary" data-action="save-note">${icon('save')}Сохранить</button><button class="button primary" data-action="draft-from-detail">Подготовить КП${icon('arrow')}</button></div></footer>`;
     history.replaceState(null,'',routeHash(state.view,id));
     const dialog=$('#detail-dialog');if(!dialog.open)dialog.showModal();dialog.scrollTop=0;
   }
@@ -504,7 +578,7 @@
     const id=state.detailId,v=detailValues(),updatedAt=new Date().toISOString();
     snapshot.notes[id]={text:v.text,proposalRub:positiveMoney(v.price)?Number(v.price):null,updatedAt};
     if(v.work==='new')delete snapshot.work[id];else snapshot.work[id]=v.work;
-    if(v.task||v.dueDate)snapshot.tasks[id]={text:v.task,dueDate:v.dueDate,updatedAt};else delete snapshot.tasks[id];
+    if(v.task||v.dueDate){const previous=snapshot.tasks[id];snapshot.tasks[id]={text:v.task,dueDate:v.dueDate,updatedAt};if(previous?.completedAt&&v.task===previous.text&&v.dueDate===previous.dueDate)snapshot.tasks[id].completedAt=previous.completedAt;}else delete snapshot.tasks[id];
     if(Object.values(v.checks).some(Boolean))snapshot.checks[id]=v.checks;else delete snapshot.checks[id];
     return snapshot;
   }
@@ -524,33 +598,59 @@
     return state.form;
   }
   function refreshPreview() {
-    const f=captureForm();if(!f)return;const pre=$('#proposal-preview');if(pre)pre.textContent=proposalText(f);
-    const comp=$('#proposal-completeness');const missing=missingForm(f);if(comp)comp.textContent=missing.length?'Заполните: '+missing.join(', ')+'.':'Основные поля заполнены. Проверьте документы и допустимый способ подачи.';
+    const f=captureForm();if(!f)return;const pre=$('#proposal-preview');if(pre)pre.innerHTML=P.proposalHtml(f);
+    const comp=$('#proposal-completeness');const missing=missingForm(f);if(comp)comp.textContent=missing.length?'Для оформления заполните: '+missing.join(', ')+'.':'Поля заполнены. Проверьте фактические сведения, полномочия и канал подачи.';
   }
   function saveDraft() {
     const captured=captureForm();if(!captured)return false;
     const f={...captured,id:captured.id||'draft-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)),updatedAt:new Date().toISOString()};
     const next=structuredClone(local),i=next.drafts.findIndex(d=>d.id===f.id);
     if(i>=0)next.drafts[i]=f;else next.drafts.push(f);
-    next.company={organization:f.organization,requisites:f.requisites,contact:f.contact,expert:f.expert,qualification:f.qualification};
+    next.company={organization:f.organization,requisites:f.requisites,contact:f.contact,expert:f.expert,qualification:f.qualification,signatory:f.signatory,signatoryRole:f.signatoryRole,taxNote:f.taxNote};
     if(f.recordId){if(['new','review','draft'].includes(next.work[f.recordId]||'new'))next.work[f.recordId]='draft';if(positiveMoney(f.price))next.notes[f.recordId]={...(next.notes[f.recordId]||{}),proposalRub:Number(f.price),updatedAt:f.updatedAt};}
     if(!persist(next))return false;
     replaceDraft(f);notify('Черновик сохранён. Документ не отправлялся.');render();return true;
   }
 
   async function copyProposal() {
-    const f=captureForm();if(!f)return;const text=proposalText(f);
+    const f=outputForm();if(!f)return;const text=proposalText(f);
     try{await navigator.clipboard.writeText(text);notify('Проект предложения скопирован.');}
     catch{
       const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.top='-1000px';document.body.appendChild(area);area.select();let ok=false;try{ok=document.execCommand('copy');}catch{}area.remove();notify(ok?'Проект предложения скопирован.':'Копирование недоступно. Скачайте документ в TXT.');
     }
   }
+  function outputForm() {
+    const f=captureForm();if(!f)return null;
+    if($('#proposal-form')&&!$('#proposal-form').reportValidity())return null;
+    if(f.documentMode==='letter'&&!P.canExportLetter(f)){
+      refreshPreview();notify('Документ пока не оформлен. Заполните: '+missingForm(f).join(', ')+'. Или выберите режим черновика.');
+      $('#proposal-completeness')?.scrollIntoView?.({block:'center',behavior:'smooth'});return null;
+    }
+    return f;
+  }
+  function printProposal() {
+    const f=outputForm();if(!f)return;
+    $('#print-document').innerHTML=P.proposalHtml(f);document.body.classList.add('print-proposal');
+    try{window.print();}catch{document.body.classList.remove('print-proposal');$('#print-document').innerHTML='';notify('Печать недоступна. Скачайте редактируемый файл RTF.');}
+  }
   function csvCell(v) { let s=plain(v);if(/^[\s\uFEFF]*[=+\-@]|^[\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'; }
   function csv(rows) { return '\uFEFF'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n'); }
-  function exportRegistry() {
+  function exportRegistry(privateData=false) {
     const list=state.view==='opportunities'?filterRecords():records();
-    const rows=[['ID','Статус источника','Суд','Номер дела','Предмет','Регион','Дата акта / извещения','Срок предложения','Заседание','Опубликованная сумма, ₽','Назначение суммы','Моя цена, ₽','Содержание акта','Следующий шаг','Ссылка на материал','Ссылка на документ','Проверено','Основание проверки','Рабочий статус','Моя заметка','Избранное','Мой следующий шаг','Дата следующего действия'],...list.map(o=>[o.id,statusLabel(o),courtName(o),o.caseNumber,o.title,o.region,o.publishedAt,o.deadline,o.hearingAt,o.amountRub,({expert_fee:'Стоимость экспертизы',claim:'Сумма иска',contract:'Цена закупки / контракта',not_published:'Не опубликовано'})[o.amountType]||o.amountType,local.notes[o.id]?.proposalRub||'',o.decisionSummary,o.nextAction,o.sourceUrl,o.documentUrl,o.checkedAt,o.verification,WORK_STATUS[local.work[o.id]||'new'],local.notes[o.id]?.text||'',local.favorites.includes(o.id)?'Да':'',local.tasks[o.id]?.text||'',local.tasks[o.id]?.dueDate||''])];
-    download('msk-expert-cases-'+(state.db.meta?.asOf||'export')+'.csv',csv(rows),'text/csv;charset=utf-8');notify('Реестр выгружен в CSV. Он включает локальные цены и заметки.');
+    const headers=['ID','Статус источника','Суд / получатель','Номер дела / закупки','Предмет','Регион','Дата акта / извещения','Срок предложения','Заседание','Опубликованная сумма, ₽','Назначение суммы','Содержание акта','Следующий шаг по исследованию','Ссылка на материал','Ссылка на документ','Проверено','Основание проверки'];
+    if(privateData)headers.push('Моя цена, ₽','Рабочий статус','Моя заметка','Избранное','Мой следующий шаг','Дата следующего действия','Задача выполнена');
+    const rows=[headers,...list.map(o=>{
+      const row=[o.id,statusLabel(o),courtName(o),o.caseNumber,o.title,o.region,o.publishedAt,o.deadline,o.hearingAt,o.amountRub,({expert_fee:'Стоимость экспертизы',claim:'Сумма иска',contract:'Цена закупки / контракта',not_published:'Не опубликовано'})[o.amountType]||o.amountType,o.decisionSummary,o.nextAction,o.sourceUrl,o.documentUrl,o.checkedAt,o.verification];
+      if(privateData)row.push(local.notes[o.id]?.proposalRub??'',WORK_STATUS[local.work[o.id]||'new'],local.notes[o.id]?.text||'',local.favorites.includes(o.id)?'Да':'',local.tasks[o.id]?.text||'',local.tasks[o.id]?.dueDate||'',local.tasks[o.id]?.completedAt||'');return row;
+    })];
+    download('msk-expert-'+(privateData?'private-work-':'public-cases-')+(state.db.meta?.asOf||'export')+'.csv',csv(rows),'text/csv;charset=utf-8');
+    if($('#export-dialog').open)$('#export-dialog').close();
+    notify(privateData?'Рабочая выгрузка сохранена. Файл содержит ваши заметки, цены и задачи.':'Публичный реестр выгружен без личных заметок, задач и цен.');
+  }
+  function chooseRegistryExport() {
+    const count=(state.view==='opportunities'?filterRecords():records()).length;
+    $('#export-content').innerHTML=`<h2 id="export-title">Состав CSV-выгрузки</h2><p>В текущем отборе: ${count} записей. Выберите, какие данные включить в файл.</p><div class="local-note"><strong>Публичный реестр</strong><p>Сведения из источников, ссылки, сроки и опубликованные суммы. Подходит для передачи коллегам.</p><button class="button primary" data-action="export-public-csv">${icon('down')}Скачать публичный CSV</button></div><div class="local-note"><strong>Моя рабочая выгрузка</strong><p>Также включает собственные цены, заметки, этапы, избранное и личные задачи. Проверьте содержимое перед передачей.</p><button class="button secondary" data-action="export-work-csv">${icon('down')}Скачать рабочий CSV</button></div><div class="dialog-actions"><button class="button ghost" data-action="close-export">Закрыть</button></div>`;
+    $('#export-dialog').showModal();
   }
   function exportCourts() {const rows=[['Суд','Тип','Регион','Официальный сайт','Поиск дел','Контакты','Email','Телефон','Адрес','Источник','Дата проверки','Примечание'],...filteredCourts().map(c=>[c.name,c.kind,c.region,c.website,c.caseSearchUrl,c.contactUrl,c.email,c.phone,c.address,c.sourceUrl,c.checkedAt,c.note])];download('msk-expert-courts.csv',csv(rows),'text/csv;charset=utf-8');}
   function closeMenu() {const wasOpen=$('#sidebar').classList.contains('open');$('#sidebar').classList.remove('open');$('#sidebar-scrim').hidden=true;$('#mobile-menu').setAttribute('aria-expanded','false');$('#app-shell').inert=false;document.body.classList.remove('menu-open');if(wasOpen&&state.menuReturnFocus?.isConnected)state.menuReturnFocus.focus({preventScroll:true});state.menuReturnFocus=null;}
@@ -571,6 +671,13 @@
       switch(action.dataset.action){
         case 'close-menu':closeMenu();break;
         case 'refresh':await loadData(true);break;
+        case 'planner-kind':if(['all','tasks','deadlines'].includes(action.dataset.kind)){state.plannerKind=action.dataset.kind;render();[...document.querySelectorAll('[data-action="planner-kind"]')].find(el=>el.dataset.kind===state.plannerKind)?.focus({preventScroll:true});}break;
+        case 'calendar-deadlines':exportCalendar('deadlines');break;
+        case 'calendar-tasks':exportCalendar('tasks');break;
+        case 'calendar-record':exportCalendar('deadlines',id);break;
+        case 'edit-task':openTask(id);break;
+        case 'close-task':closeTask();break;
+        case 'toggle-task':toggleTask(id);break;
         case 'quick-filter':{
           const preset=action.dataset.preset;setView('opportunities');Object.assign(state,FILTER_DEFAULTS);
           if(preset==='soon'){state.due='3';state.sort='deadline';}
@@ -626,9 +733,14 @@
           }break;
         }
         case 'copy-proposal':await copyProposal();break;
-        case 'download-proposal':{const f=captureForm();if(f)download('КП_'+safeFilename(f.caseNumber||'черновик')+'.txt',proposalText(f));break;}
-        case 'print-proposal':refreshPreview();window.print();break;
-        case 'export-csv':exportRegistry();break;
+        case 'download-proposal':{const f=outputForm();if(f)download('КП_'+safeFilename(f.documentNumber||f.caseNumber||'предложение')+'.txt',proposalText(f));break;}
+        case 'download-rtf':{const f=outputForm();if(f)download('КП_'+safeFilename(f.documentNumber||f.caseNumber||'предложение')+'.rtf',P.proposalRtf(f),'application/rtf');break;}
+        case 'print-proposal':printProposal();break;
+        case 'preview-proposal':refreshPreview();$('#proposal-document-panel')?.scrollIntoView?.({block:'start',behavior:'smooth'});break;
+        case 'export-csv':chooseRegistryExport();break;
+        case 'export-public-csv':exportRegistry(false);break;
+        case 'export-work-csv':exportRegistry(true);break;
+        case 'close-export':$('#export-dialog').close();break;
         case 'export-courts':exportCourts();break;
         case 'backup':download('msk-expert-private-backup-'+moscowDateKey()+'.json',JSON.stringify(exportWorkspaceSnapshot(),null,2),'application/json');notify('Копия включает заметки, задачи, избранное и черновики. Храните её приватно.');break;
         case 'raw-backup':if(storageSnapshot!==null)download('msk-expert-original-backup-'+moscowDateKey()+'.json',storageSnapshot,'application/json');else notify('Исходная копия в браузере недоступна.');break;
@@ -662,11 +774,12 @@
     const maps={'work-status-filter':'workStatus','due-filter':'due','sort-filter':'sort','region-filter':'region','court-filter':'court','court-type-filter':'courtType','source-type-filter':'sourceType','category-filter':'category'};
     if(maps[event.target.id]){state[maps[event.target.id]]=event.target.value;updateFilterResults();}
     if(event.target.id==='saved-filter-select')applySavedFilter(event.target.value);
+    if(event.target.closest('#proposal-form')&&event.target.id!=='recordId')refreshPreview();
     if(event.target.dataset.workId){
       const id=event.target.dataset.workId,next=structuredClone(local),value=event.target.value;
       if(!Object.hasOwn(WORK_STATUS,value))return;
       if(value==='new')delete next.work[id];else next.work[id]=value;
-      if(persist(next)){render();notify('Рабочий этап обновлён.');}else event.target.value=local.work[id]||'new';
+      if(persist(next)){render();[...document.querySelectorAll('[data-work-id]')].find(el=>el.dataset.workId===id)?.focus({preventScroll:true});notify('Рабочий этап обновлён.');}else event.target.value=local.work[id]||'new';
     }
     if(event.target.id==='recordId'){
       const previous=state.form?.recordId||'',value=event.target.value;
@@ -674,12 +787,13 @@
       const o=getRecord(value);
       if(value!==previous&&o&&!window.confirm('Подставить получателя, номер и предмет выбранной записи? Остальной текст и ваша цена сохранятся.')){event.target.value=previous;return;}
       captureForm();state.form.recordId=value;
-      if(o){state.form.court=courtName(o);state.form.caseNumber=o.caseNumber||'';state.form.subject=o.title||'';if(!previousForm.price&&positiveMoney(local.notes[o.id]?.proposalRub))state.form.price=String(local.notes[o.id].proposalRub);}
+      if(o){state.form.court=courtName(o);state.form.caseNumber=o.caseNumber||'';state.form.subject=o.title||'';state.form.documentKind=o.sourceType==='procurement_adjacent'?'procurement':'court';if(!previousForm.price&&positiveMoney(local.notes[o.id]?.proposalRub))state.form.price=String(local.notes[o.id].proposalRub);}
       render();
     }
   });
   document.addEventListener('submit',event=>{
     if(event.target.id==='proposal-form'){event.preventDefault();saveDraft();}
+    if(event.target.id==='task-form'){event.preventDefault();saveTask();}
     if(event.target.id==='save-filter-form'){
       event.preventDefault();const name=$('#filter-name').value.trim();if(!name||name.length>80)return;
       const next=structuredClone(local);next.savedFilters.push({id:'filter-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)),name,filters:filterSnapshot()});
@@ -697,6 +811,8 @@
     }catch{notify('Файл не похож на корректную резервную копию этой панели. Данные не изменены.');}
   });
   $('#confirm-dialog').addEventListener('close',()=>{state.importData=null;});
+  $('#task-dialog').addEventListener('cancel',event=>{event.preventDefault();closeTask();});
+  $('#task-dialog').addEventListener('close',()=>{state.taskId=null;state.taskBaseline=null;});
   $('#refresh-button').addEventListener('click',()=>loadData(true));
   $('#mobile-menu').addEventListener('click',()=>$('#sidebar').classList.contains('open')?closeMenu():openMenu());
   $('#sidebar-scrim').addEventListener('click',closeMenu);
@@ -722,7 +838,8 @@
     if(route.view!==state.view)setView(route.view);
     if(route.id){if(state.db){if(getRecord(route.id))openDetail(route.id);else notify('Запись не найдена в текущем реестре.');}else state.pendingRecord=route.id;}
   });
-  window.addEventListener('beforeunload',event=>{if(detailDirty()||draftDirty()){event.preventDefault();event.returnValue='';}});
+  window.addEventListener('afterprint',()=>{document.body.classList.remove('print-proposal');$('#print-document').innerHTML='';});
+  window.addEventListener('beforeunload',event=>{if(detailDirty()||draftDirty()||taskDirty()){event.preventDefault();event.returnValue='';}});
   hydrateIcons();readUI();
   const initial=readRoute();state.view=initial.view;state.pendingRecord=initial.id;
   Object.assign(state,FILTER_DEFAULTS,{courtType:'all'},state.filterViews[state.view]||{});

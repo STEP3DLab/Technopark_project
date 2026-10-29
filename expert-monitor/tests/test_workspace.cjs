@@ -199,3 +199,71 @@ test('Dirty detection covers every editable field, including organization, conta
   assert.equal(Object.hasOwn(w.draftComparable(baseline), 'id'), false);
   assert.equal(Object.hasOwn(w.draftComparable(baseline), 'organization'), true);
 });
+
+test('Document fields and signing defaults roundtrip while old v1 backups remain unchanged', () => {
+  const legacy = {version: 1, notes: {}, work: {}, drafts: [{id: 'legacy', court: 'Суд', price: 'уточняется'}]};
+  const oldDraft = w.normalizeWorkspace(legacy).drafts[0];
+  assert.deepEqual(oldDraft, legacy.drafts[0]);
+  assert.equal(Object.hasOwn(oldDraft, 'documentKind'), false, 'kind can be inferred from linked record by the UI');
+  const draft = {id: 'new', recordId: 'removed-record', documentKind: 'procurement', documentMode: 'letter',
+    documentDate: '2026-10-29', documentNumber: '12/Э', validUntil: '2026-12-31',
+    signatory: 'Петров Пётр Петрович', signatoryRole: 'Директор', taxNote: 'НДС 20%'};
+  const company = {organization: 'АНО', signatory: draft.signatory, signatoryRole: draft.signatoryRole, taxNote: draft.taxNote};
+  const workspace = {...w.emptyWorkspace(), drafts: [draft], company};
+  assert.deepEqual(w.normalizeWorkspace(JSON.parse(JSON.stringify(workspace))), workspace);
+  const merged = w.mergeWorkspaces(w.normalizeWorkspace(legacy), workspace);
+  assert.deepEqual(merged.drafts.map(item => item.id), ['legacy', 'new']);
+  assert.equal(merged.drafts[1].documentKind, 'procurement');
+  merged.company.signatory = 'Другой';
+  assert.equal(company.signatory, 'Петров Пётр Петрович', 'company defaults are detached');
+});
+
+test('New document fields reject invalid kinds, modes, dates and excess lengths without banning incomplete drafts', () => {
+  assert.equal(w.validDraft({id: 'empty', documentDate: '', validUntil: '', documentMode: 'draft', documentKind: 'general'}), true);
+  assert.equal(w.validDraft({id: 'leap', documentDate: '2028-02-29'}), true);
+  for (const change of [
+    {documentKind: 'unknown'}, {documentKind: ''}, {documentMode: 'sent'},
+    {documentDate: '2026-02-29'}, {documentDate: '2026-04-31'}, {documentDate: null},
+    {validUntil: '2026-10-29T00:00:00Z'}, {validUntil: '2026-13-01'},
+    {documentNumber: 'x'.repeat(101)}, {signatory: 'x'.repeat(1001)},
+    {signatoryRole: 'x'.repeat(1001)}, {taxNote: 'x'.repeat(2001)}
+  ]) {
+    assert.equal(w.validDraft({id: 'invalid', ...change}), false, JSON.stringify(Object.keys(change)));
+    assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), drafts: [{id: 'invalid', ...change}]}), null);
+  }
+  for (const [field, max] of [['signatory', 1000], ['signatoryRole', 1000], ['taxNote', 2000]]) {
+    assert.ok(w.normalizeWorkspace({...w.emptyWorkspace(), company: {[field]: 'x'.repeat(max)}}));
+    assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), company: {[field]: 'x'.repeat(max + 1)}}), null);
+    assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), company: {[field]: 42}}), null);
+  }
+});
+
+test('Task completion is optional, requires an ISO instant and never weakens updatedAt validation', () => {
+  const completed = {...task(), completedAt: '2026-10-29T10:30:00.123Z'};
+  const workspace = {...w.emptyWorkspace(), tasks: {done: completed, open: task()}};
+  assert.deepEqual(w.normalizeWorkspace(JSON.parse(JSON.stringify(workspace))), workspace);
+  for (const completedAt of ['', null, 'today', '2026-10-29', '2026-10-29T10:30:00',
+    '2026-02-30T10:00:00Z', '2026-10-29T25:00:00Z']) {
+    assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), tasks: {a: {...task(), completedAt}}}), null);
+  }
+  const noUpdatedAt = {...completed};
+  delete noUpdatedAt.updatedAt;
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), tasks: {a: noUpdatedAt}}), null);
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), tasks: {a: {...completed, updatedAt: 'local'}}}), null);
+  const current = {...w.emptyWorkspace(), tasks: {same: completed}};
+  const incoming = {...w.emptyWorkspace(), tasks: {same: task('Открытая импортированная'), new: completed}};
+  const merged = w.mergeWorkspaces(current, incoming);
+  assert.equal(merged.tasks.same.completedAt, completed.completedAt, 'current completion wins a merge conflict');
+  assert.equal(merged.tasks.new.completedAt, completed.completedAt, 'new completed task is retained');
+  assert.deepEqual(w.mergeWorkspaces(workspace, workspace), workspace, 'self-merge retains completion');
+});
+
+test('Every document setting participates in dirty detection while save timestamps do not', () => {
+  const baseline = {id: 'd', documentKind: 'general', documentMode: 'draft', documentDate: '2026-10-29',
+    documentNumber: '', signatory: 'Иванов', signatoryRole: 'Директор', taxNote: 'НДС включён', validUntil: ''};
+  for (const [field, value] of Object.entries({documentKind: 'court', documentMode: 'letter', documentDate: '2026-10-30',
+    documentNumber: '15', signatory: 'Петров', signatoryRole: 'Заместитель', taxNote: 'Без НДС', validUntil: '2026-11-15'})) {
+    assert.equal(w.isDraftDirty({...baseline, [field]: value}, baseline), true, field);
+  }
+  assert.equal(w.isDraftDirty({...baseline, createdAt: stamp, updatedAt: stamp}, baseline), false);
+});

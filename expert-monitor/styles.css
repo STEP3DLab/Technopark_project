@@ -5051,3 +5051,1179 @@ body.menu-open { overflow: hidden; }
   .source-health-grid { gap: 10px; }
   .source-health-card { padding: 16px 14px; }
 }
+
+/* v2.1 — personal planner, kept separate from source deadlines. */
+.planner-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.planner-summary-card {
+  min-width: 0;
+  padding: 17px 18px;
+  border: 1px solid #dfe7e2;
+  border-radius: 12px;
+  background: #fff;
+  color: #546f75;
+  text-align: left;
+}
+.planner-summary-card b, .planner-summary-card strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #2f6251;
+  font-size: 27px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+.planner-summary-card > span, .planner-summary-card small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.planner-summary-card.is-overdue {
+  border-color: #ead9c8;
+  background: #fffbf5;
+}
+.planner-summary-card.is-overdue b, .planner-summary-card.is-overdue strong {
+  color: #9b6232;
+}
+.planner-summary-card.is-today {
+  border-color: #c8dfd1;
+  background: #f4faf6;
+}
+button.planner-summary-card:hover, .planner-summary-card[aria-pressed="true"] {
+  border-color: #86b49c;
+  box-shadow: 0 2px 8px #12302d08;
+}
+.planner-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding: 15px 18px;
+  margin: 0 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+.planner-toolbar > * {
+  min-width: 0;
+}
+.planner-toolbar .view-switch {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.planner-toolbar .view-switch button {
+  flex-shrink: 0;
+}
+.planner-toolbar > .button-row, .planner-export-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.planner-toolbar .button {
+  font-size: 12px;
+}
+.planner-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 22px;
+  padding: 0 3px;
+  color: #627a7d;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.planner-note p {
+  margin: 0;
+}
+.planner-note svg {
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+}
+.planner-search {
+  display: flex;
+  max-width: 650px;
+  margin-bottom: 18px;
+}
+.planner-search input {
+  background: #fff;
+  min-height: 44px;
+}
+.planner-groups, .planner-agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.agenda-group {
+  --agenda-accent: #416f5a;
+  --agenda-tint: #f0f7f2;
+  --agenda-stroke: #dce9df;
+  min-width: 0;
+  margin: 0 0 18px;
+  border: 1px solid #dfe7e2;
+  border-radius: 13px;
+  background: #fff;
+  overflow: hidden;
+}
+.planner-groups > .agenda-group, .planner-agenda > .agenda-group {
+  margin-bottom: 0;
+}
+.agenda-group[data-period="overdue"] {
+  --agenda-accent: #905b31;
+  --agenda-tint: #fff6ec;
+  --agenda-stroke: #eedbc8;
+}
+.agenda-group[data-period="today"] {
+  --agenda-accent: #28664b;
+  --agenda-tint: #eaf6ed;
+  --agenda-stroke: #cfe4d4;
+}
+.agenda-group[data-period="week"], .agenda-group[data-period="next7days"] {
+  --agenda-accent: #426f76;
+  --agenda-tint: #edf6f6;
+  --agenda-stroke: #d5e6e6;
+}
+.agenda-group[data-period="undated"], .agenda-group[data-period="no-date"],
+.agenda-group[data-period="done"] {
+  --agenda-accent: #667974;
+  --agenda-tint: #f3f5f3;
+  --agenda-stroke: #e1e7e2;
+}
+.agenda-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 17px 21px;
+  border-bottom: 1px solid var(--agenda-stroke);
+  background: var(--agenda-tint);
+}
+.agenda-heading h2, .agenda-heading h3 {
+  margin: 0;
+  color: var(--agenda-accent);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+.agenda-heading > span, .agenda-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 27px;
+  height: 26px;
+  padding: 0 7px;
+  border: 1px solid var(--agenda-stroke);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--agenda-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+.agenda-heading h2 .agenda-count {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.agenda-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.agenda-item {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  min-width: 0;
+  padding: 21px;
+  border-bottom: 1px solid #e7eee9;
+  background: #fff;
+}
+.agenda-item:last-child {
+  border-bottom: 0;
+}
+.agenda-item:focus-within {
+  background: #fbfefb;
+}
+.agenda-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  min-height: 65px;
+  padding: 10px 5px;
+  border: 1px solid var(--agenda-stroke);
+  border-radius: 9px;
+  background: var(--agenda-tint);
+  color: var(--agenda-accent);
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.agenda-date b, .agenda-date strong {
+  display: block;
+  color: inherit;
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.15;
+}
+.agenda-date span, .agenda-date small, .agenda-date time {
+  display: block;
+  color: inherit;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.agenda-body {
+  min-width: 0;
+}
+.agenda-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 6px;
+  color: #668175;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.agenda-kind svg {
+  width: 12px;
+  height: 12px;
+}
+.agenda-title {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 7px;
+  border: 0;
+  background: transparent;
+  color: #2b544b;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: -.01em;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+button.agenda-title:hover, a.agenda-title:hover {
+  color: #196543;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.agenda-action {
+  margin: 0 0 10px;
+  color: #526f72;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.agenda-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+  margin-top: 9px;
+  color: #6b807a;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.agenda-meta .tag {
+  white-space: normal;
+}
+.agenda-meta .case-number {
+  font-size: 10px;
+}
+.agenda-actions {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 130px;
+}
+.agenda-actions .button {
+  min-height: 38px;
+  font-size: 11px;
+}
+.agenda-actions .button.primary {
+  background: #eef8f0;
+  border-color: #cbe3d1;
+  color: #2d6b4a;
+}
+.agenda-actions .button.primary:hover {
+  background: #e3f3e7;
+  border-color: #a9cbb2;
+}
+.agenda-item.is-done {
+  background: #fafcfa;
+}
+.agenda-item.is-done .agenda-action {
+  color: #788a80;
+  text-decoration: line-through;
+  text-decoration-color: #adbbb1;
+}
+.agenda-item.is-done .agenda-date {
+  border-color: #e0e8e1;
+  background: #f0f5f0;
+  color: #5b7a64;
+}
+.agenda-empty {
+  margin: 0;
+  padding: 24px 21px;
+  color: #70857b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.agenda-empty p {
+  margin: 0 0 12px;
+}
+.agenda-empty p:last-child {
+  margin-bottom: 0;
+}
+.agenda-orphan, .agenda-orphan-note {
+  display: block;
+  margin-top: 8px;
+  color: #8c6a42;
+  font-size: 11px;
+  line-height: 1.65;
+}
+@media (max-width: 1050px) {
+  .planner-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .agenda-item {
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 13px 15px;
+  }
+  .agenda-actions {
+    grid-column: 2;
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+@media (max-width: 600px) {
+  .planner-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-bottom: 16px;
+  }
+  .planner-summary-card {
+    padding: 14px 15px;
+  }
+  .planner-summary-card b, .planner-summary-card strong {
+    font-size: 25px;
+  }
+  .planner-toolbar {
+    padding: 13px;
+    gap: 12px;
+  }
+  .planner-toolbar .view-switch {
+    width: 100%;
+  }
+  .planner-toolbar .view-switch button {
+    flex: 1 0 auto;
+    min-height: 38px;
+    padding-inline: 9px;
+    font-size: 11px;
+  }
+  .planner-toolbar > .button-row, .planner-export-actions {
+    width: 100%;
+  }
+  .planner-toolbar .button {
+    flex: 1 1 auto;
+    min-height: 42px;
+    font-size: 12px;
+  }
+  .planner-note {
+    margin-bottom: 18px;
+    font-size: 11px;
+  }
+  .planner-search input {
+    font-size: 16px;
+  }
+  .agenda-heading {
+    padding: 15px 16px;
+  }
+  .agenda-heading h2, .agenda-heading h3 {
+    font-size: 14px;
+  }
+  .agenda-item {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 12px;
+    padding: 17px 15px;
+  }
+  .agenda-date {
+    min-height: 61px;
+    padding: 9px 4px;
+    border-radius: 8px;
+  }
+  .agenda-date b, .agenda-date strong {
+    font-size: 20px;
+  }
+  .agenda-title {
+    font-size: 13px;
+  }
+  .agenda-action {
+    font-size: 12px;
+  }
+  .agenda-meta {
+    gap: 6px;
+    font-size: 10px;
+  }
+  .agenda-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid #eaf0eb;
+  }
+  .agenda-actions .button {
+    min-height: 42px;
+    font-size: 12px;
+  }
+  .agenda-empty {
+    padding: 20px 16px;
+  }
+}
+
+/* Structured proposal preview and a dedicated, isolated print surface. */
+#print-document {
+  display: none;
+}
+.proposal-document {
+  min-width: 0;
+  margin: 0;
+  padding: 26px;
+  border: 1px solid #dfe5df;
+  border-radius: 11px;
+  background: #fff;
+  color: #35463e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+.proposal-document h1, .proposal-document h2, .proposal-document h3 {
+  font-family: inherit;
+  color: #263e32;
+  letter-spacing: 0;
+}
+.proposal-document p {
+  margin: 0 0 13px;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre-line;
+}
+.proposal-document p:last-child {
+  margin-bottom: 0;
+}
+.proposal-document ul, .proposal-document ol {
+  padding-left: 20px;
+  margin: 10px 0 16px;
+}
+.proposal-document li {
+  padding-left: 2px;
+  margin: 5px 0;
+}
+.proposal-letterhead, .proposal-document-header {
+  padding-bottom: 17px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #315b44;
+}
+.proposal-letterhead strong, .proposal-document-header strong,
+.proposal-letterhead h2, .proposal-document-header h2 {
+  display: block;
+  margin: 0 0 8px;
+  color: #284c37;
+  font-size: 17px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+.proposal-letterhead p, .proposal-document-header p,
+.proposal-letterhead small, .proposal-document-header small {
+  display: block;
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.65;
+  color: #5d7063;
+}
+.proposal-recipient, .proposal-document-recipient {
+  margin: 0 0 21px;
+  color: #415348;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.proposal-title, .proposal-document-title,
+.proposal-document .proposal-title, .proposal-document .proposal-document-title {
+  margin: 20px 0 18px;
+  color: #2a4435;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: center;
+}
+.proposal-document-body {
+  min-width: 0;
+}
+.proposal-terms, .proposal-document-terms {
+  width: 100%;
+  margin: 19px 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.proposal-terms th, .proposal-terms td,
+.proposal-document-terms th, .proposal-document-terms td {
+  padding: 10px 12px;
+  border: 1px solid #dce5dd;
+  text-align: left;
+  vertical-align: top;
+}
+.proposal-terms th, .proposal-document-terms th {
+  width: 36%;
+  background: #f4f7f3;
+  color: #405a48;
+  font-weight: 600;
+}
+.proposal-terms dt, .proposal-document-terms dt {
+  margin-top: 12px;
+  color: #36533f;
+  font-weight: 700;
+}
+.proposal-terms dd, .proposal-document-terms dd {
+  margin: 4px 0 0;
+}
+.proposal-signature, .proposal-document-signature {
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid #dce5dc;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.proposal-document-note {
+  margin-top: 22px;
+  padding-top: 13px;
+  border-top: 1px solid #e4e9e3;
+  color: #68796b;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.proposal-draft-banner {
+  display: block;
+  margin: 0 0 17px;
+  padding: 8px 11px;
+  border: 1px solid #e5d9c6;
+  border-radius: 5px;
+  background: #fffaf1;
+  color: #806639;
+  font-family: "Montserrat", Inter, "Segoe UI", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.65;
+}
+.proposal-preview {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  tab-size: 4;
+}
+.proposal-preview.proposal-document {
+  white-space: normal;
+}
+@media (max-width: 600px) {
+  .proposal-document {
+    padding: 21px 18px;
+    font-size: 13px;
+  }
+  .proposal-letterhead strong, .proposal-document-header strong,
+  .proposal-letterhead h2, .proposal-document-header h2 {
+    font-size: 17px;
+  }
+  .proposal-title, .proposal-document-title,
+  .proposal-document .proposal-title, .proposal-document .proposal-document-title {
+    font-size: 15px;
+  }
+  .proposal-terms th, .proposal-terms td,
+  .proposal-document-terms th, .proposal-document-terms td {
+    padding: 8px;
+    font-size: 11px;
+  }
+}
+@page proposal {
+  size: A4;
+  margin: 18mm 19mm 20mm;
+}
+@media print {
+  .planner-toolbar, .planner-search, .agenda-actions {
+    display: none;
+  }
+  .agenda-heading {
+    break-after: avoid;
+    background: #fff;
+  }
+  .agenda-item {
+    break-inside: avoid;
+  }
+  body.print-proposal {
+    display: block;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    width: auto;
+    background: #fff;
+    color: #000;
+    page: proposal;
+  }
+  body.print-proposal > :not(#print-document) {
+    display: none !important;
+  }
+  body.print-proposal > #print-document {
+    display: block !important;
+    position: static;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    color: #000;
+    box-shadow: none;
+    overflow: visible;
+    page: proposal;
+  }
+  #print-document .proposal-document {
+    display: block;
+    position: static;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: #000;
+    box-shadow: none;
+    overflow: visible;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    break-inside: auto;
+  }
+  #print-document p, #print-document li {
+    orphans: 3;
+    widows: 3;
+    break-inside: auto;
+  }
+  #print-document p {
+    margin-bottom: 3.5mm;
+  }
+  #print-document h1, #print-document h2, #print-document h3 {
+    color: #000;
+    break-after: avoid;
+    break-inside: avoid;
+  }
+  #print-document .proposal-letterhead, #print-document .proposal-document-header {
+    margin-bottom: 5mm;
+    padding-bottom: 4mm;
+    border-color: #333;
+    break-inside: avoid;
+  }
+  #print-document .proposal-letterhead strong, #print-document .proposal-document-header strong,
+  #print-document .proposal-letterhead h2, #print-document .proposal-document-header h2 {
+    color: #000;
+    font-size: 15pt;
+  }
+  #print-document .proposal-letterhead p, #print-document .proposal-document-header p,
+  #print-document .proposal-letterhead small, #print-document .proposal-document-header small {
+    color: #333;
+    font-size: 9pt;
+    line-height: 1.45;
+  }
+  #print-document .proposal-recipient, #print-document .proposal-document-recipient {
+    margin-bottom: 5mm;
+    color: #111;
+    font-size: 10.5pt;
+    break-inside: avoid;
+  }
+  #print-document .proposal-title, #print-document .proposal-document-title {
+    margin: 5mm 0;
+    color: #000;
+    font-size: 12.5pt;
+    line-height: 1.4;
+    break-after: avoid;
+    break-inside: avoid;
+  }
+  #print-document .proposal-document-body {
+    break-inside: auto;
+  }
+  #print-document .proposal-terms, #print-document .proposal-document-terms {
+    margin: 5mm 0;
+    font-size: 10.5pt;
+    break-inside: auto;
+  }
+  #print-document .proposal-terms tr, #print-document .proposal-document-terms tr {
+    break-inside: avoid;
+  }
+  #print-document .proposal-terms th, #print-document .proposal-terms td,
+  #print-document .proposal-document-terms th, #print-document .proposal-document-terms td {
+    padding: 2.5mm 3mm;
+    border-color: #aaa;
+    background: #fff;
+    color: #111;
+    font-size: 10.5pt;
+  }
+  #print-document .proposal-signature, #print-document .proposal-document-signature {
+    margin-top: 7mm;
+    padding-top: 4mm;
+    border-color: #aaa;
+    color: #000;
+    font-size: 10.5pt;
+    break-inside: avoid;
+  }
+  #print-document .proposal-document-note {
+    margin-top: 5mm;
+    padding-top: 3mm;
+    border-color: #bbb;
+    color: #444;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    break-inside: auto;
+  }
+  #print-document .proposal-draft-banner {
+    margin-bottom: 4mm;
+    padding: 2mm 3mm;
+    border-color: #aaa;
+    border-radius: 0;
+    background: #fff;
+    color: #444;
+    font-size: 8.5pt;
+    break-after: avoid;
+    break-inside: avoid;
+  }
+  #print-document a {
+    color: #000;
+    text-decoration: none;
+  }
+  #print-document button, #print-document input, #print-document select,
+  #print-document textarea, #print-document .no-print {
+    display: none;
+  }
+  .proposal-preview {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+/* Structured letter details: terms are a definition list of short rows. */
+.proposal-document-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 15px;
+  margin: 0 0 18px;
+  color: #627365;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.proposal-document .proposal-document-note {
+  font-size: 10px;
+  line-height: 1.7;
+}
+.proposal-document h2 {
+  margin: 19px 0 10px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.proposal-document h3 {
+  margin: 16px 0 9px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.proposal-terms > div, .proposal-document-terms > div {
+  display: grid;
+  grid-template-columns: minmax(80px, .85fr) minmax(0, 1.15fr);
+  gap: 13px;
+  padding: 11px 0;
+  border-bottom: 1px solid #e2e9e1;
+}
+.proposal-terms > div:first-child, .proposal-document-terms > div:first-child {
+  border-top: 1px solid #e2e9e1;
+}
+.proposal-terms > div > dt, .proposal-terms > div > dd,
+.proposal-document-terms > div > dt, .proposal-document-terms > div > dd {
+  margin: 0;
+  min-width: 0;
+}
+.proposal-signature-line {
+  margin-top: 15px;
+  line-height: 2;
+  overflow-wrap: anywhere;
+}
+.proposal-draft-banner strong {
+  display: block;
+  margin-bottom: 4px;
+}
+.proposal-draft-banner ul, .proposal-draft-banner ol {
+  margin: 5px 0 1px;
+  padding-left: 17px;
+}
+.proposal-draft-banner li {
+  margin: 2px 0;
+}
+@media print {
+  #print-document .proposal-document-meta {
+    margin-bottom: 5mm;
+    color: #333;
+    font-size: 9pt;
+    break-inside: avoid;
+  }
+  #print-document .proposal-document h2 {
+    margin: 5mm 0 3mm;
+    font-size: 11pt;
+  }
+  #print-document .proposal-document h3 {
+    margin: 4mm 0 2.5mm;
+    font-size: 10.5pt;
+  }
+  #print-document .proposal-letterhead h2,
+  #print-document .proposal-document-header h2 {
+    margin: 0 0 2mm;
+    font-size: 15pt;
+  }
+  #print-document .proposal-terms > div, #print-document .proposal-document-terms > div {
+    grid-template-columns: 50mm minmax(0, 1fr);
+    gap: 5mm;
+    padding: 3mm 0;
+    border-color: #bbb;
+    break-inside: avoid;
+  }
+  #print-document .proposal-terms > div > dt, #print-document .proposal-terms > div > dd,
+  #print-document .proposal-document-terms > div > dt, #print-document .proposal-document-terms > div > dd {
+    color: #111;
+    font-size: 10.5pt;
+  }
+  #print-document .proposal-signature-line {
+    margin-top: 5mm;
+  }
+  #print-document .proposal-document .proposal-document-note {
+    font-size: 8.5pt;
+    line-height: 1.5;
+  }
+}
+
+/* v2.1 integration: nested planner panels and a full-width letter viewer. */
+[data-page="planner"] > .panel > .planner-toolbar {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+.planner-toolbar > .search-field {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+.planner-toolbar > .search-field input {
+  min-height: 42px;
+  background: #fafcfb;
+  font-size: 13px;
+}
+#planner-results {
+  min-width: 0;
+  padding: 18px;
+  background: #f7faf7;
+}
+#planner-results > .agenda-group:last-child {
+  margin-bottom: 0;
+}
+.agenda-group > summary {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  cursor: pointer;
+}
+.agenda-group > summary::-webkit-details-marker {
+  display: none;
+}
+.agenda-group > summary:focus-visible {
+  outline-offset: -3px;
+}
+.agenda-group > summary .agenda-heading {
+  position: relative;
+  padding-right: 48px;
+}
+.agenda-group > summary .agenda-heading::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 5px);
+  right: 22px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--agenda-accent);
+  border-bottom: 1.5px solid var(--agenda-accent);
+  transform: rotate(45deg);
+}
+.agenda-group[open] > summary .agenda-heading::after {
+  top: calc(50% - 1px);
+  transform: rotate(225deg);
+}
+.agenda-group:not([open]) > summary .agenda-heading {
+  border-bottom: 0;
+}
+.agenda-heading .panel-count {
+  margin-left: 0;
+}
+.agenda-body > .agenda-meta:first-child {
+  margin: 0 0 9px;
+}
+.agenda-meta .agenda-kind {
+  margin: 0;
+}
+.agenda-date b, .agenda-date strong {
+  font-size: 16px;
+  line-height: 1.35;
+}
+.agenda-body .field-hint {
+  overflow-wrap: anywhere;
+}
+.agenda-actions > .icon-button {
+  align-self: flex-end;
+}
+.planner-note {
+  display: block;
+  margin: 15px 3px 0;
+  padding: 0;
+}
+.planner-note > strong {
+  margin-right: 4px;
+  color: #486a5b;
+}
+#task-form > .field + .field {
+  margin-top: 16px;
+}
+#task-form > .field-hint {
+  margin-top: 12px;
+}
+.proposal-preview-panel {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid #dce5dd;
+  border-radius: 14px;
+  background: #edf2ee;
+}
+.proposal-preview-panel .preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 0 0 20px;
+}
+.proposal-preview-panel .preview-toolbar h2 {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+  color: #3e6150;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.proposal-preview-panel .preview-toolbar .button-row {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.proposal-preview-panel > .proposal-preview {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  white-space: normal;
+  overflow: visible;
+}
+.proposal-preview-panel .proposal-document {
+  width: 100%;
+  max-width: 794px;
+  max-height: none;
+  margin: 0 auto;
+  padding: 42px 50px;
+  border: 1px solid #dce4dc;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 5px 18px #244c3510;
+  color: #314337;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.proposal-preview-panel .proposal-letterhead strong,
+.proposal-preview-panel .proposal-document-header strong,
+.proposal-preview-panel .proposal-letterhead h2,
+.proposal-preview-panel .proposal-document-header h2 {
+  font-size: 20px;
+}
+.proposal-preview-panel .proposal-recipient,
+.proposal-preview-panel .proposal-document-recipient,
+.proposal-preview-panel .proposal-terms,
+.proposal-preview-panel .proposal-document-terms,
+.proposal-preview-panel .proposal-signature,
+.proposal-preview-panel .proposal-document-signature {
+  font-size: 14px;
+}
+.proposal-preview-panel .proposal-title,
+.proposal-preview-panel .proposal-document-title {
+  font-size: 18px;
+}
+.proposal-preview-panel .proposal-document .proposal-document-note {
+  font-size: 11px;
+}
+.proposal-readiness {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid #dbe7dd;
+  border-radius: 9px;
+  background: #f2f8f3;
+  color: #557260;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.proposal-readiness h3, .proposal-readiness strong {
+  color: #366345;
+  font-size: 13px;
+}
+.proposal-readiness p {
+  margin: 5px 0 0;
+}
+.proposal-readiness ul {
+  margin: 7px 0 0;
+  padding-left: 18px;
+}
+.proposal-readiness.needs-attention, .proposal-readiness.is-incomplete {
+  border-color: #e7ddc7;
+  background: #fffbf2;
+  color: #836b40;
+}
+.proposal-readiness.needs-attention strong,
+.proposal-readiness.is-incomplete strong {
+  color: #7d602d;
+}
+@media (max-width: 1050px) {
+  .planner-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 820px) {
+  .proposal-preview-panel .proposal-document {
+    padding: 32px;
+  }
+}
+@media (max-width: 600px) {
+  .planner-toolbar > .search-field {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+  .planner-toolbar > .search-field input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  #planner-results {
+    padding: 11px;
+  }
+  .agenda-date b, .agenda-date strong {
+    font-size: 15px;
+  }
+  .agenda-group > summary .agenda-heading {
+    padding-right: 43px;
+  }
+  .agenda-group > summary .agenda-heading::after {
+    right: 18px;
+  }
+  .proposal-preview-panel {
+    padding: 15px 12px;
+  }
+  .proposal-preview-panel .preview-toolbar {
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .proposal-preview-panel .preview-toolbar h2 {
+    flex-basis: 100%;
+    font-size: 14px;
+  }
+  .proposal-preview-panel .preview-toolbar .button-row {
+    width: 100%;
+  }
+  .proposal-preview-panel .preview-toolbar .button {
+    min-height: 42px;
+    flex: 1 1 auto;
+  }
+  .proposal-preview-panel .proposal-document {
+    padding: 23px 18px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .proposal-preview-panel .proposal-letterhead strong,
+  .proposal-preview-panel .proposal-document-header strong,
+  .proposal-preview-panel .proposal-letterhead h2,
+  .proposal-preview-panel .proposal-document-header h2 {
+    font-size: 18px;
+  }
+  .proposal-preview-panel .proposal-title,
+  .proposal-preview-panel .proposal-document-title {
+    font-size: 16px;
+  }
+  .proposal-preview-panel .proposal-terms,
+  .proposal-preview-panel .proposal-document-terms {
+    font-size: 12px;
+  }
+  .proposal-preview-panel .proposal-terms > div,
+  .proposal-preview-panel .proposal-document-terms > div {
+    gap: 10px;
+  }
+}
+@media print {
+  .proposal-preview-panel {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #fff;
+  }
+  .proposal-preview-panel .proposal-document {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  .proposal-readiness {
+    display: none;
+  }
+}

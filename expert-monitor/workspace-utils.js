@@ -16,11 +16,14 @@
     id: 200, recordId: 200, court: 1000, caseNumber: 300, subject: 5000,
     organization: 1000, requisites: 10000, contact: 2000, expert: 1000,
     qualification: 20000, conditions: 20000, attachments: 20000,
-    createdAt: 100, updatedAt: 100, price: 100, days: 100
+    createdAt: 100, updatedAt: 100, price: 100, days: 100,
+    documentKind: 16, documentMode: 16, documentDate: 10, documentNumber: 100,
+    signatory: 1000, signatoryRole: 1000, taxNote: 2000, validUntil: 10
   });
   const DRAFT_EDITABLE_FIELDS = Object.freeze(Object.keys(DRAFT_LIMITS)
     .filter(key => !['id', 'createdAt', 'updatedAt'].includes(key)));
-  const COMPANY_FIELDS = new Set(['organization', 'requisites', 'contact', 'expert', 'qualification']);
+  const COMPANY_FIELDS = new Set(['organization', 'requisites', 'contact', 'expert', 'qualification',
+    'signatory', 'signatoryRole', 'taxNote']);
   const CHECK_FIELDS = new Set(['stage', 'scope', 'eligibility', 'materials', 'deadline', 'channel']);
   const FILTER_FIELDS = new Set([
     'search', 'status', 'region', 'court', 'sourceType', 'workStatus', 'due',
@@ -74,10 +77,14 @@
 
   function validDraft(draft) {
     return safeObject(draft) && validId(draft.id)
-      && Object.entries(draft).every(([key, value]) => Object.hasOwn(DRAFT_LIMITS, key)
-        && (key === 'price' || key === 'days'
-          ? validString(value, 100) || validMoney(value)
-          : validString(value, DRAFT_LIMITS[key])));
+      && Object.entries(draft).every(([key, value]) => {
+        if (!Object.hasOwn(DRAFT_LIMITS, key)) return false;
+        if (key === 'price' || key === 'days') return validString(value, 100) || validMoney(value);
+        if (key === 'documentKind') return ['court', 'procurement', 'general'].includes(value);
+        if (key === 'documentMode') return ['draft', 'letter'].includes(value);
+        if (key === 'documentDate' || key === 'validUntil') return value === '' || validDateKey(value);
+        return validString(value, DRAFT_LIMITS[key]);
+      });
   }
 
   function validDateKey(value) {
@@ -110,10 +117,11 @@
   }
 
   function validTask(task) {
-    return allowedFields(task, new Set(['text', 'dueDate', 'updatedAt']))
+    return allowedFields(task, new Set(['text', 'dueDate', 'updatedAt', 'completedAt']))
       && validString(task.text, 2000)
       && (task.dueDate === '' || validDateKey(task.dueDate))
-      && validTimestamp(task.updatedAt);
+      && validTimestamp(task.updatedAt)
+      && (task.completedAt === undefined || validTimestamp(task.completedAt));
   }
 
   function validChecks(checks) {
@@ -140,7 +148,8 @@
       || !denseArray(raw.drafts, 5000)
       || !raw.drafts.every(validDraft) || !uniqueIds(raw.drafts)) return false;
     if (raw.company !== undefined && (!allowedFields(raw.company, COMPANY_FIELDS)
-      || !Object.values(raw.company).every(value => validString(value, 20000)))) return false;
+      || !Object.entries(raw.company).every(([key, value]) =>
+        validString(value, ['signatory', 'signatoryRole', 'taxNote'].includes(key) ? DRAFT_LIMITS[key] : 20000)))) return false;
     if (raw.favorites !== undefined && (!denseArray(raw.favorites, 10000)
       || !raw.favorites.every(validId)
       || new Set(raw.favorites).size !== raw.favorites.length)) return false;

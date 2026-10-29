@@ -1,0 +1,46 @@
+name: Expert monitor — application checks
+
+on:
+  push:
+    paths:
+      - 'expert-monitor/**'
+      - '.github/workflows/expert-monitor-checks.yml'
+  pull_request:
+    paths:
+      - 'expert-monitor/**'
+      - '.github/workflows/expert-monitor-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: expert-monitor-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate application syntax
+        run: |
+          node --check expert-monitor/app.js
+          node --check expert-monitor/monitor-utils.js
+          node --check expert-monitor/workspace-utils.js
+      - name: Test filters, private workspace and application behavior
+        run: |
+          node expert-monitor/tests/test_filters.cjs
+          node expert-monitor/tests/test_workspace.cjs
+          node expert-monitor/tests/test_app.cjs
+      - name: Test public-source monitoring and validate the research registry
+        run: |
+          python -m unittest discover -s expert-monitor/tests -v
+          python expert-monitor/scripts/validate.py --data-dir expert-monitor/data

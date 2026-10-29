@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="no-referrer">
+  <title>Внутренняя проверка адаптивности — МСК Эксперт</title>
+  <style>
+    :root {color-scheme:light;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#25453e;background:#eff4f0;font-size:14px}
+    * {box-sizing:border-box}
+    body {margin:0;padding:24px}
+    h1 {margin:0 0 8px;font-size:23px;line-height:1.35}
+    p {margin:0 0 18px;color:#5f776d;line-height:1.7}
+    a {color:#287450}
+    .shell {max-width:1440px;margin:0 auto}
+    .tools {display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px;padding:16px;border:1px solid #d8e4da;border-radius:12px;background:white}
+    label {display:flex;flex-direction:column;gap:7px;color:#526f5d;font-size:12px;font-weight:600}
+    select,button {font:inherit;min-height:42px;border:1px solid #ccddd0;border-radius:7px;background:white;color:#315841;padding:9px 12px}
+    button {cursor:pointer;font-size:13px;font-weight:600}
+    button:hover {background:#f1f8f3;border-color:#80af90}
+    :focus-visible {outline:3px solid #16734f;outline-offset:3px}
+    .metrics {display:flex;align-items:center;flex-wrap:wrap;gap:8px 20px;margin:14px 0;padding:15px 17px;border:1px solid #d8e4da;border-radius:10px;background:white;font-size:12px;line-height:1.7}
+    .metrics b {font-variant-numeric:tabular-nums;color:#315b43}
+    #qa-status {display:inline-block;padding:4px 10px;border-radius:5px;font-weight:650;background:#edf2ee;color:#5b7464}
+    #qa-status[data-result="pass"] {background:#e3f3e7;color:#28603b}
+    #qa-status[data-result="fail"] {background:#fff0e5;color:#8b4b29}
+    #qa-status[data-result="error"] {background:#f8e9e7;color:#8f4641}
+    .stage {max-width:100%;overflow-x:auto;padding:18px 0 24px;scrollbar-width:thin}
+    .frame-wrap {width:max-content;max-width:none;margin:0 auto;box-shadow:0 8px 35px #163a2414;border-radius:10px;overflow:hidden;border:1px solid #bcd1c1;background:white}
+    iframe {display:block;width:390px;height:940px;max-width:none;border:0;background:white}
+    details {margin:0 0 13px;padding:13px 17px;border:1px solid #d9e4db;border-radius:9px;background:white;font-size:12px;line-height:1.7}
+    summary {cursor:pointer;color:#43664d;font-weight:600}
+    #qa-overflow {padding-left:20px;margin:12px 0 0;overflow-wrap:anywhere}
+    #qa-note {font-size:12px;margin:0 0 12px}
+    code {font-family:ui-monospace,"Cascadia Code",monospace;font-size:11px}
+    .foot {font-size:11px;color:#708577;margin-top:12px}
+    @media(max-width:600px) {body{padding:15px}h1{font-size:20px}.tools{padding:13px;gap:10px}label{flex:1 1 130px}select{font-size:16px}.tools button{flex:1 1 130px}.metrics{gap:7px 14px}.stage{padding-top:10px}.frame-wrap{margin:0}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <h1>Внутренняя проверка адаптивности</h1>
+    <p>МСК Эксперт · ручная проверка опубликованного приложения в заданной ширине. Измерения относятся к документу внутри рамки.</p>
+    <section class="tools" aria-label="Параметры проверки">
+      <label for="check-view">Раздел<select id="check-view"><option value="planner" selected>Планировщик</option value="overview">Обзор</option><option value="opportunities">Реестр</option><option value="workspace">Моя работа</option><option value="proposals">Предложения</option><option value="sources">Источники</option><option value="courts">Суды</option><option value="guide">Инструкция</option></select></label>
+      <label for="check-width">Ширина области<select id="check-width"><option value="360">360 px</option><option value="390" selected>390 px</option><option value="768">768 px</option><option value="1280">1280 px</option></select></label>
+      <button type="button" id="check-report">Проверить размеры</button>
+      <button type="button" id="check-reload">Обновить приложение</button>
+    </section>
+    <section class="metrics" aria-label="Результаты измерений" aria-live="polite">
+      <span id="qa-status" data-result="pending">Ожидание приложения</span>
+      <span>Ширина рамки: <b id="qa-frame-width">390</b> px</span>
+      <span>Viewport: <b id="qa-viewport">—</b> px</span>
+      <span>Ширина документа: <b id="qa-scroll-width">—</b> px</span>
+      <span>Переполнение: <b id="qa-overflow-px">—</b> px</span>
+      <span>Раздел: <b id="qa-current-view">—</b></span>
+    </section>
+    <p id="qa-note">Сама проверочная страница не сохраняет данные, не экспортирует документы и не обращается к внешним сервисам. Действия внутри рамки выполняются обычным приложением в этом браузере.</p>
+    <details id="qa-details"><summary>Элементы, выходящие за правую границу документа</summary><ul id="qa-overflow"><li>Проверка ещё не выполнена.</li></ul></details>
+    <div class="stage" aria-label="Область просмотра приложения">
+      <div class="frame-wrap"><iframe id="check-frame" title="МСК Эксперт — проверяемое приложение, ширина 390 пикселей" src="../index.html#planner" width="390" height="940" referrerpolicy="no-referrer"></iframe></div>
+    </div>
+    <p class="foot">Это служебный тестовый стенд. Для обычной работы откройте <a href="../index.html">панель МСК Эксперт</a>. Горизонтальная прокрутка самого стенда при широкой рамке допустима; индикатор оценивает только внутренний документ.</p>
+  </main>
+  <script>
+    'use strict';
+    (() => {
+      const $ = id => document.getElementById(id);
+      const frame = $('check-frame');
+      const views = new Set(['planner','overview','opportunities','workspace','proposals','sources','courts','guide']);
+      const widths = new Set([360,390,768,1280]);
+      let observer = null;
+      let reportTimer = null;
+      function scheduleReport() {clearTimeout(reportTimer);reportTimer=setTimeout(report,160);}
+      function setStatus(text,result) {$('qa-status').textContent=text;$('qa-status').dataset.result=result;}
+      function describe(node) {
+        let text=node.tagName.toLowerCase();
+        if(node.id)text+='#'+node.id;
+        else if(typeof node.className==='string')text+='.'+node.className.trim().split(/\s+/).filter(Boolean).slice(0,3).join('.');
+        return text.replace(/\.$/,'');
+      }
+      function clippedByAncestor(node,win) {
+        let parent=node.parentElement;
+        while(parent&&parent!==win.document.body&&parent!==win.document.documentElement) {
+          const overflow=win.getComputedStyle(parent).overflowX;
+          if(['auto','scroll','hidden','clip'].includes(overflow))return true;
+          parent=parent.parentElement;
+        }
+        return false;
+      }
+      function report() {
+        try {
+          const win=frame.contentWindow;
+          const doc=frame.contentDocument;
+          if(!win||!doc||!doc.body){setStatus('Приложение ещё загружается','pending');return;}
+          const viewport=doc.documentElement.clientWidth||win.innerWidth;
+          const total=Math.max(doc.documentElement.scrollWidth,doc.body.scrollWidth);
+          const overflow=Math.max(0,total-viewport);
+          $('qa-frame-width').textContent=String(Math.round(frame.getBoundingClientRect().width));
+          $('qa-viewport').textContent=String(viewport);
+          $('qa-scroll-width').textContent=String(total);
+          $('qa-overflow-px').textContent=String(overflow);
+          const page=doc.querySelector('[data-page]');
+          $('qa-current-view').textContent=page? page.getAttribute('data-page') : 'Загрузка';
+          setStatus(overflow>1?'Есть горизонтальное переполнение':page?'Переполнения нет':'Макет загружается',overflow>1?'fail':page?'pass':'pending');
+          const hits=[];
+          for(const node of doc.body.querySelectorAll('*')) {
+            if(hits.length>=12)break;
+            const rect=node.getBoundingClientRect();
+            if(rect.width<1||rect.height<1||rect.left>=viewport||rect.right<=viewport+1)continue;
+            if(clippedByAncestor(node,win))continue;
+            hits.push({name:describe(node),right:Math.round(rect.right),width:Math.round(rect.width)});
+          }
+          const list=$('qa-overflow');list.replaceChildren();
+          if(!hits.length){const li=document.createElement('li');li.textContent='Выступающих элементов не найдено. Вложенные таблицы с собственной прокруткой исключены.';list.appendChild(li);}
+          for(const hit of hits){const li=document.createElement('li');const code=document.createElement('code');code.textContent=hit.name;li.appendChild(code);li.appendChild(document.createTextNode(' · правая граница '+hit.right+' px · ширина '+hit.width+' px'));list.appendChild(li);}
+        } catch(error) {
+          setStatus('Не удалось прочитать рамку','error');
+          $('qa-current-view').textContent='Недоступен';
+          const li=document.createElement('li');li.textContent='Измерение требует, чтобы стенд и приложение были опубликованы на одном домене. '+String(error.message||error);$('qa-overflow').replaceChildren(li);
+        }
+      }
+      function observeFrame() {
+        if(observer)observer.disconnect();
+        try {
+          if(frame.contentDocument?.body){observer=new MutationObserver(scheduleReport);observer.observe(frame.contentDocument.body,{childList:true,subtree:true,attributes:true});}
+        } catch { /* report() explains a cross-origin or failed load. */ }
+        scheduleReport();
+      }
+      $('check-width').addEventListener('change',event=>{
+        const width=Number(event.target.value);if(!widths.has(width))return;
+        frame.style.width=width+'px';frame.setAttribute('width',String(width));
+        frame.title='МСК Эксперт — проверяемое приложение, ширина '+width+' пикселей';
+        scheduleReport();
+      });
+      $('check-view').addEventListener('change',event=>{
+        const view=event.target.value;if(!views.has(view))return;
+        frame.src='../index.html#'+view;setStatus('Переход к разделу','pending');scheduleReport();
+      });
+      $('check-report').addEventListener('click',report);
+      $('check-reload').addEventListener('click',()=>{const view=$('check-view').value;if(!views.has(view))return;frame.src='../index.html?qa_reload='+Date.now()+'#'+view;setStatus('Обновление приложения','pending');});
+      frame.addEventListener('load',observeFrame);
+      window.addEventListener('resize',scheduleReport);
+      if(frame.contentDocument?.readyState==='complete')observeFrame();
+    })();
+  </script>
+</body>
+</html>

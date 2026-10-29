@@ -24,7 +24,7 @@ test('the actual HTML provides every literal controller ID exactly once and keep
   assert.match(html,/<dialog\b[^>]*\bid=['"]avatar-focus-dialog['"]/,'Large view must use a native dialog');
 });
 
-async function harness(){
+async function harness({fetchResponse,beforeReady}={}){
   const elements=new Map(),timers=new Map(),rafs=new Map();let now=0,timerId=0,rafId=0,heldVision=null,cameraDeferred=null,stopped=0;
   class El{
     constructor(id=''){
@@ -53,19 +53,76 @@ async function harness(){
   const nav=['text','camera','video','about'].map(mode=>{const el=new El();el.dataset.mode=mode;return el;});
   const document={hidden:false,activeElement:null,getElementById:get,createElement:()=>new El(),querySelectorAll:()=>nav,querySelector:selector=>selector==='.avatar-card'?get('avatar-card'):new El(),addEventListener(){}};
   class Avatar{load(){}clear(){}resize(){}showAt(){}setScene(){}setAppearance(){}}
-  const stream={getTracks:()=>[{stop(){stopped++;}}]};
+  const track=new EventTarget();track.stop=()=>{stopped++;};
+  const stream={getTracks:()=>[track]};
+  const defaultFetch=async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:url.includes('recognition-library')?library:url.includes('evaluation-v07')?benchmark:motionByUrl.get(url)});
   const context=vm.createContext({document,CanvasAvatar:Avatar,TrialProtocol,SessionLedger,frameReadiness,DEMO_SOURCES,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
     window:{addEventListener(){},speechSynthesis:{cancel(){}}},navigator:{mediaDevices:{getUserMedia:()=>cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}},
-    location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,performance:{now:()=>now},
+    location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,AbortController,performance:{now:()=>now},
     matchMedia:()=>({matches:false}),requestAnimationFrame:cb=>{rafs.set(++rafId,cb);return rafId;},cancelAnimationFrame:id=>rafs.delete(id),
     setTimeout:cb=>{timers.set(++timerId,cb);return timerId;},clearTimeout:id=>timers.delete(id),
     loadVision:()=>heldVision?.promise||Promise.resolve(),resetVision:async()=>{},detect:()=>new Promise(()=>{}),
-    fetch:async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:url.includes('recognition-library')?library:url.includes('evaluation-v07')?benchmark:motionByUrl.get(url)}),console,
+    fetch:(url,options)=>fetchResponse?fetchResponse(url,options,defaultFetch):defaultFetch(url),console,
   });
-  const api=await vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare,setVisualMode};})()`,context);
+  const ready=vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare,setVisualMode};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
-  return{api,get,document,timers,frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
+  const controls={get,document,timers,window:context.window,endCamera:()=>track.dispatchEvent(new Event('ended')),frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
+  await beforeReady?.(controls);
+  return{...controls,api:await ready};
 }
+
+test('a stalled initial motion body times out, leaves controls usable and cannot replace a later successful retry',async()=>{
+  let stalled=false,signal,releaseBody,stalledMotion;
+  const h=await harness({
+    fetchResponse(url,options,fallback){
+      if(!stalled&&url.includes('/motion/')){
+        stalled=true;signal=options.signal;stalledMotion=motionByUrl.get(url);
+        return Promise.resolve({ok:true,json:()=>new Promise(resolve=>{releaseBody=resolve;})});
+      }
+      return fallback(url);
+    },
+    async beforeReady(controls){
+      await new Promise(resolve=>setImmediate(resolve));
+      assert.equal(signal.aborted,false);assert.equal(controls.get('active-word').textContent,'Загрузка…');
+      controls.advance(15001);
+    },
+  });
+  assert.equal(signal.aborted,true);assert.equal(h.api.s.data,null);assert.equal(h.get('play').disabled,true);
+  assert.equal(h.window.hearingEquality.state().ready,false);
+  await h.api.selectWord('hello');assert.equal(h.api.s.selected.id,'hello');assert.ok(h.api.s.data);
+  const loaded=h.api.s.data;
+  releaseBody(stalledMotion);await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(h.api.s.selected.id,'hello');assert.equal(h.api.s.data,loaded);assert.equal(h.get('play').disabled,false);
+});
+
+test('an ended camera track cancels a gesture in progress without creating a recognition attempt',async()=>{
+  const h=await harness();h.api.setMode('camera');await h.api.startCamera();
+  assert.equal(h.api.s.capturing,true);h.api.recordGesture();h.advance(2100);
+  assert.ok(h.api.s.recordFrames);h.endCamera();h.advance(4000);
+  assert.equal(h.api.s.stream,null);assert.equal(h.api.s.capturing,false);assert.equal(h.api.s.recordFrames,null);
+  assert.equal(h.api.s.recordPending,false);assert.equal(h.api.ledger.attempts.length,0);assert.equal(h.stopped(),1);
+  assert.equal(h.get('record').disabled,true);assert.equal(h.get('start-camera').hidden,false);assert.equal(h.get('start-camera').disabled,false);
+  assert.equal(h.get('record-indicator').hidden,true);assert.match(h.get('capture-notice').textContent,/Камера отключилась/);
+});
+
+test('leaving dialogue aborts dictation, resets both controls and ignores a late speech result',async()=>{
+  const h=await harness(),recognitions=[];
+  h.window.SpeechRecognition=class{
+    constructor(){this.aborted=false;recognitions.push(this);}
+    start(){}abort(){this.aborted=true;this.onend?.();}
+  };
+  h.api.setMode('dialogue');h.get('employee-text').value='Сохранённый ответ';h.get('dictate-reply').click();
+  const previous=recognitions[0];assert.ok(previous);assert.equal(h.api.s.speech,previous);
+  assert.equal(h.get('dictate-reply').getAttribute('aria-pressed'),'true');assert.equal(h.get('dictate').classList.contains('recording'),true);
+  h.api.setMode('text');
+  assert.equal(previous.aborted,true);assert.equal(h.api.s.speech,null);
+  assert.equal(h.get('dictate-reply').getAttribute('aria-pressed'),'false');assert.equal(h.get('dictate').classList.contains('recording'),false);
+  const textBefore=h.get('message').value;
+  previous.onresult({results:[[{transcript:'Поздний результат'}]]});previous.onend();
+  assert.equal(h.get('message').value,textBefore);assert.equal(h.get('employee-text').value,'Сохранённый ответ');
+  h.get('dictate').click();assert.equal(recognitions.length,2);assert.equal(h.api.s.speech,recognitions[1]);
+  h.get('dictate').click();assert.equal(recognitions[1].aborted,true);assert.equal(h.api.s.speech,null);
+});
 test('scrub uses requested position rather than the position restored by pause',async()=>{
   const h=await harness();h.get('timeline').value='500';h.get('timeline').emit('input');
   assert.equal(h.api.s.time,h.api.s.data.duration/2);

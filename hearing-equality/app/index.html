@@ -4,9 +4,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#223260"><meta name="description" content="Равенство по слуху: исследовательский прототип двусторонней коммуникации. Жесты, текст, голос и цифровой аватар в одном пространстве.">
 <title>Равенство по слуху · пространство диалога</title>
-<link rel="stylesheet" href="platform.css?v=0.7">
-<link rel="stylesheet" href="dialogue.css?v=0.7">
-<link rel="stylesheet" href="rgsu.css?v=0.9">
+<link rel="stylesheet" href="platform.css?v=0.10.0">
+<link rel="stylesheet" href="dialogue.css?v=0.10.0">
+<link rel="stylesheet" href="rgsu.css?v=0.10.0">
+<link rel="stylesheet" href="showcase.css?v=0.10.0">
 <link rel="icon" type="image/svg+xml" href="assets/brand/rgsu-blue.svg">
 </head>
 <body>
@@ -26,21 +27,22 @@
 <div class="shell">
 <aside class="sidebar">
 <a class="brand" href="./" aria-label="Равенство по слуху, главная"><img src="assets/brand/rgsu-white.svg" width="39" height="58" alt="РГСУ"><span class="brand-copy">Равенство <b>по слуху</b><small>ТЕХНОЛОГИИ ВЗАИМОПОНИМАНИЯ</small></span></a>
-<div class="rail-label">РОССИЙСКИЙ ГОСУДАРСТВЕННЫЙ<br>СОЦИАЛЬНЫЙ УНИВЕРСИТЕТ<strong>Проектный центр «Детский технопарк»</strong></div>
+<div class="rail-label">РОССИЙСКИЙ ГОСУДАРСТВЕННЫЙ<br>СОЦИАЛЬНЫЙ УНИВЕРСИТЕТ<strong>Проектный центр «Технопарк РГСУ»</strong></div>
 <nav class="nav" aria-label="Режимы приложения">
 <button aria-label="Диалог" data-short="Диалог" data-mode="dialogue"><svg><use href="#i-volume"/></svg><span>Диалог<small>Посетитель и сотрудник</small></span></button>
 <button aria-label="Текст → жесты" data-short="Текст" data-mode="text" aria-current="page"><svg><use href="#i-text"/></svg><span>Текст → жесты<small>Аватар и исходная запись</small></span></button>
 <button aria-label="Жесты → голос" data-short="Камера" data-mode="camera"><svg><use href="#i-camera"/></svg><span>Жесты → голос<small>Камера телефона</small></span></button>
-<button aria-label="Перевод видео" data-short="Видео" data-mode="video"><svg><use href="#i-video"/></svg><span>Перевод видео<small>Разбор одного жеста</small></span></button>
+<button aria-label="Видео → текст" data-short="Видео" data-mode="video"><svg><use href="#i-video"/></svg><span>Видео → текст<small>Разбор одного жеста</small></span></button>
 <button aria-label="Испытание" data-short="Тест" data-mode="research"><svg><use href="#i-check"/></svg><span>Испытание<small>Серии и результаты</small></span></button>
 <button aria-label="О проекте" data-short="Проект" data-mode="about"><svg><use href="#i-grid"/></svg><span>О проекте<small>Возможности и пилот</small></span></button>
 </nav>
-<div class="rail-bottom"><div class="rail-card"><span class="dot"></span> Исследовательский прототип<p>Технологии, которые<br>помогают понимать друг друга.</p><b>РГСУ · Детский технопарк</b></div><a href="studio.html?outfit=indigo">Студия аватара v0.9 ↗</a><span>Версия 0.9 · октябрь 2026</span></div>
+<div class="rail-bottom"><div class="rail-card"><span class="dot"></span> Исследовательский прототип<p>Технологии, которые<br>помогают понимать друг друга.</p><b>РГСУ · Технопарк</b></div><a href="studio.html?outfit=indigo">Студия аватара ↗</a><span>Демонстрационная версия 0.10</span></div>
 </aside>
 <main id="workspace">
 <h1 class="sr-only">Равенство по слуху — прототип РГСУ</h1>
-<header class="topbar"><div class="breadcrumb">Лаборатория коммуникации <span>/</span> <b id="mode-crumb">Текст → жесты</b></div><button id="present" class="button ghost"><svg><use href="#i-screen"/></svg>Показ для НТС</button></header>
-<section class="intro" id="intro-banner"><div><div class="eyebrow"><span></span> РУССКИЙ ЖЕСТОВЫЙ ЯЗЫК</div><h1>Понимать<br> <em>друг друга.</em></h1><p>Жесты, текст и голос — в одном пространстве общения.</p></div><div class="intro-visual" aria-hidden="true"><span class="signal signal-one">Аа</span><div class="signal-line"></div><span class="signal signal-main">≈</span><div class="signal-line"></div><span class="signal signal-last"><i></i><i></i><i></i><i></i><i></i></span><div class="visual-caption">ТЕКСТ <span>↔</span> ЖЕСТ <span>↔</span> ГОЛОС</div></div><div class="intro-tag">Прототип для НТС <span>v0.9</span></div></section>
+<header class="topbar"><div class="breadcrumb">Лаборатория коммуникации <span>/</span> <b id="mode-crumb">Текст → жесты</b></div><div class="topbar-actions"><button id="open-guide" class="text-button" type="button">Памятка</button><button id="prepare-show" class="button ghost" type="button"><svg><use href="#i-check"/></svg><span>Подготовить показ</span></button><button id="present" class="button primary"><svg><use href="#i-screen"/></svg>Показ для НТС</button></div></header>
+<div id="showcase-readiness" class="showcase-readiness" role="status" hidden><span class="status-dot"></span><span id="readiness-copy">Подготовка материалов…</span><progress id="readiness-progress" max="1" value="0" aria-label="Загрузка материалов показа"></progress><button id="readiness-reload" class="button ghost" type="button" hidden>Обновить страницу</button><button id="readiness-dismiss" class="text-button" type="button" aria-label="Скрыть состояние подготовки">✕</button></div>
+<section class="intro" id="intro-banner"><div><div class="eyebrow"><span></span> РУССКИЙ ЖЕСТОВЫЙ ЯЗЫК</div><h1>Понимать<br> <em>друг друга.</em></h1><p>Жесты, текст и голос — в одном пространстве общения.</p></div><div class="intro-visual" aria-hidden="true"><span class="signal signal-one">Аа</span><div class="signal-line"></div><span class="signal signal-main">≈</span><div class="signal-line"></div><span class="signal signal-last"><i></i><i></i><i></i><i></i><i></i></span><div class="visual-caption">ТЕКСТ <span>↔</span> ЖЕСТ <span>↔</span> ГОЛОС</div></div><div class="intro-tag">Прототип для НТС <span>v0.10</span></div></section>
 
 <section id="view-dialogue" class="view" hidden>
 <div class="section-head"><div><span class="step-label">ДВУСТОРОННЯЯ КОММУНИКАЦИЯ</span><h2>Диалог посетителя и сотрудника</h2></div><span class="pill">Словарь: 6 слов + свои образцы</span></div>
@@ -60,11 +62,14 @@
 </section>
 
 <section id="view-text" class="view">
-<div class="section-head"><div><span class="step-label">01 / ТЕКСТ И ГОЛОС → ЖЕСТЫ</span><h2>От слова к жесту</h2></div><span class="pill"><span class="dot"></span> 6 слов в словаре</span></div>
+<div class="section-head"><div><span class="step-label">01 / ТЕКСТ И ГОЛОС → ЖЕСТЫ</span><h2>От слова <span class="heading-light">к жесту</span></h2><p class="section-description">Русский жестовый язык. Движение, которое можно рассмотреть.</p></div><span class="pill"><span class="dot"></span> 6 слов в словаре</span></div>
 <div class="text-workspace">
 <section class="card composer"><div class="card-top"><h3>Ваше сообщение</h3><span class="language">РУС</span></div>
 <form id="text-form"><label for="message" class="sr-only">Слово для аватара</label><textarea id="message" rows="3" maxlength="200" placeholder="Например, «Вопрос»">Вопрос</textarea><div class="input-bottom"><span id="char-count">6 / 200</span><button type="button" id="dictate" class="icon-button" aria-label="Ввести голосом"><svg><use href="#i-mic"/></svg></button></div><button class="button primary wide" id="translate" type="submit">Показать жест <svg><use href="#i-arrow"/></svg></button></form>
-<p class="hint">Выберите одно слово из набора. Перевод предложений пока не поддерживается.</p>
+<p class="hint">Выберите слово или введите его выше. Для каждого движения есть исходная запись.</p>
+<div class="composer-vocabulary"><div class="small-heading">Словарь для показа <span>6 слов</span></div><div id="composer-words" class="word-chips" role="group" aria-label="Слова для демонстрации"></div></div>
+<div class="showcase-controls"><button id="showcase-start" type="button" class="button ghost wide" disabled><svg><use href="#i-play"/></svg><span>Автопоказ</span></button><button id="showcase-stop" type="button" class="text-button" hidden>Остановить показ</button><p id="showcase-status" class="hint" role="status">Шесть движений по очереди. Это словарь отдельных слов.</p></div>
+<details class="composer-details"><summary>Как пользоваться</summary><p>«Сравнить» показывает аватар рядом с человеком. «Крупно» увеличивает сцену. Скорость можно уменьшить до 0,5×. Предложения и отрицания требуют отдельного перевода.</p><p>Клавиши: пробел — воспроизведение, ← / → — кадр, F — крупный просмотр. При вводе текста эти клавиши работают как обычно.</p></details>
 <div id="text-notice" class="notice" role="status" hidden></div>
 
 <div class="privacy-note"><svg><use href="#i-mic"/></svg><span>Голосовой ввод зависит от браузера и может отправлять звук его службе распознавания.</span></div>
@@ -92,7 +97,7 @@
     </div>
   </div>
   <div class="avatar-words"><div class="small-heading" id="avatar-words-label">Выберите жест</div><div id="word-chips" class="word-chips" role="group" aria-labelledby="avatar-words-label"></div></div>
-  <div class="stage-foot"><span>Понятность аватара ещё требует проверки носителями РЖЯ.</span><a href="studio.html?outfit=indigo">Студия ↗</a></div>
+  <div class="stage-foot"><span>Записанное движение · понятность аватара проверяется в пилоте.</span><a href="studio.html?outfit=indigo">Студия ↗</a></div>
 </section>
 </div>
 <div class="workflow-strip"><div><span>1</span><p><b>Введите слово</b>или используйте голос</p></div><svg><use href="#i-arrow"/></svg><div><span>2</span><p><b>Откройте жест</b>из записанного словаря</p></div><svg><use href="#i-arrow"/></svg><div><span>3</span><p><b>Сравните движение</b>аватара и человека</p></div></div>
@@ -114,14 +119,21 @@
 <div class="section-head"><div><span class="step-label">04 / ОТ ПРОТОТИПА К ПИЛОТУ</span><h2>Диалог в обе стороны</h2></div><span class="pill">Проект 0007-26-ИТ</span></div>
 <div class="about-grid"><article class="card about-lead"><span class="eyebrow">ИДЕЯ ПРОЕКТА</span><h3>Один экран.<br>Два собеседника.<br><em>Взаимопонимание.</em></h3><p>Человек показывает жест — собеседник видит текст и слышит слово. В ответ можно выбрать слово и увидеть его исполнение аватаром.</p><p>Первый целевой сценарий для обсуждения на НТС: доступная встреча посетителя и сотрудника в офисе обслуживания.</p><span class="pill">Предложение для пилота, не действующий сервис</span></article>
 <article class="card readiness"><h3>Что можно проверить сейчас</h3><ul><li><b>Текст → аватар</b><span>6 записанных слов и сравнение с исходным видео</span></li><li><b>Камера / видео → слово</b><span>Экспериментальное сравнение траекторий с образцами</span></li><li><b>Слово → голос</b><span>Озвучивание средствами устройства</span></li><li><b>Собственные примеры</b><span>Запись образцов для конкретного выступающего</span></li></ul></article></div>
-<div class="card evidence"><div><span class="step-label">ГРАНИЦЫ ТЕКУЩЕЙ ВЕРСИИ</span><h3>Показываем технологию.<br>Проверяем её вместе с людьми.</h3></div><div><p>Это не универсальный переводчик РЖЯ. Шесть слов не покрывают язык, а сравнение отдельных жестов не восстанавливает грамматику, контекст и немануальные компоненты.</p><p>Точность распознавания на новых пользователях не измерена. Встроенные видео входят в набор образцов. Понятность аватара требует отдельной оценки носителями РЖЯ.</p></div></div>
+<div class="card evidence"><div><span class="step-label">ГРАНИЦЫ ТЕКУЩЕЙ ВЕРСИИ</span><h3>Показываем технологию.<br>Проверяем её вместе с людьми.</h3></div><div><p>Это не универсальный переводчик РЖЯ. Шесть слов не покрывают язык, а сравнение отдельных жестов не восстанавливает грамматику, контекст и немануальные компоненты.</p><p>Проведена техническая проверка на 12 отдельных записях: 4 верных ответа, 8 отказов, 0 ошибок. Проверка камеры с новыми участниками и оценка понятности аватара носителями РЖЯ ещё впереди.</p></div></div>
+<section class="technology-section" id="technology-comparison" aria-labelledby="technology-title"><div class="section-head"><div><span class="step-label">МИРОВОЙ ОПЫТ · ПРОВЕРЕНО 29.10.2026</span><h2 id="technology-title">Что уже делает Google</h2><p class="section-description">ASL и русский жестовый язык — разные языки. Для РЖЯ нужен собственный корпус и проверка с носителями.</p></div></div><div class="technology-grid">
+<article class="card technology-card"><span class="technology-tag">ASL → EN · Pixel 11</span><h3>Google SL2T</h3><p>Перевод американского жестового языка в английский текст в Gboard и Live Transcribe. Представлен 12 августа 2026 года.</p><p class="hint">Обработка координат тела, рук и лица. Публичный API для подключения к нашему сайту не найден.</p><a href="https://deepmind.google/blog/putting-sign-language-ai-into-users-hands/" target="_blank" rel="noopener">О технологии Google ↗</a></article>
+<article class="card technology-card"><span class="technology-tag pending">Анонс · статус проверен</span><h3>SignGemma</h3><p>Google анонсировал открытую модель понимания жестовых языков. В проверенном журнале релизов Gemma её выпуск не указан.</p><p class="hint">На 29 октября 2026 года доступные веса и публичный API не подтверждены. Интеграция в прототип не заявляется.</p><a href="https://ai.google.dev/gemma/docs/releases" target="_blank" rel="noopener">Официальные релизы ↗</a></article>
+<article class="card technology-card ours"><span class="technology-tag">РЖЯ · наш прототип</span><h3>MediaPipe + образцы</h3><p>MediaPipe Holistic выделяет координаты. Алгоритм сравнивает движения с образцами шести слов, затем человек подтверждает результат.</p><p class="hint">Работаем над русским жестовым языком, двусторонним диалогом и оценкой понятности аватара.</p><a href="https://github.com/STEP3DLab/Technopark_project/blob/main/hearing-equality/docs/GOOGLE_SIGN_REVIEW_2026-10.md" target="_blank" rel="noopener">Разбор и источники ↗</a></article></div></section>
 <div class="section-head"><h2>Следующий шаг — измеримый пилот</h2></div><div class="pilot-grid"><article><span>01</span><h3>20 полных сообщений</h3><p>Выбрать один сценарий обслуживания и подготовить переводы с переводчиком и носителями РЖЯ.</p></article><article><span>02</span><h3>Независимая проверка</h3><p>Разделить обучающие и проверочные записи по людям. Измерить ошибки, отказы и задержку на телефонах.</p></article><article><span>03</span><h3>Оценка понимания</h3><p>Сравнить аватар с видео человека и проверить завершение реальных задач общения.</p></article></div>
 <div class="card sources"><h3>Открытые основания проекта</h3><p>Исходные видео и движения: Slovo, специальная публичная лицензия. Выделение координат: MediaPipe Holistic. Сравнение движений: DTW, экспериментальные пороги. Код интерфейса: MIT.</p><div class="button-row"><a class="button ghost" href="https://github.com/STEP3DLab/Technopark_project/tree/main/hearing-equality" target="_blank" rel="noopener">Исходный код ↗</a><a class="button ghost" href="./assets/sources/SLOVO-LICENSE-en.pdf" target="_blank" rel="noopener">Лицензия данных ↗</a><a class="button ghost" href="studio.html?outfit=indigo">Подробная студия ↗</a></div></div>
 </section>
-<footer class="footer"><span>Равенство по слуху <b>·</b> РГСУ / Детский технопарк</span><span>Создаём пространство для понимания</span></footer>
+<footer class="footer"><span>Равенство по слуху <b>·</b> РГСУ / Технопарк</span><span>Создаём пространство для понимания</span></footer>
 </main></div>
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="avatar-focus-dialog" aria-label="Крупный просмотр жеста"></dialog>
 <dialog id="presentation"><div class="presentation-top"><span>РАВЕНСТВО ПО СЛУХУ / НТС</span><button id="close-presentation" class="button ghost">Закрыть ✕</button></div><div class="presentation-body"><span id="slide-kicker" class="step-label"></span><h2 id="slide-title"></h2><p id="slide-copy"></p><div id="slide-cards" class="slide-cards"></div><button id="slide-action" class="button primary"></button></div><div class="presentation-bottom"><span id="slide-count"></span><div class="button-row"><button id="prev-slide" class="button ghost">← Назад</button><button id="next-slide" class="button primary">Далее →</button></div></div></dialog>
-<script type="module" src="platform.js?v=0.9"></script>
+<dialog id="showcase-guide" aria-labelledby="guide-title"><div class="guide-top"><span class="step-label">ПОДГОТОВКА К ДЕМОНСТРАЦИИ</span><button id="close-guide" class="button ghost" type="button" aria-label="Закрыть памятку">Закрыть ✕</button></div><h2 id="guide-title">Показ за пять минут</h2><p class="guide-lead">Откройте приложение на компьютере для проектора. Для камеры можно использовать телефон.</p><ol class="guide-steps"><li><b>Подготовьте материалы</b><span>Нажмите «Подготовить показ» при доступном интернете. Дождитесь результата. Проверьте звук в режиме «Диалог».</span></li><li><b>Покажите движение</b><span>Выберите «Вопрос» → «Сравнить» → «Крупно». Замедлите до 0,5×, затем включите «Автопоказ» шести слов.</span></li><li><b>Проведите короткий диалог</b><span>В режиме «Диалог» введите реплику посетителя, подтвердите и озвучьте. Ответьте словом «Да» — его покажет аватар.</span></li><li><b>Объясните распознавание</b><span>В «Видео → текст» выберите пример и «Разбор по готовым координатам». Это разбор известной записи. Живую камеру показывайте отдельным экспериментом.</span></li><li><b>Покажите результат и следующий шаг</b><span>«Испытание»: 4 верных ответа, 8 отказов, 0 ошибок на 12 видео. «О проекте»: Google SL2T, отличие РЖЯ и пилот из 20 полных сообщений.</span></li></ol><div class="guide-note"><b>Что работает без сети после подготовки</b><p>Словарь, аватар, исходные видео и разбор готовых координат. Для первой загрузки модели камеры нужен интернет. Голос и диктовка зависят от браузера и установленных голосов.</p></div><div class="button-row"><button id="guide-prepare" class="button primary" type="button">Подготовить показ</button><button id="guide-start" class="button ghost" type="button">Открыть аватар</button><button id="copy-demo-link" class="text-button" type="button">Скопировать ссылку</button></div><p id="guide-feedback" class="hint" role="status"></p></dialog>
+<noscript><p class="no-script">Для работы аватара включите JavaScript в браузере.</p></noscript>
+<script type="module" src="platform.js?v=0.10.0"></script>
+<script type="module" src="showcase.js?v=0.10.0"></script>
 </body></html>

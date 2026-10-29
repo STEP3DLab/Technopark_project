@@ -1,10 +1,20 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.9';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.10.0';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.7';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.10.0';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.10.0';
 import { TrialProtocol } from './trial-protocol.js';
 const $ = id => document.getElementById(id);
+async function fetchJSON(path,timeout=15000){
+  const controller=typeof AbortController!=='undefined'?new AbortController():null;
+  let timer;
+  try{
+    return await Promise.race([
+      fetch(path,controller?{signal:controller.signal}:undefined).then(response=>{if(!response.ok)throw new Error('Материал недоступен');return response.json();}),
+      new Promise((_,reject)=>{timer=setTimeout(()=>{controller?.abort();reject(new Error('Загрузка заняла слишком много времени. Повторите при доступном интернете.'));},timeout);})
+    ]);
+  }finally{clearTimeout(timer);}
+}
 const s = { mode:'text', catalog:[], motions:new Map(), templates:[], templatesReady:false, custom:[], selected:null,
   data:null, time:0, playing:false, raf:0, last:0, compare:false, view:'avatar', selectionToken:0, playbackToken:0,
   stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0, recordPending:false, trialContext:null,
@@ -56,10 +66,10 @@ async function playAvatar() {
   if(!s.data||!['text','dialogue'].includes(s.mode))return;
   const token=s.selectionToken,playToken=++s.playbackToken;
   if(s.time>=s.data.duration-.03)s.time=0;
-  s.playing=true;
+  s.playing=true;renderPlayback();
   if(s.compare){
     video.currentTime=s.time;video.playbackRate=Number($('speed').value);
-    try{await video.play();}catch{
+    try{await playbackDeadline(video.play());}catch{
       if(playToken!==s.playbackToken||token!==s.selectionToken||!s.playing)return;
       pauseAvatar();notice('text-notice','Видео не запускается. Попробуйте режим «Аватар».','error');return;
     }
@@ -76,12 +86,13 @@ async function selectWord(id,autoplay=false) {
   for(const button of $('word-chips').children)button.setAttribute('aria-pressed',String(button.dataset.id===id));
   try{
     let data=s.motions.get(id);
-    if(!data){const r=await fetch(item.motion);if(!r.ok)throw new Error('Движение недоступно');data=validateMotion(await r.json());s.motions.set(id,data);}
+    if(!data){data=validateMotion(await fetchJSON(item.motion));s.motions.set(id,data);}
     if(token!==s.selectionToken)return;
     s.data=data;avatar.load(data);dialogueAvatar.load(data);video.src=item.video;video.load();$('active-word').textContent=item.text;$('dialogue-active-word').textContent=item.text;renderPlayback();
     if(autoplay){if(s.mode==='text'&&matchMedia('(max-width: 700px)').matches)document.querySelector('.avatar-card').scrollIntoView({block:'start'});playAvatar();}
-  }catch{if(token===s.selectionToken){$('active-word').textContent='Нет связи';notice('text-notice','Не удалось открыть движение. Проверьте соединение и выберите слово ещё раз.','error');}}
+  }catch(error){console.error('Avatar motion could not load:',error);if(token===s.selectionToken){$('active-word').textContent='Нет связи';notice('text-notice','Не удалось открыть движение. Проверьте соединение и выберите слово ещё раз.','error');}}
 }
+function playbackDeadline(promise){let timer;return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Видео не запустилось вовремя')),10000);})]).finally(()=>clearTimeout(timer));}
 function updateCount(){$('char-count').textContent=`${$('message').value.length} / 200`;}
 $('message').addEventListener('input',updateCount);
 $('text-form').addEventListener('submit',e=>{
@@ -142,17 +153,28 @@ $('avatar-focus').onclick=openAvatarFocus;
 focusDialog.addEventListener('close',restoreAvatarCard);
 video.addEventListener('ended',pauseAvatar);
 video.addEventListener('error',()=>{if(s.compare&&s.data){pauseAvatar();notice('text-notice','Исходное видео недоступно. Можно посмотреть движение аватара.','error');}});
-function stopDictation(){if(s.speech){s.speech.abort();s.speech=null;}$('dictate').classList.remove('recording');$('dictate').setAttribute('aria-label','Ввести голосом');}
+function dictationUI(active){
+  $('dictate').classList.toggle('recording',active);$('dictate').setAttribute('aria-label',active?'Остановить голосовой ввод':'Ввести голосом');
+  $('dictate-reply').classList.toggle('recording',active);$('dictate-reply').textContent=active?'Остановить запись':'Ввести голосом';
+  $('dictate-reply').setAttribute('aria-pressed',String(active));
+}
+function stopDictation(){
+  const rec=s.speech;s.speech=null;
+  try{rec?.abort();}catch{}
+  dictationUI(false);
+  if($('text-notice').textContent.startsWith('Слушаю'))notice('text-notice','Голосовой ввод остановлен. Можно ввести текст вручную.');
+  if($('reply-status').textContent.includes('Слушаю'))$('reply-status').textContent='Голосовой ввод остановлен. Можно ввести ответ вручную.';
+}
 $('dictate').onclick=()=>{
   if(s.speech){stopDictation();return;}
   const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!Recognition){notice('text-notice','В этом браузере нет голосового ввода. Введите слово с клавиатуры.');return;}
-  pauseAvatar();const rec=new Recognition();s.speech=rec;rec.lang='ru-RU';rec.interimResults=false;rec.maxAlternatives=1;
-  $('dictate').classList.add('recording');$('dictate').setAttribute('aria-label','Остановить голосовой ввод');
-  notice('text-notice','Слушаю. Произнесите одно слово из словаря.');
-  rec.onresult=e=>{if(s.speech!==rec)return;const heard=e.results[0][0].transcript.slice(0,200);if(s.mode==='dialogue'){$('employee-text').value=heard;$('reply-status').textContent='Голос распознан. Проверьте текст перед отправкой.';}else{$('message').value=heard;updateCount();notice('text-notice','Текст готов. Проверьте его и нажмите «Показать жест».');}};
-  rec.onerror=e=>{if(s.speech!==rec)return;notice('text-notice',e.error==='not-allowed'?'Микрофон не разрешён. Можно ввести слово вручную.':'Не удалось распознать голос. Попробуйте ещё раз или введите слово.','error');};
-  rec.onend=()=>{if(s.speech===rec){s.speech=null;$('dictate').classList.remove('recording');$('dictate').setAttribute('aria-label','Ввести голосом');}};
+  pauseAvatar();window.speechSynthesis?.cancel();const rec=new Recognition();s.speech=rec;rec.lang='ru-RU';rec.interimResults=false;rec.maxAlternatives=1;
+  let completed=false;dictationUI(true);
+  notice('text-notice',s.mode==='dialogue'?'Слушаю. После записи проверьте ответ. Звук может обрабатываться службой браузера.':'Слушаю. Произнесите одно слово из словаря.');
+  rec.onresult=e=>{if(s.speech!==rec)return;completed=true;const heard=(e.results?.[0]?.[0]?.transcript||'').slice(0,s.mode==='dialogue'?500:200);if(s.mode==='dialogue'){$('employee-text').value=heard;$('reply-status').textContent='Голос распознан. Проверьте текст перед отправкой.';}else{$('message').value=heard;updateCount();notice('text-notice','Текст готов. Проверьте его и нажмите «Показать жест».');}};
+  rec.onerror=e=>{if(s.speech!==rec)return;completed=true;notice('text-notice',e.error==='not-allowed'?'Микрофон не разрешён. Можно ввести текст вручную.':e.error==='network'?'Служба голосового ввода недоступна. Используйте клавиатуру.':'Не удалось распознать голос. Попробуйте ещё раз или введите текст.','error');};
+  rec.onend=()=>{if(s.speech===rec){s.speech=null;dictationUI(false);if(!completed)notice('text-notice','Речь не получена. Повторите запись или введите текст вручную.');}};
   try{rec.start();}catch{stopDictation();notice('text-notice','Не удалось запустить голосовой ввод. Введите текст вручную.','error');}
 };
 function speak(text){
@@ -196,9 +218,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const response=await fetch('./assets/recognition-library.json?v=0.7');
-  if(!response.ok)throw new Error('Не удалось загрузить образцы. Повторите запуск.');
-  const data=await response.json();
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.10.0');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -222,7 +242,9 @@ async function startCamera(){
     if(!navigator.mediaDevices?.getUserMedia)throw new Error('Камера недоступна. Откройте страницу по HTTPS в браузере телефона.');
     const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:$('facing').value},width:{ideal:640},height:{ideal:480}}});
     if(token!==s.captureToken){stream.getTracks().forEach(t=>t.stop());return;}
-    s.stream=stream;inputVideo.srcObject=stream;await inputVideo.play();
+    s.stream=stream;
+    for(const track of stream.getTracks())track.addEventListener?.('ended',()=>{if(token===s.captureToken&&s.stream===stream){stopCapture();notice('capture-notice','Камера отключилась. Проверьте подключение и включите её снова.','error');}},{once:true});
+    inputVideo.srcObject=stream;await inputVideo.play();
     if(token!==s.captureToken)return;
     $('camera-placeholder').hidden=true;$('capture-stage').classList.toggle('mirrored',$('facing').value==='user');cameraButtons();
     await Promise.all([loadVision(),ensureTemplates()]);await resetVision();
@@ -336,9 +358,7 @@ $('replay-analysis').onclick=async()=>{
     if(!motion){
       const item=s.catalog.find(x=>x.id===id);
       if(!item)throw new Error('Исходная запись не найдена. Выберите пример ещё раз.');
-      const response=await fetch(item.motion);
-      if(!response.ok)throw new Error('Не удалось загрузить координаты записи. Повторите разбор.');
-      motion=validateMotion(await response.json());s.motions.set(id,motion);
+      motion=validateMotion(await fetchJSON(item.motion));s.motions.set(id,motion);
     }
     if(token!==s.captureToken)return;
     inputVideo.currentTime=0;
@@ -374,7 +394,7 @@ function setMode(mode){
   if(mode==='dialogue')setCompare(false);
   $('view-text').hidden=mode!=='text';$('view-capture').hidden=!['camera','video'].includes(mode);$('view-about').hidden=mode!=='about';
   for(const button of document.querySelectorAll('[data-mode]')){if(button.dataset.mode===mode)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}
-  const labels={dialogue:'Диалог',research:'Испытание',text:'Текст → жесты',camera:'Жесты → голос',video:'Перевод видео',about:'О проекте'};$('mode-crumb').textContent=labels[mode];
+  const labels={dialogue:'Диалог',research:'Испытание',text:'Текст → жесты',camera:'Жесты → голос',video:'Видео → текст',about:'О проекте'};$('mode-crumb').textContent=labels[mode];
   $('camera-controls').hidden=mode!=='camera';$('video-controls').hidden=mode!=='video';$('enroll-panel').hidden=mode!=='camera';
   $('capture-step').textContent=mode==='video'?'03 / ВИДЕО → ТЕКСТ И ГОЛОС':'02 / ЖЕСТЫ → ТЕКСТ И ГОЛОС';
   $('capture-title').textContent=mode==='video'?'Прочитайте движение':'Дайте жесту голос';$('capture-source-title').textContent=mode==='video'?'Видеозапись':'Камера';
@@ -435,7 +455,7 @@ $('dialogue-stop').onclick=()=>{stopCapture();notice('capture-notice','Каме�
 $('dialogue-record').onclick=()=>recordGesture();
 $('dialogue-enroll').onclick=()=>{setMode('camera');$('enroll-panel').open=true;};
 $('clear-dialogue').onclick=()=>{ledger.messages=[];renderHistory();};
-$('dictate-reply').onclick=()=>{if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){toast('Голосовой ввод недоступен. Используйте клавиатуру.');return;}$('reply-status').textContent='Голосовой ввод может отправлять звук службе браузера. Слушаю…';$('dictate').click();};
+$('dictate-reply').onclick=()=>{if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){toast('Голосовой ввод недоступен. Используйте клавиатуру.');return;}$('dictate').click();};
 for(const button of document.querySelectorAll('[data-phrase]'))button.onclick=()=>{$('employee-text').value=button.dataset.phrase;$('reply-status').textContent='Заготовка для пилота. Сейчас доступна только текстом.';};
 $('check-device').onclick=()=>{
   const secure=window.isSecureContext||['localhost','127.0.0.1'].includes(location.hostname);
@@ -449,12 +469,12 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.9',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.10.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
   if(!resetArmed){resetArmed=true;$('clear-session').textContent='Подтвердить сброс сессии';setTimeout(()=>{resetArmed=false;$('clear-session').textContent='Начать новую сессию';},6000);return;}
-  stopCapture();pauseAvatar();ledger.clear();protocolRuns.length=0;protocol=null;clearResult();renderProtocol();renderHistory();updateResearch();resetArmed=false;$('clear-session').textContent='Начать новую сессию';toast('Новая сессия начата.');
+  stopCapture();pauseAvatar();stopDictation();window.speechSynthesis?.cancel();ledger.clear();protocolRuns.length=0;protocol=null;clearResult();renderProtocol();renderHistory();updateResearch();resetArmed=false;$('clear-session').textContent='Начать новую сессию';toast('Новая сессия начата.');
 };
 
 function renderProtocol(){
@@ -479,8 +499,7 @@ $('protocol-finish').onclick=()=>{stopCapture();protocol?.finish();renderProtoco
 
 async function loadBenchmark(){
   try{
-    const response=await fetch('./assets/evaluation-v07.json');if(!response.ok)throw new Error();
-    const report=await response.json(),now=report.current.summary,before=report.baseline.summary;
+    const report=await fetchJSON('./assets/evaluation-v07.json'),now=report.current.summary,before=report.baseline.summary;
     $('benchmark-correct').textContent=`${now.correct} / ${now.total}`;
     $('benchmark-rejected').textContent=now.rejected;$('benchmark-wrong').textContent=now.wrong;
     $('benchmark-note').textContent=`${report.holdout.clips} записей · ${report.holdout.signers} других исполнителей · шесть слов. Раньше: ${before.correct} верных, ${before.rejected} отказов, ${before.wrong} ошибочный ответ. Сейчас: ${report.current.templates} образец от ${report.current.signers} исполнителей. Пороги не менялись.`;
@@ -495,10 +514,11 @@ const slides=[
   {kicker:'02 / СЦЕНАРИЙ',title:'Обе стороны видят историю разговора',copy:'В режиме диалога можно исправить распознанное слово, подтвердить реплику и показать ответ сотрудника. Неподготовленные сообщения остаются текстовыми.',cards:[['Вопрос','Слово есть в текущем наборе.'],['Да','Сотрудник может ответить аватаром.'],['Нужна помощь','Заготовка для пилота, пока только текст.']],action:'Показать сценарий',mode:'dialogue'},
   {kicker:'03 / ПРОТОТИП',title:'Шесть слов и собственные образцы',copy:'Доступны камера, короткое видео и сравнение аватара с оригиналом. Разбор готовых координат явно отмечен как демонстрация известного образца.',cards:[['Камера','Проверка устройства и видимости кистей.'],['Настройка','Несколько образцов одного движения.'],['Голос','Озвучивание после подтверждения.']],action:'Открыть видео',mode:'video'},
   {kicker:'04 / ПРОВЕРКА',title:'Проверка на 12 отдельных видеозаписях',copy:'Четыре верных ответа, восемь отказов, ноль ошибочных ответов. Все 12 исполнителей отсутствуют в наборе образцов. Это ограниченная проверка по видео; испытание с камеры ещё впереди.',cards:[['Образцы','21 запись от трёх исполнителей.'],['Контрольная серия','12 заданий с заранее фиксированными словами.'],['Отчёт','Ошибки и исправления учитываются отдельно.']],action:'Открыть испытание',mode:'research'},
-  {kicker:'05 / ПРЕДЛОЖЕНИЕ НТС',title:'Следующий этап — пилот с носителями РЖЯ',copy:'Предлагаем выбрать один сценарий, подготовить 20 полных сообщений и проверить их на новых участниках. Точность распознавания и понятность аватара пока не установлены.',cards:[['Материал','Переводчик и носители РЖЯ.'],['Метрики','Ошибки, отказы и время обработки.'],['Результат','Понимание сообщения и завершение диалога.']],action:'Открыть план пилота',mode:'about'}
+  {kicker:'05 / МИРОВОЙ ОПЫТ',title:'Google переводит ASL. Наша задача — русский жестовый язык',copy:'SL2T уже работает в Gboard и Live Transcribe на Pixel 11: американский жестовый язык → английский текст. В нашем прототипе MediaPipe выделяет координаты, а сравнение с образцами работает на шести словах РЖЯ. Это разные уровни готовности.',cards:[['Google SL2T','Потребительский продукт с августа 2026 года.'],['SignGemma','Публичный релиз и API пока не подтверждены.'],['Наш следующий шаг','Корпус РЖЯ, новые участники и оценка понимания.']],action:'Сравнить технологии',mode:'about'},
+  {kicker:'06 / ПРЕДЛОЖЕНИЕ НТС',title:'Следующий этап — пилот с носителями РЖЯ',copy:'Предлагаем выбрать один сценарий, подготовить 20 полных сообщений и проверить их на новых участниках. Живую камеру и понятность аватара предстоит оценить с участниками; небольшой результат по видео уже опубликован.',cards:[['Материал','Переводчик и носители РЖЯ.'],['Метрики','Ошибки, отказы и время обработки.'],['Результат','Понимание сообщения и завершение диалога.']],action:'Открыть план пилота',mode:'about'}
 ];let slideIndex=0;
 function renderSlide(){const slide=slides[slideIndex];$('slide-kicker').textContent=slide.kicker;$('slide-title').textContent=slide.title;$('slide-copy').textContent=slide.copy;$('slide-cards').replaceChildren();for(const [title,copy] of slide.cards){const card=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');b.textContent=title;p.textContent=copy;card.append(b,p);$('slide-cards').append(card);}$('slide-action').textContent=slide.action;$('slide-count').textContent=`${slideIndex+1} / ${slides.length}`;$('prev-slide').disabled=slideIndex===0;$('next-slide').disabled=slideIndex===slides.length-1;}
-$('present').onclick=()=>{pauseAvatar();stopCapture();stopDictation();lastFocus=document.activeElement;renderSlide();$('presentation').showModal();};
+$('present').onclick=()=>{pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();lastFocus=document.activeElement;renderSlide();$('presentation').showModal();};
 $('close-presentation').onclick=()=>$('presentation').close();$('presentation').addEventListener('close',()=>lastFocus?.focus());
 $('prev-slide').onclick=()=>{slideIndex=Math.max(0,slideIndex-1);renderSlide();};$('next-slide').onclick=()=>{slideIndex=Math.min(slides.length-1,slideIndex+1);renderSlide();};
 $('slide-action').onclick=()=>{$('presentation').close();setMode(slides[slideIndex].mode);$('mode-crumb').scrollIntoView({block:'start'});};
@@ -507,8 +527,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseAvata
 window.addEventListener('pagehide',()=>{stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
 window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
 try{
-  const response=await fetch('./assets/sources/slovo-sources.json?v=0.7');if(!response.ok)throw new Error();
-  s.catalog=createCatalog((await response.json()).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.10.0')).samples);
   loadBenchmark();
   for(const item of s.catalog){
     const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);$('word-chips').append(word);
@@ -519,3 +538,13 @@ try{
   const requested=new URLSearchParams(location.search).get('word');
   await selectWord(s.catalog.some(x=>x.id===requested)?requested:'question');
 }catch{notice('text-notice','Не удалось загрузить словарь. Проверьте соединение и обновите страницу.','error');$('active-word').textContent='Нет связи';}
+
+// Narrow public interface for the presentation controls; no dialogue contents or camera frames.
+window.hearingEquality=Object.freeze({
+  catalog:()=>s.catalog.map(({id,text,motion,video})=>({id,text,motion,video})),
+  state:()=>({mode:s.mode,selected:s.selected?.id||null,ready:Boolean(s.data),playing:s.playing,time:s.time,duration:s.data?.duration||0,view:s.view}),
+  select:async(id,autoplay=false)=>{await selectWord(id,autoplay);return Boolean(s.data&&s.selected?.id===id);},
+  play:playAvatar,pause:pauseAvatar,mode:setMode,view:setVisualMode,step:stepFrame,focus:openAvatarFocus,
+  stop:()=>{pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();},
+  notify:toast,
+});

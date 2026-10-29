@@ -1,14 +1,15 @@
 /** Sculptural digital character. Measured signing landmarks remain the motion source.
  * Presentation interpolation is isolated from recognition and never overwrites assets.
  */
-import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.6';
-import { handMetrics, traceDigit } from './hand-geometry.js?v=0.9';
+import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.10.0';
+import { handMetrics, traceDigit } from './hand-geometry.js?v=0.10.0';
 const OUTFITS = Object.freeze({
-  indigo:{body:'#243B71',light:'#5879B0',dark:'#0E1C3E',seam:'#94B3E5',accent:'#FFFFFF'},
+  indigo:{body:'#243B68',light:'#49658E',dark:'#142642',seam:'#7F9AC1',accent:'#FFFFFF'},
   teal:{body:'#295655',light:'#386D68',dark:'#1D4143',seam:'#729C94',accent:'#C0DDD0'},
   slate:{body:'#404D5B',light:'#526372',dark:'#2B3846',seam:'#8D9FAB',accent:'#D9E3E5'},
 });
-const SKIN={base:'#E5EBF2',light:'#F7F9FC',shade:'#B1C1D4',line:'#607793'};
+// A quiet porcelain palette keeps fingers legible against the university blue.
+const SKIN={base:'#E9EEF3',light:'#FCFDFE',shade:'#BBC9D7',line:'#6B7D90'};
 
 export class CanvasAvatar {
   constructor(container) {
@@ -172,10 +173,16 @@ export class CanvasAvatar {
   drawStudio() {
     const c=this.ctx,dark=this.scene==='dark',w=this.width,h=this.height;
     const g=c.createRadialGradient(w*.43,h*.2,0,w*.5,h*.35,Math.max(w,h)*.8);
-    g.addColorStop(0,dark?'#405A88':'#FFFFFF');
-    g.addColorStop(.5,dark?'#283F68':'#E8EFF7');
-    g.addColorStop(1,dark?'#132440':'#CFDCEB');
+    g.addColorStop(0,dark?'#354C70':'#FFFFFF');
+    g.addColorStop(.5,dark?'#223650':'#EEF2F7');
+    g.addColorStop(1,dark?'#152438':'#DCE5EE');
     c.fillStyle=g;c.fillRect(0,0,w,h);
+    // Broad, soft studio light rather than a halo or a decorative interface grid.
+    const ambient=c.createLinearGradient(0,0,w,h);
+    ambient.addColorStop(0,dark?'#AEC6E70B':'#FFFFFF38');
+    ambient.addColorStop(.6,'#FFFFFF00');
+    ambient.addColorStop(1,dark?'#07122128':'#819AB610');
+    c.fillStyle=ambient;c.fillRect(0,0,w,h);
   }
 
   path(points, close = false) {
@@ -273,61 +280,89 @@ export class CanvasAvatar {
     const c=this.ctx,s=this.shoulder,f=face(10),chin=face(152),a=face(234)||p[7],b=face(454)||p[8];
     if(!a||!b)return;
     const cx=(a[0]+b[0])/2,cy=f&&chin?(f[1]+chin[1])/2:(a[1]+b[1])/2;
-    const w=Math.max(this.distance(a,b)*.57,s*.18),h=f&&chin?this.distance(f,chin)*.55:w*1.28;
+    const w=Math.max(this.distance(a,b)*.59,s*.18),h=f&&chin?this.distance(f,chin)*.55:w*1.28;
     let angle=Math.atan2(b[1]-a[1],b[0]-a[0]);if(Math.abs(angle)>Math.PI/2)angle-=Math.sign(angle)*Math.PI;
     c.save();c.translate(cx,cy);c.rotate(angle);
-    // A deliberately non-photoreal ceramic shell. No pasted portrait or hair.
+    // A single sculpted face, with small natural ears; no helmet, visor or rings.
     for(const side of [-1,1]){
-      const ear=c.createLinearGradient(side*w*.86,0,side*w*1.14,0);ear.addColorStop(0,'#829BB8');ear.addColorStop(.5,'#DCE8F2');ear.addColorStop(1,'#627C9E');
-      c.beginPath();c.ellipse(side*w*.99,h*.02,w*.14,h*.22,side*-.05,0,Math.PI*2);c.fillStyle=ear;c.fill();
-      c.beginPath();c.ellipse(side*w*1.02,h*.02,w*.035,h*.11,0,0,Math.PI*2);c.fillStyle='#34527D';c.fill();
+      const ear=c.createLinearGradient(side*w*.85,0,side*w*1.08,0);
+      ear.addColorStop(0,SKIN.shade);ear.addColorStop(.55,SKIN.base);ear.addColorStop(1,'#D3DEE8');
+      c.beginPath();c.ellipse(side*w*.965,h*.045,w*.125,h*.175,side*-.12,0,Math.PI*2);c.fillStyle=ear;c.fill();
+      c.beginPath();c.moveTo(side*w*1.01,-h*.045);
+      c.quadraticCurveTo(side*w*1.055,h*.05,side*w*.995,h*.12);
+      c.strokeStyle='#8CA0B559';c.lineWidth=Math.max(.5,w*.025);c.stroke();
     }
-    c.beginPath();c.moveTo(0,-h*1.09);c.bezierCurveTo(w*.79,-h*1.09,w*1.05,-h*.68,w,-h*.06);c.bezierCurveTo(w*.97,h*.45,w*.64,h*.94,w*.23,h*1.02);c.quadraticCurveTo(0,h*1.08,-w*.23,h*1.02);c.bezierCurveTo(-w*.64,h*.94,-w*.97,h*.45,-w,-h*.06);c.bezierCurveTo(-w*1.05,-h*.68,-w*.79,-h*1.09,0,-h*1.09);c.closePath();
-    const shell=c.createRadialGradient(-w*.35,-h*.48,w*.06,0,-h*.08,h*1.35);
-    shell.addColorStop(0,'#F8FAFC');shell.addColorStop(.46,'#E9EFF5');shell.addColorStop(.72,'#D2DEEA');shell.addColorStop(1,'#9AAFC5');c.fillStyle=shell;c.fill();
+    c.beginPath();c.moveTo(0,-h*1.06);
+    c.bezierCurveTo(w*.77,-h*1.06,w*1.02,-h*.63,w*.98,-h*.03);
+    c.bezierCurveTo(w*.95,h*.42,w*.62,h*.88,w*.25,h*.985);
+    c.quadraticCurveTo(0,h*1.055,-w*.25,h*.985);
+    c.bezierCurveTo(-w*.62,h*.88,-w*.95,h*.42,-w*.98,-h*.03);
+    c.bezierCurveTo(-w*1.02,-h*.63,-w*.77,-h*1.06,0,-h*1.06);c.closePath();
+    const skin=c.createRadialGradient(-w*.42,-h*.52,w*.05,w*.15,h*.02,h*1.35);
+    skin.addColorStop(0,SKIN.light);skin.addColorStop(.52,SKIN.base);skin.addColorStop(.82,'#CFDBE5');skin.addColorStop(1,SKIN.shade);
+    c.fillStyle=skin;c.fill();
     c.save();c.clip();
-    c.beginPath();c.moveTo(-w*.85,-h*.71);c.bezierCurveTo(-w*.56,-h*.98,w*.1,-h*1.05,w*.57,-h*.79);c.strokeStyle='#FFFFFFA0';c.lineWidth=w*.04;c.stroke();
-    c.beginPath();c.moveTo(w*.79,-h*.52);c.bezierCurveTo(w*.95,h*.13,w*.52,h*.82,w*.1,h*.95);c.strokeStyle='#7C98B12A';c.lineWidth=w*.16;c.stroke();
+    // Soft planes on cheek and jaw preserve the recorded facial movement.
+    const cheek=c.createLinearGradient(-w,0,w,0);
+    cheek.addColorStop(0,'#7990A62B');cheek.addColorStop(.28,'#FFFFFF00');
+    cheek.addColorStop(.65,'#FFFFFF00');cheek.addColorStop(1,'#667F9934');
+    c.fillStyle=cheek;c.fillRect(-w,-h,w*2,h*2.1);
+    c.beginPath();c.moveTo(-w*.73,h*.34);
+    c.bezierCurveTo(-w*.51,h*.76,-w*.22,h*.92,w*.13,h*.94);
+    c.strokeStyle='#FFFFFF42';c.lineWidth=w*.06;c.stroke();
     c.restore();
-    // A thin matte shell leaves the measured facial features unobstructed.
-    c.beginPath();c.moveTo(-w*.79,-h*.61);
-    c.bezierCurveTo(-w*.63,-h*.88,w*.61,-h*.88,w*.79,-h*.59);
-    c.bezierCurveTo(w*.95,-h*.04,w*.72,h*.67,w*.3,h*.86);
-    c.quadraticCurveTo(0,h*.96,-w*.3,h*.86);
-    c.bezierCurveTo(-w*.73,h*.67,-w*.95,-h*.04,-w*.79,-h*.61);c.closePath();
-    const visor=c.createLinearGradient(-w,-h,w,h);
-    visor.addColorStop(0,'#3F5879');visor.addColorStop(.45,'#223B5C');visor.addColorStop(1,'#142944');
-    c.fillStyle=visor;c.fill();c.strokeStyle='#E3F2FF40';c.lineWidth=Math.max(.6,w*.012);c.stroke();
+    // A restrained cropped hairstyle makes the silhouette human without
+    // introducing synthetic facial expressions or obscuring measured features.
+    c.beginPath();c.moveTo(-w*.97,-h*.035);
+    c.bezierCurveTo(-w*1.08,-h*.63,-w*.7,-h*1.11,-w*.12,-h*1.105);
+    c.bezierCurveTo(w*.46,-h*1.17,w*1.015,-h*.81,w*.99,-h*.2);
+    c.lineTo(w*.89,-h*.06);c.lineTo(w*.82,-h*.49);
+    c.bezierCurveTo(w*.63,-h*.64,w*.27,-h*.76,w*.12,-h*.79);
+    c.bezierCurveTo(-w*.15,-h*.59,-w*.52,-h*.64,-w*.8,-h*.49);
+    c.lineTo(-w*.87,-h*.05);c.closePath();
+    const hair=c.createLinearGradient(-w,-h,w,0);
+    hair.addColorStop(0,'#40566D');hair.addColorStop(.48,'#293D54');hair.addColorStop(1,'#1B2C40');
+    c.fillStyle=hair;c.fill();
+    c.beginPath();c.moveTo(-w*.7,-h*.73);
+    c.bezierCurveTo(-w*.36,-h*.97,w*.12,-h*1.01,w*.51,-h*.81);
+    c.strokeStyle='#8DA4B22A';c.lineWidth=Math.max(.5,w*.035);c.stroke();
     c.restore();
     if(!this.frame.face)return;
     this.drawEye([33,160,158,133,153,144].map(face),w);
     this.drawEye([263,387,385,362,373,380].map(face),w);
     for(const ids of [[70,63,105,66,107],[300,293,334,296,336]]){
-      if(this.smoothPath(ids.map(face),false)){c.strokeStyle='#B6CADF';c.lineWidth=Math.max(.8,w*.052);c.stroke();}
+      if(this.smoothPath(ids.map(face),false)){c.strokeStyle='#43576A';c.lineWidth=Math.max(.8,w*.048);c.stroke();}
     }
     const nose=face(4),bridge=face(6);
     if(nose&&bridge){
       c.beginPath();c.moveTo(bridge[0],bridge[1]);
-      c.quadraticCurveTo(nose[0]-w*.045,nose[1]-w*.08,nose[0]-w*.105,nose[1]);
-      c.quadraticCurveTo(nose[0],nose[1]+w*.055,nose[0]+w*.09,nose[1]);c.closePath();
-      const shade=c.createLinearGradient(nose[0]-w*.12,0,nose[0]+w*.1,0);
-      shade.addColorStop(0,'#294460');shade.addColorStop(.48,'#7890A9');shade.addColorStop(1,'#3B5573');
+      c.quadraticCurveTo(nose[0]-w*.025,nose[1]-w*.1,nose[0]-w*.095,nose[1]);
+      c.quadraticCurveTo(nose[0],nose[1]+w*.06,nose[0]+w*.105,nose[1]);c.closePath();
+      const shade=c.createLinearGradient(nose[0]-w*.12,0,nose[0]+w*.12,0);
+      shade.addColorStop(0,'#A9B8C6');shade.addColorStop(.44,'#F8FAFC');shade.addColorStop(1,'#B5C4D1');
       c.fillStyle=shade;c.fill();
+      c.beginPath();c.moveTo(nose[0]-w*.095,nose[1]);
+      c.quadraticCurveTo(nose[0],nose[1]+w*.06,nose[0]+w*.105,nose[1]);
+      c.strokeStyle='#798D9D70';c.lineWidth=Math.max(.4,w*.012);c.stroke();
     }
     // Continuous outer and inner mouth contours: no threshold, invented smile,
     // gaze or blinking. Only recorded landmarks drive the expression.
     const outer=[61,40,37,0,267,270,291,321,314,17,84,91].map(face);
-    if(this.smoothPath(outer)){c.fillStyle='#617B98';c.fill();c.strokeStyle='#91A8C0';c.lineWidth=Math.max(.45,w*.016);c.stroke();}
+    if(this.smoothPath(outer)){c.fillStyle='#A5AEBB';c.fill();c.strokeStyle='#8191A3';c.lineWidth=Math.max(.4,w*.012);c.stroke();}
     const inner=[78,81,13,311,308,402,14,178].map(face);
-    if(this.smoothPath(inner)){c.fillStyle='#10243C';c.fill();}
+    if(this.smoothPath(inner)){c.fillStyle='#405267';c.fill();}
   }
 
   drawEye(points,headRadius) {
     if(points.some(p=>!p))return;
     const c=this.ctx;
-    if(this.path(points,true)){c.fillStyle='#CBDCEB';c.fill();}
-    // The contour can close completely; no minimum opening or fabricated iris.
-    if(this.smoothPath(points.slice(0,4),false)){c.strokeStyle='#B9CFE3';c.lineWidth=Math.max(.4,headRadius*.017);c.stroke();}
+    if(this.path(points,true)){c.fillStyle='#52667B';c.fill();}
+    // The eye follows the measured contour and can close fully. No invented
+    // gaze, persistent minimum opening, decorative LEDs or fabricated iris.
+    if(this.smoothPath(points.slice(0,4),false)){c.strokeStyle='#364D63';c.lineWidth=Math.max(.5,headRadius*.022);c.stroke();}
+    if(this.smoothPath([points[0],points[5],points[4],points[3]],false)){
+      c.strokeStyle='#A1B1BF';c.lineWidth=Math.max(.35,headRadius*.012);c.stroke();
+    }
   }
 
   drawArm({a,b,d,hand}) {
@@ -342,10 +377,17 @@ export class CanvasAvatar {
     this.capsule(b,d,elbowRadius,wristRadius,this.skinGradient(b,d,elbowRadius));
     c.beginPath();c.arc(d[0],d[1],wristRadius,0,Math.PI*2);
     c.fillStyle=this.skinGradient(b,d,elbowRadius);c.fill();
-    const sleeveEnd=this.mix(a,b,.34);
+    const sleeveEnd=this.mix(a,b,.57);
     const sleeve=c.createLinearGradient(a[0]-upperRadius,a[1]-upperRadius,a[0]+upperRadius,a[1]+upperRadius);
     sleeve.addColorStop(0,palette.light);sleeve.addColorStop(.45,palette.body);sleeve.addColorStop(1,palette.dark);
-    this.capsule(a,sleeveEnd,upperRadius*1.045,upperRadius*.8,sleeve);
+    this.capsule(a,sleeveEnd,upperRadius*1.025,upperRadius*.77,sleeve);
+    // A fine stitched cuff reads as clothing, not a separate shoulder plate.
+    const sleeveLength=this.distance(a,b)||1;
+    const sx=-(b[1]-a[1])/sleeveLength,sy=(b[0]-a[0])/sleeveLength;
+    const cuffRadius=upperRadius*.74;
+    c.beginPath();c.moveTo(sleeveEnd[0]-sx*cuffRadius,sleeveEnd[1]-sy*cuffRadius);
+    c.quadraticCurveTo(sleeveEnd[0]+(b[0]-a[0])*.026,sleeveEnd[1]+(b[1]-a[1])*.026,sleeveEnd[0]+sx*cuffRadius,sleeveEnd[1]+sy*cuffRadius);
+    c.strokeStyle=palette.seam+'45';c.lineWidth=Math.max(.5,s*.004);c.stroke();
   }
 
   drawHand(points) {
@@ -389,3 +431,4 @@ export class CanvasAvatar {
   }
   dispose() { this.resizeObserver.disconnect(); window.removeEventListener?.('resize', this.onWindowResize); this.dprQuery?.removeEventListener?.('change', this.onDprChange); this.clear(); this.canvas.remove(); this.note.remove(); }
 }
+

@@ -1,10 +1,10 @@
 /** Sculptural digital character. Measured signing landmarks remain the motion source.
  * Presentation interpolation is isolated from recognition and never overwrites assets.
  */
-import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.11.0';
-import { handMetrics } from './hand-geometry.js?v=0.11.0';
-import { paintHand, skinMaterial } from './avatar-hands.js?v=0.11.0';
-import { measureAvatarFrame, fitAvatarFrame } from './avatar-framing.js?v=0.11.0';
+import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.11.1';
+import { handMetrics } from './hand-geometry.js?v=0.11.1';
+import { paintHand, skinMaterial } from './avatar-hands.js?v=0.11.1';
+import { measureAvatarFrame, fitAvatarFrame } from './avatar-framing.js?v=0.11.1';
 const OUTFITS = Object.freeze({
   indigo:{body:'#304B78',light:'#4B6B9A',dark:'#1C2E4E',seam:'#8EA6CC',accent:'#FFFFFF'},
   teal:{body:'#356562',light:'#5D8880',dark:'#244B4D',seam:'#9ABBB0',accent:'#C0DDD0'},
@@ -21,7 +21,7 @@ export class CanvasAvatar {
     this.canvas.style.cssText = 'display:block;width:100%;height:100%;';
     this.ctx = this.canvas.getContext('2d', { alpha: true });
     if (!this.ctx) throw new Error('Canvas 2D недоступен');
-    container.style.position ||= 'relative';
+    if ((window.getComputedStyle?.(container)?.position || container.style.position || 'static') === 'static') container.style.position = 'relative';
     container.append(this.canvas);
     this.note=document.createElement('div');
     this.note.style.cssText='position:absolute;top:12px;right:12px;max-width:46%;padding:5px 8px;border-radius:5px;background:#fffae9ed;color:#715d32;font:10px/1.4 Arial,sans-serif;pointer-events:none;';

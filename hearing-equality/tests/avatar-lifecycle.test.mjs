@@ -5,19 +5,29 @@ import {CanvasAvatar} from '../app/canvas-avatar.js';
 import {sampleMotion} from '../app/avatar-motion.js';
 const clip=JSON.parse(readFileSync(new URL('../app/assets/motion/cc59e1b2-5778-47bb-a452-779033da61b0.json',import.meta.url)));
 
-function fixture(run){
+function fixture(run,{computedPosition='static'}={}){
  const previous={document:globalThis.document,window:globalThis.window,ResizeObserver:globalThis.ResizeObserver};
  let width=340,height=420,bitmapWrites=0,bufferWidth=0,bufferHeight=0;
  const context=new Proxy({}, {get:(o,k)=>k in o?o[k]:String(k).startsWith('create')?()=>({addColorStop(){}}):()=>{}});
  const canvas={style:{},setAttribute(){},getContext:()=>context,remove(){},
   get width(){return bufferWidth},set width(v){bufferWidth=v;bitmapWrites++},get height(){return bufferHeight},set height(v){bufferHeight=v;bitmapWrites++}};
  globalThis.document={createElement:tag=>tag==='canvas'?canvas:{style:{},remove(){}}};
- globalThis.window={devicePixelRatio:1};globalThis.ResizeObserver=class{observe(){}disconnect(){}};
+ globalThis.window={devicePixelRatio:1,getComputedStyle:target=>({position:target.style.position||computedPosition})};globalThis.ResizeObserver=class{observe(){}disconnect(){}};
  const container={style:{},dataset:{},append(){},getBoundingClientRect:()=>({width,height})};
  let avatar;
  try{avatar=new CanvasAvatar(container);avatar.load(clip);run({avatar,canvas,setSize:(w,h)=>{width=w;height=h},writes:()=>bitmapWrites});}
  finally{avatar?.dispose();Object.assign(globalThis,previous);}
 }
+
+test('a CSS-positioned absolute studio container is not overridden by an inline relative position',()=>fixture(({avatar})=>{
+ assert.equal(avatar.container.style.position,undefined,'Preserve stylesheet positioning so the studio stage fills its comparison cell');
+ assert.equal(window.getComputedStyle(avatar.container).position,'absolute');
+},{computedPosition:'absolute'}));
+
+test('an otherwise static main or dialogue container gains a local positioning context for its overlay',()=>fixture(({avatar})=>{
+ assert.equal(avatar.container.style.position,'relative');
+ assert.equal(window.getComputedStyle(avatar.container).position,'relative');
+},{computedPosition:'static'}));
 
 test('hidden scene defers interpolation and displays the latest requested time when shown',()=>fixture(({avatar,setSize})=>{
  const frame=avatar.frame;let reads=0;

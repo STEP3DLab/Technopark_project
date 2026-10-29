@@ -2,7 +2,7 @@
  * All dimensions come from the same metrics used by the forearm endpoint.
  * Depth is used only for compositing, never as a pixel/material dimension.
  */
-import { handMetrics, traceDigit } from './hand-geometry.js?v=0.11.0';
+import { handMetrics, traceDigit } from './hand-geometry.js?v=0.11.1';
 
 const DIGITS = [
   { ids: [1,2,3,4], width: 1.10 },

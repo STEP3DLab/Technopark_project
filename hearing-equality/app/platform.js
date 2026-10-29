@@ -1,8 +1,8 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.11.0';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.11.1';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.11.0';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.11.0';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.11.1';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.11.1';
 import { TrialProtocol } from './trial-protocol.js';
 const $ = id => document.getElementById(id);
 async function fetchJSON(path,timeout=15000){
@@ -228,7 +228,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const data=await fetchJSON('./assets/recognition-library.json?v=0.11.0');
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.11.1');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -479,7 +479,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.11.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.11.1',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
@@ -537,7 +537,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseAvata
 window.addEventListener('pagehide',()=>{stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
 window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
 try{
-  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.11.0')).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.11.1')).samples);
   loadBenchmark();
   for(const item of s.catalog){
     const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);$('word-chips').append(word);

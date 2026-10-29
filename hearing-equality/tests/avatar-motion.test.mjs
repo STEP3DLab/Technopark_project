@@ -4,6 +4,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {prepareMotion,sampleMotion,interpolateCoordinate,armLayers,getSmoothingMetrics,SMOOTHING_LIMITS} from '../app/avatar-motion.js';
 const root=new URL('../app/assets/motion/',import.meta.url);
 const clips=readdirSync(root).filter(f=>f.endsWith('.json')).map(f=>JSON.parse(readFileSync(new URL(f,root))));
+const curated=JSON.parse(readFileSync(new URL('../app/assets/sources/slovo-sources.json',import.meta.url))).samples.map(item=>clips.find(clip=>clip.clip_id===item.file.replace('.mp4','')));
 const pose=()=>Array.from({length:33},(_,i)=>[i===11?.3:i===12?.7:.5,.5,0,1]);
 const hand=(x=.4)=>Array.from({length:21},(_,i)=>[x+i*.001,.5,0]);
 const data=frames=>({width:720,height:1280,fps:30,frames});
@@ -106,7 +107,9 @@ test('denoising does not fill long hand gaps or use short reconstructed gaps as 
 
 test('curated smoothing stays within the translation bound and its cubic stays inside each neighbouring pair',()=>{
  for(const clip of clips){const track=prepareMotion(clip),metrics=getSmoothingMetrics(track);
-  assert.ok(metrics.maxWristCorrection<=SMOOTHING_LIMITS.body+SMOOTHING_LIMITS.hand+1e-12);
+  assert.ok(metrics.maxWristCorrection<=SMOOTHING_LIMITS.hand+1e-12);
+  assert.ok(metrics.maxBodyCorrection<=SMOOTHING_LIMITS.body+1e-12);
+  assert.ok(metrics.maxHeadCorrection<=SMOOTHING_LIMITS.head+1e-12);
   assert.deepEqual(getSmoothingMetrics(track),metrics);
   for(let i=0;i<track.frames.length-1;i++){
    const a=at(track,i),b=at(track,i+1),middle=at(track,i+.5);
@@ -115,6 +118,92 @@ test('curated smoothing stays within the translation bound and its cubic stays i
     for(let p=0;p<a[key].length;p++)for(let axis=0;axis<3;axis++){
      const x=a[key][p]?.[axis],y=b[key][p]?.[axis],value=middle[key]?.[p]?.[axis];if(![x,y,value].every(Number.isFinite))continue;
      assert.ok(value>=Math.min(x,y)-1e-12&&value<=Math.max(x,y)+1e-12,'Optional filtering must retain the shape-preserving cubic interpolation');
+    }
+   }
+  }
+ }
+});
+
+const faceClip=()=>{
+ const clip=syntheticClip(Array.from({length:25},()=>.18));
+ clip.face_indices=[10,152,234,454];
+ clip.frames.forEach(frame=>{
+  frame.right=syntheticHand(.76);
+  frame.face=[[.5,.2,0],[.5,.32,0],[.45,.26,0],[.55,.26,0]];
+ });
+ return clip;
+};
+
+test('shoulder detector jitter cannot create motion in a stationary face or stationary hands',()=>{
+ const clip=faceClip();
+ clip.frames.forEach((frame,i)=>{for(const index of [11,12])frame.pose[index][0]+=(i%2?1:-1)*.003;});
+ const track=prepareMotion(clip);
+ for(let i=0;i<clip.frames.length;i++){
+  const frame=at(track,i);
+  for(const part of ['face','left','right'])assert.deepEqual(frame[part],clip.frames[i][part],`${part} must not inherit the shoulder correction`);
+ }
+ const metrics=getSmoothingMetrics(track);
+ assert.ok(metrics.bodyCurvatureAfter<metrics.bodyCurvatureBefore*.6,'The noisy shoulders themselves should still be denoised');
+ assert.equal(metrics.headCurvatureAfter,0);
+});
+
+test('hand-to-face and hand-to-shoulder contact keep both measured participants fixed',()=>{
+ for(const target of ['face','shoulder']){
+  const clip=faceClip();
+  clip.frames.forEach((frame,i)=>{
+   const jitter=(i%2?1:-1)*.0012;
+   if(target==='face'){
+    frame.face=frame.face.map(point=>[point[0]+jitter,...point.slice(1)]);
+    frame.left=syntheticHand(frame.face[2][0],frame.face[2][1]);
+   }else{
+    for(const index of [11,12])frame.pose[index][0]+=jitter;
+    frame.left=syntheticHand(frame.pose[11][0],frame.pose[11][1]);
+   }
+  });
+  const track=prepareMotion(clip);
+  for(let i=0;i<clip.frames.length;i++){
+   const filtered=at(track,i);
+   assert.deepEqual(filtered.left,clip.frames[i].left,'The contacting hand must stay at its measured location');
+   if(target==='face')assert.deepEqual(filtered.face,clip.frames[i].face);
+   else for(const index of [11,12])assert.deepEqual(filtered.pose[index],clip.frames[i].pose[index]);
+  }
+ }
+});
+
+test('fast signing relative to the torso is protected even when screen-space wrist motion is slow',()=>{
+ const clip=syntheticClip(Array.from({length:12},(_,i)=>.18+(i%2?1:-1)*.001));
+ clip.frames.forEach((frame,i)=>{for(const index of [11,12])frame.pose[index][0]+=.04*i;});
+ const track=prepareMotion(clip);
+ for(let i=0;i<clip.frames.length;i++)assert.deepEqual(at(track,i).left,clip.frames[i].left);
+ assert.ok(getSmoothingMetrics(track).fastProtectedHandFrames>=8);
+});
+
+test('all six curated clips reduce head jitter without altering facial configuration at recorded instants',()=>{
+ for(const clip of curated){
+  const track=prepareMotion(clip),metrics=getSmoothingMetrics(track);
+  assert.ok(metrics.headCurvatureAfter<metrics.headCurvatureBefore,`${clip.clip_id}: smoothing must not introduce torso jitter into the head`);
+  for(let i=0;i<clip.frames.length;i++){
+   const source=track.frames[i].face,filtered=at(track,i).face;
+   for(let p=0;p<source.length;p++){
+    for(const axis of [0,1])assert.ok(Math.abs((filtered[p][axis]-filtered[0][axis])-(source[p][axis]-source[0][axis]))<1e-12);
+    assert.deepEqual(filtered[p].slice(2),source[p].slice(2));
+   }
+  }
+ }
+});
+
+test('source-frame boundaries have continuous display velocity in every curated clip',()=>{
+ const dt=1e-6;
+ for(const clip of curated)for(const smooth of [false,true]){
+  const track=prepareMotion(clip),scale=getSmoothingMetrics(track).shoulderPixels;
+  for(let i=1;i<clip.frames.length-1;i++){
+   const t=i/track.fps,a=sampleMotion(track,t-dt,{smooth}),b=sampleMotion(track,t,{smooth}),c=sampleMotion(track,t+dt,{smooth});
+   for(const part of ['pose','left','right','face']){
+    if(!a[part]||!b[part]||!c[part])continue;
+    for(let p=0;p<b[part].length;p++)for(const axis of [0,1]){
+     const factor=(axis===0?clip.width:clip.height)/scale;
+     const jump=Math.abs((c[part][p][axis]-b[part][p][axis])-(b[part][p][axis]-a[part][p][axis]))*factor/dt;
+     assert.ok(jump<.01,`${clip.clip_id}/${part}/${p}: unexpected velocity step at frame ${i}`);
     }
    }
   }

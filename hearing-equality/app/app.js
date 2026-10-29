@@ -1,6 +1,6 @@
 import { initUI, setItems, setSelection, setPlayback, setMessage, setReady, setMode, setLoop, setTour, showToast, revealViewer } from './ui.js?v=0.3';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
-import { CanvasAvatar } from './canvas-avatar.js?v=0.11.1';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.12.0';
 
 const video = document.getElementById('reference-video');
 const cache = new Map();

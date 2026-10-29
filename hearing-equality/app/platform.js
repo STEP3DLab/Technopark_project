@@ -1,8 +1,8 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.11.1';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.12.0';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.11.1';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.11.1';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.12.0';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.12.0';
 import { TrialProtocol } from './trial-protocol.js';
 const $ = id => document.getElementById(id);
 async function fetchJSON(path,timeout=15000){
@@ -17,6 +17,7 @@ async function fetchJSON(path,timeout=15000){
 }
 const s = { mode:'text', catalog:[], motions:new Map(), templates:[], templatesReady:false, custom:[], selected:null,
   data:null, time:0, playing:false, raf:0, last:0, compare:false, view:'avatar', selectionToken:0, playbackToken:0,
+  repeat:false, repeatWaiting:false, repeatTimer:0,
   stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0, recordPending:false, trialContext:null,
   frame:null, analyzing:false, videoReady:false, sampleId:null, videoURL:null, result:null, speech:null };
 const ledger = new SessionLedger();
@@ -44,26 +45,55 @@ function renderPlayback() {
   // Replacing the play icon on every RAF churns DOM while the canvas is drawing.
   if(playbackUIState!==s.playing){
     $('play').innerHTML=s.playing?'Ⅱ':'<svg><use href="#i-play"/></svg>';
-    putAttribute('play','aria-label',s.playing?'Пауза':'Воспроизвести');playbackUIState=s.playing;
+    playbackUIState=s.playing;
   }
   const ready=Boolean(s.data),frame=currentFrame(),frames=s.data?.frames.length||0;
-  for(const id of ['play','replay'])if($(id).disabled===ready)$(id).disabled=!ready;
+  const ended=ready&&s.time>=s.data.duration-.01;
+  const action=s.playing?'Пауза':ended?'Повторить с начала':s.time>0?'Продолжить':'Воспроизвести';
+  putAttribute('play','aria-label',action);putAttribute('play','title',`${action} · Пробел`);
+  const speed=String($('speed').value).replace('.',',');
+  putText('playback-status',!ready?'Движение не загружено':s.repeatWaiting?'Пауза перед повтором':s.playing?`Воспроизведение · ${speed}×`:ended?'Завершено · можно повторить':s.time>0?'Пауза':'Готово к показу');
+  for(const id of ['play','replay','repeat','timeline'])if($(id).disabled===ready)$(id).disabled=!ready;
+  putAttribute('repeat','aria-pressed',s.repeat);
   const recordedPosition=ready?Math.max(0,Math.min(frames-1,s.time*s.data.fps)):0;
   $('frame-prev').disabled=!ready||recordedPosition<=1e-6;$('frame-next').disabled=!ready||recordedPosition>=frames-1-1e-6;
   putText('frame-readout',ready?`Кадр ${frame+1} / ${frames}`:'Кадр —');
   putAttribute('timeline','aria-valuetext',ready?`${format(s.time)} из ${format(s.data.duration)} · кадр ${frame+1} из ${frames}`:'Нет движения');
   avatar.showAt(s.time);dialogueAvatar.showAt(s.time);
 }
-function pauseAvatar() {++s.playbackToken;s.playing=false;cancelAnimationFrame(s.raf);s.raf=0;video.pause();renderPlayback();}
+function cancelRepeatWait(){clearTimeout(s.repeatTimer);s.repeatTimer=0;s.repeatWaiting=false;}
+function pauseAvatar() {++s.playbackToken;s.playing=false;cancelRepeatWait();cancelAnimationFrame(s.raf);s.raf=0;video.pause();renderPlayback();}
+function setRepeat(enabled){
+  s.repeat=Boolean(enabled&&s.data&&s.mode==='text');
+  if(!s.repeat&&s.repeatWaiting)pauseAvatar();
+  renderPlayback();
+}
+function finishAvatar(){
+  if(!s.data||!s.playing||s.repeatWaiting)return;
+  s.time=s.data.duration;
+  if(!s.repeat||document.hidden||s.mode!=='text'){pauseAvatar();return;}
+  // The final frame stays still. No transition is generated between the
+  // recording's end and its beginning; one cancellable timer owns the repeat.
+  cancelAnimationFrame(s.raf);s.raf=0;video.pause();s.repeatWaiting=true;renderPlayback();
+  const selection=s.selectionToken,playback=s.playbackToken;
+  const timer=setTimeout(()=>{
+    if(s.repeatTimer!==timer)return;
+    s.repeatTimer=0;
+    if(selection!==s.selectionToken||playback!==s.playbackToken||!s.repeat||!s.playing||document.hidden||s.mode!=='text')return;
+    s.repeatWaiting=false;s.time=0;playAvatar();
+  },800);
+  s.repeatTimer=timer;
+}
 function tick(now) {
-  if(!s.playing||!s.data)return;
+  s.raf=0;if(!s.playing||!s.data||s.repeatWaiting)return;
   if(s.compare){if(!video.seeking)s.time=Math.min(s.data.duration,video.currentTime);}
   else s.time=Math.min(s.data.duration,s.time+Math.max(0,(now-s.last)/1000)*Number($('speed').value));
   s.last=now;renderPlayback();
-  if(s.time>=s.data.duration-.01){pauseAvatar();return;}s.raf=requestAnimationFrame(tick);
+  if(s.time>=s.data.duration-.01){finishAvatar();return;}s.raf=requestAnimationFrame(tick);
 }
 async function playAvatar() {
-  if(!s.data||!['text','dialogue'].includes(s.mode))return;
+  if(!s.data||document.hidden||!['text','dialogue'].includes(s.mode))return;
+  cancelRepeatWait();
   const token=s.selectionToken,playToken=++s.playbackToken;
   if(s.time>=s.data.duration-.03)s.time=0;
   s.playing=true;renderPlayback();
@@ -80,7 +110,7 @@ async function playAvatar() {
 }
 async function selectWord(id,autoplay=false) {
   const item=s.catalog.find(x=>x.id===id);if(!item)return;
-  const token=++s.selectionToken;pauseAvatar();s.data=null;s.selected=item;s.time=0;avatar.clear();dialogueAvatar.clear();
+  const token=++s.selectionToken;pauseAvatar();s.repeat=false;s.data=null;s.selected=item;s.time=0;avatar.clear();dialogueAvatar.clear();
   $('active-word').textContent='Загрузка…';$('message').value=item.text;updateCount();
   notice('text-notice','');renderPlayback();
   for(const button of $('word-chips').children)button.setAttribute('aria-pressed',String(button.dataset.id===id));
@@ -98,15 +128,24 @@ $('message').addEventListener('input',updateCount);
 $('text-form').addEventListener('submit',e=>{
   e.preventDefault();const item=matchText($('message').value,s.catalog);
   if(item){selectWord(item.id,true);return;}
-  ++s.selectionToken;pauseAvatar();s.data=null;s.selected=null;s.time=0;avatar.clear();dialogueAvatar.clear();$('dialogue-active-word').textContent='Ответ текстом';video.removeAttribute('src');video.load();
+  ++s.selectionToken;pauseAvatar();s.repeat=false;s.data=null;s.selected=null;s.time=0;avatar.clear();dialogueAvatar.clear();$('dialogue-active-word').textContent='Ответ текстом';video.removeAttribute('src');video.load();
   $('active-word').textContent='Нет в словаре';renderPlayback();
   for(const button of $('word-chips').children)button.setAttribute('aria-pressed','false');
   notice('text-notice','Для этого сообщения нет записи. Выберите одно из шести слов. Отрицания и предложения требуют отдельного перевода.','error');
 });
 $('play').onclick=()=>s.playing?pauseAvatar():playAvatar();
 $('replay').onclick=()=>{pauseAvatar();s.time=0;playAvatar();};
+$('repeat').onclick=()=>setRepeat(!s.repeat);
 $('timeline').addEventListener('input',()=>{const ratio=Number($('timeline').value)/1000;pauseAvatar();if(!s.data)return;s.time=ratio*s.data.duration;if(video.readyState>=1)video.currentTime=s.time;renderPlayback();});
-$('speed').onchange=()=>{video.playbackRate=Number($('speed').value);s.last=performance.now();};
+$('timeline').addEventListener('keydown',event=>{
+  if(!s.data||event.ctrlKey||event.metaKey||event.altKey)return;
+  if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();stepFrame(event.key==='ArrowLeft'?-1:1);}
+  else if(event.key==='Home'||event.key==='End'){
+    event.preventDefault();pauseAvatar();s.time=event.key==='Home'?0:(s.data.frames.length-1)/s.data.fps;
+    if(video.readyState>=1)video.currentTime=s.time;renderPlayback();
+  }
+});
+$('speed').onchange=()=>{video.playbackRate=Number($('speed').value);s.last=performance.now();renderPlayback();};
 let motionSmoothing=true;
 function setMotionSmoothing(enabled){
   motionSmoothing=Boolean(enabled);
@@ -119,7 +158,7 @@ setMotionSmoothing(true);
 $('motion-smoothing').onclick=()=>setMotionSmoothing(!motionSmoothing);
 function setVisualMode(view){
   if(!['avatar','compare','reference'].includes(view))return;
-  const resume=s.playing;pauseAvatar();s.view=view;s.compare=view!=='avatar';
+  const resume=s.playing&&!s.repeatWaiting;s.repeat=false;pauseAvatar();s.view=view;s.compare=view!=='avatar';
   video.hidden=!s.compare;$('stage').classList.toggle('compare',view==='compare');$('stage').classList.toggle('reference',view==='reference');
   for(const name of ['avatar','compare','reference'])putAttribute(`show-${name}`,'aria-pressed',name===view);
   if(video.readyState>=1)video.currentTime=s.time;
@@ -140,11 +179,12 @@ function stepFrame(delta){
 }
 $('frame-prev').onclick=()=>stepFrame(-1);$('frame-next').onclick=()=>stepFrame(1);
 // Move the live card rather than cloning media/canvas nodes or their controls.
-const focusDialog=$('avatar-focus-dialog'),avatarCard=document.querySelector('.avatar-card');
-let focusHome=null,focusNext=null,focusReturn=null;
+const focusDialog=$('avatar-focus-dialog'),avatarCard=document.querySelector('.avatar-card'),showcaseControls=$('showcase-controls');
+let focusHome=null,focusNext=null,focusReturn=null,showcaseHome=null,showcaseNext=null;
 function restoreAvatarCard(){
   if(!focusHome)return;
-  pauseAvatar();
+  if(showcaseHome)showcaseHome.insertBefore(showcaseControls,showcaseNext?.parentNode===showcaseHome?showcaseNext:null);
+  showcaseHome=null;showcaseNext=null;
   focusHome.insertBefore(avatarCard,focusNext?.parentNode===focusHome?focusNext:null);
   focusHome=null;focusNext=null;
   putText('avatar-focus-label','Крупно');putAttribute('avatar-focus','aria-expanded',false);
@@ -152,16 +192,16 @@ function restoreAvatarCard(){
 }
 function openAvatarFocus(){
   if(focusDialog.open){focusDialog.close();return;}
-  const resume=s.playing;pauseAvatar();
   focusHome=avatarCard.parentNode;focusNext=avatarCard.nextSibling;focusReturn=document.activeElement||$('avatar-focus');
+  showcaseHome=showcaseControls.parentNode;showcaseNext=showcaseControls.nextSibling;
+  avatarCard.insertBefore(showcaseControls,$('avatar-footer'));
   focusDialog.append(avatarCard);focusDialog.showModal();
   putText('avatar-focus-label','Закрыть');putAttribute('avatar-focus','aria-expanded',true);
   avatar.resize();renderPlayback();$('avatar-focus').focus({preventScroll:true});
-  if(resume)playAvatar();
 }
 $('avatar-focus').onclick=openAvatarFocus;
 focusDialog.addEventListener('close',restoreAvatarCard);
-video.addEventListener('ended',pauseAvatar);
+video.addEventListener('ended',()=>{if(s.compare)finishAvatar();});
 video.addEventListener('error',()=>{if(s.compare&&s.data){pauseAvatar();notice('text-notice','Исходное видео недоступно. Можно посмотреть движение аватара.','error');}});
 function dictationUI(active){
   $('dictate').classList.toggle('recording',active);$('dictate').setAttribute('aria-label',active?'Остановить голосовой ввод':'Ввести голосом');
@@ -228,7 +268,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const data=await fetchJSON('./assets/recognition-library.json?v=0.11.1');
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.12.0');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -397,7 +437,7 @@ $('replay-analysis').onclick=async()=>{
 function setMode(mode){
   if(focusDialog.open){focusDialog.close();restoreAvatarCard();}
   if(!['dialogue','research','text','camera','video','about'].includes(mode))mode='dialogue';
-  pauseAvatar();stopDictation();stopCapture();window.speechSynthesis?.cancel();s.mode=mode;s.videoReady=false;s.sampleId=null;$('replay-analysis').disabled=true;releaseFile();
+  s.repeat=false;pauseAvatar();stopDictation();stopCapture();window.speechSynthesis?.cancel();s.mode=mode;s.videoReady=false;s.sampleId=null;$('replay-analysis').disabled=true;releaseFile();
   inputVideo.removeAttribute('src');inputVideo.load();inputVideo.controls=false;$('analyze-video').disabled=true;
   $('view-dialogue').hidden=mode!=='dialogue';$('view-research').hidden=mode!=='research';$('intro-banner').hidden=['dialogue','research'].includes(mode);
   $(mode==='dialogue'?'dialogue-camera-slot':'capture-stage-home').append($('capture-stage'));
@@ -479,7 +519,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.11.1',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.12.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
@@ -533,11 +573,11 @@ $('close-presentation').onclick=()=>$('presentation').close();$('presentation').
 $('prev-slide').onclick=()=>{slideIndex=Math.max(0,slideIndex-1);renderSlide();};$('next-slide').onclick=()=>{slideIndex=Math.min(slides.length-1,slideIndex+1);renderSlide();};
 $('slide-action').onclick=()=>{$('presentation').close();setMode(slides[slideIndex].mode);$('mode-crumb').scrollIntoView({block:'start'});};
 $('presentation').addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();$('next-slide').click();}if(e.key==='ArrowLeft'){e.preventDefault();$('prev-slide').click();}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseAvatar();stopDictation();const active=Boolean(s.stream)||s.analyzing;stopCapture();if(active)notice('capture-notice','Обработка остановлена: вкладка была скрыта. Запустите камеру или анализ заново.');window.speechSynthesis?.cancel();}});
-window.addEventListener('pagehide',()=>{stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){s.repeat=false;pauseAvatar();stopDictation();const active=Boolean(s.stream)||s.analyzing;stopCapture();if(active)notice('capture-notice','Обработка остановлена: вкладка была скрыта. Запустите камеру или анализ заново.');window.speechSynthesis?.cancel();}});
+window.addEventListener('pagehide',()=>{s.repeat=false;pauseAvatar();stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
 window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
 try{
-  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.11.1')).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.12.0')).samples);
   loadBenchmark();
   for(const item of s.catalog){
     const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);$('word-chips').append(word);
@@ -552,9 +592,9 @@ try{
 // Narrow public interface for the presentation controls; no dialogue contents or camera frames.
 window.hearingEquality=Object.freeze({
   catalog:()=>s.catalog.map(({id,text,motion,video})=>({id,text,motion,video})),
-  state:()=>({mode:s.mode,selected:s.selected?.id||null,ready:Boolean(s.data),playing:s.playing,time:s.time,duration:s.data?.duration||0,view:s.view}),
+  state:()=>({mode:s.mode,selected:s.selected?.id||null,ready:Boolean(s.data),playing:s.playing,time:s.time,duration:s.data?.duration||0,view:s.view,repeat:s.repeat}),
   select:async(id,autoplay=false)=>{await selectWord(id,autoplay);return Boolean(s.data&&s.selected?.id===id);},
-  play:playAvatar,pause:pauseAvatar,mode:setMode,view:setVisualMode,step:stepFrame,focus:openAvatarFocus,
+  play:playAvatar,pause:pauseAvatar,mode:setMode,view:setVisualMode,step:stepFrame,focus:openAvatarFocus,repeat:setRepeat,
   stop:()=>{pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();},
   notify:toast,
 });

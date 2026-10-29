@@ -1,6 +1,6 @@
 // Only curated, same-origin demonstration assets are stored. Camera models,
 // microphone audio, uploaded files and conversation content are never cached.
-export const APP_VERSION = '0.11.1';
+export const APP_VERSION = '0.12.0';
 export const APP_BASE = new URL('./', import.meta.url);
 export const CACHE_PREFIX = `hearing-equality-demo:${APP_BASE.pathname}:`;
 export const CACHE_NAME = `${CACHE_PREFIX}${APP_VERSION}`;

@@ -67,6 +67,14 @@ function capsule(ctx,a,b,ra,rb) {
   ctx.closePath();
 }
 
+/** A single measured phalanx for depth-aware surface shading. Reuses the same
+ * exact tangent construction as traceDigit and never moves the joint centres.
+ */
+export function tracePhalanx(ctx,a,b,startRadius,endRadius) {
+  if(!valid(a)||!valid(b)||!Number.isFinite(startRadius)||!Number.isFinite(endRadius)||startRadius<=0||endRadius<=0)return false;
+  capsule(ctx,a,b,startRadius,endRadius);return true;
+}
+
 /** Append the three rounded phalanges and two stable joint discs to an
  * existing path. All subpaths have the same winding, including U-bends and
  * coincident joints. Use ONE normal/nonzero fill; do not stroke the individual

@@ -1,0 +1,1474 @@
+{
+  "note": "Kinematics ordered raw, v0.11 smoothing, v0.12 smoothing. Timing from Node on this workspace; not browser rendering timing.",
+  "records": [
+    {
+      "id": "hello",
+      "label": "Привет!",
+      "frames": 50,
+      "fps": 30,
+      "shoulderPixels": 242.15509724560576,
+      "filled": 0,
+      "missing": 0,
+      "kinematics": {
+        "body": [
+          {
+            "curvaturePct": 0.25999652241834786,
+            "speed": {
+              "median": 0.10165733178698354,
+              "p95": 0.5071649713196021,
+              "max": 0.6117561774721423
+            },
+            "accelerationRms": 4.679937403530261,
+            "accelerationMax": 14.620653723292047
+          },
+          {
+            "curvaturePct": 0.13458726615304772,
+            "speed": {
+              "median": 0.08912060919192162,
+              "p95": 0.4722071189681527,
+              "max": 0.5389214637402071
+            },
+            "accelerationRms": 2.422570790754859,
+            "accelerationMax": 6.7294692898429895
+          },
+          {
+            "curvaturePct": 0.13457728146525258,
+            "speed": {
+              "median": 0.08983607128701016,
+              "p95": 0.4722071189681527,
+              "max": 0.5389214637402071
+            },
+            "accelerationRms": 2.4223910663745465,
+            "accelerationMax": 6.692748466375737
+          }
+        ],
+        "head": [
+          {
+            "curvaturePct": 0.20297071798236946,
+            "speed": {
+              "median": 0.19131088998164716,
+              "p95": 1.032229558007247,
+              "max": 1.4961451370759957
+            },
+            "accelerationRms": 3.65347292368265,
+            "accelerationMax": 14.406052973464112
+          },
+          {
+            "curvaturePct": 0.16000355931808355,
+            "speed": {
+              "median": 0.1963578132722172,
+              "p95": 0.9841753660005311,
+              "max": 1.4961451370759957
+            },
+            "accelerationRms": 2.880064067725504,
+            "accelerationMax": 10.923371594350186
+          },
+          {
+            "curvaturePct": 0.14350761178360286,
+            "speed": {
+              "median": 0.202637815830602,
+              "p95": 0.969373293721446,
+              "max": 1.4961451370759957
+            },
+            "accelerationRms": 2.583137012104851,
+            "accelerationMax": 11.02987266607868
+          }
+        ],
+        "left": [
+          {
+            "curvaturePct": 0.4465541681599563,
+            "speed": {
+              "median": 0.1438879386170996,
+              "p95": 0.6179321592236902,
+              "max": 1.0290584274760357
+            },
+            "accelerationRms": 8.037975026879213,
+            "accelerationMax": 30.090293450906188
+          },
+          {
+            "curvaturePct": 0.21357659454509292,
+            "speed": {
+              "median": 0.08945357035325822,
+              "p95": 0.5602919681650962,
+              "max": 0.8739069352481674
+            },
+            "accelerationRms": 3.8443787018116726,
+            "accelerationMax": 14.282017768011817
+          },
+          {
+            "curvaturePct": 0.21648029412297481,
+            "speed": {
+              "median": 0.08945357035323291,
+              "p95": 0.5602919681650962,
+              "max": 0.8949754308319521
+            },
+            "accelerationRms": 3.8966452942135468,
+            "accelerationMax": 13.382695136061157
+          }
+        ],
+        "right": [
+          {
+            "curvaturePct": 2.051850012942955,
+            "speed": {
+              "median": 0.942751579295167,
+              "p95": 5.546818667795881,
+              "max": 8.204097313820517
+            },
+            "accelerationRms": 36.933300232973195,
+            "accelerationMax": 154.5436443181133
+          },
+          {
+            "curvaturePct": 1.8719910337572212,
+            "speed": {
+              "median": 0.6640626402943244,
+              "p95": 5.5519060174035895,
+              "max": 8.204097313820517
+            },
+            "accelerationRms": 33.69583860762998,
+            "accelerationMax": 156.31756934037904
+          },
+          {
+            "curvaturePct": 1.8498552518067135,
+            "speed": {
+              "median": 0.6672400816701328,
+              "p95": 5.546818667795881,
+              "max": 8.204097313820517
+            },
+            "accelerationRms": 33.29739453252085,
+            "accelerationMax": 154.5436443181133
+          }
+        ]
+      },
+      "metrics": {
+        "method": "symmetric-adaptive-translation",
+        "radius": 2,
+        "shoulderPixels": 242.15509724560576,
+        "frames": 50,
+        "wristSamples": 96,
+        "wristCurvatureBefore": 0.014848399073157732,
+        "wristCurvatureAfter": 0.013169715582313184,
+        "slowWristCurvatureBefore": 0.0029803609699912323,
+        "slowWristCurvatureAfter": 0.0007660955383131843,
+        "slowWristSamples": 29,
+        "rmsWristCorrection": 0.0031918475414683656,
+        "maxWristCorrection": 0.008000000000000106,
+        "contactProtectedHandFrames": 6,
+        "fastProtectedHandFrames": 14,
+        "bodyCurvatureBefore": 0.0025999652241834657,
+        "bodyCurvatureAfter": 0.0013457728146525443,
+        "bodySamples": 48,
+        "maxBodyCorrection": 0.004,
+        "headCurvatureBefore": 0.0020297071798237253,
+        "headCurvatureAfter": 0.0014350761178360046,
+        "headSamples": 48,
+        "maxHeadCorrection": 0.003
+      },
+      "quietWristBeforeAfterPct": [
+        0.07661975429684352,
+        0.07660955383131843
+      ],
+      "maxWristCorrectionPixels": 1.9372407779648717,
+      "maxHeadCorrectionPixels": 0.7264652917368173,
+      "digitVectorError": 1.9984014443252818e-14,
+      "faceVectorError": 3.9968028886505635e-14,
+      "depthFlips": 0,
+      "minDepthMargin": 0.564233,
+      "minVisibleMargin": 10.391125310378525,
+      "minFaceProximity": 0.08010306687457862,
+      "protectedFaceFrames": 0,
+      "protectedFaceError": 0,
+      "prepareMs": [
+        {
+          "median": 5.9538670000000025,
+          "p95": 7.99193600000001,
+          "max": 8.95429999999999
+        },
+        {
+          "median": 3.578567000000021,
+          "p95": 4.432827000000032,
+          "max": 5.557046000000014
+        }
+      ],
+      "sampleUs": [
+        {
+          "median": 25.066263200000005,
+          "p95": 29.224526400000013,
+          "max": 29.224526400000013
+        },
+        {
+          "median": 24.148716800000056,
+          "p95": 28.650102000000015,
+          "max": 28.650102000000015
+        }
+      ]
+    },
+    {
+      "id": "yes",
+      "label": "да",
+      "frames": 30,
+      "fps": 30,
+      "shoulderPixels": 278.4913146013427,
+      "filled": 0,
+      "missing": 0,
+      "kinematics": {
+        "body": [
+          {
+            "curvaturePct": 0.39693908914017584,
+            "speed": {
+              "median": 0.08511598747901712,
+              "p95": 0.4011937797787169,
+              "max": 0.6190546919989954
+            },
+            "accelerationRms": 7.144903604523165,
+            "accelerationMax": 22.850660688474804
+          },
+          {
+            "curvaturePct": 0.2422578097925974,
+            "speed": {
+              "median": 0.09376624576565046,
+              "p95": 0.2850859440636905,
+              "max": 0.5288028861975701
+            },
+            "accelerationRms": 4.3606405762667535,
+            "accelerationMax": 20.064076406116122
+          },
+          {
+            "curvaturePct": 0.32304414755941424,
+            "speed": {
+              "median": 0.09184390998238708,
+              "p95": 0.33173762238967464,
+              "max": 0.6190546919989954
+            },
+            "accelerationRms": 5.814794656069457,
+            "accelerationMax": 22.850660688474804
+          }
+        ],
+        "head": [
+          {
+            "curvaturePct": 0.1366237245375968,
+            "speed": {
+              "median": 0.05795788129836813,
+              "p95": 0.13423780958873655,
+              "max": 0.17897007710100432
+            },
+            "accelerationRms": 2.4592270416767423,
+            "accelerationMax": 5.196488363408582
+          },
+          {
+            "curvaturePct": 0.16496577248161717,
+            "speed": {
+              "median": 0.04937033666434128,
+              "p95": 0.13599782986813597,
+              "max": 0.221727975879768
+            },
+            "accelerationRms": 2.969383904669109,
+            "accelerationMax": 8.329766462562532
+          },
+          {
+            "curvaturePct": 0.10639960741947097,
+            "speed": {
+              "median": 0.0480072370403143,
+              "p95": 0.12945525895007637,
+              "max": 0.1578961322906982
+            },
+            "accelerationRms": 1.9151929335504774,
+            "accelerationMax": 4.2624607348052495
+          }
+        ],
+        "left": [
+          {
+            "curvaturePct": 1.63109879038007,
+            "speed": {
+              "median": 0.42804386865425637,
+              "p95": 1.1521911441156862,
+              "max": 1.1670989083615597
+            },
+            "accelerationRms": 29.35977822684126,
+            "accelerationMax": 62.302304290885644
+          },
+          {
+            "curvaturePct": 0.7977547070893112,
+            "speed": {
+              "median": 0.18209981181902357,
+              "p95": 0.7896748084240801,
+              "max": 0.8450504262964159
+            },
+            "accelerationRms": 14.359584727607603,
+            "accelerationMax": 38.81300215059435
+          },
+          {
+            "curvaturePct": 0.8253613389470612,
+            "speed": {
+              "median": 0.1808791361147977,
+              "p95": 0.7811472447412217,
+              "max": 0.872434892057839
+            },
+            "accelerationRms": 14.8565041010471,
+            "accelerationMax": 38.280045586336165
+          }
+        ],
+        "right": [
+          {
+            "curvaturePct": 2.21439396066436,
+            "speed": {
+              "median": 0.31586635449045847,
+              "p95": 2.3804286746411707,
+              "max": 3.977732845745173
+            },
+            "accelerationRms": 39.85909129195848,
+            "accelerationMax": 159.53587132733014
+          },
+          {
+            "curvaturePct": 2.0996790558324436,
+            "speed": {
+              "median": 0.34211861222429557,
+              "p95": 2.435497555908749,
+              "max": 3.78289106495227
+            },
+            "accelerationRms": 37.794223004983984,
+            "accelerationMax": 151.65661702319193
+          },
+          {
+            "curvaturePct": 2.207363232256102,
+            "speed": {
+              "median": 0.2987815489700162,
+              "p95": 2.3804286746411707,
+              "max": 3.977732845745173
+            },
+            "accelerationRms": 39.732538180609836,
+            "accelerationMax": 159.53587132733014
+          }
+        ]
+      },
+      "metrics": {
+        "method": "symmetric-adaptive-translation",
+        "radius": 2,
+        "shoulderPixels": 278.4913146013427,
+        "frames": 30,
+        "wristSamples": 56,
+        "wristCurvatureBefore": 0.01944739555442596,
+        "wristCurvatureAfter": 0.016663843762686602,
+        "slowWristCurvatureBefore": 0.004450554953929801,
+        "slowWristCurvatureAfter": 0.00131572160595124,
+        "slowWristSamples": 10,
+        "rmsWristCorrection": 0.003734790153854582,
+        "maxWristCorrection": 0.008000000000000096,
+        "contactProtectedHandFrames": 13,
+        "fastProtectedHandFrames": 8,
+        "bodyCurvatureBefore": 0.003969390891401815,
+        "bodyCurvatureAfter": 0.0032304414755941475,
+        "bodySamples": 28,
+        "maxBodyCorrection": 0.003855716859286489,
+        "headCurvatureBefore": 0.0013662372453759084,
+        "headCurvatureAfter": 0.0010639960741946662,
+        "headSamples": 28,
+        "maxHeadCorrection": 0.001169894384885748
+      },
+      "quietWristBeforeAfterPct": [
+        0.14162121551489043,
+        0.131572160595124
+      ],
+      "maxWristCorrectionPixels": 2.227930516810768,
+      "maxHeadCorrectionPixels": 0.32580542519156114,
+      "digitVectorError": 0,
+      "faceVectorError": 3.9968028886505635e-14,
+      "depthFlips": 0,
+      "minDepthMargin": 0.1356219999999999,
+      "minVisibleMargin": 9.774181063008047,
+      "minFaceProximity": 0.02689112567513084,
+      "protectedFaceFrames": 5,
+      "protectedFaceError": 0,
+      "prepareMs": [
+        {
+          "median": 2.8963659999999436,
+          "p95": 6.638310000000047,
+          "max": 8.604681000000028
+        },
+        {
+          "median": 1.7184370000002218,
+          "p95": 4.771510000000035,
+          "max": 4.975458000000117
+        }
+      ],
+      "sampleUs": [
+        {
+          "median": 27.391665199999988,
+          "p95": 32.41494279999997,
+          "max": 32.41494279999997
+        },
+        {
+          "median": 28.927710000000115,
+          "p95": 33.80151799999994,
+          "max": 33.80151799999994
+        }
+      ]
+    },
+    {
+      "id": "good",
+      "label": "хорошо",
+      "frames": 49,
+      "fps": 30,
+      "shoulderPixels": 322.56620727491713,
+      "filled": 0,
+      "missing": 0,
+      "kinematics": {
+        "body": [
+          {
+            "curvaturePct": 0.18291218814083693,
+            "speed": {
+              "median": 0.03589762616517701,
+              "p95": 0.3021887763479664,
+              "max": 0.3573272468730579
+            },
+            "accelerationRms": 3.292419386535065,
+            "accelerationMax": 9.870006448104734
+          },
+          {
+            "curvaturePct": 0.092125923785687,
+            "speed": {
+              "median": 0.032647619047528935,
+              "p95": 0.25470491516398774,
+              "max": 0.26875904917266535
+            },
+            "accelerationRms": 1.6582666281423661,
+            "accelerationMax": 4.983542503942965
+          },
+          {
+            "curvaturePct": 0.14374707666435024,
+            "speed": {
+              "median": 0.03392703569494834,
+              "p95": 0.2704778463007156,
+              "max": 0.3573272468730579
+            },
+            "accelerationRms": 2.587447379958304,
+            "accelerationMax": 6.981679900209154
+          }
+        ],
+        "head": [
+          {
+            "curvaturePct": 0.09091167688161696,
+            "speed": {
+              "median": 0.050552940923888914,
+              "p95": 0.12786808747878994,
+              "max": 0.16461304812628905
+            },
+            "accelerationRms": 1.6364101838691052,
+            "accelerationMax": 3.542816869088317
+          },
+          {
+            "curvaturePct": 0.1259161074131679,
+            "speed": {
+              "median": 0.04973995251948086,
+              "p95": 0.15887022247873195,
+              "max": 0.16539437416741024
+            },
+            "accelerationRms": 2.266489933437022,
+            "accelerationMax": 7.161847914512844
+          },
+          {
+            "curvaturePct": 0.031428138526772675,
+            "speed": {
+              "median": 0.03710020370878716,
+              "p95": 0.12786808747878994,
+              "max": 0.15887022247873195
+            },
+            "accelerationRms": 0.5657064934819082,
+            "accelerationMax": 1.437174484234388
+          }
+        ],
+        "left": [
+          {
+            "curvaturePct": 0.23462886580130687,
+            "speed": {
+              "median": 0.061403939607301984,
+              "p95": 0.18978006872719544,
+              "max": 0.26448532441569184
+            },
+            "accelerationRms": 4.223319584423524,
+            "accelerationMax": 11.54197580068331
+          },
+          {
+            "curvaturePct": 0.11129879982762653,
+            "speed": {
+              "median": 0.020392591304038116,
+              "p95": 0.16198323484779617,
+              "max": 0.26448532441569184
+            },
+            "accelerationRms": 2.0033783968972774,
+            "accelerationMax": 12.186910963336143
+          },
+          {
+            "curvaturePct": 0.11129879982763016,
+            "speed": {
+              "median": 0.020392591304038116,
+              "p95": 0.16198323484779617,
+              "max": 0.26448532441569184
+            },
+            "accelerationRms": 2.003378396897343,
+            "accelerationMax": 12.186910963336143
+          }
+        ],
+        "right": [
+          {
+            "curvaturePct": 2.210097429093049,
+            "speed": {
+              "median": 0.42935211868948453,
+              "p95": 3.6762571320796282,
+              "max": 4.507964592210609
+            },
+            "accelerationRms": 39.78175372367488,
+            "accelerationMax": 159.16399692917028
+          },
+          {
+            "curvaturePct": 2.2190674844656635,
+            "speed": {
+              "median": 0.3151575780314152,
+              "p95": 3.6988196529096617,
+              "max": 4.520961585755594
+            },
+            "accelerationRms": 39.94321472038194,
+            "accelerationMax": 161.41840497261217
+          },
+          {
+            "curvaturePct": 2.203913995545928,
+            "speed": {
+              "median": 0.319470075753479,
+              "p95": 3.6762571320796282,
+              "max": 4.507964592210609
+            },
+            "accelerationRms": 39.670451919826704,
+            "accelerationMax": 159.16399692917028
+          }
+        ]
+      },
+      "metrics": {
+        "method": "symmetric-adaptive-translation",
+        "radius": 2,
+        "shoulderPixels": 322.56620727491713,
+        "frames": 49,
+        "wristSamples": 94,
+        "wristCurvatureBefore": 0.015715567681046264,
+        "wristCurvatureAfter": 0.015603884648712159,
+        "slowWristCurvatureBefore": 0.002372765656204686,
+        "slowWristCurvatureAfter": 0.0014100891771952494,
+        "slowWristSamples": 67,
+        "rmsWristCorrection": 0.0010859200290879185,
+        "maxWristCorrection": 0.006551110053823266,
+        "contactProtectedHandFrames": 41,
+        "fastProtectedHandFrames": 7,
+        "bodyCurvatureBefore": 0.0018291218814084002,
+        "bodyCurvatureAfter": 0.0014374707666434704,
+        "bodySamples": 47,
+        "maxBodyCorrection": 0.0034058996722117494,
+        "headCurvatureBefore": 0.0009091167688161729,
+        "headCurvatureAfter": 0.0003142813852676964,
+        "headSamples": 47,
+        "maxHeadCorrection": 0.001126920308609634
+      },
+      "quietWristBeforeAfterPct": [
+        0.13885071237203866,
+        0.14100891771952492
+      ],
+      "maxWristCorrectionPixels": 2.1131667235023492,
+      "maxHeadCorrectionPixels": 0.3635064098492888,
+      "digitVectorError": 3.9968028886505635e-14,
+      "faceVectorError": 7.105427357601002e-14,
+      "depthFlips": 0,
+      "minDepthMargin": 0.3568350000000001,
+      "minVisibleMargin": 8.917349661131029,
+      "minFaceProximity": 0.23544756511773784,
+      "protectedFaceFrames": 0,
+      "protectedFaceError": 0,
+      "prepareMs": [
+        {
+          "median": 4.9932550000003175,
+          "p95": 10.606566999999814,
+          "max": 12.919812000000093
+        },
+        {
+          "median": 2.8208220000001347,
+          "p95": 6.136492000000089,
+          "max": 6.167047999999795
+        }
+      ],
+      "sampleUs": [
+        {
+          "median": 29.12144640000006,
+          "p95": 34.31416479999989,
+          "max": 34.31416479999989
+        },
+        {
+          "median": 28.00520799999976,
+          "p95": 49.606877600000004,
+          "max": 49.606877600000004
+        }
+      ]
+    },
+    {
+      "id": "question",
+      "label": "вопрос",
+      "frames": 48,
+      "fps": 30,
+      "shoulderPixels": 320.55950495239045,
+      "filled": 0,
+      "missing": 0,
+      "kinematics": {
+        "body": [
+          {
+            "curvaturePct": 0.27585351377574835,
+            "speed": {
+              "median": 0.11903600972865845,
+              "p95": 0.41188556029865214,
+              "max": 0.5019154132423735
+            },
+            "accelerationRms": 4.96536324796347,
+            "accelerationMax": 16.005642573439783
+          },
+          {
+            "curvaturePct": 0.17852078086135514,
+            "speed": {
+              "median": 0.10228216266834045,
+              "p95": 0.23377024749648587,
+              "max": 0.5019154132423735
+            },
+            "accelerationRms": 3.213374055504393,
+            "accelerationMax": 16.739809545271942
+          },
+          {
+            "curvaturePct": 0.21475359186589887,
+            "speed": {
+              "median": 0.08776118535765608,
+              "p95": 0.2896001410012974,
+              "max": 0.5019154132423735
+            },
+            "accelerationRms": 3.8655646535861794,
+            "accelerationMax": 16.739809545271942
+          }
+        ],
+        "head": [
+          {
+            "curvaturePct": 0.2260750736656949,
+            "speed": {
+              "median": 0.08048192664649882,
+              "p95": 0.23220058074154368,
+              "max": 0.26616892648812535
+            },
+            "accelerationRms": 4.069351325982509,
+            "accelerationMax": 11.333654362983275
+          },
+          {
+            "curvaturePct": 0.2675453287553326,
+            "speed": {
+              "median": 0.07262618220701231,
+              "p95": 0.27729714569895164,
+              "max": 0.3069592663663808
+            },
+            "accelerationRms": 4.815815917595987,
+            "accelerationMax": 16.62361034582419
+          },
+          {
+            "curvaturePct": 0.19398655661547962,
+            "speed": {
+              "median": 0.06402199438172135,
+              "p95": 0.23220058074154368,
+              "max": 0.26616892648812535
+            },
+            "accelerationRms": 3.4917580190786333,
+            "accelerationMax": 11.333654362983275
+          }
+        ],
+        "left": [
+          {
+            "curvaturePct": 0.5336267563709628,
+            "speed": {
+              "median": 0.16094138785965834,
+              "p95": 0.29172783411857856,
+              "max": 0.5926415370282506
+            },
+            "accelerationRms": 9.605281614677331,
+            "accelerationMax": 20.657902948152064
+          },
+          {
+            "curvaturePct": 0.19698251717420118,
+            "speed": {
+              "median": 0.036988866889577116,
+              "p95": 0.29172783411857856,
+              "max": 0.5926415370282506
+            },
+            "accelerationRms": 3.5456853091356213,
+            "accelerationMax": 20.2958521132058
+          },
+          {
+            "curvaturePct": 0.19903069710356572,
+            "speed": {
+              "median": 0.036988866889565895,
+              "p95": 0.29172783411857856,
+              "max": 0.5926415370282506
+            },
+            "accelerationRms": 3.5825525478641826,
+            "accelerationMax": 20.35781679972559
+          }
+        ],
+        "right": [
+          {
+            "curvaturePct": 1.4738967622787837,
+            "speed": {
+              "median": 0.8338274042109254,
+              "p95": 2.865366157857085,
+              "max": 3.333922190889151
+            },
+            "accelerationRms": 26.530141721018108,
+            "accelerationMax": 66.2599121485567
+          },
+          {
+            "curvaturePct": 1.3796424512056453,
+            "speed": {
+              "median": 0.7474319981265412,
+              "p95": 2.903292198062476,
+              "max": 3.2934260806020026
+            },
+            "accelerationRms": 24.833564121701613,
+            "accelerationMax": 65.66915240318362
+          },
+          {
+            "curvaturePct": 1.3855158992561387,
+            "speed": {
+              "median": 0.7453793453149323,
+              "p95": 2.865366157857085,
+              "max": 3.333922190889151
+            },
+            "accelerationRms": 24.939286186610495,
+            "accelerationMax": 66.2599121485567
+          }
+        ]
+      },
+      "metrics": {
+        "method": "symmetric-adaptive-translation",
+        "radius": 2,
+        "shoulderPixels": 320.55950495239045,
+        "frames": 48,
+        "wristSamples": 92,
+        "wristCurvatureBefore": 0.011084063291435348,
+        "wristCurvatureAfter": 0.00989764498626084,
+        "slowWristCurvatureBefore": 0.004993406147685058,
+        "slowWristCurvatureAfter": 0.0007981395488335898,
+        "slowWristSamples": 43,
+        "rmsWristCorrection": 0.0026698103634968827,
+        "maxWristCorrection": 0.00799999999999994,
+        "contactProtectedHandFrames": 23,
+        "fastProtectedHandFrames": 20,
+        "bodyCurvatureBefore": 0.002758535137757472,
+        "bodyCurvatureAfter": 0.0021475359186589743,
+        "bodySamples": 46,
+        "maxBodyCorrection": 0.003530456422726033,
+        "headCurvatureBefore": 0.0022607507366569496,
+        "headCurvatureAfter": 0.0019398655661547837,
+        "headSamples": 46,
+        "maxHeadCorrection": 0.0016697943141877319
+      },
+      "quietWristBeforeAfterPct": [
+        0.07951808573184982,
+        0.07981395488335898
+      ],
+      "maxWristCorrectionPixels": 2.5644760396191044,
+      "maxHeadCorrectionPixels": 0.5352684387283356,
+      "digitVectorError": 3.9968028886505635e-14,
+      "faceVectorError": 3.9968028886505635e-14,
+      "depthFlips": 0,
+      "minDepthMargin": 0.6718035,
+      "minVisibleMargin": 9.339042039535531,
+      "minFaceProximity": 0.004856503698455667,
+      "protectedFaceFrames": 7,
+      "protectedFaceError": 0,
+      "prepareMs": [
+        {
+          "median": 5.26986399999987,
+          "p95": 11.27184600000055,
+          "max": 21.827492999999777
+        },
+        {
+          "median": 3.09441599999991,
+          "p95": 6.686263000000508,
+          "max": 12.957354999999552
+        }
+      ],
+      "sampleUs": [
+        {
+          "median": 28.8927208000001,
+          "p95": 34.19603599999973,
+          "max": 34.19603599999973
+        },
+        {
+          "median": 34.70530599999984,
+          "p95": 42.477971999999866,
+          "max": 42.477971999999866
+        }
+      ]
+    },
+    {
+      "id": "friend",
+      "label": "друг",
+      "frames": 40,
+      "fps": 30,
+      "shoulderPixels": 208.05060339676984,
+      "filled": 2,
+      "missing": 0,
+      "kinematics": {
+        "body": [
+          {
+            "curvaturePct": 0.2535224262606169,
+            "speed": {
+              "median": 0.10356641891731341,
+              "p95": 0.3976732894330976,
+              "max": 0.43204120093528736
+            },
+            "accelerationRms": 4.563403672691104,
+            "accelerationMax": 12.148966784486902
+          },
+          {
+            "curvaturePct": 0.12743279083152978,
+            "speed": {
+              "median": 0.10651590780500278,
+              "p95": 0.2889769289948069,
+              "max": 0.3023837744729356
+            },
+            "accelerationRms": 2.293790234967536,
+            "accelerationMax": 7.256672002892459
+          },
+          {
+            "curvaturePct": 0.12743279083152978,
+            "speed": {
+              "median": 0.10651590780500278,
+              "p95": 0.2889769289948069,
+              "max": 0.3023837744729356
+            },
+            "accelerationRms": 2.293790234967536,
+            "accelerationMax": 7.256672002892459
+          }
+        ],
+        "head": [
+          {
+            "curvaturePct": 0.1435415461177634,
+            "speed": {
+              "median": 0.1737813354575927,
+              "p95": 0.3845343817140844,
+              "max": 0.5618021967384075
+            },
+            "accelerationRms": 2.583747830119741,
+            "accelerationMax": 5.797267233109183
+          },
+          {
+            "curvaturePct": 0.0777093206354944,
+            "speed": {
+              "median": 0.14849274393671855,
+              "p95": 0.3829127144969334,
+              "max": 0.5618021967384075
+            },
+            "accelerationRms": 1.3987677714388993,
+            "accelerationMax": 5.671142974971438
+          },
+          {
+            "curvaturePct": 0.07697913790021348,
+            "speed": {
+              "median": 0.14849274393671855,
+              "p95": 0.372404728459008,
+              "max": 0.5618021967384075
+            },
+            "accelerationRms": 1.3856244822038426,
+            "accelerationMax": 6.321326262066145
+          }
+        ],
+        "left": [
+          {
+            "curvaturePct": 0.925611194415092,
+            "speed": {
+              "median": 0.2688221957023134,
+              "p95": 0.8183688725513272,
+              "max": 1.595877937204222
+            },
+            "accelerationRms": 16.661001499471656,
+            "accelerationMax": 41.82016088417973
+          },
+          {
+            "curvaturePct": 0.4772786844140763,
+            "speed": {
+              "median": 0.11665908494286927,
+              "p95": 0.8861199318688623,
+              "max": 1.595877937204222
+            },
+            "accelerationRms": 8.591016319453374,
+            "accelerationMax": 41.79075905167865
+          },
+          {
+            "curvaturePct": 0.46313148260676285,
+            "speed": {
+              "median": 0.11744269034723609,
+              "p95": 0.7899838605015613,
+              "max": 1.595877937204222
+            },
+            "accelerationRms": 8.336366686921732,
+            "accelerationMax": 42.16277421067617
+          }
+        ],
+        "right": [
+          {
+            "curvaturePct": 2.098778751405735,
+            "speed": {
+              "median": 0.9744950264595046,
+              "p95": 3.686639644573027,
+              "max": 5.485260570300856
+            },
+            "accelerationRms": 37.778017525303234,
+            "accelerationMax": 153.25328413427238
+          },
+          {
+            "curvaturePct": 2.0623988668521305,
+            "speed": {
+              "median": 0.9577628955666923,
+              "p95": 3.6893584625890177,
+              "max": 5.48242813435396
+            },
+            "accelerationRms": 37.12317960333834,
+            "accelerationMax": 151.87619494799708
+          },
+          {
+            "curvaturePct": 2.080622655179179,
+            "speed": {
+              "median": 0.9452158645520882,
+              "p95": 3.686639644573027,
+              "max": 5.485260570300856
+            },
+            "accelerationRms": 37.45120779322522,
+            "accelerationMax": 153.25328413427238
+          }
+        ]
+      },
+      "metrics": {
+        "method": "symmetric-adaptive-translation",
+        "radius": 2,
+        "shoulderPixels": 208.05060339676984,
+        "frames": 40,
+        "wristSamples": 76,
+        "wristCurvatureBefore": 0.016219784725110774,
+        "wristCurvatureAfter": 0.015072294787832393,
+        "slowWristCurvatureBefore": 0.005852664478657473,
+        "slowWristCurvatureAfter": 0.0015693320294843528,
+        "slowWristSamples": 27,
+        "rmsWristCorrection": 0.0030318692815269627,
+        "maxWristCorrection": 0.008000000000000096,
+        "contactProtectedHandFrames": 0,
+        "fastProtectedHandFrames": 9,
+        "bodyCurvatureBefore": 0.002535224262606122,
+        "bodyCurvatureAfter": 0.0012743279083152904,
+        "bodySamples": 38,
+        "maxBodyCorrection": 0.003999999999999999,
+        "headCurvatureBefore": 0.0014354154611776345,
+        "headCurvatureAfter": 0.000769791379002131,
+        "headSamples": 38,
+        "maxHeadCorrection": 0.0019228218479609158
+      },
+      "quietWristBeforeAfterPct": [
+        0.15678010892510486,
+        0.15693320294843527
+      ],
+      "maxWristCorrectionPixels": 1.6644048271741787,
+      "maxHeadCorrectionPixels": 0.4000442456927606,
+      "digitVectorError": 7.105427357601002e-14,
+      "faceVectorError": 3.9968028886505635e-14,
+      "depthFlips": 0,
+      "minDepthMargin": 0.3006165,
+      "minVisibleMargin": 13.137753141717521,
+      "minFaceProximity": 0.39116804870739275,
+      "protectedFaceFrames": 0,
+      "protectedFaceError": 0,
+      "prepareMs": [
+        {
+          "median": 5.519003999999768,
+          "p95": 6.85894400000052,
+          "max": 7.3608720000001995
+        },
+        {
+          "median": 2.7222130000000107,
+          "p95": 6.390725999999631,
+          "max": 6.565661000000546
+        }
+      ],
+      "sampleUs": [
+        {
+          "median": 27.181980400000246,
+          "p95": 32.057338800000075,
+          "max": 32.057338800000075
+        },
+        {
+          "median": 27.758972400000133,
+          "p95": 28.45698639999973,
+          "max": 28.45698639999973
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "label": "работать",
+      "frames": 49,
+      "fps": 30,
+      "shoulderPixels": 301.0707387874418,
+      "filled": 2,
+      "missing": 0,
+      "kinematics": {
+        "body": [
+          {
+            "curvaturePct": 0.2154940534167385,
+            "speed": {
+              "median": 0.0624395595197167,
+              "p95": 0.2143340240659246,
+              "max": 0.48703328274830215
+            },
+            "accelerationRms": 3.878892961501293,
+            "accelerationMax": 11.292640599641748
+          },
+          {
+            "curvaturePct": 0.10762520070140742,
+            "speed": {
+              "median": 0.05710487300885221,
+              "p95": 0.20808865268609328,
+              "max": 0.26567679593319155
+            },
+            "accelerationRms": 1.9372536126253335,
+            "accelerationMax": 8.596348382183354
+          },
+          {
+            "curvaturePct": 0.10762520070140742,
+            "speed": {
+              "median": 0.05710487300885221,
+              "p95": 0.20808865268609328,
+              "max": 0.26567679593319155
+            },
+            "accelerationRms": 1.9372536126253335,
+            "accelerationMax": 8.596348382183354
+          }
+        ],
+        "head": [
+          {
+            "curvaturePct": 0.1413505373052041,
+            "speed": {
+              "median": 0.10109337807081789,
+              "p95": 0.41830571566440866,
+              "max": 0.43494272182814364
+            },
+            "accelerationRms": 2.544309671493674,
+            "accelerationMax": 4.771609646278827
+          },
+          {
+            "curvaturePct": 0.07099810691860212,
+            "speed": {
+              "median": 0.08473869317721472,
+              "p95": 0.39035514465972193,
+              "max": 0.43494272182814364
+            },
+            "accelerationRms": 1.2779659245348383,
+            "accelerationMax": 3.2469547082200814
+          },
+          {
+            "curvaturePct": 0.06995195215278695,
+            "speed": {
+              "median": 0.08473869317722124,
+              "p95": 0.3900605961671487,
+              "max": 0.43494272182814364
+            },
+            "accelerationRms": 1.259135138750165,
+            "accelerationMax": 4.413945589656849
+          }
+        ],
+        "left": [
+          {
+            "curvaturePct": 0.4530753171985856,
+            "speed": {
+              "median": 0.1465691493801197,
+              "p95": 0.46453567248455874,
+              "max": 0.8740845094414469
+            },
+            "accelerationRms": 8.155355709574541,
+            "accelerationMax": 20.01177283136012
+          },
+          {
+            "curvaturePct": 0.20165089926438384,
+            "speed": {
+              "median": 0.06855496259610666,
+              "p95": 0.35575304952252534,
+              "max": 0.8740845094414469
+            },
+            "accelerationRms": 3.629716186758909,
+            "accelerationMax": 16.113991257475046
+          },
+          {
+            "curvaturePct": 0.2018070786193334,
+            "speed": {
+              "median": 0.06855496259607936,
+              "p95": 0.35575304952251174,
+              "max": 0.8740845094414469
+            },
+            "accelerationRms": 3.632527415148001,
+            "accelerationMax": 16.147630008625054
+          }
+        ],
+        "right": [
+          {
+            "curvaturePct": 2.709456285149046,
+            "speed": {
+              "median": 1.1927605934796972,
+              "p95": 3.6502506919492155,
+              "max": 6.374955154982798
+            },
+            "accelerationRms": 48.77021313268283,
+            "accelerationMax": 158.5479848157154
+          },
+          {
+            "curvaturePct": 2.658116965667747,
+            "speed": {
+              "median": 1.1399785398301048,
+              "p95": 3.6229571497744613,
+              "max": 6.312609221171874
+            },
+            "accelerationRms": 47.846105382019445,
+            "accelerationMax": 158.60192865514077
+          },
+          {
+            "curvaturePct": 2.622596262025278,
+            "speed": {
+              "median": 1.1585951307083255,
+              "p95": 3.6502506919492155,
+              "max": 6.374955154982798
+            },
+            "accelerationRms": 47.20673271645501,
+            "accelerationMax": 158.5479848157154
+          }
+        ]
+      },
+      "metrics": {
+        "method": "symmetric-adaptive-translation",
+        "radius": 2,
+        "shoulderPixels": 301.0707387874418,
+        "frames": 49,
+        "wristSamples": 94,
+        "wristCurvatureBefore": 0.01942476589844554,
+        "wristCurvatureAfter": 0.01859937801455982,
+        "slowWristCurvatureBefore": 0.00401897759947487,
+        "slowWristCurvatureAfter": 0.0009476064627968549,
+        "slowWristSamples": 43,
+        "rmsWristCorrection": 0.002728336980876579,
+        "maxWristCorrection": 0.008000000000000132,
+        "contactProtectedHandFrames": 0,
+        "fastProtectedHandFrames": 15,
+        "bodyCurvatureBefore": 0.002154940534167376,
+        "bodyCurvatureAfter": 0.001076252007014108,
+        "bodySamples": 47,
+        "maxBodyCorrection": 0.003906356173577667,
+        "headCurvatureBefore": 0.0014135053730520385,
+        "headCurvatureAfter": 0.0006995195215278536,
+        "headSamples": 47,
+        "maxHeadCorrection": 0.001677151554594553
+      },
+      "quietWristBeforeAfterPct": [
+        0.09486477793493076,
+        0.09476064627968549
+      ],
+      "maxWristCorrectionPixels": 2.4085659102995742,
+      "maxHeadCorrectionPixels": 0.5049412576002886,
+      "digitVectorError": 3.9968028886505635e-14,
+      "faceVectorError": 3.9968028886505635e-14,
+      "depthFlips": 0,
+      "minDepthMargin": 0.488777,
+      "minVisibleMargin": 7.785767625398828,
+      "minFaceProximity": 0.1626913615863299,
+      "protectedFaceFrames": 0,
+      "protectedFaceError": 0,
+      "prepareMs": [
+        {
+          "median": 5.36725000000024,
+          "p95": 8.860136999999668,
+          "max": 16.12869099999989
+        },
+        {
+          "median": 3.2752789999995002,
+          "p95": 5.300889000000097,
+          "max": 6.69274200000018
+        }
+      ],
+      "sampleUs": [
+        {
+          "median": 27.235938000000168,
+          "p95": 30.588824000000024,
+          "max": 30.588824000000024
+        },
+        {
+          "median": 26.39737479999967,
+          "p95": 28.0603995999998,
+          "max": 28.0603995999998
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "headCurvaturePct": [
+      0.1655536770718696,
+      0.15991024443231758,
+      0.11802376262871614
+    ],
+    "bodyCurvaturePct": [
+      0.26138810436764814,
+      0.14767416539033576,
+      0.17797512733888737
+    ],
+    "quietWristAfterPct": 0.11705109090490362,
+    "quietWristSamples": 219,
+    "minVisibleMargin": 7.785767625398828,
+    "totalProtectedFaceFrames": 12
+  },
+  "renderingBenchmark": {
+    "recordedAt": "2026-10-29T11:36:31.592Z",
+    "node": "v24.22.1",
+    "canvas": "0.1.100",
+    "method": {
+      "dpr": 1,
+      "scene": "dark",
+      "outfit": "indigo",
+      "fractions": [
+        0.04,
+        0.2,
+        0.38,
+        0.56,
+        0.74,
+        0.92
+      ],
+      "warmupRounds": 3,
+      "measuredRounds": 12,
+      "measuredFramesPerClipVariantViewport": 72,
+      "sourceStable": true,
+      "note": "Native CPU rasterization plus 1-pixel readback. Sampling measured separately; no image encoding. Does not measure browser FPS."
+    },
+    "startingHashes": {
+      "canvas-avatar.js": "c65d034b39fbc03e7aed8b771eaf32111b0eb3c4b08246f3c06d2eeb197ffa91",
+      "avatar-hands.js": "79daf576796e44045eddd4868f696f1072120a73c0287e831e55f0bc12cd105a",
+      "hand-geometry.js": "f4a0d4376893ffd467d5f3accc08da9b839ddf34477040718382f691a5ba9207",
+      "avatar-motion.js": "a77cd2889ba61052b724bccb78bd90a8133692a0ad9e53eaac07e690b2891e8e",
+      "avatar-framing.js": "fd22390447471a6df7f482708a9c49b7bf5e4c78bbd415120da0a4f603e2d0e3"
+    },
+    "endingHashes": {
+      "canvas-avatar.js": "c65d034b39fbc03e7aed8b771eaf32111b0eb3c4b08246f3c06d2eeb197ffa91",
+      "avatar-hands.js": "79daf576796e44045eddd4868f696f1072120a73c0287e831e55f0bc12cd105a",
+      "hand-geometry.js": "f4a0d4376893ffd467d5f3accc08da9b839ddf34477040718382f691a5ba9207",
+      "avatar-motion.js": "a77cd2889ba61052b724bccb78bd90a8133692a0ad9e53eaac07e690b2891e8e",
+      "avatar-framing.js": "fd22390447471a6df7f482708a9c49b7bf5e4c78bbd415120da0a4f603e2d0e3"
+    },
+    "summary": [
+      {
+        "width": 550,
+        "height": 500,
+        "variant": "baseline-v0.11.1",
+        "samplingMs": {
+          "samples": 432,
+          "median": 0.04920399999991787,
+          "p95": 0.11454299999991235,
+          "max": 1.4806170000001657,
+          "over16ms": 0
+        },
+        "drawingMs": {
+          "samples": 432,
+          "median": 4.5417130000000725,
+          "p95": 5.94419199999993,
+          "max": 17.28377599999999,
+          "over16ms": 1
+        },
+        "combinedMs": {
+          "samples": 432,
+          "median": 4.600711999999476,
+          "p95": 6.083441999999991,
+          "max": 17.373671999999942,
+          "over16ms": 2
+        },
+        "worstClipByP95": "hello"
+      },
+      {
+        "width": 550,
+        "height": 500,
+        "variant": "current-v0.12",
+        "samplingMs": {
+          "samples": 432,
+          "median": 0.04965500000025713,
+          "p95": 0.13570500000014363,
+          "max": 1.9684940000006463,
+          "over16ms": 0
+        },
+        "drawingMs": {
+          "samples": 432,
+          "median": 7.711021000000073,
+          "p95": 10.705605000000105,
+          "max": 23.823818000000074,
+          "over16ms": 2
+        },
+        "combinedMs": {
+          "samples": 432,
+          "median": 7.780185999999958,
+          "p95": 10.764194000000316,
+          "max": 23.896027000000004,
+          "over16ms": 2
+        },
+        "worstClipByP95": "hello"
+      },
+      {
+        "width": 1200,
+        "height": 650,
+        "variant": "baseline-v0.11.1",
+        "samplingMs": {
+          "samples": 432,
+          "median": 0.05095699999947101,
+          "p95": 0.11267000000043481,
+          "max": 2.3198350000020582,
+          "over16ms": 0
+        },
+        "drawingMs": {
+          "samples": 432,
+          "median": 8.569055999998454,
+          "p95": 11.154022000000623,
+          "max": 19.403967000000193,
+          "over16ms": 2
+        },
+        "combinedMs": {
+          "samples": 432,
+          "median": 8.620515000000523,
+          "p95": 11.361515000000509,
+          "max": 19.4520590000011,
+          "over16ms": 2
+        },
+        "worstClipByP95": "work"
+      },
+      {
+        "width": 1200,
+        "height": 650,
+        "variant": "current-v0.12",
+        "samplingMs": {
+          "samples": 432,
+          "median": 0.05544299999928626,
+          "p95": 0.14932599999883678,
+          "max": 1.8196199999983946,
+          "over16ms": 0
+        },
+        "drawingMs": {
+          "samples": 432,
+          "median": 12.975377000000663,
+          "p95": 16.281412000000273,
+          "max": 24.96310900000026,
+          "over16ms": 23
+        },
+        "combinedMs": {
+          "samples": 432,
+          "median": 13.036536999999953,
+          "p95": 16.341221999999107,
+          "max": 25.024061000000074,
+          "over16ms": 25
+        },
+        "worstClipByP95": "question"
+      }
+    ]
+  },
+  "verification": {
+    "files": [
+      {
+        "file": "tests/avatar-framing.test.mjs",
+        "exit": 0,
+        "tests": 5,
+        "failed": 0
+      },
+      {
+        "file": "tests/avatar-lifecycle.test.mjs",
+        "exit": 0,
+        "tests": 7,
+        "failed": 0
+      },
+      {
+        "file": "tests/avatar-motion.test.mjs",
+        "exit": 0,
+        "tests": 17,
+        "failed": 0
+      },
+      {
+        "file": "tests/avatar-render.test.mjs",
+        "exit": 0,
+        "tests": 1,
+        "failed": 0
+      },
+      {
+        "file": "tests/catalog.test.mjs",
+        "exit": 0,
+        "tests": 3,
+        "failed": 0
+      },
+      {
+        "file": "tests/demo-cache.test.mjs",
+        "exit": 0,
+        "tests": 12,
+        "failed": 0
+      },
+      {
+        "file": "tests/evaluation.test.mjs",
+        "exit": 0,
+        "tests": 1,
+        "failed": 0
+      },
+      {
+        "file": "tests/hand-geometry.test.mjs",
+        "exit": 0,
+        "tests": 12,
+        "failed": 0
+      },
+      {
+        "file": "tests/platform.test.mjs",
+        "exit": 0,
+        "tests": 36,
+        "failed": 0
+      },
+      {
+        "file": "tests/playback.test.mjs",
+        "exit": 0,
+        "tests": 7,
+        "failed": 0
+      },
+      {
+        "file": "tests/recognizer.test.mjs",
+        "exit": 0,
+        "tests": 6,
+        "failed": 0
+      },
+      {
+        "file": "tests/session.test.mjs",
+        "exit": 0,
+        "tests": 5,
+        "failed": 0
+      },
+      {
+        "file": "tests/studio-settings.test.mjs",
+        "exit": 0,
+        "tests": 6,
+        "failed": 0
+      },
+      {
+        "file": "tests/trial-protocol.test.mjs",
+        "exit": 0,
+        "tests": 3,
+        "failed": 0
+      },
+      {
+        "file": "tests/vision-lifecycle.test.mjs",
+        "exit": 0,
+        "tests": 6,
+        "failed": 0
+      }
+    ],
+    "total": 127,
+    "failures": 0,
+    "verify": {
+      "exit": 0,
+      "output": "hello: 50 frames, video SHA-256 and motion provenance verified\nyes: 30 frames, video SHA-256 and motion provenance verified\ngood: 49 frames, video SHA-256 and motion provenance verified\nquestion: 48 frames, video SHA-256 and motion provenance verified\nfriend: 40 frames, video SHA-256 and motion provenance verified\nwork: 49 frames, video SHA-256 and motion provenance verified\n6 records and 9 unsupported/meaning-changing inputs verified. Linguistic comprehension has not been tested.\n"
+    }
+  }
+}

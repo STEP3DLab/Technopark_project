@@ -1,17 +1,17 @@
 /** Sculptural digital character. Measured signing landmarks remain the motion source.
  * Presentation interpolation is isolated from recognition and never overwrites assets.
  */
-import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.11.1';
-import { handMetrics } from './hand-geometry.js?v=0.11.1';
-import { paintHand, skinMaterial } from './avatar-hands.js?v=0.11.1';
-import { measureAvatarFrame, fitAvatarFrame } from './avatar-framing.js?v=0.11.1';
+import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.12.0';
+import { handMetrics } from './hand-geometry.js?v=0.12.0';
+import { paintHand, skinMaterial } from './avatar-hands.js?v=0.12.0';
+import { measureAvatarFrame, fitAvatarFrame } from './avatar-framing.js?v=0.12.0';
 const OUTFITS = Object.freeze({
   indigo:{body:'#304B78',light:'#4B6B9A',dark:'#1C2E4E',seam:'#8EA6CC',accent:'#FFFFFF'},
   teal:{body:'#356562',light:'#5D8880',dark:'#244B4D',seam:'#9ABBB0',accent:'#C0DDD0'},
   slate:{body:'#4F5D70',light:'#738296',dark:'#343F51',seam:'#AFBCCC',accent:'#D9E3E5'},
 });
 // Warm matte skin separates the signing surface from the navy garment.
-const SKIN={base:'#DDA885',light:'#F4CFB1',shade:'#AE755D',line:'#845B49'};
+const SKIN={base:'#DFAE8C',light:'#F8D7B9',shade:'#A96F53',line:'#82563F'};
 
 export class CanvasAvatar {
   constructor(container) {
@@ -238,10 +238,15 @@ export class CanvasAvatar {
     const neckTop=chin?[chin[0],chin[1]-s*.08]:[nx,cy-s*.3];
     const neckEnd=[nx,collarY+s*.065];
     this.capsule(neckTop,neckEnd,s*.089,s*.105,this.skinGradient(neckTop,neckEnd,s*.105));
+    c.save();c.clip();
+    const neckShade=c.createLinearGradient(0,neckTop[1],0,neckEnd[1]);
+    neckShade.addColorStop(0,'#75462D75');neckShade.addColorStop(.48,'#99614332');neckShade.addColorStop(1,'#99614300');
+    c.fillStyle=neckShade;c.fillRect(nx-s*.18,neckTop[1]-s*.04,s*.36,Math.max(s*.1,neckEnd[1]-neckTop[1]+s*.12));
+    c.restore();
     // The shirt and sleeves share a single lighting field, so the shoulders
     // form one continuous garment instead of separate joint covers.
     const fabric=c.createLinearGradient(cx-s*.67,cy-s*.48,cx+s*.75,cy+s*1.55);
-    fabric.addColorStop(0,palette.light);fabric.addColorStop(.42,palette.body);fabric.addColorStop(1,palette.dark);
+    fabric.addColorStop(0,palette.light);fabric.addColorStop(.32,palette.body);fabric.addColorStop(1,palette.dark);
     this.bodyPaint=fabric;
     const measuredHip=p[23]&&p[24]?(p[23][0]+p[24][0])/2:cx;
     const hip=cx+Math.max(-s*.18,Math.min(s*.18,measuredHip-cx));
@@ -256,12 +261,23 @@ export class CanvasAvatar {
     c.fillStyle=fabric;c.fill();
     // Gentle folds follow the torso rather than adding decorative armour.
     c.save();c.clip();
+    const chestLight=c.createRadialGradient(cx-s*.17,cy+s*.12,s*.02,cx,cy+s*.33,s*.83);
+    chestLight.addColorStop(0,palette.seam+'19');chestLight.addColorStop(.6,palette.seam+'05');chestLight.addColorStop(1,palette.seam+'00');
+    this.fabricLight=chestLight;this.fabricLightRect=[cx-s*.7,cy-s*.25,s*1.4,s*1.7];
+    c.fillStyle=chestLight;c.fillRect(cx-s*.7,cy-s*.25,s*1.4,s*1.7);
+    for(const side of [-1,1]){
+      const fold=c.createLinearGradient(cx+side*s*.50,cy,cx+side*s*.24,cy+s*.22);
+      fold.addColorStop(0,palette.dark+'45');fold.addColorStop(1,palette.dark+'00');
+      c.beginPath();c.moveTo(cx+side*s*.49,cy+s*.12);
+      c.bezierCurveTo(cx+side*s*.29,cy+s*.4,hip+side*s*.34,cy+s*.85,hip+side*s*.32,bottom);
+      c.lineTo(hip+side*s*.49,bottom);c.lineTo(cx+side*s*.63,cy);c.closePath();c.fillStyle=fold;c.fill();
+    }
     c.beginPath();c.moveTo(l[0]+s*.04,l[1]+s*.28);
     c.bezierCurveTo(cx-s*.4,cy+s*.55,hip-s*.37,cy+s*.9,hip-s*.36,bottom);
-    c.strokeStyle=palette.dark+'2B';c.lineWidth=s*.02;c.stroke();
+    c.strokeStyle=palette.dark+'28';c.lineWidth=s*.015;c.stroke();
     c.beginPath();c.moveTo(r[0]-s*.055,r[1]+s*.3);
     c.bezierCurveTo(cx+s*.39,cy+s*.57,hip+s*.35,cy+s*.91,hip+s*.37,bottom);
-    c.strokeStyle=palette.seam+'0F';c.lineWidth=s*.012;c.stroke();
+    c.strokeStyle=palette.seam+'14';c.lineWidth=s*.009;c.stroke();
     c.restore();
     c.beginPath();c.moveTo(nx-s*.137,collarY);
     c.quadraticCurveTo(nx,collarY+s*.105,nx+s*.137,collarY);
@@ -290,31 +306,43 @@ export class CanvasAvatar {
     for(const side of [-1,1]){
       const ear=c.createLinearGradient(side*w*.82,0,side*w*1.08,0);
       ear.addColorStop(0,SKIN.shade);ear.addColorStop(.52,SKIN.base);ear.addColorStop(1,'#CA9475');
-      c.beginPath();c.ellipse(side*w*.96,h*.025,w*.12,h*.175,side*-.1,0,Math.PI*2);c.fillStyle=ear;c.fill();
-      c.beginPath();c.moveTo(side*w*.997,-h*.047);
-      c.quadraticCurveTo(side*w*1.045,h*.035,side*w*.99,h*.12);
-      c.strokeStyle='#9B65465E';c.lineWidth=Math.max(.5,w*.028);c.stroke();
+      c.beginPath();c.ellipse(side*w*.96,h*.035,w*.125,h*.177,side*-.1,0,Math.PI*2);c.fillStyle=ear;c.fill();
+      c.beginPath();c.moveTo(side*w*.997,-h*.054);
+      c.bezierCurveTo(side*w*1.075,-h*.016,side*w*1.035,h*.080,side*w*.983,h*.115);
+      c.strokeStyle='#9B654668';c.lineWidth=Math.max(.5,w*.029);c.stroke();
+      c.beginPath();c.ellipse(side*w*.98,h*.050,w*.032,h*.051,side*.23,0,Math.PI*2);
+      c.fillStyle='#A36D4B3B';c.fill();
     }
     c.beginPath();c.moveTo(0,-h*1.055);
     c.bezierCurveTo(w*.73,-h*1.055,w*.985,-h*.64,w*.975,-h*.035);
-    c.bezierCurveTo(w*.97,h*.30,w*.75,h*.69,w*.43,h*.89);
-    c.quadraticCurveTo(w*.20,h*1.015,0,h*1.015);
-    c.quadraticCurveTo(-w*.20,h*1.015,-w*.43,h*.89);
-    c.bezierCurveTo(-w*.75,h*.69,-w*.97,h*.30,-w*.975,-h*.035);
+    c.bezierCurveTo(w*.97,h*.31,w*.79,h*.66,w*.45,h*.88);
+    c.bezierCurveTo(w*.29,h*.975,w*.13,h*.988,0,h*.988);
+    c.bezierCurveTo(-w*.13,h*.988,-w*.29,h*.975,-w*.45,h*.88);
+    c.bezierCurveTo(-w*.79,h*.66,-w*.97,h*.31,-w*.975,-h*.035);
     c.bezierCurveTo(-w*.985,-h*.64,-w*.73,-h*1.055,0,-h*1.055);c.closePath();
-    const skin=c.createRadialGradient(-w*.4,-h*.5,w*.03,w*.15,h*.07,h*1.5);
-    skin.addColorStop(0,SKIN.light);skin.addColorStop(.47,SKIN.base);skin.addColorStop(.86,'#C58B6C');skin.addColorStop(1,SKIN.shade);
+    const skin=c.createRadialGradient(-w*.43,-h*.5,w*.03,w*.15,h*.07,h*1.6);
+    skin.addColorStop(0,SKIN.light);skin.addColorStop(.40,'#E8B996');skin.addColorStop(.70,SKIN.base);skin.addColorStop(1,SKIN.shade);
     c.fillStyle=skin;c.fill();
     c.save();c.clip();
-    // Low-contrast cheek planes avoid the porcelain mask and angular glare.
+    // Soft cheek and temple planes give the measured face a matte volume.
+    // They are cosmetic surfaces; no expression or landmark is synthesized.
     for(const side of [-1,1]){
-      const cheek=c.createRadialGradient(side*w*.55,h*.28,0,side*w*.57,h*.26,w*.49);
-      cheek.addColorStop(0,side<0?'#CC80601A':'#985C4323');cheek.addColorStop(1,'#CC806000');
+      const cheek=c.createRadialGradient(side*w*.54,h*.24,0,side*w*.57,h*.26,w*.54);
+      cheek.addColorStop(0,side<0?'#CF806027':'#985A3F2A');cheek.addColorStop(1,'#CC806000');
       c.fillStyle=cheek;c.fillRect(-w,-h,w*2,h*2.1);
+      const temple=c.createLinearGradient(side*w*.96,0,side*w*.53,0);
+      temple.addColorStop(0,'#81523535');temple.addColorStop(1,'#81523500');
+      c.fillStyle=temple;c.fillRect(side<0?-w:w*.5,-h*.68,w*.5,h*1.4);
     }
-    const jaw=c.createLinearGradient(0,h*.70,0,h*1.02);
-    jaw.addColorStop(0,'#7D4D3700');jaw.addColorStop(1,'#7D4D3730');
-    c.fillStyle=jaw;c.fillRect(-w,h*.7,w*2,h*.4);
+    const forehead=c.createRadialGradient(-w*.25,-h*.50,0,-w*.25,-h*.50,w*.68);
+    forehead.addColorStop(0,'#FFE8CD36');forehead.addColorStop(1,'#FFE8CD00');
+    c.fillStyle=forehead;c.fillRect(-w,-h,w*2,h*1.8);
+    const jaw=c.createLinearGradient(0,h*.62,0,h*1.0);
+    jaw.addColorStop(0,'#7D4D3700');jaw.addColorStop(1,'#7D4D373C');
+    c.fillStyle=jaw;c.fillRect(-w,h*.62,w*2,h*.4);
+    const chinLight=c.createRadialGradient(-w*.11,h*.72,0,-w*.11,h*.72,w*.39);
+    chinLight.addColorStop(0,'#F9D4B224');chinLight.addColorStop(1,'#F9D4B200');
+    c.fillStyle=chinLight;c.fillRect(-w,h*.4,w*2,h*.7);
     c.restore();
     // A simple side-parted silhouette stays clear of the eyebrows and ears.
     c.beginPath();c.moveTo(-w*.97,h*.015);
@@ -326,23 +354,30 @@ export class CanvasAvatar {
     c.bezierCurveTo(-w*.11,-h*.59,-w*.49,-h*.52,-w*.81,-h*.48);
     c.lineTo(-w*.86,h*.02);c.closePath();
     const hair=c.createLinearGradient(-w,-h*1.2,w,h*.05);
-    hair.addColorStop(0,'#4C4947');hair.addColorStop(.42,'#303638');hair.addColorStop(1,'#222A30');
+    hair.addColorStop(0,'#53524C');hair.addColorStop(.40,'#353D3E');hair.addColorStop(.75,'#263239');hair.addColorStop(1,'#1B2932');
     c.fillStyle=hair;c.fill();
+    c.save();c.clip();
+    const hairLight=c.createRadialGradient(-w*.35,-h*.84,0,-w*.32,-h*.78,w*.93);
+    hairLight.addColorStop(0,'#A8AAA126');hairLight.addColorStop(1,'#A8AAA100');
+    c.fillStyle=hairLight;c.fillRect(-w*1.2,-h*1.4,w*2.4,h*1.6);
     c.beginPath();c.moveTo(-w*.78,-h*.71);
     c.bezierCurveTo(-w*.43,-h*1.03,-w*.02,-h*1.07,w*.31,-h*.94);
-    c.strokeStyle='#A5A39A32';c.lineWidth=Math.max(.6,w*.048);c.stroke();
+    c.strokeStyle='#A5A99F32';c.lineWidth=Math.max(.6,w*.038);c.stroke();
+    c.beginPath();c.moveTo(-w*.85,-h*.51);
+    c.bezierCurveTo(-w*.54,-h*.72,-w*.17,-h*.75,w*.16,-h*.88);
+    c.strokeStyle='#14232A31';c.lineWidth=Math.max(.5,w*.025);c.stroke();
+    c.beginPath();c.moveTo(-w*.68,-h*.73);
+    c.bezierCurveTo(-w*.37,-h*.87,-w*.16,-h*.88,w*.06,-h*.93);
+    c.strokeStyle='#BEC0AD19';c.lineWidth=Math.max(.5,w*.019);c.stroke();
     c.beginPath();c.moveTo(w*.31,-h*.94);
     c.bezierCurveTo(w*.56,-h*.86,w*.73,-h*.63,w*.80,-h*.42);
     c.strokeStyle='#0C182A35';c.lineWidth=Math.max(.6,w*.05);c.stroke();
     c.restore();
+    c.restore();
     if(!this.frame.face)return;
     this.drawEye([33,160,158,133,153,144].map(face),w);
     this.drawEye([263,387,385,362,373,380].map(face),w);
-    for(const ids of [[70,63,105,66,107],[300,293,334,296,336]]){
-      if(this.smoothPath(ids.map(face),false)){
-        c.strokeStyle='#50433C';c.lineWidth=Math.max(.8,w*.045);c.stroke();
-      }
-    }
+    for(const ids of [[70,63,105,66,107],[300,293,334,296,336]])this.drawBrow(ids.map(face),w);
     const nose=face(4),bridge=face(6);
     if(nose&&bridge){
       c.beginPath();c.moveTo(bridge[0],bridge[1]);
@@ -350,24 +385,40 @@ export class CanvasAvatar {
       c.quadraticCurveTo(nose[0]+w*.01,nose[1]+w*.083,nose[0]+w*.13,nose[1]-w*.005);
       c.quadraticCurveTo(nose[0]+w*.048,nose[1]-w*.10,bridge[0],bridge[1]);c.closePath();
       const shade=c.createLinearGradient(nose[0]-w*.13,0,nose[0]+w*.16,0);
-      shade.addColorStop(0,'#CA9374');shade.addColorStop(.4,'#EFC4A2');shade.addColorStop(1,'#B87E61');
+      shade.addColorStop(0,'#C68D6B');shade.addColorStop(.38,'#F3CEAA');shade.addColorStop(.67,'#E0AD86');shade.addColorStop(1,'#AD7354');
       c.fillStyle=shade;c.fill();
       c.beginPath();c.moveTo(nose[0]-w*.10,nose[1]);
       c.quadraticCurveTo(nose[0],nose[1]+w*.06,nose[0]+w*.11,nose[1]);
-      c.strokeStyle='#96664D88';c.lineWidth=Math.max(.4,w*.016);c.stroke();
+      c.strokeStyle='#96664D79';c.lineWidth=Math.max(.4,w*.016);c.stroke();
     }
     // Eyelid, eyebrow and mouth shape follows the recording continuously.
     const outer=[61,40,37,0,267,270,291,321,314,17,84,91].map(face);
     if(this.smoothPath(outer)){
       const lipY=outer.reduce((sum,p)=>sum+p[1],0)/outer.length;
       const lips=c.createLinearGradient(0,lipY-w*.09,0,lipY+w*.12);
-      lips.addColorStop(0,'#A57261');lips.addColorStop(1,'#C08B75');
+      lips.addColorStop(0,'#94644F');lips.addColorStop(.46,'#B98169');lips.addColorStop(.68,'#CC967A');lips.addColorStop(1,'#B27E65');
       c.fillStyle=lips;c.fill();
     }
     const inner=[78,81,13,311,308,402,14,178].map(face);
-    if(this.smoothPath(inner)){c.fillStyle='#67483F';c.fill();}
+    if(this.smoothPath(inner)){
+      const top=Math.min(...inner.map(p=>p[1])),bottom=Math.max(...inner.map(p=>p[1]));
+      const cavity=c.createLinearGradient(0,top,0,Math.max(top+.01,bottom));
+      cavity.addColorStop(0,'#624435');cavity.addColorStop(1,'#875344');c.fillStyle=cavity;c.fill();
+    }
     const lower=[91,84,17,314,321].map(face);
-    if(this.smoothPath(lower,false)){c.strokeStyle='#EBC1A844';c.lineWidth=Math.max(.35,w*.018);c.stroke();}
+    if(this.smoothPath(lower,false)){c.strokeStyle='#F3CFAC6B';c.lineWidth=Math.max(.35,w*.018);c.stroke();}
+  }
+
+  drawBrow(points,headRadius) {
+    if(points.some(p=>!p)||points.length<3)return;
+    const c=this.ctx,upper=[],lower=[];
+    for(let i=0;i<points.length;i++){
+      const a=points[Math.max(0,i-1)],b=points[Math.min(points.length-1,i+1)],p=points[i];
+      const length=this.distance(a,b)||1,nx=-(b[1]-a[1])/length,ny=(b[0]-a[0])/length;
+      const thickness=Math.max(.35,headRadius*.029)*[.30,.82,1,.80,.37][i];
+      upper.push([p[0]+nx*thickness,p[1]+ny*thickness]);lower.unshift([p[0]-nx*thickness,p[1]-ny*thickness]);
+    }
+    if(this.smoothPath([...upper,...lower])){c.fillStyle='#53463B';c.fill();}
   }
 
   drawEye(points,headRadius) {
@@ -378,20 +429,23 @@ export class CanvasAvatar {
     const aperture=Math.max(...points.map(p=>(p[0]-outer[0])*-dy+(p[1]-outer[1])*dx))-
       Math.min(...points.map(p=>(p[0]-outer[0])*-dy+(p[1]-outer[1])*dx));
     if(this.path(points,true)){
-      c.fillStyle='#EEE7DB';c.fill();
+      const center=this.mix(outer,inner,.5);
+      const whites=c.createRadialGradient(center[0]-width*.08,center[1],0,center[0],center[1],width*.57);
+      whites.addColorStop(0,'#FFF3DE');whites.addColorStop(1,'#D9C5AD');c.fillStyle=whites;c.fill();
       // Neutral irises are a material/style detail, clipped to the recorded
       // eyelid aperture. We do not add blink, smile or gaze animations.
       if(aperture>.25&&width>1){
         c.save();c.clip();
-        const center=this.mix(outer,inner,.5),radius=width*.19;
+        const radius=width*.195;
         c.beginPath();c.ellipse(center[0],center[1],radius,radius*1.07,0,0,Math.PI*2);
-        c.fillStyle='#4D4B40';c.fill();
+        const iris=c.createRadialGradient(center[0]-radius*.26,center[1]-radius*.22,0,center[0],center[1],radius);
+        iris.addColorStop(0,'#7F795B');iris.addColorStop(.55,'#565B49');iris.addColorStop(1,'#2D3C3C');c.fillStyle=iris;c.fill();
         c.beginPath();c.arc(center[0],center[1],radius*.52,0,Math.PI*2);c.fillStyle='#263237';c.fill();
         c.beginPath();c.arc(center[0]-radius*.27,center[1]-radius*.30,Math.max(.2,radius*.17),0,Math.PI*2);
         c.fillStyle='#FFFFFFA0';c.fill();c.restore();
       }
     }
-    if(this.smoothPath(points.slice(0,4),false)){c.strokeStyle='#5D493D';c.lineWidth=Math.max(.5,headRadius*.022);c.stroke();}
+    if(this.smoothPath(points.slice(0,4),false)){c.strokeStyle='#5D493DEB';c.lineWidth=Math.max(.5,headRadius*.023);c.stroke();}
     if(this.smoothPath([points[0],points[5],points[4],points[3]],false)){
       c.strokeStyle='#A4765C70';c.lineWidth=Math.max(.35,headRadius*.012);c.stroke();
     }
@@ -405,6 +459,7 @@ export class CanvasAvatar {
     this.capsule(a,b,upperRadius,elbowRadius,this.skinGradient(a,b,upperRadius));
     const sleeveEnd=this.mix(a,b,.65);
     this.capsule(a,sleeveEnd,upperRadius*1.035,upperRadius*.83,this.bodyPaint||palette.body);
+    if(this.fabricLight){c.save();c.clip();c.fillStyle=this.fabricLight;c.fillRect(...this.fabricLightRect);c.restore();}
     const length=this.distance(a,b)||1,ux=(b[0]-a[0])/length,uy=(b[1]-a[1])/length;
     const nx=-uy,ny=ux,rr=upperRadius*.79;
     c.beginPath();c.moveTo(sleeveEnd[0]-nx*rr,sleeveEnd[1]-ny*rr);

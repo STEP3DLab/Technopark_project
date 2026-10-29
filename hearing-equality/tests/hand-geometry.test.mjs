@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {handMetrics,traceDigit} from '../app/hand-geometry.js';
-import {paintHand,skinMaterial} from '../app/avatar-hands.js';
+import {handMetrics,traceDigit,tracePhalanx} from '../app/hand-geometry.js';
+import {paintHand,skinMaterial,handSurfacePlan} from '../app/avatar-hands.js';
 import {readFileSync,readdirSync} from 'node:fs';
 
 // Sample the emitted contours independently of Canvas. This checks the filled
@@ -110,15 +110,19 @@ test('fist material thickness follows adjacent knuckles rather than shortened cu
 });
 
 function surfaceRecorder(){
- const fills=[],paths=[],state={depth:0,strokes:0};let path=[];
+ const fills=[],paths=[],state={depth:0,strokes:0,clips:0},stack=[];let path=[];
  const point=(...values)=>{assert.ok(values.every(Number.isFinite));path.push(values);};
+ const gradient=(...values)=>{assert.ok(values.every(Number.isFinite));return {addColorStop(position,color){assert.ok(position>=0&&position<=1);assert.equal(typeof color,'string');}}};
  const ctx=new Proxy({
-  save(){state.depth++;},restore(){assert.ok(state.depth>0);state.depth--;},
+  globalAlpha:1,shadowColor:'transparent',shadowBlur:0,shadowOffsetX:0,shadowOffsetY:0,
+  save(){state.depth++;stack.push({alpha:ctx.globalAlpha,clips:state.clips,shadowColor:ctx.shadowColor,shadowBlur:ctx.shadowBlur,shadowOffsetX:ctx.shadowOffsetX,shadowOffsetY:ctx.shadowOffsetY});},restore(){assert.ok(state.depth>0);const saved=stack.pop();ctx.globalAlpha=saved.alpha;state.clips=saved.clips;for(const key of ['shadowColor','shadowBlur','shadowOffsetX','shadowOffsetY'])ctx[key]=saved[key];state.depth--;},
   beginPath(){path=[];paths.push(path);},moveTo:point,lineTo:point,
   quadraticCurveTo:point,closePath(){},
+  clip(){state.clips++;},
   arc(...values){assert.ok(values[2]>0);point(...values.slice(0,5));},
-  fill(){fills.push([...path]);},stroke(){state.strokes++;},
-  createLinearGradient(...values){assert.ok(values.every(Number.isFinite));return {addColorStop(position,color){assert.ok(position>=0&&position<=1);assert.equal(typeof color,'string');}}},
+  fill(){assert.ok(ctx.globalAlpha>=0&&ctx.globalAlpha<=1);if(ctx.shadowColor!=='transparent')assert.ok(state.clips>0,'contact shadows stay clipped inside the hand');fills.push([...path]);},stroke(){state.strokes++;},
+  fillRect(...values){assert.ok(values.every(Number.isFinite));},
+  createLinearGradient:gradient,createRadialGradient:gradient,
  },{get:(o,key)=>{if(key in o)return o[key];throw new Error(`Unexpected canvas method: ${String(key)}`);}});
  return {ctx,state,fills,paths};
 }
@@ -138,9 +142,8 @@ test('extended fingers use continuous fills without knuckle rings, and palm does
  }
  const metrics=handMetrics(points,200),{ctx,state,fills}=surfaceRecorder();
  assert.equal(paintHand(ctx,points,200),true);assert.equal(state.depth,0);
- assert.equal(fills.length,6);assert.equal(state.strokes,0,'straight fingers do not acquire decorative rings');
- const palm=fills[0];
- const vertices=palm.flatMap(command=>Array.from({length:command.length/2},(_,i)=>command.slice(i*2,i*2+2)));
+ assert.ok(fills.length>0);assert.equal(state.strokes,0,'straight fingers do not acquire decorative rings');
+ const vertices=handSurfacePlan(points,200).palm;
  assert.ok(vertices.every(p=>p[1]<=80),'palm surface never extends behind this wrist');
  const wristPoints=vertices.filter(p=>p[1]===80);
  assert.ok(wristPoints.length>=2);
@@ -156,12 +159,37 @@ test('hand painter preserves recorded joints and restores canvas state across th
    const points=Object.freeze(frame[side].map(p=>Object.freeze([p[0]*clip.width,p[1]*clip.height,p[2]])));
    const pose=frame.pose||frame.pose33,shoulder=Math.hypot((pose[11][0]-pose[12][0])*clip.width,(pose[11][1]-pose[12][1])*clip.height);
    const {ctx,state,fills}=surfaceRecorder();assert.equal(paintHand(ctx,points,shoulder,skin),true);
-   assert.equal(state.depth,0);assert.equal(fills.length,6);
+   assert.equal(state.depth,0);assert.equal(state.clips,0);assert.equal(ctx.globalAlpha,1);assert.ok(fills.length>0);
   }
  }
  for(const shoulder of [0,NaN,1,150]){
   const {ctx,state}=surfaceRecorder();assert.equal(paintHand(ctx,Array.from({length:21},()=>[5,5,0]),shoulder,skin),true);assert.equal(state.depth,0);
  }
+});
+
+test('phalanx surface patches preserve exact endpoints and remain bounded for folded or coincident joints',()=>{
+ for(const [a,b,ra,rb] of [[[0,0],[20,0],3,2.1],[[0,0],[0,0],3,2.1],[[0,0],[.01,.02],3,2.1]]){
+  const ctx=new PathRecorder(),before=structuredClone([a,b]);assert.equal(tracePhalanx(ctx,a,b,ra,rb),true);assert.deepEqual([a,b],before);
+  assert.equal(ctx.paths.length,1);assert.ok(signedArea(ctx.paths[0])<0);
+  assert.ok(inside(a,ctx.paths[0]));assert.ok(inside(b,ctx.paths[0]));
+  for(const [x,y] of ctx.paths[0]){assert.ok(x>=Math.min(a[0],b[0])-3-1e-8&&x<=Math.max(a[0],b[0])+3+1e-8);assert.ok(y>=Math.min(a[1],b[1])-3-1e-8&&y<=Math.max(a[1],b[1])+3+1e-8);}
+ }
+ const ctx=new PathRecorder();assert.equal(tracePhalanx(ctx,[0,0],[1,1],NaN,2),false);assert.deepEqual(ctx.paths,[]);
+});
+
+test('palm occlusion is continuous near the depth boundary without moving geometry',()=>{
+ const points=Array.from({length:21},(_,i)=>[i%4*9,Math.floor(i/4)*11,0]);
+ points[2][2]=points[3][2]=points[4][2]=1;
+ const at=value=>{const p=structuredClone(points);for(const id of [6,7,8])p[id][2]=value;return handSurfacePlan(p,180);};
+ for(const boundary of [-.055,0,.055]){
+  const before=at(boundary-1e-7),after=at(boundary+1e-7);
+  assert.deepEqual(before.palm,after.palm);assert.equal(before.wristRadius,after.wristRadius);
+  const first=before.layers.find(d=>d.index===1),second=after.layers.find(d=>d.index===1);
+  assert.ok(Math.abs(first.frontWeight-second.frontWeight)<1e-4,'no hard whole-finger switch');
+ }
+ assert.equal(at(-.2).layers.find(d=>d.index===1).frontWeight,1);
+ assert.equal(at(.2).layers.find(d=>d.index===1).frontWeight,0);
+ assert.equal(handSurfacePlan(null,180),null);
 });
 
 test('matte skin illumination remains continuous as a limb crosses the previous normal-flip angle',()=>{

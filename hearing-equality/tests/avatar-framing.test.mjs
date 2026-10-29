@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { measureAvatarFrame, fitAvatarFrame } from '../app/avatar-framing.js';
+import { prepareMotion, sampleMotion } from '../app/avatar-motion.js';
+import { handMetrics } from '../app/hand-geometry.js';
 
 const root = new URL('../app/', import.meta.url);
 const catalog = JSON.parse(readFileSync(new URL('assets/sources/slovo-sources.json', root)));
@@ -30,6 +32,36 @@ test('all active fingers and facial landmarks stay inside portrait, comparison a
       }
       assert.equal(JSON.stringify(fit), initial);
       assert.ok(fit.shoulder <= height * .40);
+    }
+  }
+});
+
+test('smoothed subframes and the visible width of every active finger fit the fixed frame', () => {
+  for (const { id, data } of clips) {
+    const track = prepareMotion(data), bounds = measureAvatarFrame(data);
+    for (const [width, height] of [[600, 390], [300, 390], [350, 310], [180, 310], [900, 620]]) {
+      const fit = fitAvatarFrame(bounds, width, height, { top: 42 });
+      const project = point => [
+        fit.originX + (point[0] * bounds.sw - bounds.centerX) * fit.scale,
+        fit.originY + (point[1] * bounds.sh - bounds.minY) * fit.scale,
+        point[2],
+      ];
+      for (let step = 0; step <= (track.frames.length - 1) * 4; step++) {
+        const frame = sampleMotion(track, step / (track.fps * 4), { smooth: true });
+        for (const side of ['left', 'right']) {
+          if (bounds.restingHands.includes(side) || !frame[side]) continue;
+          const points = frame[side].map(project), { fingerRadius, wristRadius } = handMetrics(points, fit.shoulder);
+          for (let i = 0; i < points.length; i++) {
+            const [x, y] = points[i], radius = i === 0 ? wristRadius : fingerRadius * 1.10;
+            assert.ok(x - radius >= 0 && x + radius <= width && y - radius >= 42 && y + radius <= height,
+              `${id}/${side}/${i}: visible hand edge clipped at ${step / 4} in ${width}×${height}`);
+          }
+        }
+        for (const point of frame.face || []) {
+          const [x, y] = project(point);
+          assert.ok(x >= 0 && x <= width && y >= 42 && y <= height, `${id}: smoothed face leaves the fixed frame`);
+        }
+      }
     }
   }
 });

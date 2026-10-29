@@ -12,23 +12,27 @@ const motionByUrl=new Map(manifest.samples.map(x=>{const path=`./assets/motion/$
 const library=JSON.parse(readFileSync(new URL('assets/recognition-library.json',root)));
 const benchmark=JSON.parse(readFileSync(new URL('assets/evaluation-v07.json',root)));
 const source=readFileSync(new URL('platform.js',root),'utf8').replace(/^import .*;\n/gm,'');
+const showcaseSource=readFileSync(new URL('showcase.js',root),'utf8').replace(/^import .*;\n/gm,'');
 test('the actual HTML provides every literal controller ID exactly once and keeps the focus label inside its button',()=>{
   const html=readFileSync(new URL('index.html',root),'utf8');
   const htmlIds=[...html.matchAll(/\bid\s*=\s*['"]([^'"]+)['"]/g)].map(match=>match[1]);
   // Derive dependencies from production code, not the permissive fake DOM below.
   // In particular, putText('avatar-focus-label', ...) must resolve in real HTML.
-  const requiredIds=new Set([...source.matchAll(/(?:\$\(|putText\(|putAttribute\()\s*'([^']+)'/g)].map(match=>match[1]));
+  const requiredIds=new Set([...(source+'\n'+showcaseSource).matchAll(/(?:\$\(|putText\(|putAttribute\()\s*'([^']+)'/g)].map(match=>match[1]));
   for(const id of requiredIds)assert.equal(htmlIds.filter(actual=>actual===id).length,1,`Controller requires exactly one #${id} in app/index.html`);
   const focusButton=html.match(/<button\b[^>]*\bid=['"]avatar-focus['"][^>]*>([\s\S]*?)<\/button>/)?.[1];
   assert.match(focusButton||'',/<span\b[^>]*\bid=['"]avatar-focus-label['"]/,'The focus label must remain inside the live focus button');
   assert.match(html,/<dialog\b[^>]*\bid=['"]avatar-focus-dialog['"]/,'Large view must use a native dialog');
 });
 
-async function harness({fetchResponse,beforeReady}={}){
-  const elements=new Map(),timers=new Map(),rafs=new Map();let now=0,timerId=0,rafId=0,heldVision=null,cameraDeferred=null,stopped=0;
+async function harness({fetchResponse,beforeReady,showcase=false}={}){
+  const elements=new Map(),timers=new Map(),rafs=new Map(),documentListeners=new Map(),windowListeners=new Map();let now=0,timerId=0,rafId=0,heldVision=null,cameraDeferred=null,stopped=0;
+  const html=readFileSync(new URL('index.html',root),'utf8');
+  const tags=new Map([...html.matchAll(/<([a-z]+)\b[^>]*\bid=['"]([^'"]+)['"]/gi)].map(match=>[match[2],match[1]]));
+  const addListener=(map,type,cb,capture=false)=>{if(!map.has(type))map.set(type,[]);map.get(type).push({cb,capture});};
   class El{
-    constructor(id=''){
-      this.id=id;this.value=id==='speed'?'1':'';this.hidden=false;this.disabled=false;this.children=[];this.parentNode=null;
+    constructor(id='',tag=tags.get(id)||'div'){
+      this.id=id;this.tagName=tag.toLowerCase();this.value=id==='speed'?'1':'';this.hidden=false;this.disabled=false;this.children=[];this.parentNode=null;
       this.attrs={};this.listeners={};this.dataset={};this.videoWidth=640;this.videoHeight=480;this.readyState=4;this.duration=1.6;this.currentTime=0;this.textContent='';this.open=false;this.htmlWrites=0;
       const classes=new Set();this.classList={add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),toggle(x,on){if(on??!classes.has(x))classes.add(x);else classes.delete(x);}};
     }
@@ -36,22 +40,33 @@ async function harness({fetchResponse,beforeReady}={}){
     get nextSibling(){return this.parentNode?.children[this.parentNode.children.indexOf(this)+1]||null;}
     addEventListener(type,cb){(this.listeners[type]??=[]).push(cb);}
     removeEventListener(type,cb){this.listeners[type]=(this.listeners[type]||[]).filter(x=>x!==cb);}
-    emit(type){let prevented=false;for(const cb of this.listeners[type]||[])cb({preventDefault(){prevented=true;}});if(type==='cancel'&&!prevented)this.close();}
+    emit(type,detail={}){const event={target:this,defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},...detail};
+      for(const {cb,capture} of documentListeners.get(type)||[])if(capture)cb(event);
+      const result=this[`on${type}`]?.(event);for(const cb of this.listeners[type]||[])cb(event);
+      for(const {cb,capture} of documentListeners.get(type)||[])if(!capture)cb(event);
+      if(type==='cancel'&&!event.defaultPrevented)this.close();return result;
+    }
+    matches(selector){if(selector==='[data-mode]')return this.dataset.mode!==undefined;if(selector==='[contenteditable=true]')return this.attrs.contenteditable==='true';if(selector==='#word-chips button')return this.tagName==='button'&&Boolean(this.parentNode?.closest('#word-chips'));return selector.startsWith('#')?this.id===selector.slice(1):this.tagName===selector;}
+    closest(selectors){for(let node=this;node;node=node.parentNode)if(selectors.split(',').some(selector=>node.matches(selector.trim())))return node;return null;}
+    querySelector(selector){for(const child of this.children){if(child.matches(selector))return child;const nested=child.querySelector(selector);if(nested)return nested;}return null;}
     remove(){if(this.parentNode){const i=this.parentNode.children.indexOf(this);if(i>=0)this.parentNode.children.splice(i,1);}this.parentNode=null;}
     append(...els){for(const el of els){el.remove();el.parentNode=this;this.children.push(el);}}
     insertBefore(el,next){el.remove();const i=next?this.children.indexOf(next):this.children.length;if(i<0)throw new Error('Reference node is not a child');el.parentNode=this;this.children.splice(i,0,el);}
     replaceChildren(...els){for(const child of this.children)child.parentNode=null;this.children=[];this.append(...els);}
     setAttribute(k,v){this.attrs[k]=String(v);}getAttribute(k){return this.attrs[k]??null;}removeAttribute(k){delete this.attrs[k];}
     getContext(){return{clearRect(){}};}pause(){}load(){}play(){return Promise.resolve();}
-    focus(){document.activeElement=this;}scrollIntoView(){}showModal(){this.open=true;}close(){if(this.open){this.open=false;this.emit('close');}}click(){this.onclick?.();}
+    focus(){document.activeElement=this;}scrollIntoView(){}showModal(){this.open=true;}close(){if(this.open){this.open=false;this.emit('close');}}click(){return this.emit('click');}
   }
   const get=id=>{if(!elements.has(id))elements.set(id,new El(id));return elements.get(id);};
   get('facing').value='user';get('message').value='Вопрос';
   get('text-workspace').append(get('composer'),get('avatar-card'),get('after-avatar'));
-  get('avatar-card').append(get('avatar-focus'),get('play'),get('source-video'),get('word-chips'));
+  get('avatar-card').append(get('avatar-focus'),get('play'),get('source-video'),get('word-chips'),get('avatar-footer'));
   get('avatar-focus').append(get('avatar-focus-label'));
+  get('composer').append(get('showcase-controls'),get('composer-details'));
+  get('showcase-controls').append(get('showcase-start'),get('showcase-status'));
+  get('showcase-start').append(new El('','span'));
   const nav=['text','camera','video','about'].map(mode=>{const el=new El();el.dataset.mode=mode;return el;});
-  const document={hidden:false,activeElement:null,getElementById:get,createElement:()=>new El(),querySelectorAll:()=>nav,querySelector:selector=>selector==='.avatar-card'?get('avatar-card'):new El(),addEventListener(){}};
+  const document={hidden:false,activeElement:null,getElementById:get,createElement:tag=>new El('',tag),querySelectorAll:()=>nav,querySelector:selector=>selector==='.avatar-card'?get('avatar-card'):selector==='dialog[open]'?[...elements.values()].find(el=>el.tagName==='dialog'&&el.open)||null:new El(),addEventListener:(type,cb,capture)=>addListener(documentListeners,type,cb,capture),emit(type,detail={}){for(const {cb} of documentListeners.get(type)||[])cb({target:get('document'),...detail});}};
   const avatars=new Map();
   class Avatar{
     constructor(container){avatars.set(container.id,this);this.smoothing=true;}
@@ -62,18 +77,21 @@ async function harness({fetchResponse,beforeReady}={}){
   const stream={getTracks:()=>[track]};
   const defaultFetch=async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:url.includes('recognition-library')?library:url.includes('evaluation-v07')?benchmark:motionByUrl.get(url)});
   const context=vm.createContext({document,CanvasAvatar:Avatar,TrialProtocol,SessionLedger,frameReadiness,DEMO_SOURCES,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,drawLandmarks(){},
-    window:{addEventListener(){},speechSynthesis:{cancel(){}}},navigator:{mediaDevices:{getUserMedia:()=>cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}},
+    window:{addEventListener:(type,cb)=>addListener(windowListeners,type,cb),speechSynthesis:{cancel(){}},emit(type){for(const {cb} of windowListeners.get(type)||[])cb();}},navigator:{mediaDevices:{getUserMedia:()=>cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}},
     location:{hash:'#text',search:''},history:{replaceState(){}},URL,URLSearchParams,AbortController,performance:{now:()=>now},
     matchMedia:()=>({matches:false}),requestAnimationFrame:cb=>{rafs.set(++rafId,cb);return rafId;},cancelAnimationFrame:id=>rafs.delete(id),
-    setTimeout:cb=>{timers.set(++timerId,cb);return timerId;},clearTimeout:id=>timers.delete(id),
+    setTimeout:(cb,ms=0)=>{timers.set(++timerId,{cb,at:now+ms});return timerId;},clearTimeout:id=>timers.delete(id),
+    MutationObserver:class{observe(){}},readDemoCacheStatus:async()=>({offlineReady:false}),prepareDemoAssets:async()=>({offlineReady:false}),
     loadVision:()=>heldVision?.promise||Promise.resolve(),resetVision:async()=>{},detect:()=>new Promise(()=>{}),
     fetch:(url,options)=>fetchResponse?fetchResponse(url,options,defaultFetch):defaultFetch(url),console,
   });
   const ready=vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare,setVisualMode};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
-  const controls={get,document,timers,avatars,window:context.window,endCamera:()=>track.dispatchEvent(new Event('ended')),frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
+  const controls={get,document,timers,avatars,window:context.window,endCamera:()=>track.dispatchEvent(new Event('ended')),frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const due=[...timers].filter(([,timer])=>timer.at<=now);for(const [id,timer] of due){timers.delete(id);timer.cb();}},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
   await beforeReady?.(controls);
-  return{...controls,api:await ready};
+  const api=await ready;
+  if(showcase)vm.runInContext(`(()=>{${showcaseSource}\n})()`,context);
+  return{...controls,api};
 }
 
 test('smoothing toggles both avatars without restarting playback, changing the word or seeking source video',async()=>{
@@ -300,7 +318,7 @@ test('animation frames do not recreate the play button while its state is unchan
  for(let i=0;i<30;i++)h.frame(16);
  assert.equal(h.api.s.playing,true);assert.equal(play.htmlWrites,writes);assert.equal(play.getAttribute('aria-label'),'Пауза');
  assert.ok(Number(h.get('timeline').value)>0);h.api.pauseAvatar();assert.equal(play.htmlWrites,writes+1);
- assert.equal(play.getAttribute('aria-label'),'Воспроизвести');h.api.pauseAvatar();assert.equal(play.htmlWrites,writes+1);
+ assert.equal(play.getAttribute('aria-label'),'Продолжить');h.api.pauseAvatar();assert.equal(play.htmlWrites,writes+1);
 });
 
 
@@ -312,4 +330,122 @@ test('frame steps choose the nearest recorded neighbour from between frames, inc
  assert.equal(h.api.s.time,5/fps);assert.equal(h.get('source-video').currentTime,5/fps);
  h.api.s.time=.5/fps;h.api.pauseAvatar();assert.equal(h.get('frame-prev').disabled,false);
  h.get('frame-prev').click();assert.equal(h.api.s.time,0);assert.equal(h.get('frame-prev').disabled,true);
+});
+
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
+
+test('repeat holds the last frame for 800 ms and restarts at frame one without joining the endpoints',async()=>{
+ const h=await harness();h.get('repeat').click();await h.api.playAvatar();
+ h.frame(h.api.s.data.duration*1000+10);
+ assert.equal(h.api.s.repeatWaiting,true);assert.equal(h.api.s.playing,true);
+ assert.equal(h.api.s.time,h.api.s.data.duration);assert.equal(h.get('play').getAttribute('aria-label'),'Пауза');
+ assert.equal(h.get('playback-status').textContent,'Пауза перед повтором');
+ h.advance(799);assert.equal(h.api.s.time,h.api.s.data.duration);assert.equal(h.api.s.repeatWaiting,true);
+ h.advance(1);assert.equal(h.api.s.time,0);assert.equal(h.api.s.repeatWaiting,false);assert.equal(h.api.s.playing,true);
+ h.frame(100);assert.ok(Math.abs(h.api.s.time-.1)<1e-9);
+});
+
+test('cancelled repeat callbacks cannot restart after pause, scrub, a new word, view changes, navigation, or a hidden tab',async()=>{
+ const actions=[
+  h=>h.api.pauseAvatar(),
+  h=>{h.get('timeline').value='400';h.get('timeline').emit('input');},
+  h=>h.get('repeat').click(),
+  h=>h.api.selectWord('hello',true),
+  h=>h.api.setVisualMode('compare'),
+  h=>h.api.setMode('video'),
+  h=>{h.document.hidden=true;h.document.emit('visibilitychange');},
+ ];
+ for(const action of actions){
+  const h=await harness();h.get('repeat').click();await h.api.playAvatar();h.frame(2000);
+  const stale=h.timers.get(h.api.s.repeatTimer).cb;
+  await action(h);
+  const expected={time:h.api.s.time,playing:h.api.s.playing,word:h.api.s.selected.id,token:h.api.s.playbackToken};
+  stale();h.advance(1000);await flush();
+  assert.deepEqual({time:h.api.s.time,playing:h.api.s.playing,word:h.api.s.selected.id,token:h.api.s.playbackToken},expected);
+  assert.equal(h.api.s.repeatWaiting,false);assert.equal(h.api.s.repeatTimer,0);
+ }
+});
+
+test('video ended events schedule only one still pause and restart comparison from the same first instant',async()=>{
+ const h=await harness(),video=h.get('source-video');h.api.setCompare(true);h.get('repeat').click();await h.api.playAvatar();
+ video.currentTime=h.api.s.data.duration;video.emit('ended');
+ const timer=h.api.s.repeatTimer;assert.ok(timer);assert.equal(h.api.s.time,h.api.s.data.duration);
+ video.emit('ended');assert.equal(h.api.s.repeatTimer,timer);
+ h.advance(800);await flush();
+ assert.equal(h.api.s.playing,true);assert.equal(h.api.s.time,0);assert.equal(video.currentTime,0);
+ video.currentTime=.2;h.frame(16);assert.equal(h.api.s.time,.2);
+});
+
+test('moving the live player and its one showcase wrapper preserves playback and an outstanding repeat pause',async()=>{
+ const h=await harness(),controls=h.get('showcase-controls'),home=controls.parentNode,next=controls.nextSibling;
+ h.get('repeat').click();await h.api.playAvatar();h.frame(200);
+ const time=h.api.s.time,token=h.api.s.playbackToken;
+ h.get('avatar-focus').click();
+ assert.equal(controls.parentNode,h.get('avatar-card'));assert.equal(controls.nextSibling,h.get('avatar-footer'));
+ assert.equal(h.api.s.playing,true);assert.equal(h.api.s.time,time);assert.equal(h.api.s.playbackToken,token);
+ h.get('avatar-focus-dialog').emit('cancel');
+ assert.equal(controls.parentNode,home);assert.equal(controls.nextSibling,next);assert.equal(h.api.s.playing,true);
+ h.frame(2000);const timer=h.api.s.repeatTimer;
+ h.get('avatar-focus').click();h.get('avatar-focus').click();
+ assert.equal(h.api.s.repeatTimer,timer);assert.equal(h.api.s.repeatWaiting,true);
+ h.advance(800);assert.equal(h.api.s.time,0);assert.equal(h.api.s.playing,true);
+});
+
+test('the actual six-word showcase starts inside large view, survives resizing, and completes each word once',async()=>{
+ const h=await harness({showcase:true});h.get('repeat').click();h.get('avatar-focus').click();
+ const sequence=h.get('showcase-start').click();await flush();
+ assert.equal(h.get('avatar-focus-dialog').open,true);assert.equal(h.api.s.repeat,false);
+ const visited=[];
+ for(let index=0;index<6;index++){
+  h.advance(350);await flush();assert.equal(h.api.s.playing,true);
+  visited.push(h.api.s.selected.id);
+  if(index===0){
+   h.frame(100);const time=h.api.s.time,token=h.api.s.playbackToken;
+   h.get('avatar-focus').click();h.get('avatar-focus').click();
+   assert.equal(h.api.s.time,time);assert.equal(h.api.s.playbackToken,token);
+   assert.equal(h.get('showcase-start').getAttribute('aria-pressed'),'true');
+  }
+  h.frame(2000);assert.equal(h.api.s.playing,false);
+  h.advance(80);await flush();h.advance(900);await flush();
+ }
+ await sequence;
+ assert.deepEqual(visited,manifest.samples.map(item=>item.id));
+ assert.equal(h.get('showcase-start').getAttribute('aria-pressed'),'false');
+ assert.equal(h.api.s.playing,false);assert.equal(h.get('avatar-focus-dialog').open,true);
+ assert.match(h.get('showcase-status').textContent,/Показ завершён/);
+});
+
+test('manual repeat during a showcase gap cancels its queued next word without competing playback',async()=>{
+ const h=await harness({showcase:true});const sequence=h.get('showcase-start').click();await flush();
+ h.advance(350);await flush();h.frame(2000);h.advance(80);await flush();
+ const word=h.api.s.selected.id;h.get('repeat').click();
+ assert.equal(h.get('showcase-start').getAttribute('aria-pressed'),'false');assert.equal(h.api.s.repeat,true);
+ await h.api.playAvatar();h.advance(900);await flush();await sequence;
+ assert.equal(h.api.s.selected.id,word);assert.equal(h.api.s.playing,true);assert.equal(h.api.s.time,0);
+});
+
+test('a cancelled showcase load cannot overwrite or start after a manual word selection',async()=>{
+ let release;const first=`./assets/motion/${manifest.samples[0].file.replace('.mp4','.json')}`;
+ const h=await harness({showcase:true,fetchResponse(url,options,fallback){
+  return url===first?Promise.resolve({ok:true,json:()=>new Promise(resolve=>{release=()=>resolve(motionByUrl.get(url));})}):fallback(url);
+ }});
+ const sequence=h.get('showcase-start').click();await flush();assert.ok(release);
+ const word=h.get('word-chips').children.find(button=>button.dataset.id==='yes');word.click();await flush();
+ assert.equal(h.api.s.selected.id,'yes');const data=h.api.s.data,token=h.api.s.playbackToken;
+ release();await sequence;h.advance(2000);await flush();
+ assert.equal(h.api.s.selected.id,'yes');assert.equal(h.api.s.data,data);assert.equal(h.api.s.playbackToken,token);
+ assert.equal(h.get('showcase-start').getAttribute('aria-pressed'),'false');
+});
+
+test('quarter speed uses real elapsed time and keyboard controls select exact frames after ordinary button clicks',async()=>{
+ const h=await harness({showcase:true}),timeline=h.get('timeline'),fps=h.api.s.data.fps;
+ h.get('speed').value='.25';h.get('speed').emit('change');await h.api.playAvatar();h.frame(400);
+ assert.ok(Math.abs(h.api.s.time-.1)<1e-9);assert.equal(h.get('source-video').playbackRate,.25);
+ timeline.emit('keydown',{key:'ArrowRight'});assert.equal(h.api.s.playing,false);assert.equal(h.api.s.time,4/fps);
+ timeline.emit('keydown',{key:'Home'});assert.equal(h.api.s.time,0);
+ timeline.emit('keydown',{key:'End'});assert.equal(h.api.s.time,(h.api.s.data.frames.length-1)/fps);
+ h.get('show-compare').click();h.get('show-compare').emit('keydown',{key:'f'});
+ assert.equal(h.get('avatar-focus-dialog').open,true);
+ h.get('avatar-focus').emit('keydown',{key:'ArrowLeft'});
+ assert.equal(h.api.s.time,(h.api.s.data.frames.length-2)/fps);assert.equal(h.get('source-video').currentTime,h.api.s.time);
 });

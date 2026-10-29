@@ -312,3 +312,67 @@ button{touch-action:manipulation}
 .avatar-card .stage-foot .motion-smoothing{margin-left:auto}
 .avatar-card .stage-foot>a{margin:0;flex:none;font-size:10px}
 @media(max-width:700px){.motion-smoothing{min-height:42px;font-size:11px}.avatar-card .stage-foot>span{flex-basis:100%}.avatar-card .stage-foot .motion-smoothing{margin-left:0}}
+
+/* The same short recording can be inspected slowly or repeated with a still
+   pause; the presentation controls move with the live card in large view. */
+.avatar-card .playback-tools{gap:6px;flex-wrap:wrap}
+.avatar-card .frame-controls .icon-button,.avatar-card .playback-tools>#replay{width:44px;min-width:44px;height:44px;min-height:44px}
+.avatar-card .avatar-focus,.avatar-top .segmented button,.avatar-words .word-chips button,.motion-smoothing{min-height:44px}
+.avatar-card .speed{display:flex;flex-direction:column;align-items:stretch;gap:2px;margin-left:0}
+.avatar-card .speed>span{font-size:10px;line-height:1.2;color:var(--muted)}
+.avatar-card .speed select{min-height:44px;min-width:64px;font-size:12px}
+.avatar-card .timeline .scrub-meta{font-size:11px}
+.avatar-card .stage-word{flex-wrap:wrap;gap:4px 10px}
+.avatar-card .stage-word>span{font-size:11px;line-height:1.4;letter-spacing:0}
+.repeat-toggle{min-height:44px;padding:8px 11px;border:1px solid var(--line);border-radius:7px;background:white;color:var(--navy);font:600 12px/1.3 Manrope,Arial,sans-serif;white-space:nowrap;touch-action:manipulation}
+.repeat-toggle[aria-pressed=true]{background:#e7efff;border-color:#91afe2;box-shadow:inset 0 0 0 1px #91afe2;color:#234e9b}
+.repeat-toggle:hover{background:#edf3fc}
+#avatar-focus-dialog .showcase-controls{display:flex;align-items:center;gap:12px;margin:0;padding:7px 18px;border-top:1px solid var(--line);text-align:left}
+#avatar-focus-dialog .showcase-controls .button{width:auto;min-width:170px;flex:none;min-height:44px}
+#avatar-focus-dialog .showcase-controls #showcase-status{flex:1;min-height:0;margin:0;font-size:11px;line-height:1.5}
+@media(max-width:700px){
+  .avatar-card .playback-tools{gap:5px;align-items:end}
+  #avatar-focus-dialog .showcase-controls{gap:9px;padding:6px 12px}
+  #avatar-focus-dialog .showcase-controls .button{min-width:0;padding:8px 10px;font-size:11px}
+  #avatar-focus-dialog .showcase-controls #showcase-status{font-size:10px}
+}
+@media(max-width:420px){
+  .avatar-card .playback-tools{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px 8px}
+  .avatar-card .playback-tools .frame-controls{grid-column:1;grid-row:1}
+  .avatar-card .playback-tools .speed{grid-column:2;grid-row:1;justify-self:end}
+  .avatar-card .playback-tools>#replay{grid-column:3;grid-row:1}
+  .avatar-card .playback-tools .repeat-toggle{grid-column:1/-1;grid-row:2}
+}
+
+/* A modal locks the background without changing/restoring its scroll position
+   in script. Percentage width excludes a reserved browser scrollbar. */
+html:has(#avatar-focus-dialog[open]){overflow:hidden;scrollbar-gutter:stable}
+body:has(#avatar-focus-dialog[open]){overflow:hidden}
+#avatar-focus-dialog{box-sizing:border-box;max-width:100%;overscroll-behavior:contain}
+@media(max-width:700px){
+  #avatar-focus-dialog{inset:0;width:100%;max-width:100%;height:100dvh;max-height:100dvh;margin:0;overflow-y:auto;overflow-x:hidden}
+  #avatar-focus-dialog>.avatar-card{height:auto;min-height:100%;max-height:none;overflow:visible}
+  #avatar-focus-dialog .avatar-top{display:flex;flex-wrap:nowrap;align-items:center;min-height:0;padding:6px 10px;gap:6px}
+  #avatar-focus-dialog .avatar-top .avatar-heading{display:none}
+  #avatar-focus-dialog .avatar-top .segmented{display:flex;flex:1 1 0;min-width:0;margin:0;padding:2px;gap:0}
+  #avatar-focus-dialog .avatar-top .segmented button{flex:1 1 0;min-width:0;min-height:44px;padding:7px 4px;font-size:11px;white-space:nowrap}
+  #avatar-focus-dialog .avatar-top .avatar-focus{flex:0 0 auto;min-width:68px;min-height:44px;padding:7px 8px;font-size:11px}
+  #avatar-focus-dialog .avatar-focus svg{display:none}
+  #avatar-focus-dialog .avatar-card .stage{flex:1 0 clamp(300px,43dvh,380px);min-height:clamp(300px,43dvh,380px);height:auto}
+  #avatar-focus-dialog .stage-view-labels .stage-label{padding-right:10px;padding-left:10px;font-size:8px}
+  #avatar-focus-dialog .avatar-card .player{grid-template-columns:44px minmax(0,1fr);gap:0 8px;padding:0 10px 8px}
+  #avatar-focus-dialog .avatar-card .playback-tools{display:flex;grid-column:1/-1;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:4px}
+  #avatar-focus-dialog .playback-tools .frame-controls{flex:none;gap:3px}
+  #avatar-focus-dialog .playback-tools .repeat-toggle{flex:none;width:82px;padding:7px 5px;font-size:11px}
+  #avatar-focus-dialog .playback-tools .speed{flex:none}
+  #avatar-focus-dialog .playback-tools .speed>span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  #avatar-focus-dialog .playback-tools .speed select{width:64px;min-width:64px;max-width:64px;min-height:44px}
+  #avatar-focus-dialog .avatar-card .stage-foot{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;padding:4px 10px 8px}
+  #avatar-focus-dialog .stage-foot>span{display:none}
+  #avatar-focus-dialog .stage-foot .motion-smoothing{margin:0;min-height:44px}
+  #avatar-focus-dialog .stage-foot>a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 6px;margin-left:auto}
+}
+@media(max-width:340px){
+  #avatar-focus-dialog .avatar-card .playback-tools{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px 8px}
+  #avatar-focus-dialog .playback-tools .repeat-toggle{width:auto;grid-column:1/-1;grid-row:2}
+}

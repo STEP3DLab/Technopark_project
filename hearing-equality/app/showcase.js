@@ -1,5 +1,5 @@
-import './platform.js?v=0.11.1';
-import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.11.1';
+import './platform.js?v=0.12.0';
+import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.12.0';
 
 const api=window.hearingEquality;
 const $=id=>document.getElementById(id);
@@ -15,10 +15,9 @@ function syncWords(){
 }
 function sequenceUI(active,message){
   sequenceActive=active;
-  $('showcase-start').disabled=active||!catalog.length;
+  $('showcase-start').disabled=!catalog.length;
   $('showcase-start').setAttribute('aria-pressed',String(active));
-  $('showcase-start').querySelector('span').textContent=active?'Идёт автопоказ':'Автопоказ';
-  $('showcase-stop').hidden=!active;
+  $('showcase-start').querySelector('span').textContent=active?'Остановить показ':'Автопоказ · 6 жестов';
   if(message)$('showcase-status').textContent=message;
 }
 function stopSequence({pause=true,message='Автопоказ остановлен. Можно выбрать любой жест.'}={}){
@@ -29,7 +28,8 @@ function stopSequence({pause=true,message='Автопоказ остановле
 async function runSequence(){
   if(!catalog.length||sequenceActive)return;
   const generation=++sequenceGeneration;
-  api.mode('text');api.view('avatar');
+  if(api.state().mode!=='text')api.mode('text');
+  api.repeat(false);
   sequenceUI(true,'Загружаем первое движение…');
   try{
     for(let i=0;i<catalog.length;i++){
@@ -105,8 +105,7 @@ if(api){
   }
   syncWords();sequenceUI(false);
   new MutationObserver(syncWords).observe($('active-word'),{childList:true,characterData:true,subtree:true});
-  $('showcase-start').onclick=runSequence;
-  $('showcase-stop').onclick=()=>stopSequence();
+  $('showcase-start').onclick=()=>sequenceActive?stopSequence():runSequence();
   $('prepare-show').onclick=prepare;
   $('guide-prepare').onclick=()=>{guide.close();prepare();};
   $('open-guide').onclick=openGuide;
@@ -129,24 +128,29 @@ if(api){
   };
   document.addEventListener('click',event=>{
     if(!sequenceActive)return;
-    if(event.target.closest('[data-mode],#word-chips button,#text-form,#play,#replay,#timeline,#frame-prev,#frame-next,#show-avatar,#show-reference,#show-compare,#present,#avatar-focus,#open-guide')){
+    if(event.target.closest('[data-mode],#word-chips button,#text-form,#play,#replay,#repeat,#timeline,#frame-prev,#frame-next,#show-avatar,#show-reference,#show-compare,#present,#open-guide')){
       stopSequence({pause:false,message:'Автопоказ остановлен: включено ручное управление.'});
     }
   },true);
   $('timeline').addEventListener('input',()=>stopSequence({pause:false}));
+  $('timeline').addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key))stopSequence({pause:false});});
+  $('speed').addEventListener('change',()=>stopSequence({pause:false,message:'Автопоказ остановлен: выбрана скорость для разбора.'}));
   document.addEventListener('keydown',event=>{
-    if(event.repeat||event.ctrlKey||event.metaKey||event.altKey)return;
-    if(event.target.closest('input,textarea,select,button,summary,a,[contenteditable=true]'))return;
+    if(event.defaultPrevented||event.isComposing||event.ctrlKey||event.metaKey||event.altKey)return;
+    if(event.target.closest('input,textarea,select,[contenteditable=true]'))return;
     const activeDialog=document.querySelector('dialog[open]');
     if(activeDialog&&activeDialog.id!=='avatar-focus-dialog')return;
     if(api.state().mode!=='text')return;
     const key=event.key.toLowerCase();
     if([' ','arrowleft','arrowright','f','а'].includes(key)){
-      event.preventDefault();stopSequence({pause:false});
+      if(event.repeat&&!['arrowleft','arrowright'].includes(key))return;
+      if(key===' '&&event.target.closest('button,summary,a'))return;
+      event.preventDefault();
+      if(key==='f'||key==='а'){api.focus();return;}
+      stopSequence({pause:false});
       if(key===' ')api.state().playing?api.pause():api.play();
       else if(key==='arrowleft')api.step(-1);
       else if(key==='arrowright')api.step(1);
-      else api.focus();
     }
   });
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stopSequence({message:'Автопоказ остановлен: вкладка была скрыта.'});});
@@ -155,5 +159,10 @@ if(api){
   window.addEventListener('offline',()=>{
     if(!preparing)readDemoCacheStatus().then(status=>{if(status.offlineReady)showReadiness(status);else{showReadiness(status);$('readiness-copy').textContent='Сеть недоступна. Уже открытые движения можно просматривать; полный автономный показ ещё не подготовлен.';}}).catch(()=>{});
   });
-  readDemoCacheStatus().then(status=>{if(status.offlineReady)showReadiness(status);}).catch(()=>{});
+  readDemoCacheStatus().then(status=>{
+    if(status.offlineReady&&!preparing){
+      showReadiness(status);
+      $('prepare-show').querySelector('span').textContent='Материалы готовы';
+    }
+  }).catch(()=>{});
 }

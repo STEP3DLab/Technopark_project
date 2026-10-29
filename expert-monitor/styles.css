@@ -7038,6 +7038,7 @@ button.agenda-title:hover, a.agenda-title:hover {
     padding: 14px;
   }
   .compare-table tr > :first-child {
+    position: static;
     min-width: 115px;
     max-width: 140px;
     width: 125px;

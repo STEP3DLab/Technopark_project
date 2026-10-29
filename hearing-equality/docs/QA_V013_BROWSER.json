@@ -1,0 +1,140 @@
+{
+  "environment": "Chromium, isolated DOM with local source/fixtures. Clipboard, share, speech, camera denial, and video playback simulated; recognition runs on existing source coordinates. Live camera quality not tested.",
+  "passed": 33,
+  "failed": 0,
+  "errors": [],
+  "results": [
+    {
+      "scenario": "Empty draft cannot be displayed or transferred",
+      "status": "passed"
+    },
+    {
+      "scenario": "Quick phrase inserts into draft without replacement",
+      "status": "passed"
+    },
+    {
+      "scenario": "Undo restores draft",
+      "status": "passed"
+    },
+    {
+      "scenario": "Clear is reversible",
+      "status": "passed"
+    },
+    {
+      "scenario": "Phrase search spans all categories",
+      "status": "passed"
+    },
+    {
+      "scenario": "Empty phrase search has an explanation",
+      "status": "passed"
+    },
+    {
+      "scenario": "Draft is not stored without opt-in",
+      "status": "passed"
+    },
+    {
+      "scenario": "Storage opt-out removes saved draft",
+      "status": "passed"
+    },
+    {
+      "scenario": "Oversize paste is not truncated and cannot be transferred",
+      "status": "passed"
+    },
+    {
+      "scenario": "Copy preserves exact text",
+      "status": "passed"
+    },
+    {
+      "scenario": "Clipboard denial opens manual-copy fallback",
+      "status": "passed"
+    },
+    {
+      "scenario": "Modal restores keyboard focus",
+      "status": "passed"
+    },
+    {
+      "scenario": "Unsupported share exposes copy, not a false success",
+      "status": "passed"
+    },
+    {
+      "scenario": "Share cancellation preserves draft",
+      "status": "passed"
+    },
+    {
+      "scenario": "Share payload contains text only, with no encoded private URL",
+      "status": "passed"
+    },
+    {
+      "scenario": "Large message is keyboard dismissible",
+      "status": "passed"
+    },
+    {
+      "scenario": "User HTML remains inert text",
+      "status": "passed"
+    },
+    {
+      "scenario": "One revision is not duplicated in dialogue",
+      "status": "passed"
+    },
+    {
+      "scenario": "Both conversation roles are represented",
+      "status": "passed"
+    },
+    {
+      "scenario": "Transcript copying preserves speakers",
+      "status": "passed"
+    },
+    {
+      "scenario": "Late speech result cannot overwrite manual reply",
+      "status": "passed"
+    },
+    {
+      "scenario": "Leaving the view invalidates pending dictation",
+      "status": "passed"
+    },
+    {
+      "scenario": "Cancelling reset preserves conversation",
+      "status": "passed"
+    },
+    {
+      "scenario": "New conversation clears draft, reply, history, undo and saved text",
+      "status": "passed"
+    },
+    {
+      "scenario": "Camera denial leaves text composition available",
+      "status": "passed"
+    },
+    {
+      "scenario": "Demonstration result cannot be inserted before confirmation",
+      "status": "passed"
+    },
+    {
+      "scenario": "Confirmed known-sample result is inserted and visibly labelled demo",
+      "status": "passed"
+    },
+    {
+      "scenario": "Editing does not erase demo provenance",
+      "status": "passed"
+    },
+    {
+      "scenario": "Storage failure is shown without deleting working text",
+      "status": "passed"
+    },
+    {
+      "scenario": "No horizontal overflow at 320, 360, 390, 768 and 1440 CSS pixels",
+      "status": "passed"
+    },
+    {
+      "scenario": "Reading preferences have explicit pressed states",
+      "status": "passed"
+    },
+    {
+      "scenario": "Existing avatar remains available",
+      "status": "passed"
+    },
+    {
+      "scenario": "No uncaught browser JavaScript errors",
+      "status": "passed"
+    }
+  ]
+}

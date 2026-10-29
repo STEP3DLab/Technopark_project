@@ -1,5 +1,5 @@
 import './platform.js?v=0.12.0';
-import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.12.0';
+import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.13.0';
 
 const api=window.hearingEquality;
 const $=id=>document.getElementById(id);
@@ -67,7 +67,7 @@ function showReadiness({cached=0,total=0,failed=[],offlineReady=false,needsReloa
   if(loading)$('readiness-copy').textContent='Подготовка материалов · '+cached+' из '+total+'. Оставьте страницу открытой.';
   else if(offlineReady&&retained)$('readiness-copy').textContent='Ранее подготовленные материалы сохранены и доступны без сети. Обновление не завершилось: повторите при стабильном интернете.';
   else if(offlineReady)$('readiness-copy').textContent='Материалы показа готовы. Аватар, исходные видео и готовые координаты доступны без сети. Камера и голос проверяются отдельно.';
-  else if(needsReload)$('readiness-copy').textContent='Материалы сохранены. Обновите страницу, чтобы включить автономный показ. Текущая история диалога при этом очистится.';
+  else if(needsReload)$('readiness-copy').textContent='Материалы сохранены. Обновите страницу, чтобы включить автономный показ. История диалога очистится; сначала скопируйте важный текст.';
   else $('readiness-copy').textContent='Загружено '+cached+' из '+total+' материалов. '+(failed.length?'Часть загрузок не завершилась. ':'')+'Повторите подготовку при доступном интернете.';
   $('readiness-reload').hidden=!needsReload;
 }

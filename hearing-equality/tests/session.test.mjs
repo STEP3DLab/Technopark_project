@@ -21,6 +21,13 @@ test('reports omit full dialogue text and clearing starts a fresh session',()=>{
   assert.equal(JSON.stringify(log.exportReport()).includes('Private conversation'),false);
   log.clear();assert.equal(log.messages.length,0);assert.equal(log.summary().total,0);
 });
+test('saved messages preserve all 2000 characters and line breaks without silent shortening',()=>{
+  const log=new SessionLedger(),text='\n'+ 'Я'.repeat(1997)+'\n ';
+  const message=log.addMessage('visitor',text);
+  assert.equal(message.text,text);assert.equal(message.text.length,2000);
+  assert.throws(()=>log.addMessage('employee',text+'!'),RangeError);
+  assert.equal(log.messages.length,1);assert.equal(log.addMessage('employee',' \n '),null);
+});
 test('frame guidance distinguishes body, clipped hands and complete hands',()=>{
   const pose=Array.from({length:33},()=>[.5,.5,0,1]),hand=Array.from({length:21},()=>[.5,.5,0]);
   assert.deepEqual(frameReadiness({pose,left:hand,right:hand}),{body:true,hands:2,ready:true});

@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#223260">
   <meta name="description" content="Равенство по слуху — студия демонстрации аватара. Шесть слов русского жестового языка, воспроизведение движения и сравнение с исходным видео.">
-  <title>Равенство по слуху — студия аватара · v0.12</title>
-  <link rel="stylesheet" href="./styles.css?v=0.12.0">
+  <title>Равенство по слуху — студия аватара · v0.15</title>
+  <link rel="stylesheet" href="./styles.css?v=0.15.0">
+<link rel="stylesheet" href="avatar-3d.css?v=0.15.0">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Перейти к содержимому</a>
@@ -22,7 +23,7 @@
     <main id="main-content">
       <section class="intro" aria-labelledby="page-title">
         <div class="intro-copy-group"><h1 id="page-title">Аватар <span>в движении.</span></h1><p class="intro-copy">Выберите слово. Рассмотрите жест. Сравните с исходным видео.</p></div>
-        <div class="demo-badge"><span class="status-dot" aria-hidden="true"></span><span>Демонстратор <b>v0.12</b> · 6 слов</span></div>
+        <div class="demo-badge"><span class="status-dot" aria-hidden="true"></span><span>Демонстратор <b>v0.15</b> · 6 слов</span></div>
       </section>
 
       <nav class="tabs" role="tablist" aria-label="Разделы студии">
@@ -39,7 +40,7 @@
               <button id="mode-reference" class="mode-button" data-mode="reference" type="button" aria-pressed="false">Исходное видео</button>
               <button id="mode-compare" class="mode-button" data-mode="compare" type="button" aria-pressed="false">Сравнить</button>
             </div>
-            <div class="scene-tools" role="group" aria-label="Настройки сцены"><span class="presentation-badge">Студия РЖЯ · v0.12</span>
+            <div class="scene-tools" role="group" aria-label="Настройки сцены"><span class="presentation-badge">Студия РЖЯ · v0.15</span>
               <button id="appearance-button" class="icon-button appearance-button" type="button" aria-label="Внешний вид аватара" title="Внешний вид аватара" aria-expanded="false" aria-controls="appearance-panel"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 4-5 3 2 5 3-1v9h8v-9l3 1 2-5-5-3c-.5 2-2 3-4 3s-3.5-1-4-3Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
               <button id="theme-toggle" class="icon-button" type="button" aria-label="Фон сцены: переключить на светлый" title="Фон сцены" aria-pressed="false"><span data-label class="sr-only">Светлый фон</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42m0-14.14-1.42 1.42M6.35 17.65l-1.42 1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
               <button id="focus-button" class="icon-button focus-button" type="button" aria-label="Режим показа" title="Режим показа · F" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 21h6m-3-4v4M7 8h3M7 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="focus-label" data-label>Режим показа</span></button>
@@ -128,16 +129,16 @@
 
       <section id="panel-about" class="tab-panel about-panel" role="tabpanel" aria-labelledby="tab-about" hidden>
         <div class="panel-heading"><div><p class="eyebrow">Равенство по слуху</p><h2>От записи — к аватару</h2><p>Этот демонстратор помогает исследовать воспроизведение жестов и удобство взаимодействия с цифровым персонажем.</p></div></div>
-<div class="version-note"><span class="version-label">Аватар v0.12</span><p>Обновлённый облик, более чёткие кисти и плавные движения. Сравнивайте аватара с исходной записью.</p></div>
+<div class="version-note"><span class="version-label">Аватар v0.15</span><p>Обновлённый облик, более чёткие кисти и плавные движения. Сравнивайте аватара с исходной записью.</p></div>
         <div class="process-grid"><article class="process-card"><span class="process-index">01</span><h3>Выбираем слово</h3><p>Текст сопоставляется с одной из шести доступных записей демонстрационного словаря.</p></article><article class="process-card"><span class="process-index">02</span><h3>Воссоздаём движение</h3><p>Аватар использует измеренные координаты тела, лица и кистей. Его можно сравнить с исходным видео.</p></article><article class="process-card"><span class="process-index">03</span><h3>Проверяем понимание</h3><p>Следующий этап — оценка переводчиком РЖЯ и участниками сообщества глухих.</p></article></div>
         <div class="about-detail-grid"><article class="about-detail"><h3>Что уже можно исследовать</h3><ul><li>Форму кистей и траекторию движения</li><li>Читаемость аватара на разных экранах</li><li>Различия между исходным видео и визуализацией</li><li>Удобство замедления, сравнения и повтора</li></ul></article><article class="about-detail limitation-detail"><h3>Границы этой версии</h3><p>Это технический демонстратор шести слов. Свободного перевода предложений и подтверждённого понимания РЖЯ в этой версии нет.</p><p>Аватар Canvas 2D следует координатам, автоматически извлечённым MediaPipe. При потере кисти детектором её пальцы временно не показываются. Стилизованная внешность не является частью исходной записи.</p><p>Для реальных оповещений и ответственной коммуникации нужны проверенные переводы.</p></article></div>
         <article class="about-detail source-credit"><div><p class="eyebrow">Происхождение данных</p><h3>Движения из Slovo</h3></div><div><p>Alexander Kapitanov, Karina Kvanchiani, Alexander Nagaev, Elizaveta Petrova. <em>Slovo: Russian Sign Language Dataset.</em></p><p>Шесть исходных видеоклипов сохранены без изменения. Координаты автоматически извлечены с помощью MediaPipe; изображение аватара и переходы построены программно. Данные и их адаптация предоставляются по специальной публичной лицензии Slovo, как есть, без гарантии качества перевода. Авторы Slovo не заявлены проверяющими этого проекта.</p><div class="source-links"><a href="https://github.com/ai-forever/slovo" target="_blank" rel="noopener noreferrer">Исходный репозиторий ↗</a><a href="./assets/sources/SLOVO-LICENSE-en.pdf" target="_blank" rel="noopener noreferrer">Лицензия данных ↗</a><a href="./assets/sources/slovo-sources.json" target="_blank" rel="noopener noreferrer">Происхождение записей ↗</a><a href="https://github.com/STEP3DLab/Technopark_project/tree/main/hearing-equality" target="_blank" rel="noopener noreferrer">Код и план MVP ↗</a></div></div></article>
       </section>
     </main>
-    <footer class="site-footer"><span>Равенство по слуху <span class="footer-separator" aria-hidden="true">·</span> Технопарк РГСУ</span><span class="footer-version"><b>v0.12</b> Доступность начинается с понимания.</span></footer>
+    <footer class="site-footer"><span>Равенство по слуху <span class="footer-separator" aria-hidden="true">·</span> Технопарк РГСУ</span><span class="footer-version"><b>v0.15</b> Доступность начинается с понимания.</span></footer>
   </div>
 
   <div id="a11y-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-  <script type="module" src="./app.js?v=0.12.0"></script>
+  <script type="module" src="./app.js?v=0.15.0"></script>
 </body>
 </html>

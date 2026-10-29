@@ -1,0 +1,185 @@
+{
+  "version": "0.13.0",
+  "date": "2026-10-29",
+  "automated": {
+    "files": 16,
+    "tests": 152,
+    "passed": 152,
+    "failed": 0,
+    "skipped": 0,
+    "runner": "node <each tests/*.test.mjs>, four independent processes at a time; platform suite rerun after final dictation fix",
+    "suites": [
+      {
+        "file": "tests/avatar-framing.test.mjs",
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/avatar-lifecycle.test.mjs",
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/avatar-motion.test.mjs",
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/avatar-render.test.mjs",
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/catalog.test.mjs",
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/communication.test.mjs",
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/demo-cache.test.mjs",
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/evaluation.test.mjs",
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/hand-geometry.test.mjs",
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/platform.test.mjs",
+        "tests": 48,
+        "pass": 48,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/playback.test.mjs",
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/recognizer.test.mjs",
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/session.test.mjs",
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/studio-settings.test.mjs",
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/trial-protocol.test.mjs",
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/vision-lifecycle.test.mjs",
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "assets": {
+    "verifiedVideos": 6,
+    "provenanceChecksPassed": true,
+    "preparedResources": 38
+  },
+  "browserPreview": {
+    "engine": "Chromium",
+    "responsiveViewportWidths": [
+      320,
+      360,
+      768
+    ],
+    "horizontalOverflow": false,
+    "minimumComposerButtonHeightPx": 44,
+    "largeMessageLengthChecked": 2000,
+    "checks": [
+      "draft persistence across modes",
+      "quick phrase and clear undo",
+      "actual clipboard equality for message and dialogue",
+      "UTF-8 download content equality",
+      "unsupported share fallback",
+      "large text 32/48/64 px and long-message scrolling",
+      "guide focus returns to editor",
+      "known-coordinate demo confirmation and duplicate prevention",
+      "avatar playback and focus view"
+    ]
+  },
+  "limitations": [
+    "No external message was sent.",
+    "Native Web Share targets were unavailable in this browser; cancellation and async errors were covered with simulated API results.",
+    "Responsive widths do not constitute tests on physical mobile devices.",
+    "Live-camera recognition accuracy and linguistic comprehension of the avatar were not measured in this release.",
+    "The RSL recognizer remains restricted to six words."
+  ],
+  "sourceSha256": {
+    "app/index.html": "6f41edd56a1b46b59d6bf789fffe2e1da992cdac12ba6b30bb6f1ca4d025273a",
+    "app/platform.js": "d22a543aed5adc2983c6b715f73b2ca667c7c264440cd778615cfba6ba650a37",
+    "app/communication.js": "2335453f929a974100b6c85f309bc6e0cba1f71292421cc83cfee8a706526d7f",
+    "app/communication.css": "cb030684c6f1e592bcd348b5c752dc1127593bcb6027cb7fbb37ddd713abc005",
+    "app/session.js": "6b85e672ae8f8530162f4ea72903f87b34f737cad72cc058e5606cab8f237055",
+    "app/showcase.js": "391027bcfd46e65b6c2beaf09798bcd6cb56d5cda483c7588b21625f87024dff",
+    "app/demo-cache.js": "657c50acb28422b96bc8950a40ca42aa4b8ebdca31497ed48fcc12042df29ff2"
+  }
+}

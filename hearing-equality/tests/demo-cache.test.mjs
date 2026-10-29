@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const base = 'https://example.test/Technopark_project/hearing-equality/app/';
 const moduleSource = readFileSync(new URL('../app/demo-cache.js', import.meta.url), 'utf8')
-  .replace(/^export /gm, '').replaceAll('import.meta.url', JSON.stringify(`${base}demo-cache.js?v=0.13.0`));
+  .replace(/^export /gm, '').replaceAll('import.meta.url', JSON.stringify(`${base}demo-cache.js?v=0.15.0`));
 const workerSource = readFileSync(new URL('../app/sw.js', import.meta.url), 'utf8')
   .replace(/^import .*;\n/, '').replace(/^export /gm, '');
 const catalog = Array.from({ length: 6 }, (_, i) => {
@@ -36,7 +36,7 @@ function storage() {
 function harness({ fetcher, controlled = true } = {}) {
   const caches = storage(), fetched = [], listeners = new Map(), timers = new Map();
   let id = 0, clock = 0, registrations = 0;
-  const active = { scriptURL: `${base}sw.js?v=0.13.0&cache=2`, state: 'activated', addEventListener() {}, removeEventListener() {}, postMessage() {} };
+  const active = { scriptURL: `${base}sw.js?v=0.15.0&cache=2`, state: 'activated', addEventListener() {}, removeEventListener() {}, postMessage() {} };
   const registration = { active, scope: base };
   const serviceWorker = {
     controller: controlled ? active : null,
@@ -70,31 +70,31 @@ function workerHarness(h, fetcher = async () => { throw new Error('offline'); })
 test('a complete prepared bundle has every curated file and an active controller', async () => {
   const h = harness(), progress = [];
   const result = await h.api.prepareDemoAssets(catalog, { onProgress: value => progress.push(value) });
-  assert.equal(result.total, 39); assert.equal(result.cached, 39); assert.equal(result.failed.length, 0);
+  assert.equal(result.total, 52); assert.equal(result.cached, 52); assert.equal(result.failed.length, 0);
   assert.equal(result.offlineReady, true); assert.equal(result.needsReload, false);
-  assert.equal(h.fetched.length, 39); assert.ok(progress.length >= 36);
+  assert.equal(h.fetched.length, 52); assert.ok(progress.length >= 52);
   assert.ok(h.fetched.every(url => url.startsWith(base)), 'No third-party model or personal data URL is fetched');
   const status = await h.api.readDemoCacheStatus(); assert.equal(status.offlineReady, true);
-  assert.equal(h.api.canonicalAssetURL('platform.js'), `${base}platform.js?v=0.13.0`);
+  assert.equal(h.api.canonicalAssetURL('platform.js'), `${base}platform.js?v=0.15.0`);
   assert.equal(h.api.canonicalAssetURL('platform.js?v=0.9'), null, 'Old release assets must not be silently substituted');
 });
 
 test('partial download failures are visible and eviction revokes readiness', async () => {
   const h = harness({ fetcher: url => new Response('file', { status: new URL(url).pathname.endsWith('manrope.woff2') ? 503 : 200 }) });
   const partial = await h.api.prepareDemoAssets(catalog);
-  assert.equal(partial.cached, 0); assert.equal(partial.downloaded, 38); assert.equal(partial.failed.length, 1); assert.equal(partial.offlineReady, false);
+  assert.equal(partial.cached, 0); assert.equal(partial.downloaded, 51); assert.equal(partial.failed.length, 1); assert.equal(partial.offlineReady, false);
   assert.equal(h.registrations(), 0, 'A partial first bundle must not activate a worker');
   assert.match(partial.failed[0].reason, /503/);
   const full = harness(); await full.api.prepareDemoAssets(catalog);
   (await full.api.readPreparedBundle()).assets.entries.delete(new URL(catalog[0].video, base).href);
   const status = await full.api.readDemoCacheStatus();
-  assert.equal(status.cached, 38); assert.equal(status.offlineReady, false); assert.equal(status.failed.length, 1);
+  assert.equal(status.cached, 51); assert.equal(status.offlineReady, false); assert.equal(status.failed.length, 1);
 });
 
 test('cached files alone do not claim offline readiness before this worker controls the page', async () => {
   const h = harness(); await h.api.prepareDemoAssets(catalog); h.serviceWorker.controller = null;
   const status = await h.api.readDemoCacheStatus();
-  assert.equal(status.cached, 39); assert.equal(status.offlineReady, false); assert.equal(status.needsReload, true);
+  assert.equal(status.cached, 52); assert.equal(status.offlineReady, false); assert.equal(status.needsReload, true);
   h.registration.active.scriptURL = `${base}sw.js?v=0.9`;
   const wrong = await h.api.readDemoCacheStatus(); assert.equal(wrong.needsReload, false); assert.equal(wrong.offlineReady, false);
 });
@@ -117,7 +117,7 @@ test('download timeout and cancellation finish with explicit failures instead of
   const snapshots = [], pending = h.api.prepareDemoAssets(catalog, { signal: external.signal, onProgress: value => snapshots.push(value) });
   await flush(); h.advance(18000); await flush(); external.abort();
   const result = await pending;
-  assert.equal(result.cached, 0); assert.equal(result.failed.length, 39); assert.equal(result.offlineReady, false);
+  assert.equal(result.cached, 0); assert.equal(result.failed.length, 52); assert.equal(result.offlineReady, false);
   assert.ok(result.failed.some(entry => /18 секунд/.test(entry.reason)));
   assert.ok(result.failed.some(entry => /отменена/.test(entry.reason)));
 });
@@ -171,12 +171,12 @@ test('a failed refresh keeps the complete manifest, files and active offline rea
   const control = await h.caches.open(h.api.CACHE_NAME), before = await (await control.match(h.api.MANIFEST_URL)).text();
   const namesBefore = await h.caches.keys(); online = false;
   const result = await h.api.prepareDemoAssets(catalog);
-  assert.equal(result.retained, true); assert.equal(result.offlineReady, true); assert.equal(result.cached, 39);
-  assert.equal(result.failed.length, 39); assert.equal(result.downloaded, 0); assert.equal(h.registrations(), 1);
+  assert.equal(result.retained, true); assert.equal(result.offlineReady, true); assert.equal(result.cached, 52);
+  assert.equal(result.failed.length, 52); assert.equal(result.downloaded, 0); assert.equal(h.registrations(), 1);
   assert.equal(await (await control.match(h.api.MANIFEST_URL)).text(), before);
   assert.deepEqual(await h.caches.keys(), namesBefore, 'The failed staging cache is discarded');
   const w = workerHarness(h);
-  assert.match(await (await w.handleDemoRequest(new Request(`${base}platform.js?v=0.13.0`))).text(), /^original:/);
+  assert.match(await (await w.handleDemoRequest(new Request(`${base}platform.js?v=0.15.0`))).text(), /^original:/);
 });
 
 test('a failed atomic pointer commit preserves the previous complete bundle', async () => {
@@ -185,8 +185,8 @@ test('a failed atomic pointer commit preserves the previous complete bundle', as
   const originalPut = control.put;
   control.put = async (url, response) => { if (url === h.api.MANIFEST_URL) throw new Error('storage quota'); return originalPut(url, response); };
   const result = await h.api.prepareDemoAssets(catalog);
-  assert.equal(result.retained, true); assert.equal(result.offlineReady, true); assert.equal(result.cached, 39);
-  assert.equal(result.downloaded, 39); assert.match(result.failed[0].reason, /storage quota/);
+  assert.equal(result.retained, true); assert.equal(result.offlineReady, true); assert.equal(result.cached, 52);
+  assert.equal(result.downloaded, 52); assert.match(result.failed[0].reason, /storage quota/);
   assert.equal(await (await control.match(h.api.MANIFEST_URL)).text(), before);
   assert.equal(h.registrations(), 1);
 });
@@ -212,17 +212,17 @@ test('preparation bypasses an older worker that would otherwise return a stale u
       // The previous worker rejects unknown version queries, but its prepared
       // cache would intercept an unversioned index.html regardless of the new
       // preparation header value. Reproduce precisely that upgrade boundary.
-      const version = request.searchParams.get('v') === '0.13.0' ? '0.13.0' : '0.10.0';
+      const version = request.searchParams.get('v') === '0.15.0' ? '0.15.0' : '0.10.0';
       return new Response(`<script type="module" src="platform.js?v=${version}"></script>`);
     }
     return new Response(`network:${url}`);
   } });
   const result = await h.api.prepareDemoAssets(catalog);
   assert.equal(result.offlineReady, true);
-  assert.ok(h.fetched.every(url => new URL(url).searchParams.get('v') === '0.13.0'), 'Every network request must bypass the old version, including video and JSON');
+  assert.ok(h.fetched.every(url => new URL(url).searchParams.get('v') === '0.15.0'), 'Every network request must bypass the old version, including video and JSON');
   const { assets } = await h.api.readPreparedBundle();
   const html = await (await assets.match(`${base}index.html`)).text();
-  assert.match(html, /platform\.js\?v=0\.13\.0/);
+  assert.match(html, /platform\.js\?v=0\.15\.0/);
   assert.doesNotMatch(html, /0\.10\.0/);
   assert.ok(await assets.match(new URL(catalog[0].video, base).href), 'Video remains stored under the canonical key used by the player');
 });

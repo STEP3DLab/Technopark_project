@@ -1,4 +1,5 @@
 // Session-only evidence. Demonstration samples are excluded from field metrics.
+import { MAX_MESSAGE_LENGTH } from './communication.js?v=0.15.0';
 export const DEMO_SOURCES = new Set(['reference', 'known-video']);
 const clean = value => String(value ?? '').trim();
 const equivalent = (a,b) => clean(a).normalize('NFKC').toLocaleLowerCase('ru').replace(/[.!]+$/,'') === clean(b).normalize('NFKC').toLocaleLowerCase('ru').replace(/[.!]+$/,'');
@@ -17,7 +18,8 @@ export class SessionLedger {
   }
   markIncorrect(id){const e=this.attempts.find(a=>a.id===id);if(!e||e.review!=='unreviewed')return false;e.review='incorrect';return true;}
   addMessage(role,text,kind='manual'){
-    const value=clean(text).slice(0,500);if(!value)return null;
+    const value=String(text??'');if(!value.trim())return null;
+    if(value.length>MAX_MESSAGE_LENGTH)throw new RangeError(`Сообщение длиннее ${MAX_MESSAGE_LENGTH} символов`);
     const message={id:this.nextId++,role,text:value,kind,timestamp:new Date().toISOString()};this.messages.push(message);return message;
   }
   summary(){

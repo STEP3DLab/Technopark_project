@@ -1,0 +1,41 @@
+{
+  "version": "0.15.0",
+  "date": "2026-10-29",
+  "automated": {
+    "tests": 190,
+    "passed": 190,
+    "failed": 0,
+    "source_videos_verified": 6,
+    "unsupported_inputs_verified": 9
+  },
+  "browser": {
+    "renderer": "software-3d",
+    "webgl_available": false,
+    "checks": [
+      "orbit buttons",
+      "skeleton visibility",
+      "full body view",
+      "playback",
+      "frame stepping",
+      "large text",
+      "phrase insertion",
+      "face-to-face message",
+      "quick reply requires explicit addition",
+      "dialogue history",
+      "supported reply triggers avatar"
+    ],
+    "responsive_css_widths": [
+      320,
+      390
+    ],
+    "horizontal_overflow": false
+  },
+  "not_verified": [
+    "hardware WebGL rendering",
+    "physical smartphone performance",
+    "live camera accuracy",
+    "microphone",
+    "RSL comprehensibility by signers"
+  ],
+  "recognition_unchanged": true
+}

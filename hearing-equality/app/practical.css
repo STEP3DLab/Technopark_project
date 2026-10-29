@@ -1,0 +1,54 @@
+/* v0.14: a camera-to-message workspace and an accessible shared screen. */
+.communication-head{margin-bottom:16px;padding-bottom:18px}
+.communication-head h2{font-size:clamp(28px,3.1vw,42px)}
+.communication-head p{max-width:760px;font-size:14px}
+.conversation-route{display:flex;gap:24px;flex-wrap:wrap;margin:0 0 24px;color:#536884;font-size:12px}
+.conversation-route span{display:flex;align-items:center;gap:8px}
+.conversation-route b{display:grid;place-items:center;width:24px;height:24px;background:#e2ebf7;border-radius:50%;color:#29477d;font-size:11px}
+.communication-layout{grid-template-columns:minmax(310px,.92fr) minmax(0,1.25fr);gap:20px}
+#communication-home{order:2}.communication-camera{order:1;box-shadow:0 8px 30px #233e6605}
+#message-composer{padding:22px}#conversation{min-height:172px;font-size:22px}
+.composer-heading{margin-bottom:14px}.composer-heading .step-label{display:none}
+.input-choice{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.input-choice button{display:flex;gap:8px;align-items:center;border:1px solid #c9d7ec;background:#edf3fd;color:#284875;border-radius:7px;min-height:44px;padding:9px 12px;font-size:12px;font-weight:700}
+.input-choice svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7}
+.input-choice button:hover{background:#dae8fc}.input-choice button:focus-visible,.phrase-categories button:focus-visible,.personal-samples button:focus-visible{outline:3px solid #3775d9;outline-offset:3px}
+.communication-camera .communication-limit{font-size:12px;padding:10px 12px;margin:12px 16px}
+.supported-word-list{padding:0 20px 12px;font-size:11px}
+.communication-camera .capture-stage{aspect-ratio:4/3;min-height:260px;max-height:340px;margin:0 16px;border-radius:10px}
+.communication-camera .camera-placeholder .frame-guide{width:98px;height:98px}
+.communication-camera .camera-placeholder h3{font-size:18px}.communication-camera .camera-placeholder p{font-size:12px;max-width:270px}
+.communication-camera .dialogue-controls{padding:16px}.communication-camera .notice{font-size:11px}
+.communication-camera .button-row{gap:8px}.communication-camera .button-row .button{font-size:12px;min-height:44px;padding:10px}
+#visitor-text{font-size:18px;min-height:72px}
+.phrase-categories{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.phrase-categories button{min-height:40px;border-radius:20px;padding:9px 12px;border:1px solid #d6dfed;background:white;color:#526782;font-size:11px;font-weight:650}
+.phrase-categories button[aria-pressed=true]{background:#243966;color:white;border-color:#243966}
+#phrase-search{width:100%;min-height:44px;border:1px solid #ccd8e9;background:#f8fafd;border-radius:7px;padding:10px 12px;font:inherit;font-size:13px;color:#243755}
+#phrase-search:focus{outline:2px solid #376ecb;outline-offset:2px}
+#phrase-results{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:235px;overflow-y:auto;overscroll-behavior:contain;padding:3px}
+#phrase-results button{font-size:12px;background:#f6f9fd;padding:10px;min-height:48px}
+#phrase-count{font-size:11px;margin-top:8px}
+.profile-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px}.profile-actions .button{min-height:44px;font-size:12px}
+.profile-import{position:relative;overflow:hidden;cursor:pointer}.profile-import input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.profile-import:focus-within{outline:3px solid #3671cb;outline-offset:2px}
+.personal-samples{display:grid;gap:7px;margin-top:12px}.personal-samples>div{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 10px;background:#f0f4fa;border-radius:7px;font-size:12px}
+.personal-samples span{overflow-wrap:anywhere;min-width:0}.personal-samples button{border:0;background:none;color:#8c3a44;font-size:11px;min-height:44px;flex-shrink:0}
+#profile-preview-copy{overflow-wrap:anywhere}#profile-status{min-height:36px}#enroll-panel>p{line-height:1.7}
+#message-display{width:min(1180px,96vw);max-height:94dvh;height:auto;overflow-y:auto}
+.face-to-face{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,1fr);align-items:start;min-width:0}
+#display-reading{padding:28px 26px;background:#f0f4fb;min-height:300px;min-width:0;transition:none}
+#display-reading.rotated{transform:rotate(180deg)}
+#display-text{padding:20px 0!important;max-height:55dvh;min-height:120px;overflow-y:auto;overflow-wrap:anywhere;white-space:pre-wrap;font-size:48px;line-height:1.3;color:#172e54}
+.display-response{padding:26px;min-width:0}.display-response>label{font-size:15px;font-weight:750;color:#273e62;display:block;margin-bottom:12px}
+#display-reply{font:inherit;font-size:20px;width:100%;padding:12px;border:1px solid #b5c7e2;border-radius:8px;min-height:120px;resize:vertical;background:#fff;color:#1b3052}
+.display-response .button-row{margin-top:18px}.display-response .quick-phrases button{min-height:44px}
+#display-replies{margin-top:16px;border-top:1px solid #d8e2f0}#display-replies p{background:#e9f3ed;padding:12px;border-radius:8px;font-size:18px;color:#1f4c3c;white-space:pre-wrap;overflow-wrap:anywhere}
+.message-display-toolbar{flex-wrap:wrap}.message-display-toolbar>div{flex-wrap:wrap;gap:8px}.message-display-toolbar .button{min-height:44px}
+@media(max-width:1100px){.communication-layout{grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr)}#message-composer{padding:18px}.communication-head h2{font-size:32px}.message-primary-actions{grid-template-columns:1fr}.message-transfer-actions{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.communication-layout{grid-template-columns:1fr}#communication-home{order:1}.communication-camera{order:2}.message-primary-actions{grid-template-columns:1fr 1fr}.communication-camera .capture-stage{max-height:none;min-height:220px;max-width:650px}.face-to-face{grid-template-columns:1fr}#display-reading{min-height:180px}#display-text{max-height:36dvh}.display-response{padding:20px}.conversation-route{gap:12px;font-size:11px}}
+@media(max-width:520px){.communication-head{gap:10px}.communication-head>.pill{display:none}.communication-head h2{font-size:29px;letter-spacing:-1px}.communication-head p{font-size:13px}.conversation-route{gap:8px 12px;margin-bottom:18px}.conversation-route b{width:21px;height:21px}.conversation-route span{gap:6px;font-size:10px}.input-choice{gap:6px}.input-choice button{flex:1;justify-content:center;padding:9px 6px;font-size:11px}.composer-badge{display:none}.message-primary-actions .button{font-size:12px;padding:11px 8px}.phrase-categories{gap:5px}.phrase-categories button{font-size:10px;padding:8px 9px;min-height:44px}#phrase-results{grid-template-columns:1fr;max-height:230px}#message-composer{padding:16px}.communication-camera .capture-stage{margin:0 12px}.communication-camera .dialogue-controls{padding:14px}#message-display{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh}.message-display-toolbar{padding:14px}.message-display-toolbar>div{width:100%}.message-display-toolbar .button{font-size:11px;padding:9px}#display-reading{padding:18px}.display-response{padding:18px}#display-text{max-height:35dvh}.display-note{font-size:11px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+#display-text{background:transparent}#message-display{min-height:0}.communication-camera .frame-guide{opacity:.75}.communication-camera .frame-guide svg{stroke:#b6c9e4}
+
+.readability-controls{display:flex;gap:8px;margin:10px 0}.readability-controls button{min-height:44px;background:#fff;border:1px solid #b3c4df;border-radius:9px;padding:8px 12px;color:#20375e;font:inherit}.readability-controls button[aria-pressed=true]{background:#213b68;color:#fff}.remember-draft{display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.6;color:#465875;margin:12px 0}.remember-draft input{width:20px;height:20px;flex-shrink:0}body[data-large-text=true] #message-composer{font-size:18px}body[data-large-text=true] #conversation{font-size:28px}body[data-large-text=true] #message-composer button,body[data-large-text=true] #message-composer .hint,body[data-large-text=true] .remember-draft{font-size:16px}body[data-high-contrast=true] .card{border-color:#273f60}body[data-high-contrast=true] .hint,body[data-high-contrast=true] .small-heading,body[data-high-contrast=true] .communication-limit,body[data-high-contrast=true] .remember-draft,body[data-high-contrast=true] #draft-status{color:#162e50}body[data-high-contrast=true] textarea,body[data-high-contrast=true] input,body[data-high-contrast=true] button{border-color:#2a456f}

@@ -1,9 +1,12 @@
-import { CanvasAvatar } from './canvas-avatar.js?v=0.12.0';
+import { createPracticalController } from './practical.js?v=0.15.0';
+import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.15.0';
+import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.15.0';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.12.0';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.12.0';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.15.0';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.15.0';
 import { TrialProtocol } from './trial-protocol.js';
+import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.15.0';
 const $ = id => document.getElementById(id);
 async function fetchJSON(path,timeout=15000){
   const controller=typeof AbortController!=='undefined'?new AbortController():null;
@@ -22,7 +25,7 @@ const s = { mode:'text', catalog:[], motions:new Map(), templates:[], templatesR
   frame:null, analyzing:false, videoReady:false, sampleId:null, videoURL:null, result:null, speech:null };
 const ledger = new SessionLedger();
 const protocolRuns=[];let protocol=null;
-let pendingAttempt = null, confirmedAttempt = null, resetArmed = false;
+let pendingAttempt = null, confirmedAttempt = null, resetArmed = false, manualCandidateId = null, manualCandidateSerial = 0;
 const dialogueAvatar = new CanvasAvatar($('dialogue-avatar'));
 dialogueAvatar.setScene('dark');dialogueAvatar.setAppearance({outfit:'indigo'});
 const avatar = new CanvasAvatar($('platform-avatar')); avatar.setScene('dark'); avatar.setAppearance({outfit:'indigo'});
@@ -126,7 +129,7 @@ function playbackDeadline(promise){let timer;return Promise.race([promise,new Pr
 function updateCount(){$('char-count').textContent=`${$('message').value.length} / 200`;}
 $('message').addEventListener('input',updateCount);
 $('text-form').addEventListener('submit',e=>{
-  e.preventDefault();const item=matchText($('message').value,s.catalog);
+  e.preventDefault();stopDictation();const item=matchText($('message').value,s.catalog);
   if(item){selectWord(item.id,true);return;}
   ++s.selectionToken;pauseAvatar();s.repeat=false;s.data=null;s.selected=null;s.time=0;avatar.clear();dialogueAvatar.clear();$('dialogue-active-word').textContent='Ответ текстом';video.removeAttribute('src');video.load();
   $('active-word').textContent='Нет в словаре';renderPlayback();
@@ -215,6 +218,9 @@ function stopDictation(){
   if($('text-notice').textContent.startsWith('Слушаю'))notice('text-notice','Голосовой ввод остановлен. Можно ввести текст вручную.');
   if($('reply-status').textContent.includes('Слушаю'))$('reply-status').textContent='Голосовой ввод остановлен. Можно ввести ответ вручную.';
 }
+// Manual input takes ownership of the field. Clear the recognition identity
+// before aborting, so even a synchronous or delayed result cannot replace it.
+for(const id of ['employee-text','message'])$(id).addEventListener('input',()=>{if(s.speech)stopDictation();});
 $('dictate').onclick=()=>{
   if(s.speech){stopDictation();return;}
   const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -222,7 +228,7 @@ $('dictate').onclick=()=>{
   pauseAvatar();window.speechSynthesis?.cancel();const rec=new Recognition();s.speech=rec;rec.lang='ru-RU';rec.interimResults=false;rec.maxAlternatives=1;
   let completed=false;dictationUI(true);
   notice('text-notice',s.mode==='dialogue'?'Слушаю. После записи проверьте ответ. Звук может обрабатываться службой браузера.':'Слушаю. Произнесите одно слово из словаря.');
-  rec.onresult=e=>{if(s.speech!==rec)return;completed=true;const heard=(e.results?.[0]?.[0]?.transcript||'').slice(0,s.mode==='dialogue'?500:200);if(s.mode==='dialogue'){$('employee-text').value=heard;$('reply-status').textContent='Голос распознан. Проверьте текст перед отправкой.';}else{$('message').value=heard;updateCount();notice('text-notice','Текст готов. Проверьте его и нажмите «Показать жест».');}};
+  rec.onresult=e=>{if(s.speech!==rec)return;completed=true;const heard=e.results?.[0]?.[0]?.transcript||'',limit=s.mode==='dialogue'?MAX_MESSAGE_LENGTH:200;if(heard.length>limit){notice('text-notice',`Получилось больше ${limit} символов. Прежний текст сохранён: повторите короче или введите сообщение вручную.`,'error');return;}if(s.mode==='dialogue'){$('employee-text').value=heard;$('reply-status').textContent='Голос распознан. Проверьте текст перед добавлением в диалог.';}else{$('message').value=heard;updateCount();notice('text-notice','Текст готов. Проверьте его и нажмите «Показать жест».');}};
   rec.onerror=e=>{if(s.speech!==rec)return;completed=true;notice('text-notice',e.error==='not-allowed'?'Микрофон не разрешён. Можно ввести текст вручную.':e.error==='network'?'Служба голосового ввода недоступна. Используйте клавиатуру.':'Не удалось распознать голос. Попробуйте ещё раз или введите текст.','error');};
   rec.onend=()=>{if(s.speech===rec){s.speech=null;dictationUI(false);if(!completed)notice('text-notice','Речь не получена. Повторите запись или введите текст вручную.');}};
   try{rec.start();}catch{stopDictation();notice('text-notice','Не удалось запустить голосовой ввод. Введите текст вручную.','error');}
@@ -236,10 +242,18 @@ function speak(text){
   speechSynthesis.speak(utterance);
 }
 $('speak').onclick=()=>{if(confirmedAttempt)speak(s.result?.text);};
-$('add-word').onclick=()=>{if(!s.result||!confirmedAttempt)return;$('conversation').value=[$('conversation').value,s.result.text.replace(/[!.]$/,'')].filter(Boolean).join(' ').slice(0,500);toast('Слово добавлено. Сообщение можно отредактировать.');};
-$('speak-message').onclick=()=>speak($('conversation').value);
-$('clear-message').onclick=()=>{$('conversation').value='';window.speechSynthesis?.cancel();};
-function clearResult(){pendingAttempt=null;confirmedAttempt=null;$('visitor-text').value='';$('capture-confirm-text').value='';$('dialogue-candidates').replaceChildren();$('capture-confirm').disabled=true;$('capture-reject').disabled=true;s.result=null;$('result-label').textContent='СЛОВО ПОЯВИТСЯ ЗДЕСЬ';$('result-word').textContent='Покажите один жест';$('result-description').textContent='Проверим сходство с образцами и предложим слово.';$('rankings').replaceChildren();$('speak').disabled=true;$('add-word').disabled=true;}
+let practical;
+const communication=createCommunicationController({document,navigator,window,speak,
+  stopActivities:()=>{++s.selectionToken;s.repeat=false;pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();},
+  onSaveMessage:(text,{demo})=>{const message=ledger.addMessage('visitor',text,demo?'demo':'manual');if(message)renderHistory();return Boolean(message);},
+  getDialogue:()=>ledger.messages,
+  onPresent:(text,metadata)=>practical?.present(text,metadata),
+});
+practical=createPracticalController({document,insertText:text=>communication.insertText(text),
+  onReply:(text,context,demo)=>{const last=ledger.messages.at(-1);if(context&&!(last?.role==='visitor'&&last.text===context))ledger.addMessage('visitor',context,demo?'demo':'manual');ledger.addMessage('employee',text,'manual');renderHistory();return true;},
+});
+$('add-word').onclick=()=>{if(!s.result||!confirmedAttempt)return;return communication.insertRecognized({text:s.result.text,attemptId:confirmedAttempt,demo:Boolean(pendingAttempt&&DEMO_SOURCES.has(pendingAttempt.source))});};
+function clearResult(){pendingAttempt=null;confirmedAttempt=null;manualCandidateId=null;$('visitor-text').value='';$('capture-confirm-text').value='';$('dialogue-candidates').replaceChildren();$('capture-confirm').disabled=true;$('capture-reject').disabled=true;s.result=null;$('result-label').textContent='СЛОВО ПОЯВИТСЯ ЗДЕСЬ';$('result-word').textContent='Покажите один жест';$('result-description').textContent='Проверим сходство с образцами и предложим слово.';$('rankings').replaceChildren();$('speak').disabled=true;$('add-word').disabled=true;}
 function showResult(frames,aspect,origin='camera',elapsedMs=0){
   const sequence=makeSequence(frames,aspect);const result=classify(sequence,[...s.templates,...s.custom]);
   s.result=result.accepted?result.rankings[0]:null;
@@ -254,13 +268,13 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
   if(result.rankings.length){const caption=document.createElement('div');caption.className='rank-caption';caption.textContent='Расстояние d: меньше — ближе к образцу. Это не вероятность.';$('rankings').append(caption);}
   pendingAttempt=ledger.addAttempt({source:origin,accepted:result.accepted,predicted:s.result?.text||'',predictedId:s.result?.id||'',protocol:origin==='camera'?s.trialContext:null,distance:result.rankings[0]?.distance,elapsedMs,frames:frames.length,personalSamples:s.custom.length>0});
   if(origin==='camera'&&s.trialContext){protocol?.record(pendingAttempt,s.trialContext);s.trialContext=null;renderProtocol();}
-  confirmedAttempt=null;
+  confirmedAttempt=null;manualCandidateId=null;
   $('visitor-text').value=s.result?.text||'';$('capture-confirm-text').value=s.result?.text||'';
   $('capture-confirm').disabled=false;$('capture-reject').disabled=false;
   $('visitor-origin').textContent=DEMO_SOURCES.has(origin)?'Демопример. Это известная запись из набора образцов.':'Это предположение. Проверьте слово или выберите другой вариант.';
   $('dialogue-candidates').replaceChildren();
   for(const candidate of result.rankings.slice(0,3)){
-    const button=document.createElement('button');button.textContent=candidate.text;button.type='button';button.onclick=()=>{$('visitor-text').value=candidate.text;$('capture-confirm-text').value=candidate.text;};$('dialogue-candidates').append(button);
+    const button=document.createElement('button');button.textContent=candidate.text;button.type='button';button.onclick=()=>{if($('visitor-text').value!==candidate.text)candidateEdited(candidate.text);$('visitor-text').value=candidate.text;$('capture-confirm-text').value=candidate.text;};$('dialogue-candidates').append(button);
   }
   updateResearch();
   return sequence;
@@ -268,7 +282,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const data=await fetchJSON('./assets/recognition-library.json?v=0.12.0');
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.15.0');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -319,6 +333,7 @@ function recordGesture(enroll=false){
   if(!s.capturing||s.recordFrames||s.recordPending)return;
   if(!enroll&&s.mode==='camera'&&protocol&&!protocol.ended&&!protocol.context()){toast('Перейдите к следующей попытке серии.');return;}
   const label=$('custom-label').value.trim();
+  if(enroll&&(label.length>120||/[\u0000-\u001f\u007f]/u.test(label))){toast('Подпись: до 120 символов, без переносов строк.');return;}
   if(enroll&&!label){toast('Введите подпись к вашему движению.');$('custom-label').focus();return;}
   if(enroll&&s.custom.length>=12){toast('Доступно 12 собственных образцов. Удалите прежние, чтобы записать новые.');return;}
   const token=s.captureToken;clearResult();s.recordPending=true;s.trialContext=!enroll&&s.mode==='camera'?(protocol?.context()||null):null;cameraButtons();renderProtocol();$('record-indicator').hidden=false;
@@ -339,7 +354,7 @@ function recordGesture(enroll=false){
       const existing=s.custom.find(t=>t.text.toLocaleLowerCase('ru')===label.toLocaleLowerCase('ru'));
       const known=matchText(label,s.catalog);
       s.custom.push({id:known?.id||existing?.id||`custom-${Date.now()}`,text:known?.text||label,origin:'custom',sequence});
-      $('custom-list').textContent=`Образцы этой сессии (${s.custom.length}/12): ${s.custom.map(t=>t.text).join(', ')}`;$('clear-custom').hidden=false;
+      renderPersonalSamples();
       notice('capture-notice',`Образец «${label}» добавлен. Теперь нажмите «Записать жест» и повторите движение для распознавания.`,'success');
     }else{showResult(frames,inputVideo.videoWidth/inputVideo.videoHeight,'camera',performance.now()-requested);notice('capture-notice','Запись завершена. Проверьте слово ниже или справа.');}
     renderProtocol();
@@ -348,7 +363,27 @@ function recordGesture(enroll=false){
 $('start-camera').onclick=startCamera;
 $('stop-camera').onclick=()=>{stopCapture();notice('capture-notice','Камера выключена. Видеопоток не сохранялся.');};
 $('record').onclick=()=>recordGesture();$('enroll').onclick=()=>recordGesture(true);
-$('clear-custom').onclick=()=>{s.custom=[];$('custom-list').textContent='Образцы удалены.';$('clear-custom').hidden=true;clearResult();};
+let importedSamples=null,profileToken=0;
+function cancelProfile(){++profileToken;importedSamples=null;$('profile-preview').hidden=true;$('import-profile').value='';}
+function renderPersonalSamples(){
+  $('custom-list').textContent=`Личные образцы: ${s.custom.length} / 12`;$('clear-custom').hidden=!s.custom.length;$('export-profile').disabled=!s.custom.length;
+  $('personal-samples').replaceChildren();
+  const groups=new Map();for(const sample of s.custom){const list=groups.get(sample.id)||[];list.push(sample);groups.set(sample.id,list);}
+  for(const [id,list] of groups){const row=document.createElement('div'),label=document.createElement('span'),remove=document.createElement('button');label.textContent=`${list[0].text} · ${list.length} обр.`;remove.type='button';remove.textContent='Удалить';remove.setAttribute('aria-label',`Удалить образцы: ${list[0].text}`);remove.onclick=()=>{stopCapture();s.custom=s.custom.filter(sample=>sample.id!==id);cancelProfile();clearResult();renderPersonalSamples();$('profile-status').textContent='Образцы фразы удалены из этой вкладки.';};row.append(label,remove);$('personal-samples').append(row);}
+}
+$('clear-custom').onclick=()=>{stopCapture();s.custom=[];cancelProfile();renderPersonalSamples();clearResult();$('profile-status').textContent='Образцы удалены из этой вкладки. Сохранённый файл не изменён.';};
+$('export-profile').onclick=()=>{
+  try{const text=serializeProfile(s.custom),url=URL.createObjectURL(new Blob([text],{type:'application/json'})),link=document.createElement('a');link.href=url;link.download='moi-zhesty.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('profile-status').textContent='Профиль подготовлен к скачиванию. В нём только личные образцы.';}
+  catch(error){$('profile-status').textContent=error.message;}
+};
+$('import-profile').onchange=async()=>{
+  const file=$('import-profile').files?.[0];cancelProfile();if(!file)return;const token=profileToken;
+  try{if(file.size>PROFILE_MAX_BYTES)throw new Error('Файл больше 2 МБ. Выберите профиль этого приложения.');const incoming=parseProfile(await file.text(),s.catalog);if(token!==profileToken)return;const merged=mergeProfiles(s.custom,incoming,s.catalog);importedSamples=incoming;$('profile-preview-copy').textContent=`Добавить ${merged.length-s.custom.length} новых образцов? Фразы: ${[...new Set(incoming.map(item=>item.text))].join('; ')}. Текущие образцы останутся.`;$('profile-preview').hidden=false;$('profile-status').textContent='Файл проверен. Добавление — только после вашего нажатия.';}
+  catch(error){if(token===profileToken)$('profile-status').textContent=error.message;}
+};
+$('apply-profile').onclick=()=>{if(!importedSamples)return;try{const merged=mergeProfiles(s.custom,importedSamples,s.catalog);stopCapture();s.custom=merged;cancelProfile();clearResult();renderPersonalSamples();$('profile-status').textContent='Образцы добавлены. Включите камеру и проверьте их новым движением.';}catch(error){$('profile-status').textContent=error.message;}};
+$('cancel-profile').onclick=()=>{cancelProfile();$('profile-status').textContent='Добавление отменено. Текущие образцы сохранены.';};
+renderPersonalSamples();
 function releaseFile(){if(s.videoURL){URL.revokeObjectURL(s.videoURL);s.videoURL=null;}}
 function waitMedia(event,action,timeout=12000){return new Promise((resolve,reject)=>{
   let timer;const clean=()=>{clearTimeout(timer);inputVideo.removeEventListener(event,ok);inputVideo.removeEventListener('error',bad);};
@@ -440,11 +475,12 @@ function setMode(mode){
   s.repeat=false;pauseAvatar();stopDictation();stopCapture();window.speechSynthesis?.cancel();s.mode=mode;s.videoReady=false;s.sampleId=null;$('replay-analysis').disabled=true;releaseFile();
   inputVideo.removeAttribute('src');inputVideo.load();inputVideo.controls=false;$('analyze-video').disabled=true;
   $('view-dialogue').hidden=mode!=='dialogue';$('view-research').hidden=mode!=='research';$('intro-banner').hidden=['dialogue','research'].includes(mode);
+  communication.setMode(mode);
   $(mode==='dialogue'?'dialogue-camera-slot':'capture-stage-home').append($('capture-stage'));
   if(mode==='dialogue')setCompare(false);
   $('view-text').hidden=mode!=='text';$('view-capture').hidden=!['camera','video'].includes(mode);$('view-about').hidden=mode!=='about';
   for(const button of document.querySelectorAll('[data-mode]')){if(button.dataset.mode===mode)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}
-  const labels={dialogue:'Диалог',research:'Испытание',text:'Текст → жесты',camera:'Жесты → голос',video:'Видео → текст',about:'О проекте'};$('mode-crumb').textContent=labels[mode];
+  const labels={dialogue:'Общение',research:'Проверка',text:'3D-собеседник',camera:'Жест → текст',video:'Видео → текст',about:'О проекте'};$('mode-crumb').textContent=labels[mode];
   $('camera-controls').hidden=mode!=='camera';$('video-controls').hidden=mode!=='video';$('enroll-panel').hidden=mode!=='camera';
   $('capture-step').textContent=mode==='video'?'03 / ВИДЕО → ТЕКСТ И ГОЛОС':'02 / ЖЕСТЫ → ТЕКСТ И ГОЛОС';
   $('capture-title').textContent=mode==='video'?'Прочитайте движение':'Дайте жесту голос';$('capture-source-title').textContent=mode==='video'?'Видеозапись':'Камера';
@@ -458,8 +494,9 @@ function setMode(mode){
 
 function renderHistory(){
   const target=$('history-messages');target.replaceChildren();
-  if(!ledger.messages.length){const p=document.createElement('p');p.className='history-empty';p.textContent='Здесь появятся подтверждённые реплики обоих собеседников.';target.append(p);return;}
-  for(const message of ledger.messages){const row=document.createElement('div');row.className=`message-bubble ${message.role}`;const label=document.createElement('small');label.textContent=(message.role==='visitor'?'Посетитель':'Сотрудник')+(message.kind==='demo'?' · демопример':message.kind==='avatar'?' · слово с аватаром':message.kind==='manual'?' · текст':' · подтверждённое слово');const text=document.createElement('p');text.textContent=message.text;row.append(label,text);target.append(row);}
+  if(!ledger.messages.length){const p=document.createElement('p');p.className='history-empty';p.textContent='Здесь появятся сообщения, которые вы явно добавили в диалог.';target.append(p);communication.updateHistory();return;}
+  for(const message of ledger.messages){const row=document.createElement('div');row.className=`message-bubble ${message.role}`;const label=document.createElement('small');label.textContent=(message.role==='visitor'?'Вы':'Собеседник')+(message.kind==='demo'?' · демопример':message.kind==='avatar'?' · слово с аватаром':message.kind==='manual'?' · текст':' · подтверждённое слово');const text=document.createElement('p');text.textContent=message.text;row.append(label,text);target.append(row);}
+  communication.updateHistory();
 }
 function updateResearch(){
   const totals=ledger.summary();$('metric-total').textContent=totals.total;$('metric-suggested').textContent=totals.suggested;$('metric-rejected').textContent=`Без совпадения: ${totals.rejected}`;
@@ -472,30 +509,48 @@ function updateResearch(){
     const tr=document.createElement('tr');for(const text of [attempt.id,origins[attempt.source]||attempt.source,attempt.protocol?.expectedText||'—',attempt.predicted||'Нет совпадения',reviews[attempt.review],`${(attempt.elapsedMs/1000).toFixed(1)} с`]){const td=document.createElement('td');td.textContent=text;tr.append(td);}$('trial-rows').append(tr);
   }
 }
-function confirmResult(text,{say=false,dialogue=false}={}){
-  const value=text.trim();if(!value){toast('Укажите слово или сообщение.');return;}
+function confirmResult(text,{say=false,add=false}={}){
+  const value=String(text??'').trim();if(!value){toast('Укажите слово или сообщение.');return;}
+  if(value.length>MAX_MESSAGE_LENGTH){toast(`Максимум ${MAX_MESSAGE_LENGTH} символов. Текст не обрезан: сократите его вручную.`);return;}
   if(pendingAttempt){
-    if(!ledger.confirm(pendingAttempt.id,value)){toast('Эта попытка уже оценена. Запишите следующий жест.');return;}
-    confirmedAttempt=pendingAttempt.id;s.result={text:value};$('speak').disabled=false;$('add-word').disabled=false;$('capture-confirm').disabled=true;$('capture-reject').disabled=true;
-    $('result-word').textContent=value;$('result-label').textContent='ПОДТВЕРЖДЕНО ПОЛЬЗОВАТЕЛЕМ';
+    if(pendingAttempt.review==='unreviewed')ledger.confirm(pendingAttempt.id,value);
+    else if(confirmedAttempt!==pendingAttempt.id||pendingAttempt.confirmedText!==value){toast('Эта попытка уже оценена. Измените текст вручную или запишите следующий жест.');return;}
+    confirmedAttempt=pendingAttempt.id;
+  }else{
+    manualCandidateId??=`manual-${++manualCandidateSerial}`;confirmedAttempt=manualCandidateId;
   }
-  if(dialogue){ledger.addMessage('visitor',value,pendingAttempt?(DEMO_SOURCES.has(pendingAttempt.source)?'demo':'confirmed'):'manual');renderHistory();$('visitor-text').value='';$('visitor-origin').textContent='Реплика добавлена в историю.';}
-  updateResearch();if(say)speak(value);
+  s.result={text:value};$('visitor-text').value=value;$('capture-confirm-text').value=value;
+  $('speak').disabled=false;$('add-word').disabled=false;$('capture-confirm').disabled=true;$('capture-reject').disabled=true;
+  $('result-word').textContent=value;$('result-label').textContent='ПОДТВЕРЖДЕНО ПОЛЬЗОВАТЕЛЕМ';
+  let outcome=null;
+  if(add){
+    outcome=communication.insertRecognized({text:value,attemptId:confirmedAttempt,demo:Boolean(pendingAttempt&&DEMO_SOURCES.has(pendingAttempt.source))});
+    $('visitor-origin').textContent=outcome.ok?'Слово добавлено в редактируемое сообщение. В историю оно попадёт по кнопке «В диалог».':outcome.reason==='duplicate'?'Это слово уже добавлено из данной попытки.':outcome.reason==='limit'?'Слово подтверждено, но в сообщении не хватает места. Сократите черновик и добавьте снова.':'Укажите текст.';
+  }
+  if(add&&outcome?.ok&&matchMedia('(max-width: 900px)').matches)$('message-composer').scrollIntoView({block:'start'});
+  updateResearch();if(say&&(!add||outcome?.ok||outcome?.reason==='duplicate'))speak(value);
+  return outcome;
 }
-$('confirm-visitor').onclick=()=>confirmResult($('visitor-text').value,{say:true,dialogue:true});
-$('visitor-text-only').onclick=()=>confirmResult($('visitor-text').value,{dialogue:true});
-$('visitor-text').addEventListener('input',()=>{
-  if(pendingAttempt&&pendingAttempt.review!=='unreviewed'){
-    pendingAttempt=null;confirmedAttempt=null;$('dialogue-candidates').replaceChildren();
+$('confirm-visitor').onclick=()=>confirmResult($('visitor-text').value,{add:true});
+$('visitor-text-only').onclick=()=>confirmResult($('visitor-text').value,{say:true,add:true});
+function candidateEdited(value){
+  if(confirmedAttempt||(pendingAttempt&&pendingAttempt.review!=='unreviewed')){
+    pendingAttempt=null;confirmedAttempt=null;manualCandidateId=null;s.result=null;$('dialogue-candidates').replaceChildren();
+    $('speak').disabled=true;$('add-word').disabled=true;
     $('visitor-origin').textContent='Новая реплика вводится вручную. Она не учитывается как распознавание.';
   }
-});
+  $('capture-confirm').disabled=!String(value).trim();$('capture-reject').disabled=!pendingAttempt;
+}
+$('visitor-text').addEventListener('input',()=>{candidateEdited($('visitor-text').value);$('capture-confirm-text').value=$('visitor-text').value;});
+$('capture-confirm-text').addEventListener('input',()=>{candidateEdited($('capture-confirm-text').value);$('visitor-text').value=$('capture-confirm-text').value;});
 $('capture-confirm').onclick=()=>confirmResult($('capture-confirm-text').value,{say:$('auto-speak').checked});
 $('capture-reject').onclick=()=>{if(pendingAttempt&&ledger.markIncorrect(pendingAttempt.id)){$('capture-confirm').disabled=true;$('capture-reject').disabled=true;s.result=null;$('speak').disabled=true;$('add-word').disabled=true;updateResearch();toast('Попытка отмечена как неверная.');}};
 $('send-reply').onclick=()=>{
-  const value=$('employee-text').value.trim();if(!value){toast('Введите ответ сотрудника.');return;}
+  stopDictation();
+  const value=$('employee-text').value;if(!value.trim()){toast('Введите ответ собеседника.');return;}
+  if(value.length>MAX_MESSAGE_LENGTH){$('reply-status').textContent=`Максимум ${MAX_MESSAGE_LENGTH} символов. Ответ сохранён: сократите его вручную.`;return;}
   const item=matchText(value,s.catalog);ledger.addMessage('employee',value,item?'avatar':'manual');renderHistory();
-  if(item){selectWord(item.id,true);$('reply-status').textContent='Ответ добавлен. Аватар показывает слово из словаря.';}
+  if(item){$('partner-avatar-detail').open=true;dialogueAvatar.resize();selectWord(item.id,true);$('reply-status').textContent='Ответ добавлен. Аватар показывает слово из словаря.';}
   else{++s.selectionToken;pauseAvatar();s.data=null;s.selected=null;s.time=0;avatar.clear();dialogueAvatar.clear();$('active-word').textContent='Текстовый ответ';$('dialogue-active-word').textContent='Ответ текстом';$('reply-status').textContent='Ответ добавлен как текст. Проверенной записи РЖЯ для этого сообщения пока нет.';renderPlayback();}
   $('employee-text').value='';
 };
@@ -504,9 +559,11 @@ $('dialogue-start').onclick=()=>{$('facing').value=$('dialogue-facing').value;st
 $('dialogue-stop').onclick=()=>{stopCapture();notice('capture-notice','Камера выключена.');};
 $('dialogue-record').onclick=()=>recordGesture();
 $('dialogue-enroll').onclick=()=>{setMode('camera');$('enroll-panel').open=true;};
-$('clear-dialogue').onclick=()=>{ledger.messages=[];renderHistory();};
+$('clear-dialogue').onclick=()=>{ledger.messages=[];practical.resetHistory();communication.resetHistory();renderHistory();$('dialogue-status').textContent='История очищена. Ваш черновик сохранён.';};
+$('gesture-input').addEventListener('toggle',()=>{if(!$('gesture-input').open&&s.mode==='dialogue'){stopCapture();notice('capture-notice','Камера выключена. Черновик сохранён.');}});
+$('partner-avatar-detail').addEventListener('toggle',()=>{if(!$('partner-avatar-detail').open&&s.mode==='dialogue')pauseAvatar();});
 $('dictate-reply').onclick=()=>{if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){toast('Голосовой ввод недоступен. Используйте клавиатуру.');return;}$('dictate').click();};
-for(const button of document.querySelectorAll('[data-phrase]'))button.onclick=()=>{$('employee-text').value=button.dataset.phrase;$('reply-status').textContent='Заготовка для пилота. Сейчас доступна только текстом.';};
+for(const button of document.querySelectorAll('[data-phrase]'))button.onclick=()=>{stopDictation();$('employee-text').value=button.dataset.phrase;$('reply-status').textContent='Заготовка для пилота. Сейчас доступна только текстом.';};
 $('check-device').onclick=()=>{
   const secure=window.isSecureContext||['localhost','127.0.0.1'].includes(location.hostname);
   const camera=Boolean(navigator.mediaDevices?.getUserMedia);const canvas=document.createElement('canvas');let gl=null;
@@ -519,12 +576,12 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.12.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.15.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
   if(!resetArmed){resetArmed=true;$('clear-session').textContent='Подтвердить сброс сессии';setTimeout(()=>{resetArmed=false;$('clear-session').textContent='Начать новую сессию';},6000);return;}
-  stopCapture();pauseAvatar();stopDictation();window.speechSynthesis?.cancel();ledger.clear();protocolRuns.length=0;protocol=null;clearResult();renderProtocol();renderHistory();updateResearch();resetArmed=false;$('clear-session').textContent='Начать новую сессию';toast('Новая сессия начата.');
+  stopCapture();pauseAvatar();stopDictation();window.speechSynthesis?.cancel();ledger.clear();practical.resetHistory();communication.resetHistory();protocolRuns.length=0;protocol=null;clearResult();renderProtocol();renderHistory();updateResearch();resetArmed=false;$('clear-session').textContent='Начать новую сессию';toast('Новая сессия начата.');
 };
 
 function renderProtocol(){
@@ -560,9 +617,9 @@ async function loadBenchmark(){
 
 for(const button of document.querySelectorAll('[data-mode]'))button.onclick=()=>setMode(button.dataset.mode);
 const slides=[
-  {kicker:'01 / ЗАДАЧА',title:'Посетитель и сотрудник общаются в одном приложении',copy:'Прототип объединяет жестовый ввод, текстовый ответ и цифровой аватар. Исследуем один ограниченный сценарий встречи посетителя.',cards:[['Посетитель','Показывает жест или вводит сообщение.'],['Подтверждение','Проверяет предложенное слово до озвучивания.'],['Сотрудник','Отвечает текстом или словом из словаря аватара.']],action:'Открыть диалог',mode:'dialogue'},
-  {kicker:'02 / СЦЕНАРИЙ',title:'Обе стороны видят историю разговора',copy:'В режиме диалога можно исправить распознанное слово, подтвердить реплику и показать ответ сотрудника. Неподготовленные сообщения остаются текстовыми.',cards:[['Вопрос','Слово есть в текущем наборе.'],['Да','Сотрудник может ответить аватаром.'],['Нужна помощь','Заготовка для пилота, пока только текст.']],action:'Показать сценарий',mode:'dialogue'},
-  {kicker:'03 / ПРОТОТИП',title:'Шесть слов и собственные образцы',copy:'Доступны камера, короткое видео и сравнение аватара с оригиналом. Разбор готовых координат явно отмечен как демонстрация известного образца.',cards:[['Камера','Проверка устройства и видимости кистей.'],['Настройка','Несколько образцов одного движения.'],['Голос','Озвучивание после подтверждения.']],action:'Открыть видео',mode:'video'},
+  {kicker:'01 / ЗАДАЧА',title:'Выразить мысль и получить ответ',copy:'Помощник для общения, когда удобнее использовать текст. Составьте сообщение, покажите его крупно, озвучьте или передайте в другое приложение.',cards:[['Ваше сообщение','Общий редактируемый черновик до 2000 символов.'],['Ваш выбор','Крупный текст, озвучивание, копирование или файл.'],['Ответ рядом','Собеседник пишет на том же устройстве.']],action:'Открыть общение',mode:'dialogue'},
+  {kicker:'02 / СЦЕНАРИЙ',title:'От первого сообщения к сохранённому диалогу',copy:'Начните с готовой фразы или напишите свой текст. Добавьте сообщение и ответ собеседника в диалог, затем скопируйте его целиком или сохраните файлом.',cards:[['Составить','Текст можно исправить и дополнить до передачи.'],['Передать','Системное меню устройства или копирование в нужный чат.'],['Сохранить','Черновик не пропадает при переходе между разделами.']],action:'Попробовать сценарий',mode:'dialogue'},
+  {kicker:'03 / ПРОТОТИП',title:'Жестовый ввод — следующий шаг к общению',copy:'Камера пока предлагает одно из шести слов РЖЯ. Пользователь проверяет результат и сам добавляет его в сообщение. Произвольные высказывания на РЖЯ ещё не распознаются.',cards:[['Камера','Видимость кистей и отдельная карточка результата.'],['Подтверждение','Ни один вариант не заменяет набранный текст.'],['Аватар','Просмотр шести подготовленных жестов с регулировкой скорости.']],action:'Открыть жестовый ввод',mode:'camera'},
   {kicker:'04 / ПРОВЕРКА',title:'Проверка на 12 отдельных видеозаписях',copy:'Четыре верных ответа, восемь отказов, ноль ошибочных ответов. Все 12 исполнителей отсутствуют в наборе образцов. Это ограниченная проверка по видео; испытание с камеры ещё впереди.',cards:[['Образцы','21 запись от трёх исполнителей.'],['Контрольная серия','12 заданий с заранее фиксированными словами.'],['Отчёт','Ошибки и исправления учитываются отдельно.']],action:'Открыть испытание',mode:'research'},
   {kicker:'05 / МИРОВОЙ ОПЫТ',title:'Google переводит ASL. Наша задача — русский жестовый язык',copy:'SL2T уже работает в Gboard и Live Transcribe на Pixel 11: американский жестовый язык → английский текст. В нашем прототипе MediaPipe выделяет координаты, а сравнение с образцами работает на шести словах РЖЯ. Это разные уровни готовности.',cards:[['Google SL2T','Потребительский продукт с августа 2026 года.'],['SignGemma','Публичный релиз и API пока не подтверждены.'],['Наш следующий шаг','Корпус РЖЯ, новые участники и оценка понимания.']],action:'Сравнить технологии',mode:'about'},
   {kicker:'06 / ПРЕДЛОЖЕНИЕ НТС',title:'Следующий этап — пилот с носителями РЖЯ',copy:'Предлагаем выбрать один сценарий, подготовить 20 полных сообщений и проверить их на новых участниках. Живую камеру и понятность аватара предстоит оценить с участниками; небольшой результат по видео уже опубликован.',cards:[['Материал','Переводчик и носители РЖЯ.'],['Метрики','Ошибки, отказы и время обработки.'],['Результат','Понимание сообщения и завершение диалога.']],action:'Открыть план пилота',mode:'about'}
@@ -576,15 +633,17 @@ $('presentation').addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.prev
 document.addEventListener('visibilitychange',()=>{if(document.hidden){s.repeat=false;pauseAvatar();stopDictation();const active=Boolean(s.stream)||s.analyzing;stopCapture();if(active)notice('capture-notice','Обработка остановлена: вкладка была скрыта. Запустите камеру или анализ заново.');window.speechSynthesis?.cancel();}});
 window.addEventListener('pagehide',()=>{s.repeat=false;pauseAvatar();stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
 window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
+// The editor and navigation must work even while the catalog is slow/offline.
+setMode(location.hash.slice(1)||'dialogue');renderHistory();
 try{
-  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.12.0')).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.15.0')).samples);
+  if(s.custom.length){s.custom=mergeProfiles([],s.custom,s.catalog);renderPersonalSamples();}
   loadBenchmark();
   for(const item of s.catalog){
-    const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);$('word-chips').append(word);
-    const reply=document.createElement('button');reply.type='button';reply.textContent=item.text;reply.onclick=()=>{$('employee-text').value=item.text;};$('reply-chips').append(reply);
+    const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>{stopDictation();return selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);};$('word-chips').append(word);
+    const reply=document.createElement('button');reply.type='button';reply.textContent=item.text;reply.onclick=()=>{stopDictation();$('employee-text').value=item.text;};$('reply-chips').append(reply);
     const clip=document.createElement('button');clip.textContent=item.text;clip.type='button';clip.onclick=()=>{releaseFile();$('video-file').value='';loadVideo(item.video,`Slovo / ${item.text}`,item.id);};$('video-examples').append(clip);
   }
-  setMode(location.hash.slice(1)||'text');
   const requested=new URLSearchParams(location.search).get('word');
   await selectWord(s.catalog.some(x=>x.id===requested)?requested:'question');
 }catch{notice('text-notice','Не удалось загрузить словарь. Проверьте соединение и обновите страницу.','error');$('active-word').textContent='Нет связи';}

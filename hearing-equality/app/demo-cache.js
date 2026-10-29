@@ -1,6 +1,6 @@
 // Only curated, same-origin demonstration assets are stored. Camera models,
 // microphone audio, uploaded files and conversation content are never cached.
-export const APP_VERSION = '0.13.0';
+export const APP_VERSION = '0.15.0';
 export const APP_BASE = new URL('./', import.meta.url);
 export const CACHE_PREFIX = `hearing-equality-demo:${APP_BASE.pathname}:`;
 export const CACHE_NAME = `${CACHE_PREFIX}${APP_VERSION}`;
@@ -11,11 +11,13 @@ export const MANIFEST_URL = new URL(`.__demo-manifest-${APP_VERSION}.json`, APP_
 export const WORKER_URL = new URL(`sw.js?v=${APP_VERSION}&cache=2`, APP_BASE).href;
 const STATIC_FILES = [
   'index.html',
-  'platform.css', 'dialogue.css', 'rgsu.css', 'showcase.css',
+  'platform.css', 'dialogue.css', 'rgsu.css', 'showcase.css', 'communication.css', 'practical.css',
   'platform.js', 'canvas-avatar.js', 'vision.js', 'catalog.js', 'recognizer.js',
   'session.js', 'trial-protocol.js', 'avatar-motion.js', 'hand-geometry.js',
   'avatar-hands.js', 'avatar-framing.js',
-  'showcase.js', 'demo-cache.js', 'communication.js', 'communication-model.js', 'communication.css',
+  'showcase.js', 'demo-cache.js', 'communication.js', 'communication-model.js', 'personal-profile.js', 'phrasebook.js', 'practical.js',
+  'avatar-3d.js', 'software-3d.js', 'human-rig.js', 'retarget-3d.js', 'avatar-3d.css',
+  'vendor/three.module.min.js', 'vendor/three.core.min.js', 'vendor/OrbitControls.js', 'vendor/THREE-LICENSE.txt',
   'fonts/manrope.woff2', 'assets/brand/rgsu-blue.svg', 'assets/brand/rgsu-white.svg',
   'assets/sources/slovo-sources.json', 'assets/recognition-library.json', 'assets/evaluation-v07.json',
 ];
@@ -29,7 +31,7 @@ export function canonicalAssetURL(value) {
   if (url.origin !== APP_BASE.origin || !url.pathname.startsWith(APP_BASE.pathname) || url.hash) return null;
   const relative = url.pathname.slice(APP_BASE.pathname.length);
   if (!STATIC_FILES.includes(relative) && !SOURCE_PATH.test(relative)) return null;
-  if ([...url.searchParams].some(([key, version]) => key !== 'v' || ![APP_VERSION, '0.12.0'].includes(version))) return null;
+  if ([...url.searchParams].some(([key, version]) => key !== 'v' || version !== APP_VERSION)) return null;
   if (url.searchParams.getAll('v').length > 1) return null;
   url.search = /\.(css|js)$/.test(relative) ? `?v=${APP_VERSION}` : '';
   return url.href;

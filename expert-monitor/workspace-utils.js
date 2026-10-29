@@ -2,10 +2,9 @@
 
 // Pure workspace model. Public registry data and browser storage are not accessed.
 (function (root, factory) {
-  const api = factory();
-  if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else root.ExpertWorkspaceUtils = api;
-})(typeof window === 'undefined' ? globalThis : window, function () {
+  if (typeof module !== 'undefined' && module.exports) module.exports = factory(require('./estimate-utils.js'));
+  else root.ExpertWorkspaceUtils = factory(root.ExpertEstimateUtils);
+})(typeof window === 'undefined' ? globalThis : window, function (estimates) {
   const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
   const WORK_STATUS = Object.freeze({
     new: 'Не начата', review: 'Проверяю', draft: 'Готовлю предложение',
@@ -27,16 +26,24 @@
   const CHECK_FIELDS = new Set(['stage', 'scope', 'eligibility', 'materials', 'deadline', 'channel']);
   const FILTER_FIELDS = new Set([
     'search', 'status', 'region', 'court', 'sourceType', 'workStatus', 'due',
-    'sort', 'favorite', 'category', 'minAmount', 'maxAmount'
+    'sort', 'favorite', 'category', 'minAmount', 'maxAmount', 'fit'
   ]);
+  const PROFILE_FIELDS = new Set(['regions', 'categories', 'includeWords', 'excludeWords', 'minBudget', 'maxBudget']);
+  const PROFILE_REGIONS = new Set(['moscow', 'oblast', 'other', 'unknown']);
+  const PROFILE_CATEGORIES = new Set(['survey', 'design', 'land', 'expertise']);
   const WORKSPACE_FIELDS = new Set([
     'version', 'notes', 'work', 'drafts', 'company', 'favorites', 'tasks',
-    'checks', 'savedFilters', 'exportedAt'
+    'checks', 'savedFilters', 'estimates', 'profile', 'compareIds', 'exportedAt'
   ]);
+
+  function emptyProfile() {
+    return {regions: [], categories: [], includeWords: '', excludeWords: '', minBudget: '', maxBudget: ''};
+  }
 
   function emptyWorkspace() {
     return {version: 1, notes: {}, work: {}, drafts: [], company: {},
-      favorites: [], tasks: {}, checks: {}, savedFilters: []};
+      favorites: [], tasks: {}, checks: {}, savedFilters: [],
+      estimates: {}, profile: emptyProfile(), compareIds: []};
   }
 
   function safeObject(value) {
@@ -136,6 +143,39 @@
       && Object.values(filter.filters).every(value => validString(value, 1000));
   }
 
+  function validEstimate(estimate) {
+    return !!estimates && estimates.validateEstimate(estimate, {allowIncomplete: true}).valid;
+  }
+
+  function profileBudget(value) {
+    if (!validString(value, 100)) return {valid: false};
+    const cleaned = value.trim();
+    if (!cleaned) return {valid: true, amount: null};
+    if (!/^(?:\d+(?:[.,]\d{0,2})?|[.,]\d{1,2})$/.test(cleaned)) return {valid: false};
+    const amount = Number(cleaned.replace(',', '.'));
+    return {valid: Number.isFinite(amount) && amount <= 1e12, amount};
+  }
+
+  function validProfile(profile) {
+    if (!allowedFields(profile, PROFILE_FIELDS)) return false;
+    for (const [field, allowed] of [['regions', PROFILE_REGIONS], ['categories', PROFILE_CATEGORIES]]) {
+      if (Object.hasOwn(profile, field) && (!denseArray(profile[field], 4)
+        || !profile[field].every(value => allowed.has(value))
+        || new Set(profile[field]).size !== profile[field].length)) return false;
+    }
+    for (const field of ['includeWords', 'excludeWords'])
+      if (Object.hasOwn(profile, field) && !validString(profile[field], 4000)) return false;
+    const min = profileBudget(Object.hasOwn(profile, 'minBudget') ? profile.minBudget : '');
+    const max = profileBudget(Object.hasOwn(profile, 'maxBudget') ? profile.maxBudget : '');
+    return min.valid && max.valid && (min.amount === null || max.amount === null || min.amount <= max.amount);
+  }
+
+  function profileConfigured(profile) {
+    return profile.regions.length > 0 || profile.categories.length > 0
+      || [profile.includeWords, profile.excludeWords].some(value => value.split(/[,;\n]+/).some(term => term.trim()))
+      || profile.minBudget.trim() !== '' || profile.maxBudget.trim() !== '';
+  }
+
   function uniqueIds(items) {
     return new Set(items.map(item => item.id)).size === items.length;
   }
@@ -158,6 +198,11 @@
     if (raw.savedFilters !== undefined && (!denseArray(raw.savedFilters, 30)
       || !raw.savedFilters.every(validSavedFilter)
       || !uniqueIds(raw.savedFilters))) return false;
+    if (Object.hasOwn(raw, 'estimates') && !validMap(raw.estimates, validEstimate)) return false;
+    if (Object.hasOwn(raw, 'profile') && !validProfile(raw.profile)) return false;
+    if (Object.hasOwn(raw, 'compareIds') && (!denseArray(raw.compareIds, 4)
+      || !raw.compareIds.every(id => validId(id) && id.trim() && !FORBIDDEN_KEYS.has(id))
+      || new Set(raw.compareIds).size !== raw.compareIds.length)) return false;
     return raw.exportedAt === undefined || validString(raw.exportedAt, 100);
   }
 
@@ -167,6 +212,7 @@
     for (const key of WORKSPACE_FIELDS) {
       if (raw[key] !== undefined) result[key] = raw[key];
     }
+    result.profile = {...emptyProfile(), ...result.profile};
     // All accepted values are JSON data. Return a detached snapshot, never input aliases.
     return JSON.parse(JSON.stringify(result));
   }
@@ -185,12 +231,16 @@
     const right = normalizeWorkspace(incoming);
     if (!left || !right) return null;
     const merged = emptyWorkspace();
-    for (const field of ['notes', 'work', 'company', 'tasks', 'checks']) {
+    for (const field of ['notes', 'work', 'company', 'tasks', 'checks', 'estimates']) {
       merged[field] = {...right[field], ...left[field]};
     }
     merged.drafts = mergeById(left.drafts, right.drafts);
     merged.savedFilters = mergeById(left.savedFilters, right.savedFilters);
     merged.favorites = [...new Set([...left.favorites, ...right.favorites])];
+    // A profile is one coherent selection; never combine conflicting criteria.
+    // An empty workspace can still restore useful profile/comparison settings.
+    merged.profile = profileConfigured(left.profile) || !profileConfigured(right.profile) ? left.profile : right.profile;
+    merged.compareIds = left.compareIds.length ? left.compareIds : right.compareIds;
     if (left.exportedAt !== undefined) merged.exportedAt = left.exportedAt;
     else if (right.exportedAt !== undefined) merged.exportedAt = right.exportedAt;
     // Reject an oversized union instead of silently dropping either user's entries.
@@ -207,7 +257,7 @@
   }
 
   return Object.freeze({
-    WORK_STATUS, DRAFT_EDITABLE_FIELDS, emptyWorkspace, normalizeWorkspace,
-    validBackup, validDraft, mergeWorkspaces, draftComparable, isDraftDirty
+    WORK_STATUS, DRAFT_EDITABLE_FIELDS, emptyWorkspace, emptyProfile, normalizeWorkspace,
+    validBackup, validDraft, validEstimate, validProfile, mergeWorkspaces, draftComparable, isDraftDirty
   });
 });

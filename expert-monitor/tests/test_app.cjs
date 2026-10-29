@@ -7,9 +7,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const W = require('../workspace-utils.js');
+const C = require('../estimate-utils.js');
 
 const APP_DIR = path.resolve(__dirname, '..');
 const STORE_KEY = 'msk-expert-monitor-workspace-v1';
+const UI_KEY = 'msk-expert-monitor-ui-v2';
 const decode = value => String(value || '').replace(/&(?:amp|lt|gt|quot|#39);/g,
   entity => ({'&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'"}[entity]));
 
@@ -22,6 +24,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   const blobs = new Map();
   const confirmations = [];
   const data = new Map([[STORE_KEY, JSON.stringify(initial)]]);
+  if (options.uiPreferences) data.set(UI_KEY, JSON.stringify(options.uiPreferences));
   const storage = {
     failWrites: false,
     getItem(key) {return data.has(key) ? data.get(key) : null;},
@@ -29,6 +32,13 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
     removeItem(key) {data.delete(key);}
   };
   function matches(node, selector) {
+    const descendant = /^(#[\w-]+)\s+(.+)$/.exec(selector);
+    if (descendant) {
+      if (!matches(node, descendant[2])) return false;
+      for (let parent = node.formOwner || node.owner; parent; parent = parent.formOwner || parent.owner)
+        if (matches(parent, descendant[1])) return true;
+      return false;
+    }
     if (selector.startsWith('#')) return node.id === selector.slice(1);
     const attribute = /^(?:([\w-]+))?\[([^=\]]+)(?:=["']?([^"'\]]+)["']?)?\]$/.exec(selector);
     if (attribute) return (!attribute[1] || node.tagName === attribute[1].toUpperCase())
@@ -42,6 +52,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
       this.id = attrs.id || ''; this.name = attrs.name || ''; this.type = attrs.type || '';
       this.value = decode(attrs.value || ''); this.textContent = ''; this.style = {};
       this.checked = Object.hasOwn(attrs, 'checked'); this.hidden = Object.hasOwn(attrs, 'hidden');
+      this.disabled = Object.hasOwn(attrs, 'disabled');
       this.open = false; this.isConnected = true; this.listeners = new Map(); this._html = '';
       const classes = new Set((attrs.class || '').split(/\s+/).filter(Boolean));
       this.classList = {add: (...items) => items.forEach(c => classes.add(c)),
@@ -121,7 +132,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   }
   const document = {
     hidden: false, activeElement: null,
-    querySelector: selector => selector.startsWith('#') ? elements.get(selector.slice(1)) || null : document.querySelectorAll(selector)[0] || null,
+    querySelector: selector => /^#[\w-]+$/.test(selector) ? elements.get(selector.slice(1)) || null : document.querySelectorAll(selector)[0] || null,
     querySelectorAll: selector => selector === '[data-icon]' ? [] : [...nodes].filter(n => n.isConnected && matches(n, selector)),
     createElement: tag => new Node(tag),
     addEventListener(name, fn) {if (!documentListeners.has(name)) documentListeners.set(name, []); documentListeners.get(name).push(fn);},
@@ -165,7 +176,8 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   });
   context.window = context;
   vm.runInContext('globalThis.structuredClone = value => JSON.parse(JSON.stringify(value));', context);
-  for (const filename of ['monitor-utils.js', 'workspace-utils.js', 'export-utils.js', 'proposal-utils.js', 'app.js'])
+  for (const filename of ['monitor-utils.js', 'estimate-utils.js', 'workspace-utils.js', 'opportunity-utils.js',
+    'export-utils.js', 'proposal-utils.js', 'selection-ui.js', 'estimate-ui.js', 'app.js'])
     vm.runInContext(fs.readFileSync(path.join(APP_DIR, filename), 'utf8'), context, {filename});
   for (let i = 0; i < 6; i++) await new Promise(resolve => setImmediate(resolve));
   async function dispatchDocument(name, event) {
@@ -175,7 +187,9 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
     await dispatchDocument('click', {target: new Node('button', {'data-action': action, ...(id ? {'data-id': id} : {})})});
   }
   return {document, storage, downloads, confirmations, location, registry, click,
-    clickElement: target => dispatchDocument('click', {target}),
+    clickElement: target => target.disabled ? Promise.resolve() : dispatchDocument('click', {target}),
+    inputElement: (target, value) => {target.value = value; return dispatchDocument('input', {target});},
+    changeElement: target => dispatchDocument('change', {target}),
     setRegistryPayload(value) {responses.registry = value; registryParseError = false;},
     setRegistryParseError(value) {registryParseError = Boolean(value);},
     get: id => {const node = elements.get(id); assert.ok(node, 'Expected rendered element #' + id); return node;},
@@ -535,4 +549,351 @@ test('Incomplete letter output is blocked without losing edits, while draft RTF 
   assert.match(app.downloads[0].blob.type, /^application\/rtf/);
   assert.match(await app.downloads[0].blob.text(), /^\{\\rtf1/);
   assert.equal((await app.beforeUnload()).prevented, true, 'Downloading a draft does not claim it was saved');
+});
+
+function estimateInput(app, field) {
+  const input = [...app.document.querySelectorAll('[data-estimate-line]')]
+    .find(node => node.dataset.estimateField === field);
+  assert.ok(input, 'Expected an estimate line field: ' + field);
+  return input;
+}
+async function editEstimateLine(app, values) {
+  for (const [field, value] of Object.entries(values)) await app.inputElement(estimateInput(app, field), value);
+}
+const completeEstimate = (changes = {}) => ({...C.emptyEstimate(),
+  lines: [{id: 'labor-1', type: 'labor', name: 'Исследование', quantity: '2', unit: 'ч', rateRub: '1000.25'}],
+  recordTitle: 'Сохранённое исследование', caseNumber: 'EST-2099', updatedAt: '2026-10-29T10:00:00Z', ...changes});
+
+test('Imported numeric estimate fields open and close cleanly, while a real edit activates unsaved-change protection', async () => {
+  const row = futureRecord('estimate-numeric-import');
+  const saved = completeEstimate({
+    lines: [{id: 'numeric-line', type: 'labor', name: 'Импортированная работа', quantity: 2.5, unit: 'ч', rateRub: 1000.25}],
+    overheadPct: 10, reservePct: 5, markupPct: 12.5, vatPct: 0
+  });
+  const initial = {...W.emptyWorkspace(), estimates: {[row.id]: saved}};
+  assert.equal(W.validBackup(initial), true, 'Numeric values are valid imported estimate data');
+  const app = await boot(initial, {records: [row]});
+  await app.click('estimate-open', row.id);
+  assert.equal(estimateInput(app, 'quantity').value, '2.5');
+  assert.equal(estimateInput(app, 'rateRub').value, '1000.25');
+  assert.equal(app.get('estimate-markupPct').value, '12.5');
+  assert.equal((await app.beforeUnload()).prevented, false, 'DOM string conversion alone must not make an imported estimate dirty');
+  await app.click('estimate-close');
+  assert.equal(app.get('estimate-dialog').open, false);
+  assert.equal(app.confirmations.length, 0);
+  assert.deepEqual(app.stored(), initial);
+
+  await app.click('estimate-open', row.id);
+  await editEstimateLine(app, {rateRub: '1000.50'});
+  assert.equal((await app.beforeUnload()).prevented, true);
+  await app.click('estimate-close');
+  assert.equal(app.confirmations.length, 1);
+  assert.equal(app.get('estimate-dialog').open, true, 'Declining discard must retain the actual edit');
+  assert.equal(estimateInput(app, 'rateRub').value, '1000.50');
+  assert.deepEqual(app.stored(), initial);
+});
+
+test('An incomplete estimate saves its user-entered work without inferring rates or transferring a price', async () => {
+  const row = {...futureRecord('estimate-incomplete'), amountRub: 9876543, amountType: 'contract'};
+  const initial = {...W.emptyWorkspace(), notes: {[row.id]: {text: 'Существующая заметка', proposalRub: 333.33}}};
+  const app = await boot(initial, {records: [row]});
+  await app.click('estimate-open', row.id);
+  assert.equal(app.get('estimate-dialog').open, true);
+  assert.equal(estimateInput(app, 'quantity').value, '');
+  assert.equal(estimateInput(app, 'rateRub').value, '', 'The published budget must not become an own rate');
+  await editEstimateLine(app, {name: 'НЕПОЛНАЯ_РАБОТА', unit: 'ч'});
+  await app.input('estimate-notes', 'Сначала уточнить объём');
+  assert.equal((await app.beforeUnload()).prevented, true);
+  await app.click('estimate-save');
+  assert.equal(app.stored().estimates[row.id].lines[0].name, 'НЕПОЛНАЯ_РАБОТА');
+  assert.equal(app.stored().estimates[row.id].lines[0].quantity, '');
+  assert.equal(app.stored().estimates[row.id].lines[0].rateRub, '');
+  assert.equal(app.stored().estimates[row.id].notes, 'Сначала уточнить объём');
+  assert.deepEqual(app.stored().notes, initial.notes);
+  assert.equal((await app.beforeUnload()).prevented, false);
+  assert.equal(app.get('estimate-content').querySelector('[data-action="estimate-apply"]').disabled, true);
+  const saved = app.stored();
+  await app.click('estimate-apply'); // The handler must also reject a dispatched action on an incomplete form.
+  assert.deepEqual(app.stored(), saved);
+  assert.match(app.get('estimate-save-state').textContent, /заполните все строки/);
+});
+
+test('Applying a complete estimate updates the own price and open detail without overwriting saved proposals or public money', async () => {
+  const row = {...futureRecord('estimate-apply'), amountRub: 9876543, amountType: 'contract'};
+  const initial = {...W.emptyWorkspace(), notes: {[row.id]: {text: 'Сохранённая заметка', proposalRub: 1500}},
+    work: {[row.id]: 'ready'}, tasks: {[row.id]: plannedTask('Сохранённая задача')},
+    checks: {[row.id]: {stage: true}}, company: {organization: 'Сохранённая организация'},
+    drafts: [{id: 'ready-proposal', recordId: row.id, subject: 'Версия для получателя', price: '765432.10', documentMode: 'letter'}]};
+  const app = await boot(initial, {records: [row], confirmResult: true});
+  await app.click('open-detail', row.id);
+  await app.click('estimate-open', row.id);
+  await editEstimateLine(app, {name: 'Полная работа', quantity: '2', unit: 'ч', rateRub: '1000.25'});
+  await app.input('estimate-overheadPct', '10');
+  assert.equal(app.get('estimate-content').querySelector('[data-action="estimate-apply"]').disabled, false);
+  assert.equal(app.stored().notes[row.id].proposalRub, 1500);
+  await app.click('estimate-apply');
+  assert.equal(app.confirmations.length, 1, 'Replacing an existing own price needs the explicit confirmation');
+  assert.equal(app.stored().notes[row.id].proposalRub, 2200.55);
+  assert.equal(Number(app.get('detail-price').value), 2200.55);
+  assert.equal(app.get('detail-note').value, 'Сохранённая заметка');
+  assert.deepEqual(app.stored().drafts, initial.drafts);
+  assert.deepEqual(app.stored().tasks, initial.tasks);
+  assert.deepEqual(app.stored().work, initial.work);
+  assert.deepEqual(app.stored().checks, initial.checks);
+  assert.deepEqual(app.stored().company, initial.company);
+  assert.equal(app.registry.opportunities[0].amountRub, 9876543);
+  assert.equal((await app.beforeUnload()).prevented, false, 'The synchronized detail value must not become a stale dirty price');
+  await app.click('estimate-close');
+  await app.click('save-note');
+  assert.equal(app.stored().notes[row.id].proposalRub, 2200.55, 'Saving the still-open detail must not restore the old price');
+  assert.deepEqual(app.stored().drafts, initial.drafts);
+});
+
+test('A failed estimate save keeps its prior dirty baseline and a successful retry clears it', async () => {
+  const row = futureRecord('estimate-retry');
+  const initial = {...W.emptyWorkspace(), estimates: {[row.id]: completeEstimate()}};
+  const app = await boot(initial, {records: [row]});
+  await app.click('estimate-open', row.id);
+  await editEstimateLine(app, {rateRub: '2000.50'});
+  app.storage.failWrites = true;
+  await app.submit('estimate-form');
+  assert.deepEqual(app.stored(), initial);
+  assert.equal(app.get('estimate-dialog').open, true);
+  assert.equal(estimateInput(app, 'rateRub').value, '2000.50');
+  assert.match(app.get('estimate-save-state').textContent, /не сохранил данные/);
+  assert.equal((await app.beforeUnload()).prevented, true);
+  await editEstimateLine(app, {rateRub: '1000.25'});
+  assert.equal((await app.beforeUnload()).prevented, false, 'Failed persistence must not replace the old baseline with the rejected edit');
+  await editEstimateLine(app, {rateRub: '2000.50'});
+  app.storage.failWrites = false;
+  await app.click('estimate-save');
+  assert.equal(app.stored().estimates[row.id].lines[0].rateRub, '2000.50');
+  assert.equal((await app.beforeUnload()).prevented, false);
+});
+
+test('The estimate modal backup includes unsaved rates and notes while preserving the stored workspace', async () => {
+  const row = futureRecord('estimate-backup');
+  const initial = {...W.emptyWorkspace(), notes: {[row.id]: {text: 'Другая заметка', proposalRub: 250}},
+    drafts: [{id: 'kept-draft', price: '123.45'}], tasks: {[row.id]: plannedTask('Сохранённая задача')},
+    profile: {...W.emptyProfile(), regions: ['moscow']}, compareIds: [row.id]};
+  const app = await boot(initial, {records: [row]});
+  await app.click('estimate-open', row.id);
+  await editEstimateLine(app, {name: 'НЕСОХРАНЁННАЯ_РАБОТА', quantity: '1.5', rateRub: '2345.67'});
+  await app.input('estimate-notes', 'НЕСОХРАНЁННЫЕ_ДОПУЩЕНИЯ');
+  const backupButton = app.get('estimate-content').querySelector('[data-action="backup"]');
+  assert.ok(backupButton && !backupButton.disabled, 'Recovery must be reachable inside the estimate modal');
+  await app.clickElement(backupButton);
+  assert.equal(app.downloads.length, 1);
+  const snapshot = JSON.parse(await app.downloads[0].blob.text());
+  assert.equal(W.validBackup(snapshot), true);
+  assert.equal(snapshot.estimates[row.id].lines[0].rateRub, '2345.67');
+  assert.equal(snapshot.estimates[row.id].lines[0].quantity, '1.5');
+  assert.equal(snapshot.estimates[row.id].notes, 'НЕСОХРАНЁННЫЕ_ДОПУЩЕНИЯ');
+  assert.equal(snapshot.estimates[row.id].recordTitle, row.title);
+  for (const key of ['notes', 'drafts', 'tasks', 'profile', 'compareIds']) assert.deepEqual(snapshot[key], initial[key]);
+  assert.deepEqual(app.stored(), initial);
+  assert.equal(app.get('estimate-dialog').open, true);
+  assert.equal((await app.beforeUnload()).prevented, true);
+});
+
+test('Canceling a dirty estimate asks before discarding edits and leaves the saved estimate intact', async () => {
+  const row = futureRecord('estimate-cancel');
+  const initial = {...W.emptyWorkspace(), estimates: {[row.id]: completeEstimate()}};
+  const options = {records: [row], confirmResult: false};
+  const app = await boot(initial, options);
+  await app.click('estimate-open', row.id);
+  await app.input('estimate-notes', 'Не потерять без подтверждения');
+  await app.get('estimate-dialog').dispatch('cancel');
+  assert.equal(app.confirmations.length, 1);
+  assert.equal(app.get('estimate-dialog').open, true);
+  assert.equal(app.get('estimate-notes').value, 'Не потерять без подтверждения');
+  assert.equal((await app.beforeUnload()).prevented, true);
+  options.confirmResult = true;
+  await app.click('estimate-close');
+  assert.equal(app.get('estimate-dialog').open, false);
+  assert.deepEqual(app.stored(), initial);
+  assert.equal((await app.beforeUnload()).prevented, false);
+  await app.click('estimate-open', row.id);
+  assert.equal(app.get('estimate-notes').value, initial.estimates[row.id].notes);
+});
+
+test('The separate proposal estimate action changes only the current price after confirmation and keeps all other edits', async () => {
+  const row = futureRecord('estimate-proposal');
+  const saved = completeEstimate({lines: [{id: 'kopeck', type: 'expense', name: 'Явно введённый расход', quantity: '1', unit: 'шт.', rateRub: '0.01'}]});
+  const initial = {...W.emptyWorkspace(), estimates: {[row.id]: saved}, notes: {[row.id]: {proposalRub: 500.5}},
+    drafts: [{id: 'proposal-to-edit', recordId: row.id, documentKind: 'procurement', documentMode: 'draft',
+      price: '500.50', days: '14', subject: 'Сохранённый предмет', organization: 'Организация', contact: 'Контакт',
+      taxNote: 'Исходная налоговая формулировка', conditions: 'Исходные условия', caseNumber: 'PURCHASE-1'}]};
+  const options = {records: [row], confirmResult: false};
+  const app = await boot(initial, options);
+  await app.view('proposals');
+  await app.click('load-draft', 'proposal-to-edit');
+  const edits = {subject: 'НЕСОХРАНЁННЫЙ_ПРЕДМЕТ', contact: 'НЕСОХРАНЁННЫЙ_КОНТАКТ',
+    taxNote: 'НЕСОХРАНЁННАЯ_НАЛОГОВАЯ_ФОРМУЛИРОВКА', conditions: 'НЕСОХРАНЁННЫЕ_УСЛОВИЯ', days: '21'};
+  for (const [id, value] of Object.entries(edits)) await app.input(id, value);
+  await app.click('proposal-estimate');
+  assert.equal(Number(app.get('price').value), 500.5);
+  options.confirmResult = true;
+  await app.click('proposal-estimate');
+  assert.equal(Number(app.get('price').value), 0.01);
+  assert.equal(app.get('price').checkValidity(), true, 'A positive kopeck amount must remain usable in the proposal form');
+  for (const [id, value] of Object.entries(edits)) assert.equal(app.get(id).value, value);
+  assert.equal(app.get('documentKind').value, 'procurement');
+  assert.deepEqual(app.stored(), initial, 'Explicit transfer edits the form, not the saved proposal or own-price record');
+  assert.equal((await app.beforeUnload()).prevented, true);
+});
+
+test('Deleting an orphan estimate requires confirmation and successful persistence while keeping own prices and proposals', async () => {
+  const id = 'orphan-estimate-delete';
+  const initial = {...W.emptyWorkspace(), estimates: {[id]: completeEstimate(), kept: completeEstimate({recordTitle: 'Другой расчёт'})},
+    notes: {[id]: {text: 'Сохранённая заметка', proposalRub: 2000.5}},
+    drafts: [{id: 'kept-proposal', recordId: id, price: '2000.50', subject: 'Сохранённое предложение'}],
+    tasks: {[id]: plannedTask('Сохранённая задача')}};
+  const options = {records: [], confirmResult: false};
+  const app = await boot(initial, options);
+  await app.view('workspace');
+  const button = [...app.document.querySelectorAll('[data-action="estimate-delete"]')].find(node => node.dataset.id === id);
+  assert.ok(button, 'An orphan estimate must remain manageable in saved estimates');
+  await app.clickElement(button);
+  assert.equal(app.confirmations.length, 1);
+  assert.deepEqual(app.stored(), initial);
+  options.confirmResult = true;
+  app.storage.failWrites = true;
+  await app.clickElement(button);
+  assert.deepEqual(app.stored(), initial, 'A rejected deletion must retain the complete estimate');
+  app.storage.failWrites = false;
+  await app.clickElement(button);
+  assert.deepEqual(app.stored(), {...initial, estimates: {kept: initial.estimates.kept}});
+});
+
+function profileChoice(app, field, value) {
+  const input = app.document.querySelector('[data-profile-' + field + '="' + value + '"]');
+  assert.ok(input, 'Expected profile choice ' + field + '=' + value);
+  return input;
+}
+
+test('Failed profile save retains edits and dirty protection, valid backup recovers them, and an invalid range blocks backup', async () => {
+  const initial = {...W.emptyWorkspace(), notes: {kept: {text: 'Не терять'}}, drafts: [{id: 'kept-draft', price: '123'}]};
+  const app = await boot(initial, {records: [futureRecord()]});
+  await app.click('profile-open');
+  const region = profileChoice(app, 'region', 'moscow'); region.checked = true; await app.changeElement(region);
+  await app.input('profile-include', 'кровля; фасад');
+  await app.input('profile-min-budget', '100.50');
+  await app.input('profile-max-budget', '500,50');
+  app.storage.failWrites = true;
+  await app.submit('profile-form');
+  assert.equal(app.get('profile-dialog').open, true);
+  assert.equal(app.get('profile-include').value, 'кровля; фасад');
+  assert.equal(profileChoice(app, 'region', 'moscow').checked, true);
+  assert.match(app.get('profile-save-state').textContent, /не сохранил данные/);
+  assert.equal((await app.beforeUnload()).prevented, true);
+  assert.deepEqual(app.stored(), initial);
+  const backup = app.get('profile-content').querySelector('[data-action="backup"]');
+  await app.clickElement(backup);
+  assert.equal(app.downloads.length, 1);
+  const snapshot = JSON.parse(await app.downloads[0].blob.text());
+  assert.equal(W.validBackup(snapshot), true);
+  assert.deepEqual(snapshot.profile, {...W.emptyProfile(), regions: ['moscow'], includeWords: 'кровля; фасад', minBudget: '100.50', maxBudget: '500,50'});
+  assert.deepEqual(snapshot.notes, initial.notes);
+  assert.deepEqual(snapshot.drafts, initial.drafts);
+  await app.input('profile-min-budget', '1000');
+  await app.clickElement(backup);
+  assert.equal(app.downloads.length, 1, 'An unrestorable profile must not be exported as a valid recovery file');
+  assert.match(app.get('profile-save-state').textContent, /Минимум не должен превышать максимум/);
+  assert.deepEqual(app.stored(), initial);
+});
+
+test('Profile array ordering does not create false dirty state and canceling real edits keeps the modal open', async () => {
+  const profile = {...W.emptyProfile(), regions: ['oblast', 'moscow'], categories: ['expertise', 'survey']};
+  const app = await boot({...W.emptyWorkspace(), profile}, {records: [futureRecord()]});
+  await app.click('profile-open');
+  assert.equal((await app.beforeUnload()).prevented, false);
+  await app.click('profile-close');
+  assert.equal(app.confirmations.length, 0);
+  assert.equal(app.get('profile-dialog').open, false);
+  await app.click('profile-open');
+  await app.input('profile-exclude', 'НЕСОХРАНЁННОЕ_ИСКЛЮЧЕНИЕ');
+  await app.get('profile-dialog').dispatch('cancel');
+  assert.equal(app.confirmations.length, 1);
+  assert.equal(app.get('profile-dialog').open, true);
+  assert.equal(app.get('profile-exclude').value, 'НЕСОХРАНЁННОЕ_ИСКЛЮЧЕНИЕ');
+  assert.equal((await app.beforeUnload()).prevented, true);
+  assert.deepEqual(app.stored().profile, profile);
+});
+
+test('Profile reset preserves the profile and active filter on storage failure, then clears both after successful persistence', async () => {
+  const profile = {...W.emptyProfile(), includeWords: 'PUBLIC_DEADLINE_RECORD'};
+  const app = await boot({...W.emptyWorkspace(), profile}, {records: [futureRecord()], confirmResult: true});
+  app.get('fit-filter').value = 'match'; await app.changeElement(app.get('fit-filter'));
+  await app.click('profile-open');
+  await app.input('profile-exclude', 'НЕСОХРАНЁННОЕ_ИСКЛЮЧЕНИЕ');
+  app.storage.failWrites = true;
+  await app.click('profile-reset');
+  assert.deepEqual(app.stored().profile, profile);
+  assert.equal(app.get('profile-dialog').open, true);
+  assert.equal(app.get('profile-exclude').value, 'НЕСОХРАНЁННОЕ_ИСКЛЮЧЕНИЕ');
+  assert.equal(app.get('fit-filter').value, 'match');
+  assert.equal(JSON.parse(app.storage.getItem(UI_KEY)).views.opportunities.fit, 'match');
+  assert.equal((await app.beforeUnload()).prevented, true);
+  app.storage.failWrites = false;
+  await app.click('profile-reset');
+  assert.deepEqual(app.stored().profile, W.emptyProfile());
+  assert.equal(app.get('profile-dialog').open, false);
+  assert.equal(app.get('fit-filter').value, 'all');
+  assert.equal(app.get('fit-filter').disabled, true);
+  assert.equal((await app.beforeUnload()).prevented, false);
+  const uiPreferences = JSON.parse(app.storage.getItem(UI_KEY));
+  assert.equal(uiPreferences.views.opportunities.fit, 'all');
+  const reopened = await boot(app.stored(), {records: [futureRecord()], uiPreferences});
+  assert.equal(reopened.get('fit-filter').value, 'all', 'Reloading must not restore the stale profile filter');
+  assert.equal(reopened.get('fit-filter').disabled, true);
+});
+
+test('An orphan comparison entry consumes one of four slots and removing it preserves its private work', async () => {
+  const rows = ['compare-1', 'compare-2', 'compare-3', 'compare-4'].map(futureRecord);
+  const initial = {...W.emptyWorkspace(), compareIds: ['compare-1', 'compare-2', 'compare-3', 'orphan'],
+    notes: {orphan: {text: 'ORPHAN_PRIVATE_NOTE', proposalRub: 1234.5}}, tasks: {orphan: plannedTask('ORPHAN_PRIVATE_TASK')}};
+  const app = await boot(initial, {records: rows});
+  await app.click('toggle-compare', 'compare-4');
+  assert.deepEqual(app.stored().compareIds, initial.compareIds);
+  assert.match(app.get('toast').textContent, /до четырёх записей/);
+  await app.view('compare');
+  assert.match(app.get('main').innerHTML, /Запись вне текущего реестра/);
+  assert.match(app.get('main').innerHTML, /ORPHAN_PRIVATE_TASK/);
+  await app.click('remove-compare', 'orphan');
+  assert.deepEqual(app.stored().compareIds, ['compare-1', 'compare-2', 'compare-3']);
+  assert.deepEqual(app.stored().notes, initial.notes);
+  assert.deepEqual(app.stored().tasks, initial.tasks);
+  await app.view('opportunities');
+  await app.click('toggle-compare', 'compare-4');
+  assert.deepEqual(app.stored().compareIds, rows.map(row => row.id));
+});
+
+test('Toggling comparison in an open detail updates its button without replacing typed notes, prices or tasks', async () => {
+  const row = futureRecord('compare-detail');
+  const initial = {...W.emptyWorkspace(), notes: {[row.id]: {text: 'Сохранённая заметка', proposalRub: 500}},
+    tasks: {[row.id]: plannedTask('Сохранённая задача')}};
+  const app = await boot(initial, {records: [row]});
+  await app.click('open-detail', row.id);
+  await app.input('detail-note', 'UNSAVED_COMPARE_NOTE');
+  await app.input('detail-task', 'UNSAVED_COMPARE_TASK');
+  await app.input('detail-price', '765.43');
+  const button = app.get('detail-content').querySelector('[data-action="toggle-compare"]');
+  assert.ok(button);
+  assert.equal(button.attrs['aria-pressed'], 'false');
+  await app.clickElement(button);
+  assert.equal(app.get('detail-dialog').open, true);
+  assert.equal(button.attrs['aria-pressed'], 'true');
+  assert.deepEqual(app.stored().compareIds, [row.id]);
+  assert.equal(app.get('detail-note').value, 'UNSAVED_COMPARE_NOTE');
+  assert.equal(app.get('detail-task').value, 'UNSAVED_COMPARE_TASK');
+  assert.equal(app.get('detail-price').value, '765.43');
+  assert.deepEqual(app.stored().notes, initial.notes);
+  assert.deepEqual(app.stored().tasks, initial.tasks);
+  assert.equal((await app.beforeUnload()).prevented, true);
+  await app.clickElement(button);
+  assert.equal(button.attrs['aria-pressed'], 'false');
+  assert.deepEqual(app.stored().compareIds, []);
+  assert.equal(app.get('detail-note').value, 'UNSAVED_COMPARE_NOTE');
+  assert.equal(app.get('detail-task').value, 'UNSAVED_COMPARE_TASK');
 });

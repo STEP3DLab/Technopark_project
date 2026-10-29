@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const w = require('../workspace-utils.js');
+const estimates = require('../estimate-utils.js');
 
 const stamp = '2026-10-29T10:00:00+03:00';
 const task = (text = 'Проверить последнее определение') => ({text, dueDate: '2026-10-30', updatedAt: stamp});
@@ -266,4 +267,161 @@ test('Every document setting participates in dirty detection while save timestam
     assert.equal(w.isDraftDirty({...baseline, [field]: value}, baseline), true, field);
   }
   assert.equal(w.isDraftDirty({...baseline, createdAt: stamp, updatedAt: stamp}, baseline), false);
+});
+
+const savedEstimate = (changes = {}) => ({...estimates.emptyEstimate(),
+  lines: [{id: 'expert', type: 'labor', name: 'Исследование', quantity: '2.5', unit: 'ч', rateRub: '1000.50'}],
+  recordTitle: 'Сохранённый предмет исследования', caseNumber: 'А40-123/2099',
+  notes: 'Проверить доступ к объекту', updatedAt: stamp, ...changes});
+
+test('Legacy v1 and v2.1 workspaces gain independent empty estimate, profile and comparison sections', () => {
+  const legacy = {version: 1, notes: {}, work: {}, drafts: []};
+  const previous = {...legacy, tasks: {a: task()}, company: {contact: 'Сохранённый контакт'}};
+  for (const source of [legacy, previous]) {
+    const before = JSON.stringify(source);
+    const result = w.normalizeWorkspace(source);
+    assert.equal(result.version, 1);
+    assert.deepEqual(result.estimates, {});
+    assert.deepEqual(result.profile, w.emptyProfile());
+    assert.deepEqual(result.compareIds, []);
+    result.profile.regions.push('moscow');
+    result.compareIds.push('a');
+    result.estimates.a = savedEstimate();
+    assert.equal(JSON.stringify(source), before);
+    assert.deepEqual(w.emptyWorkspace().profile.regions, []);
+    assert.deepEqual(w.emptyWorkspace().compareIds, []);
+    assert.deepEqual(w.emptyWorkspace().estimates, {});
+  }
+});
+
+test('Estimates retain exact user input and orphan metadata without automatically setting a proposal price', () => {
+  const input = {...w.emptyWorkspace(), notes: {same: {proposalRub: 777.77, text: 'Отдельная рабочая оценка'}},
+    estimates: {same: savedEstimate({overheadPct: '10,25'}),
+      'removed-record': {...estimates.emptyEstimate(), notes: 'Ещё не оценено', recordTitle: 'Бывшая запись', caseNumber: 'TEST-OLD', updatedAt: stamp}},
+    profile: {regions: ['moscow'], categories: ['expertise', 'survey'], includeWords: 'кровля; фасад',
+      excludeWords: 'автомобиль', minBudget: '100000,50', maxBudget: '500000.00'},
+    compareIds: ['same', 'removed-record'], savedFilters: [{...savedFilter('fit'), filters: {fit: 'match'}}]};
+  const result = w.normalizeWorkspace(JSON.parse(JSON.stringify(input)));
+  assert.deepEqual(result, input);
+  assert.equal(w.validBackup(input), true);
+  assert.equal(result.notes.same.proposalRub, 777.77, 'A saved calculation must not silently overwrite the independent own price');
+  assert.equal(result.estimates['removed-record'].lines[0].rateRub, '');
+  result.estimates.same.lines[0].rateRub = '999';
+  result.estimates['removed-record'].recordTitle = 'Другое';
+  result.profile.regions.push('oblast');
+  assert.equal(input.estimates.same.lines[0].rateRub, '1000.50');
+  assert.equal(input.estimates['removed-record'].recordTitle, 'Бывшая запись');
+  assert.deepEqual(input.profile.regions, ['moscow']);
+});
+
+test('Workspace validation accepts unfinished estimates but rejects malformed or excessive calculations atomically', () => {
+  assert.equal(w.validEstimate(estimates.emptyEstimate()), true);
+  const incomplete = {...estimates.emptyEstimate(), notes: 'Сохранить до получения материалов', updatedAt: stamp};
+  assert.ok(w.normalizeWorkspace({...w.emptyWorkspace(), estimates: {incomplete}}));
+  const invalid = [null, [], {unknown: true}, savedEstimate({automaticPrice: 100}),
+    savedEstimate({updatedAt: '2026-10-29'}), savedEstimate({recordTitle: 'x'.repeat(1001)}),
+    savedEstimate({lines: [{...savedEstimate().lines[0], rateRub: '1e3'}]}),
+    savedEstimate({lines: [{...savedEstimate().lines[0], quantity: '1000000', rateRub: '1000000000000'}]})];
+  for (const value of invalid) {
+    const input = {...w.emptyWorkspace(), notes: {kept: {text: 'Не терять'}}, estimates: {bad: value}};
+    assert.equal(w.validEstimate(value), false);
+    assert.equal(w.normalizeWorkspace(input), null);
+    assert.equal(input.notes.kept.text, 'Не терять');
+  }
+  const tooMany = Object.fromEntries(Array.from({length: 10001}, (_, index) => ['case-' + index, incomplete]));
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), estimates: tooMany}), null);
+});
+
+test('Profiles preserve raw keyword phrases and accept bounded decimal budget strings with partial defaults', () => {
+  const partial = {includeWords: ' кровля, фасад;\n техническое состояние '};
+  assert.equal(w.validProfile(partial), true);
+  assert.deepEqual(w.normalizeWorkspace({...w.emptyWorkspace(), profile: partial}).profile, {...w.emptyProfile(), ...partial});
+  assert.deepEqual(w.normalizeWorkspace({...w.emptyWorkspace(), profile: {}}).profile, w.emptyProfile());
+  for (const profile of [
+    {...w.emptyProfile(), minBudget: '.50', maxBudget: '0,50'},
+    {...w.emptyProfile(), minBudget: '100.', maxBudget: '1000000000000'},
+    {...w.emptyProfile(), minBudget: ' ', maxBudget: ''},
+    {...w.emptyProfile(), regions: ['moscow', 'oblast', 'other', 'unknown'], categories: ['survey', 'design', 'land', 'expertise']}
+  ]) {
+    assert.equal(w.validProfile(profile), true);
+    assert.deepEqual(w.normalizeWorkspace({...w.emptyWorkspace(), profile}).profile, profile);
+  }
+  for (const changes of [
+    {regions: ['moscow', 'moscow']}, {regions: ['customer-address']}, {regions: 'moscow'},
+    {categories: ['unknown']}, {categories: ['survey', 'survey']}, {categories: [42]},
+    {includeWords: ['кровля']}, {excludeWords: 'x'.repeat(4001)}, {includeWords: undefined},
+    {minBudget: 100}, {minBudget: '-1'}, {minBudget: '1e3'}, {maxBudget: 'Infinity'},
+    {minBudget: '0x10'}, {minBudget: '1.001'}, {maxBudget: '1000000000000.01'},
+    {minBudget: '10', maxBudget: '9.99'}, {maxBudget: '1'.repeat(101)}, {unknown: 'criterion'}
+  ]) {
+    const profile = {...w.emptyProfile(), ...changes};
+    assert.equal(w.validProfile(profile), false, Object.keys(changes).join(','));
+    assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), profile}), null);
+  }
+});
+
+test('Comparison selections are unique, bounded and may keep IDs absent from the current public registry', () => {
+  const ids = ['a', 'b', 'c', 'orphaned-public-record'];
+  assert.deepEqual(w.normalizeWorkspace({...w.emptyWorkspace(), compareIds: ids}).compareIds, ids);
+  for (const compareIds of [['a', 'a'], ['a', 'b', 'c', 'd', 'e'], [''], [' '], ['__proto__'],
+    ['constructor'], ['x'.repeat(201)], [42], {}, null, undefined])
+    assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), compareIds}), null);
+});
+
+test('Merging estimates keeps current conflicts and treats configured profile and comparison as coherent selections', () => {
+  const current = {...w.emptyWorkspace(), estimates: {same: savedEstimate({notes: 'Текущий расчёт'}), orphan: savedEstimate()},
+    profile: {...w.emptyProfile(), regions: ['moscow'], includeWords: 'кровля'}, compareIds: ['current'],
+    notes: {same: {proposalRub: 777.77}}};
+  const incoming = {...w.emptyWorkspace(), estimates: {same: savedEstimate({notes: 'Импорт'}), incoming: savedEstimate()},
+    profile: {...w.emptyProfile(), categories: ['land'], excludeWords: 'кровля', minBudget: '500000'},
+    compareIds: ['one', 'two', 'three', 'four']};
+  const beforeCurrent = JSON.stringify(current), beforeIncoming = JSON.stringify(incoming);
+  const merged = w.mergeWorkspaces(current, incoming);
+  assert.equal(merged.estimates.same.notes, 'Текущий расчёт');
+  assert.deepEqual(Object.keys(merged.estimates).sort(), ['incoming', 'orphan', 'same']);
+  assert.deepEqual(merged.profile, current.profile, 'Profiles must not be field-merged into contradictory criteria');
+  assert.deepEqual(merged.compareIds, ['current'], 'Comparison import must not silently union or truncate the selection');
+  assert.equal(merged.notes.same.proposalRub, 777.77);
+  merged.estimates.same.lines[0].rateRub = '1';
+  merged.estimates.incoming.lines[0].quantity = '5';
+  merged.profile.regions.push('oblast');
+  merged.compareIds.push('another');
+  assert.equal(JSON.stringify(current), beforeCurrent);
+  assert.equal(JSON.stringify(incoming), beforeIncoming);
+  assert.deepEqual(w.mergeWorkspaces(current, current), current);
+});
+
+test('Import restores a configured profile and comparison into both legacy and all-default current workspaces', () => {
+  const incoming = {...w.emptyWorkspace(), estimates: {a: savedEstimate()},
+    profile: {...w.emptyProfile(), categories: ['survey'], includeWords: 'фасад', maxBudget: '500000'},
+    compareIds: ['a', 'missing-record']};
+  const candidates = [w.emptyWorkspace(), {version: 1, notes: {}, work: {}, drafts: []},
+    {...w.emptyWorkspace(), profile: {}}, {...w.emptyWorkspace(), profile: {...w.emptyProfile(), includeWords: ' , ;\n '}}];
+  for (const current of candidates) {
+    const merged = w.mergeWorkspaces(current, incoming);
+    assert.deepEqual(merged.profile, incoming.profile);
+    assert.deepEqual(merged.compareIds, incoming.compareIds);
+    assert.deepEqual(merged.estimates, incoming.estimates);
+  }
+  assert.deepEqual(w.mergeWorkspaces(incoming, w.emptyWorkspace()).profile, incoming.profile);
+  const invalid = {...incoming, compareIds: ['a', 'b', 'c', 'd', 'e']};
+  assert.equal(w.mergeWorkspaces(w.emptyWorkspace(), invalid), null, 'Invalid incoming data must refuse the complete import');
+});
+
+test('New sections reject prototype keys, accessors and sparse arrays without executing imported values', () => {
+  for (const key of ['__proto__', 'constructor', 'prototype']) {
+    const unsafe = JSON.parse('{"' + key + '":true}');
+    for (const change of [{estimates: unsafe}, {estimates: {a: {...savedEstimate(), ...unsafe}}},
+      {estimates: {a: savedEstimate({lines: [{...savedEstimate().lines[0], ...unsafe}]})}},
+      {profile: {...w.emptyProfile(), ...unsafe}}])
+      assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), ...change}), null);
+  }
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), compareIds: Array(1)}), null);
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), profile: {...w.emptyProfile(), regions: Array(1)}}), null);
+  const getter = savedEstimate();
+  Object.defineProperty(getter, 'lines', {enumerable: true, get() {throw new Error('Do not read imported accessors');}});
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), estimates: {a: getter}}), null);
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), estimates: undefined}), null);
+  assert.equal(w.normalizeWorkspace({...w.emptyWorkspace(), profile: undefined}), null);
+  assert.equal({}.polluted, undefined);
 });

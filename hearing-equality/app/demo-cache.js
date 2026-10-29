@@ -1,6 +1,6 @@
 // Only curated, same-origin demonstration assets are stored. Camera models,
 // microphone audio, uploaded files and conversation content are never cached.
-export const APP_VERSION = '0.10.0';
+export const APP_VERSION = '0.10.1';
 export const APP_BASE = new URL('./', import.meta.url);
 export const CACHE_PREFIX = `hearing-equality-demo:${APP_BASE.pathname}:`;
 export const CACHE_NAME = `${CACHE_PREFIX}${APP_VERSION}`;
@@ -131,7 +131,12 @@ async function fetchAndCache(cache, url, signal) {
   try {
     // The worker deliberately lets this request reach the network. Preparation
     // must not mistake its own cache fallback for a fresh successful download.
-    const response = await fetch(url, { signal: controller.signal, cache: 'reload', credentials: 'same-origin',
+    // An already-installed older worker only recognises its own preparation
+    // header value. Version EVERY network URL, including HTML, JSON and video,
+    // so the older worker cannot serve its stale cached shell into this bundle.
+    // Cache keys remain canonical; only the network fetch gets this version.
+    const networkURL = new URL(url); networkURL.searchParams.set('v', APP_VERSION);
+    const response = await fetch(networkURL.href, { signal: controller.signal, cache: 'reload', credentials: 'same-origin',
       headers: { 'X-Hearing-Demo-Prepare': APP_VERSION } });
     if (response.status !== 200 || response.type === 'opaque' || (response.url && new URL(response.url).origin !== APP_BASE.origin))
       throw new Error(`Не удалось загрузить файл (HTTP ${response.status}).`);

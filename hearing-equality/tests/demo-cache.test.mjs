@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const base = 'https://example.test/Technopark_project/hearing-equality/app/';
 const moduleSource = readFileSync(new URL('../app/demo-cache.js', import.meta.url), 'utf8')
-  .replace(/^export /gm, '').replaceAll('import.meta.url', JSON.stringify(`${base}demo-cache.js?v=0.10.0`));
+  .replace(/^export /gm, '').replaceAll('import.meta.url', JSON.stringify(`${base}demo-cache.js?v=0.10.1`));
 const workerSource = readFileSync(new URL('../app/sw.js', import.meta.url), 'utf8')
   .replace(/^import .*;\n/, '').replace(/^export /gm, '');
 const catalog = Array.from({ length: 6 }, (_, i) => {
@@ -36,7 +36,7 @@ function storage() {
 function harness({ fetcher, controlled = true } = {}) {
   const caches = storage(), fetched = [], listeners = new Map(), timers = new Map();
   let id = 0, clock = 0, registrations = 0;
-  const active = { scriptURL: `${base}sw.js?v=0.10.0&cache=2`, state: 'activated', addEventListener() {}, removeEventListener() {}, postMessage() {} };
+  const active = { scriptURL: `${base}sw.js?v=0.10.1&cache=2`, state: 'activated', addEventListener() {}, removeEventListener() {}, postMessage() {} };
   const registration = { active, scope: base };
   const serviceWorker = {
     controller: controlled ? active : null,
@@ -75,12 +75,12 @@ test('a complete prepared bundle has every curated file and an active controller
   assert.equal(h.fetched.length, 34); assert.ok(progress.length >= 34);
   assert.ok(h.fetched.every(url => url.startsWith(base)), 'No third-party model or personal data URL is fetched');
   const status = await h.api.readDemoCacheStatus(); assert.equal(status.offlineReady, true);
-  assert.equal(h.api.canonicalAssetURL('platform.js'), `${base}platform.js?v=0.10.0`);
+  assert.equal(h.api.canonicalAssetURL('platform.js'), `${base}platform.js?v=0.10.1`);
   assert.equal(h.api.canonicalAssetURL('platform.js?v=0.9'), null, 'Old release assets must not be silently substituted');
 });
 
 test('partial download failures are visible and eviction revokes readiness', async () => {
-  const h = harness({ fetcher: url => new Response('file', { status: String(url).endsWith('manrope.woff2') ? 503 : 200 }) });
+  const h = harness({ fetcher: url => new Response('file', { status: new URL(url).pathname.endsWith('manrope.woff2') ? 503 : 200 }) });
   const partial = await h.api.prepareDemoAssets(catalog);
   assert.equal(partial.cached, 0); assert.equal(partial.downloaded, 33); assert.equal(partial.failed.length, 1); assert.equal(partial.offlineReady, false);
   assert.equal(h.registrations(), 0, 'A partial first bundle must not activate a worker');
@@ -176,7 +176,7 @@ test('a failed refresh keeps the complete manifest, files and active offline rea
   assert.equal(await (await control.match(h.api.MANIFEST_URL)).text(), before);
   assert.deepEqual(await h.caches.keys(), namesBefore, 'The failed staging cache is discarded');
   const w = workerHarness(h);
-  assert.match(await (await w.handleDemoRequest(new Request(`${base}platform.js?v=0.10.0`))).text(), /^original:/);
+  assert.match(await (await w.handleDemoRequest(new Request(`${base}platform.js?v=0.10.1`))).text(), /^original:/);
 });
 
 test('a failed atomic pointer commit preserves the previous complete bundle', async () => {
@@ -191,15 +191,38 @@ test('a failed atomic pointer commit preserves the previous complete bundle', as
   assert.equal(h.registrations(), 1);
 });
 
-test('automatic installation and activation do not replace a complete old version with an unprepared one', async () => {
+test('automatic installation rejects an unprepared release instead of waiting to replace the old worker', async () => {
   const h = harness(), old = `${h.api.CACHE_PREFIX}0.9`;
   await h.caches.open(old);
   const w = workerHarness(h); let work;
-  w.handlers.get('install')({ waitUntil(promise) { work = promise; } }); await work;
+  w.handlers.get('install')({ waitUntil(promise) { work = promise; } });
+  await assert.rejects(work, /bundle must be prepared/);
   w.handlers.get('activate')({ waitUntil(promise) { work = promise; } }); await work;
   assert.equal(w.activated(), 0); assert.equal(w.claimed(), 0);
   assert.ok((await h.caches.keys()).includes(old));
   await h.api.prepareDemoAssets(catalog);
   w.handlers.get('install')({ waitUntil(promise) { work = promise; } }); await work;
   assert.equal(w.activated(), 1);
+});
+
+test('preparation bypasses an older worker that would otherwise return a stale unversioned HTML shell', async () => {
+  const h = harness({ fetcher: url => {
+    const request = new URL(url);
+    if (request.pathname.endsWith('/index.html')) {
+      // The previous worker rejects unknown version queries, but its prepared
+      // cache would intercept an unversioned index.html regardless of the new
+      // preparation header value. Reproduce precisely that upgrade boundary.
+      const version = request.searchParams.get('v') === '0.10.1' ? '0.10.1' : '0.10.0';
+      return new Response(`<script type="module" src="platform.js?v=${version}"></script>`);
+    }
+    return new Response(`network:${url}`);
+  } });
+  const result = await h.api.prepareDemoAssets(catalog);
+  assert.equal(result.offlineReady, true);
+  assert.ok(h.fetched.every(url => new URL(url).searchParams.get('v') === '0.10.1'), 'Every network request must bypass the old version, including video and JSON');
+  const { assets } = await h.api.readPreparedBundle();
+  const html = await (await assets.match(`${base}index.html`)).text();
+  assert.match(html, /platform\.js\?v=0\.10\.1/);
+  assert.doesNotMatch(html, /0\.10\.0/);
+  assert.ok(await assets.match(new URL(catalog[0].video, base).href), 'Video remains stored under the canonical key used by the player');
 });

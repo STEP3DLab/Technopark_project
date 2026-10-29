@@ -1,9 +1,11 @@
-import { APP_VERSION, APP_BASE, CACHE_PREFIX, CACHE_NAME, canonicalAssetURL, readPreparedBundle, hasCompleteDemoBundle } from './demo-cache.js?v=0.10.0';
+import { APP_VERSION, APP_BASE, CACHE_PREFIX, CACHE_NAME, canonicalAssetURL, readPreparedBundle, hasCompleteDemoBundle } from './demo-cache.js?v=0.10.1';
 
-// Automatic browser updates can fetch this script before the new release's
-// offline files exist. Such an update must remain waiting behind the old one.
+// Automatic updates can fetch this script before the new release's offline
+// files exist. Reject installation then: merely leaving a worker waiting would
+// still let it replace the old one when the last old tab closes.
 self.addEventListener('install', event => event.waitUntil((async () => {
-  if (await hasCompleteDemoBundle()) await self.skipWaiting();
+  if (!await hasCompleteDemoBundle()) throw new Error('The demonstration bundle must be prepared before activating this release.');
+  await self.skipWaiting();
 })()));
 async function activatePreparedBundle() {
   if (!await hasCompleteDemoBundle()) return;
@@ -87,7 +89,7 @@ export async function handleDemoRequest(request) {
 self.addEventListener('fetch', event => {
   const request = event.request, url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== APP_BASE.origin || !url.pathname.startsWith(APP_BASE.pathname) ||
-      request.headers.get('X-Hearing-Demo-Prepare') === APP_VERSION) return;
+      request.headers.has('X-Hearing-Demo-Prepare')) return;
   const isHome = [APP_BASE.pathname, `${APP_BASE.pathname}index.html`].includes(url.pathname);
   if (!(request.mode === 'navigate' && isHome) && !canonicalAssetURL(request.url)) return;
   event.respondWith(handleDemoRequest(request));

@@ -190,6 +190,10 @@ button{touch-action:manipulation}
   .avatar-card .playback-tools{grid-column:1/-1;justify-content:flex-end}
   .avatar-card .stage,.avatar-card .stage.compare{height:345px}
 }
+@media(min-width:701px) and (max-width:1100px){
+  .sidebar .brand{gap:15px;min-width:270px;justify-content:flex-start}
+  .sidebar .brand .brand-copy{display:block;padding-left:15px;font-size:17px}
+}
 @media(max-width:1100px){
   .topbar{height:76px;margin-bottom:24px}
   .sidebar{padding-top:20px;padding-bottom:16px}

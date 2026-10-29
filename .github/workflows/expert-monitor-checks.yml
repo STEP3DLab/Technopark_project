@@ -39,6 +39,10 @@ jobs:
           node --check expert-monitor/opportunity-utils.js
           node --check expert-monitor/selection-ui.js
           node --check expert-monitor/estimate-ui.js
+          node --check expert-monitor/registry-utils.js
+          node --check expert-monitor/workbench-utils.js
+          node --check expert-monitor/workbench-ui.js
+          node --check expert-monitor/experience-ui.js
           node --check expert-monitor/export-utils.js
           node --check expert-monitor/proposal-utils.js
       - name: Test filters, private workspace and application behavior
@@ -50,6 +54,10 @@ jobs:
           node expert-monitor/tests/test_exports.cjs
           node expert-monitor/tests/test_proposals.cjs
           node expert-monitor/tests/test_app.cjs
+          node expert-monitor/tests/test_registry.cjs
+          node expert-monitor/tests/test_workbench.cjs
+          node expert-monitor/tests/test_estimate_ui.cjs
+          node expert-monitor/tests/test_experience.cjs
       - name: Test public-source monitoring and validate the research registry
         run: |
           python -m unittest discover -s expert-monitor/tests -v

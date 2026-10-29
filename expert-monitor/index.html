@@ -8,16 +8,24 @@
   <meta name="robots" content="noindex,nofollow">
   <title>МСК Эксперт — судебный мониторинг</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23112b39'/%3E%3Cpath d='M16 44V20h7l9 14 9-14h7v24h-8V33l-8 12-8-12v11z' fill='%236ce4c1'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=20261029.6">
-  <script src="monitor-utils.js?v=20261029.6" defer></script>
-  <script src="estimate-utils.js?v=20261029.6" defer></script>
-  <script src="workspace-utils.js?v=20261029.6" defer></script>
-  <script src="opportunity-utils.js?v=20261029.6" defer></script>
-  <script src="export-utils.js?v=20261029.6" defer></script>
-  <script src="proposal-utils.js?v=20261029.6" defer></script>
-  <script src="selection-ui.js?v=20261029.6" defer></script>
-  <script src="estimate-ui.js?v=20261029.6" defer></script>
-  <script src="app.js?v=20261029.6" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261029.7">
+  <link rel="stylesheet" href="registry-v23.css?v=20261029.7">
+  <link rel="stylesheet" href="workbench.css?v=20261029.7">
+  <link rel="stylesheet" href="estimate-v23.css?v=20261029.7">
+  <link rel="stylesheet" href="experience.css?v=20261029.7">
+  <script src="monitor-utils.js?v=20261029.7" defer></script>
+  <script src="estimate-utils.js?v=20261029.7" defer></script>
+  <script src="workspace-utils.js?v=20261029.7" defer></script>
+  <script src="registry-utils.js?v=20261029.7" defer></script>
+  <script src="workbench-utils.js?v=20261029.7" defer></script>
+  <script src="opportunity-utils.js?v=20261029.7" defer></script>
+  <script src="export-utils.js?v=20261029.7" defer></script>
+  <script src="proposal-utils.js?v=20261029.7" defer></script>
+  <script src="selection-ui.js?v=20261029.7" defer></script>
+  <script src="estimate-ui.js?v=20261029.7" defer></script>
+  <script src="workbench-ui.js?v=20261029.7" defer></script>
+  <script src="experience-ui.js?v=20261029.7" defer></script>
+  <script src="app.js?v=20261029.7" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">К содержанию</a>
@@ -39,13 +47,13 @@
       <button type="button" data-view="proposals" class="nav-item"><span data-icon="document"></span>Мои предложения<span class="nav-count" id="nav-drafts">0</span></button>
     </nav>
     <div class="sidebar-note"><span data-icon="shield"></span><div><strong>Решение — за экспертом</strong><p>Каждый сигнал проверяется по первоисточнику перед подготовкой предложения.</p></div></div>
-    <div class="sidebar-bottom"><button type="button" data-view="guide" class="nav-item"><span data-icon="help"></span>Как это работает</button><div class="sidebar-footer"><span class="avatar">МЭ</span><span><b>МСК Эксперт</b><small>Рабочая панель · v2.2</small></span></div></div>
+    <div class="sidebar-bottom"><div class="experience-tools"><button type="button" class="nav-item" data-action="experience-settings"><span data-icon="filter"></span>Вид и удобство</button><button type="button" class="nav-item" data-action="experience-help"><span data-icon="help"></span>Горячие клавиши</button></div><button type="button" data-view="guide" class="nav-item"><span data-icon="help"></span>Как это работает</button><div class="sidebar-footer"><span class="avatar">МЭ</span><span><b>МСК Эксперт</b><small>Рабочая панель · v2.3</small></span></div></div>
   </aside>
   <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
   <div class="app-shell" id="app-shell">
     <header class="topbar">
       <div class="topbar-left"><button type="button" class="icon-button mobile-menu" id="mobile-menu" aria-label="Открыть меню" aria-controls="sidebar" aria-expanded="false"><span data-icon="menu"></span></button><span class="breadcrumb">Рабочее пространство<span>/</span><b id="breadcrumb-view">Обзор</b></span></div>
-      <div class="topbar-actions"><span class="snapshot-tag" id="snapshot-tag"><span class="status-dot neutral"></span>Загрузка базы</span><button type="button" class="icon-button" id="refresh-button" aria-label="Обновить опубликованные данные" title="Обновить опубликованные данные"><span data-icon="refresh"></span></button><a class="sheet-button" id="sheet-link" href="#" aria-label="Открыть Google-таблицу" title="Открыть Google-таблицу" hidden target="_blank" rel="noopener noreferrer"><span data-icon="table"></span><span class="sheet-label">Google-таблица</span><span data-icon="external"></span></a></div>
+      <div class="topbar-actions"><button type="button" class="icon-button" data-action="experience-palette" aria-label="Быстрый переход и поиск, Ctrl или Cmd K" title="Быстрый переход · Ctrl/⌘ K"><span data-icon="search"></span></button><span class="snapshot-tag" id="snapshot-tag"><span class="status-dot neutral"></span>Загрузка базы</span><button type="button" class="icon-button" id="refresh-button" aria-label="Обновить опубликованные данные" title="Обновить опубликованные данные"><span data-icon="refresh"></span></button><a class="sheet-button" id="sheet-link" href="#" aria-label="Открыть Google-таблицу" title="Открыть Google-таблицу" hidden target="_blank" rel="noopener noreferrer"><span data-icon="table"></span><span class="sheet-label">Google-таблица</span><span data-icon="external"></span></a></div>
     </header>
     <main id="main" tabindex="-1">
       <section class="loading-screen" aria-live="polite"><div class="loading-orbit" aria-hidden="true"></div><h1>Открываем рабочую панель</h1><p>Загружаем реестр и статусы источников…</p></section>
@@ -53,7 +61,7 @@
     <footer class="page-footer"><span>МСК Эксперт · Открытые источники, проверяемые решения</span><span id="footer-sync">Загрузка опубликованного среза</span></footer>
   </div>
   <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title"><div id="detail-content"></div></dialog>
-  <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-title"><div class="confirm-inner"><h2 id="confirm-title">Восстановить рабочие данные</h2><p id="import-summary" class="import-summary"></p><p>Объединение добавит недостающие записи. При совпадении останутся текущие заметки, задачи, расчёты и черновики. Настроенный профиль и непустой список сравнения также сохранятся.</p><label class="check-row"><input id="import-replace" type="checkbox"> Заменить все рабочие данные этой резервной копией</label><div class="button-row"><button type="button" class="button secondary" data-action="cancel-import">Отмена</button><button type="button" class="button primary" data-action="confirm-import">Применить резервную копию</button></div></div></dialog>
+  <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-title"><div class="confirm-inner"><h2 id="confirm-title">Восстановить рабочие данные</h2><p id="import-summary" class="import-summary"></p><div id="import-preview"></div><button type="button" class="button secondary small" data-action="backup-before-import"><span data-icon="down"></span>Скачать текущую копию перед восстановлением</button><p>Объединение добавит недостающие записи. При совпадении останутся текущие заметки, задачи, расчёты и черновики. Настроенный профиль и непустой список сравнения также сохранятся.</p><label class="check-row"><input id="import-replace" type="checkbox"> Заменить все рабочие данные этой резервной копией</label><div class="button-row"><button type="button" class="button secondary" data-action="cancel-import">Отмена</button><button type="button" class="button primary" data-action="confirm-import">Применить резервную копию</button></div></div></dialog>
   <dialog id="filters-dialog" class="confirm-dialog" aria-labelledby="filters-title"><div id="filters-content" class="confirm-inner"></div></dialog>
   <dialog id="task-dialog" class="confirm-dialog" aria-labelledby="task-title"><div id="task-content" class="confirm-inner"></div></dialog>
   <dialog id="export-dialog" class="confirm-dialog" aria-labelledby="export-title"><div id="export-content" class="confirm-inner"></div></dialog>

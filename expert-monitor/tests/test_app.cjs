@@ -176,8 +176,8 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   });
   context.window = context;
   vm.runInContext('globalThis.structuredClone = value => JSON.parse(JSON.stringify(value));', context);
-  for (const filename of ['monitor-utils.js', 'estimate-utils.js', 'workspace-utils.js', 'opportunity-utils.js',
-    'export-utils.js', 'proposal-utils.js', 'selection-ui.js', 'estimate-ui.js', 'app.js'])
+  for (const filename of ['monitor-utils.js', 'estimate-utils.js', 'workspace-utils.js', 'registry-utils.js', 'workbench-utils.js', 'opportunity-utils.js',
+    'export-utils.js', 'proposal-utils.js', 'selection-ui.js', 'estimate-ui.js', 'workbench-ui.js', 'experience-ui.js', 'app.js'])
     vm.runInContext(fs.readFileSync(path.join(APP_DIR, filename), 'utf8'), context, {filename});
   for (let i = 0; i < 6; i++) await new Promise(resolve => setImmediate(resolve));
   async function dispatchDocument(name, event) {
@@ -896,4 +896,157 @@ test('Toggling comparison in an open detail updates its button without replacing
   assert.deepEqual(app.stored().compareIds, []);
   assert.equal(app.get('detail-note').value, 'UNSAVED_COMPARE_NOTE');
   assert.equal(app.get('detail-task').value, 'UNSAVED_COMPARE_TASK');
+});
+
+test('Registry applies exact phrases and exclusions without exposing matched personal notes', async()=>{
+  const a={...futureRecord('search-a'),title:'Обследование несущих конструкций'},b={...futureRecord('search-b'),title:'Обследование несущих конструкций фасада'};
+  const app=await boot({...W.emptyWorkspace(),notes:{'search-a':{text:'PRIVATE_TAG'}}},{records:[a,b]});
+  await app.input('search-input','"несущих конструкций" -фасада PRIVATE_TAG');
+  await app.changeElement(app.get('source-type-filter'));
+  assert.match(app.get('lead-results').innerHTML,/data-open-id="search-a"/);
+  assert.doesNotMatch(app.get('lead-results').innerHTML,/data-open-id="search-b"|PRIVATE_TAG/);
+  assert.match(app.get('lead-results').innerHTML,/<mark class="search-match">несущих конструкций<\/mark>/);
+});
+
+test('An inverted budget range produces an actionable error and accessible invalid states',async()=>{
+  const app=await boot();await app.input('amount-min','900');await app.input('amount-max','100');
+  await app.changeElement(app.get('source-type-filter'));
+  assert.match(app.get('lead-results').innerHTML,/больше суммы/);
+  assert.equal(app.get('amount-min').attrs['aria-invalid'],'true');
+  await app.click('focus-budget');assert.equal(app.document.activeElement.id,'amount-min');
+  await app.input('amount-max','1000,25');await app.changeElement(app.get('source-type-filter'));
+  assert.equal(app.get('amount-min').attrs['aria-invalid'],'false');
+});
+
+test('Pagination shows 25 rows at a time while CSV and select-all cover the complete filtered registry',async()=>{
+  const rows=Array.from({length:53},(_,i)=>({...futureRecord('page-'+String(i).padStart(2,'0')),caseNumber:'CASE-'+i}));
+  const app=await boot(W.emptyWorkspace(),{records:rows});
+  assert.equal((app.get('main').innerHTML.match(/data-open-id=/g)||[]).length,25);
+  await app.click('registry-next');assert.match(app.get('lead-results').innerHTML,/Показаны 26–50 из 53/);
+  await app.click('registry-next');assert.equal((app.get('lead-results').innerHTML.match(/data-open-id=/g)||[]).length,3);
+  await app.click('wb-select-all');assert.match(app.get('main').innerHTML,/Выбрано: 53/);
+  await app.click('export-public-csv');const text=await app.downloads.at(-1).blob.text();
+  for(const row of rows)assert.ok(text.includes(row.id));
+});
+
+test('Saved filters can be renamed and duplicated without changing conditions, and failure preserves the editor',async()=>{
+  const base={...W.emptyWorkspace(),savedFilters:[{id:'one',name:'Первый',filters:{search:'обследование'}}]};
+  const app=await boot(base);await app.click('manage-filters');await app.click('rename-filter','one');
+  app.get('filter-edit-name').value='Новое имя';app.storage.failWrites=true;await app.submit('edit-filter-form');
+  assert.equal(app.stored().savedFilters[0].name,'Первый');assert.equal(app.get('filter-edit-name').value,'Новое имя');
+  app.storage.failWrites=false;await app.submit('edit-filter-form');
+  assert.equal(app.stored().savedFilters[0].name,'Новое имя');assert.deepEqual(app.stored().savedFilters[0].filters,base.savedFilters[0].filters);
+  await app.click('duplicate-filter','one');await app.submit('edit-filter-form');
+  assert.equal(app.stored().savedFilters.length,2);assert.notEqual(app.stored().savedFilters[1].id,'one');
+  assert.deepEqual(app.stored().savedFilters[1].filters,base.savedFilters[0].filters);
+});
+
+test('Updating saved filter conditions is explicit and its result counts reflect current matching records',async()=>{
+  const rows=[{...futureRecord('filter-a'),title:'Обмеры'},{...futureRecord('filter-b'),title:'Проектирование'}];
+  const base={...W.emptyWorkspace(),savedFilters:[{id:'one',name:'Отбор',filters:{search:'Обмеры'}}]};
+  const app=await boot(base,{records:rows,confirmResult:true});await app.input('search-input','Проектирование');
+  await app.changeElement(app.get('source-type-filter'));await app.click('manage-filters');
+  assert.match(app.get('filters-content').innerHTML,/1 записей/);await app.click('update-filter','one');
+  assert.equal(app.stored().savedFilters[0].filters.search,'Проектирование');
+  assert.ok(app.confirmations.some(text=>text.includes('Заменить условия')));
+});
+
+test('Next-card navigation protects dirty changes and uses the existing filtered order after saving',async()=>{
+  const app=await boot(W.emptyWorkspace(),{records:[futureRecord('nav-a'),futureRecord('nav-b')]});
+  await app.click('open-detail','nav-a');await app.input('detail-note','Keep this');await app.click('detail-next');
+  assert.equal(app.get('detail-note').value,'Keep this');assert.match(app.location.hash,/nav-a/);
+  await app.click('save-note');await app.click('detail-next');assert.match(app.location.hash,/nav-b/);
+  assert.equal(app.stored().notes['nav-a'].text,'Keep this');assert.equal(app.get('detail-note').value,'');
+});
+
+test('Checklist progress reflects unsaved checkbox changes without changing public status or storage',async()=>{
+  const row=futureRecord('check-a'),app=await boot(W.emptyWorkspace(),{records:[row]});await app.click('open-detail',row.id);
+  const box=app.get('detail-content').querySelector('[data-check="stage"]');box.checked=true;await app.changeElement(box);
+  assert.match(app.get('detail-check-progress').innerHTML,/Мои отметки: 1 из 6/);
+  assert.deepEqual(app.stored().checks,{});assert.equal(app.registry.opportunities[0].status,row.status);
+  assert.equal((await app.beforeUnload()).prevented,true);
+});
+
+test('Backups refuse an invalid open price and a successful copy records its creation time separately from work data',async()=>{
+  const row=futureRecord('backup-price'),app=await boot(W.emptyWorkspace(),{records:[row]});await app.click('open-detail',row.id);
+  await app.input('detail-price','-2');await app.click('backup');assert.equal(app.downloads.length,0);
+  assert.match(app.get('toast').textContent,/исправьте собственную цену/);
+  await app.input('detail-price','2.50');await app.click('backup');assert.equal(app.downloads.length,1);
+  assert.equal(app.stored().notes[row.id],undefined);
+  assert.ok(Number.isFinite(Date.parse(JSON.parse(app.storage.getItem(UI_KEY)).lastBackupAt)));
+  const backup=JSON.parse(await app.downloads[0].blob.text());assert.equal(backup.notes[row.id].proposalRub,2.5);
+});
+
+test('Bulk stage actions require confirmation, preserve data on failed writes and support safe undo',async()=>{
+  const rows=[futureRecord('bulk-a'),futureRecord('bulk-b')];
+  const denied=await boot(W.emptyWorkspace(),{records:rows});await denied.click('wb-select-all');await denied.click('wb-apply-stage');assert.deepEqual(denied.stored().work,{});
+  const app=await boot(W.emptyWorkspace(),{records:rows,confirmResult:true});await app.click('wb-select-all');
+  app.storage.failWrites=true;await app.click('wb-apply-stage');assert.deepEqual(app.stored().work,{});
+  app.storage.failWrites=false;await app.click('wb-apply-stage');assert.deepEqual(app.stored().work,{'bulk-a':'review','bulk-b':'review'});
+  await app.click('wb-undo');assert.deepEqual(app.stored().work,{});
+  await app.click('wb-apply-stage');await app.click('favorite','bulk-a');await app.click('wb-undo');
+  assert.equal(app.stored().work['bulk-a'],'review');assert.deepEqual(app.stored().favorites,['bulk-a']);
+  assert.match(app.get('toast').textContent,/уже изменились/);
+});
+
+test('Selected CSV exports only selected records and includes private values only after explicit private choice',async()=>{
+  const rows=[futureRecord('selected-a'),futureRecord('selected-b')];
+  const app=await boot({...W.emptyWorkspace(),notes:{'selected-a':{text:'PRIVATE_SELECTED',proposalRub:321}}},{records:rows});
+  const checkbox=app.document.querySelector('[data-wb-select="selected-a"]');checkbox.checked=true;await app.changeElement(checkbox);
+  await app.click('wb-export-public');let text=await app.downloads.at(-1).blob.text();
+  assert.ok(text.includes('selected-a'));assert.ok(!text.includes('selected-b'));assert.ok(!text.includes('PRIVATE_SELECTED'));
+  await app.click('wb-export-private');text=await app.downloads.at(-1).blob.text();assert.ok(text.includes('PRIVATE_SELECTED'));assert.ok(!text.includes('selected-b'));
+});
+
+test('Workspace retains note-only orphan records, includes them in stage editing and does not invent public facts',async()=>{
+  const app=await boot({...W.emptyWorkspace(),notes:{orphan:{text:'ORPHAN_NOTE',proposalRub:123}}},{records:[]});await app.view('workspace');
+  assert.match(app.get('main').innerHTML,/ORPHAN_NOTE/);assert.match(app.get('main').innerHTML,/Текущий публичный статус неизвестен/);
+  const field=app.document.querySelector('[data-wb-stage="orphan"]');field.value='hold';await app.changeElement(field);
+  assert.equal(app.stored().work.orphan,'hold');assert.equal(app.stored().notes.orphan.text,'ORPHAN_NOTE');
+});
+
+test('Quick personal dates change only the editor until explicitly saved',async()=>{
+  const row=futureRecord('date-a'),app=await boot(W.emptyWorkspace(),{records:[row]});await app.click('open-detail',row.id);
+  const shortcut=app.document.querySelectorAll('[data-action="wb-date-shortcut"]').find(node=>node.dataset.target==='detail'&&node.dataset.offset==='1');
+  await app.clickElement(shortcut);assert.match(app.get('detail-followup').value,/^\d{4}-\d{2}-\d{2}$/);
+  assert.deepEqual(app.stored().tasks,{});assert.equal((await app.beforeUnload()).prevented,true);
+  await app.click('save-note');assert.equal(app.stored().tasks[row.id].dueDate,app.get('detail-followup').value);
+});
+
+test('Visible quick-search and settings controls work through root routing and cannot replace an open editor',async()=>{
+  const row=futureRecord('palette-a'),app=await boot(W.emptyWorkspace(),{records:[row]});
+  await app.click('experience-palette');assert.equal(app.get('experience-palette-dialog').open,true);
+  await app.click('experience-close');await app.click('open-detail',row.id);await app.input('detail-note','UNSAVED_PALETTE');
+  await app.click('experience-palette');assert.equal(app.get('experience-palette-dialog').open,false);
+  assert.equal(app.get('detail-note').value,'UNSAVED_PALETTE');assert.match(app.document.title,/TEST-2099/);
+});
+
+test('Native numeric badInput with empty value cannot clear a stored price via save or backup',async()=>{
+  const row=futureRecord('native-price'),initial={...W.emptyWorkspace(),notes:{'native-price':{text:'Keep',proposalRub:125000}}};
+  const app=await boot(initial,{records:[row]});await app.click('open-detail',row.id);
+  const input=app.get('detail-price');input.value='';input.checkValidity=()=>false;
+  await app.click('backup');await app.click('save-note');assert.equal(app.downloads.length,0);
+  assert.equal(app.stored().notes[row.id].proposalRub,125000);assert.equal(app.get('detail-dialog').open,true);
+});
+
+test('Invalid budget filters cannot be saved, and next-card focus lands on the new title',async()=>{
+  const app=await boot(W.emptyWorkspace(),{records:[futureRecord('focus-a'),futureRecord('focus-b')]});
+  await app.input('amount-min','100');await app.input('amount-max','1');await app.click('save-filter');
+  assert.equal(app.get('filters-dialog').open,false);assert.deepEqual(app.stored().savedFilters,[]);
+  await app.click('reset-filters');await app.click('open-detail','focus-a');await app.click('detail-next');
+  assert.equal(app.document.activeElement.id,'detail-title');assert.match(app.location.hash,/focus-b/);
+});
+
+test('Import preview changes with replacement mode and pre-import backup does not apply the incoming file',async()=>{
+  const initial={...W.emptyWorkspace(),notes:{old:{text:'CURRENT_NOTE'}}},incoming={...W.emptyWorkspace(),favorites:['new']};
+  const app=await boot(initial),payload=JSON.stringify(incoming),input=app.get('backup-input');
+  input.files=[{size:Buffer.byteLength(payload),text:async()=>payload}];await input.dispatch('change');
+  assert.match(app.get('import-preview').innerHTML,/Предварительный результат/);
+  assert.match(app.get('import-preview').innerHTML,/объединение, текущие значения/);
+  app.get('import-replace').checked=true;await app.changeElement(app.get('import-replace'));
+  assert.match(app.get('import-preview').innerHTML,/полная замена/);
+  await app.click('backup-before-import');assert.match(app.downloads[0].name,/before-restore/);
+  const copied=JSON.parse(await app.downloads[0].blob.text());assert.equal(copied.notes.old.text,'CURRENT_NOTE');
+  assert.deepEqual(copied.favorites,[]);assert.deepEqual(app.stored(),initial);
+  assert.equal(app.get('confirm-dialog').open,true);await app.click('cancel-import');assert.deepEqual(app.stored(),initial);
 });

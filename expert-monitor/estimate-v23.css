@@ -1,0 +1,53 @@
+/* v2.3 estimate editing: keyboard actions, visible validation, and private output. */
+.estimate-row-actions {display:grid;grid-template-columns:repeat(2,minmax(32px,1fr));gap:4px;}
+.estimate-row-actions .icon-button {width:34px;min-width:34px;height:34px;min-height:34px;}
+.estimate-table th:last-child,.estimate-row > td:last-child {width:96px;}
+.estimate-row select,.estimate-row [data-estimate-field="unit"] {margin-top:8px;}
+.estimate-row-actions button:disabled {opacity:.35;cursor:default;}
+.estimate-field-error {display:block;margin:5px 0 8px;color:#9d2f26;font-size:11px;line-height:1.5;overflow-wrap:anywhere;}
+.estimate-field-error[hidden] {display:none;}
+.estimate-table [aria-invalid="true"],.estimate-summary [aria-invalid="true"] {border-color:#b4463d;box-shadow:0 0 0 1px #b4463d33;}
+.estimate-progress {display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px;color:var(--muted,#62756a);font-size:12px;}
+.estimate-progress progress {width:min(220px,42%);height:7px;accent-color:var(--green,#277653);}
+.estimate-copy-source {padding:12px 14px;margin:0 0 18px;border:1px solid var(--line,#dce7de);border-radius:10px;background:#f7faf7;font-size:12px;}
+.estimate-copy-source summary {cursor:pointer;font-weight:600;}
+.estimate-copy-controls {display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.estimate-copy-controls select {flex:1 1 260px;min-width:0;max-width:100%;padding:10px;border:1px solid var(--line,#dce7de);border-radius:7px;background:white;font:inherit;}
+.estimate-subtotal {color:#56735f;font-size:12px;}
+.estimate-validation-summary {margin:14px 0;}
+.estimate-validation-summary .link-button {text-align:left;font-size:12px;white-space:normal;}
+.estimate-validation-summary [hidden] {display:none;}
+.estimate-export-tools {display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#dce7de);}
+.estimate-export-tools>span {font-size:11px;color:var(--muted,#62756a);margin-right:auto;}
+.estimate-saved-toolbar {display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,.6fr);gap:14px;padding:0 22px 16px;}
+.estimate-saved-toolbar .field {min-width:0;}
+.estimate-saved-toolbar input,.estimate-saved-toolbar select {width:100%;min-width:0;font:inherit;padding:10px;border:1px solid var(--line,#dce7de);border-radius:7px;background:#fff;}
+.estimate-saved-empty {padding:18px 22px;color:var(--muted,#62756a);font-size:13px;}
+@media(max-width:600px){
+  .estimate-row-actions {display:flex;flex-wrap:wrap;gap:8px;}
+  .estimate-row-actions .icon-button {width:40px;min-width:40px;height:40px;min-height:40px;}
+  .estimate-table th:last-child,.estimate-row > td:last-child {width:auto;}
+  .estimate-toolbar>.button {white-space:normal;text-align:left;}
+  .estimate-copy-controls {display:grid;grid-template-columns:minmax(0,1fr);}
+  .estimate-copy-controls select {width:100%;}
+  .estimate-progress {gap:10px;font-size:11px;}
+  .estimate-saved-toolbar {grid-template-columns:minmax(0,1fr);padding:0 16px 14px;}
+  .estimate-export-tools>span {flex-basis:100%;}
+}
+@media print {
+  .estimate-print-document {color:#111;font:11pt/1.45 Arial,sans-serif;}
+  .estimate-print-document h1 {font-size:20pt;margin:0 0 8mm;}
+  .estimate-print-document h2 {font-size:13pt;margin:6mm 0 3mm;overflow-wrap:anywhere;}
+  .estimate-print-document p {margin:3mm 0;overflow-wrap:anywhere;}
+  .estimate-print-status {font-weight:bold;font-size:10pt;}
+  .estimate-print-document table {width:100%;border-collapse:collapse;table-layout:fixed;font-size:9pt;margin:5mm 0;}
+  .estimate-print-document th,.estimate-print-document td {border:1px solid #999;padding:2mm;vertical-align:top;overflow-wrap:anywhere;}
+  .estimate-print-document th:first-child,.estimate-print-document td:first-child {width:5%;}
+  .estimate-print-document th:nth-child(3),.estimate-print-document td:nth-child(3) {width:29%;}
+  .estimate-print-document thead {display:table-header-group;}
+  .estimate-print-document tr {break-inside:avoid;}
+  .estimate-print-document dl {margin:5mm 0 5mm auto;max-width:110mm;}
+  .estimate-print-document dl>div {display:flex;justify-content:space-between;gap:5mm;border-bottom:1px solid #ccc;padding:2mm 0;}
+  .estimate-print-document dd {margin:0;text-align:right;white-space:nowrap;}
+  .estimate-print-notes {white-space:pre-wrap;}
+}

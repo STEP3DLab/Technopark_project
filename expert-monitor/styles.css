@@ -7149,6 +7149,7 @@ button.agenda-title:hover, a.agenda-title:hover {
     font-size: 21px;
   }
   .estimate-footer {
+    position: static;
     gap: 9px;
     padding: 14px 15px max(14px, env(safe-area-inset-bottom));
   }

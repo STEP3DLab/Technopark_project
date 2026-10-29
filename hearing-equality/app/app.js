@@ -1,6 +1,6 @@
 import { initUI, setItems, setSelection, setPlayback, setMessage, setReady, setMode, setLoop, setTour, showToast, revealViewer } from './ui.js?v=0.3';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
-import { CanvasAvatar } from './canvas-avatar.js?v=0.10.1';
+import { CanvasAvatar } from './canvas-avatar.js?v=0.11.0';
 
 const video = document.getElementById('reference-video');
 const cache = new Map();
@@ -23,6 +23,18 @@ try {
     if (button) button.disabled = true;
   });
 }
+const smoothingButton = document.getElementById('studio-smoothing');
+let motionSmoothing = true;
+function setMotionSmoothing(enabled) {
+  motionSmoothing = Boolean(enabled);
+  avatar?.setSmoothing?.(motionSmoothing);
+  smoothingButton.setAttribute('aria-pressed', String(motionSmoothing));
+  smoothingButton.textContent = motionSmoothing ? 'Плавные движения' : 'Без сглаживания';
+  smoothingButton.title = motionSmoothing ? 'Выключите, чтобы видеть исходные координаты без сглаживания.' : 'Включите, чтобы уменьшить мелкое дрожание движения.';
+}
+smoothingButton.disabled = !avatar;
+setMotionSmoothing(true);
+smoothingButton.onclick = () => setMotionSmoothing(!motionSmoothing);
 const usesVideo = () => state.mode !== 'avatar';
 const activeVideo = () => state.item && video.currentSrc === new URL(state.item.video, document.baseURI).href;
 const demoVisible = () => !document.hidden && !document.getElementById('panel-demo').hidden;

@@ -7,6 +7,7 @@ const distance = (a,b,w,h) => Math.hypot((a[0]-b[0])*w,(a[1]-b[1])*h);
 export function prepareMotion(data) {
   const frames=(data.frames||[]).map(f=>({...f,pose:f.pose||f.pose33}));
   const width=Number(data.width)||1,height=Number(data.height)||1;
+  const observedHands=Object.fromEntries(['left','right'].map(key=>[key,frames.map(frame=>completeHand(frame[key]))]));
   let filled=0,missing=0;
   for(const key of ['left','right']) {
     for(let i=0;i<frames.length;) {
@@ -22,8 +23,114 @@ export function prepareMotion(data) {
       } else {for(let k=start;k<i;k++)frames[k][key]=null;missing+=count;}
     }
   }
-  return{frames,filled,missing,fps:Number(data.fps)||30};
+  return{frames,filled,missing,fps:Number(data.fps)||30,width,height,observedHands,faceIndices:data.face_indices||[]};
 }
+
+// Offline symmetric filtering has no causal lag or accumulated playback state.
+// Only small XY translations are denoised. A hand's 21 points always receive
+// the SAME correction: finger shape, hand orientation and all Z/confidence
+// coordinates at recorded instants remain unchanged. No limb is synthesized.
+export const SMOOTHING_LIMITS=Object.freeze({body:.004,hand:.008,elbow:.005,head:.003,slow:.5,fast:2.0});
+const smoothedTracks=new WeakMap();
+const clamp01=value=>Math.max(0,Math.min(1,value));
+const smoothstep=(lo,hi,value)=>{const t=clamp01((value-lo)/(hi-lo));return t*t*(3-2*t);};
+const length=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+const median=values=>{const sorted=[...values].sort((a,b)=>a-b);return sorted[Math.floor(sorted.length/2)]||1;};
+const zero=()=>[0,0];
+
+function smoothTrack(track) {
+  if(smoothedTracks.has(track))return smoothedTracks.get(track);
+  const frames=track.frames,n=frames.length,w=track.width||1,h=track.height||1;
+  const point=p=>validPoint(p)?[p[0]*w,p[1]*h]:null;
+  const body=frames.map(frame=>{
+    const a=frame.pose?.[11],b=frame.pose?.[12];
+    return validPoint(a)&&validPoint(b)&&(a[3]??1)>.45&&(b[3]??1)>.45?[(a[0]+b[0])*w/2,(a[1]+b[1])*h/2]:null;
+  });
+  const scale=median(frames.flatMap(frame=>validPoint(frame.pose?.[11])&&validPoint(frame.pose?.[12])?[distance(frame.pose[11],frame.pose[12],w,h)]:[]));
+  const relative=(p,i)=>point(p)&&body[i]?[p[0]*w-body[i][0],p[1]*h-body[i][1]]:null;
+  const wrists=Object.fromEntries(['left','right'].map(key=>[key,frames.map((frame,i)=>completeHand(frame[key])?relative(frame[key][0],i):null)]));
+  const elbows={left:frames.map((frame,i)=>relative(frame.pose?.[13],i)),right:frames.map((frame,i)=>relative(frame.pose?.[14],i))};
+  const headIndices=[10,152,234,454].map(id=>track.faceIndices?.indexOf(id)).filter(id=>id>=0);
+  const heads=frames.map((frame,i)=>{
+    if(!body[i]||headIndices.length<2||headIndices.some(id=>!validPoint(frame.face?.[id])))return null;
+    const center=headIndices.reduce((sum,id)=>[sum[0]+frame.face[id][0],sum[1]+frame.face[id][1]],[0,0]).map(value=>value/headIndices.length);
+    return relative(center,i);
+  });
+  const hasWindow=(anchors,i,observed)=>i>=2&&i<n-2&&anchors.slice(i-2,i+3).every(Boolean)&&(!observed||observed.slice(i-2,i+3).every(Boolean));
+  const windowSpeed=(anchors,i)=>Math.max(...Array.from({length:4},(_,k)=>length(anchors[i+k-2],anchors[i+k-1])))*track.fps/scale;
+  const shift=(anchors,i,limit,observed)=>{
+    if(!hasWindow(anchors,i,observed))return zero();
+    const center=anchors[i];
+    // An exact hold/contact plateau must stay exact, including its first frame.
+    if(length(center,anchors[i-1])<scale*1e-9||length(center,anchors[i+1])<scale*1e-9)return zero();
+    const strength=.9*(1-smoothstep(SMOOTHING_LIMITS.slow,SMOOTHING_LIMITS.fast,windowSpeed(anchors,i)));
+    if(strength===0)return zero();
+    const kernel=[1,4,6,4,1];
+    const correction=[0,1].map(axis=>strength*(kernel.reduce((sum,weight,k)=>sum+weight*anchors[i+k-2][axis],0)/16-center[axis]));
+    const magnitude=Math.hypot(...correction),bound=limit*scale;
+    return magnitude>bound?correction.map(value=>value*bound/magnitude):correction;
+  };
+  // A conservative projected-proximity guard, not a claim of 3-D contact
+  // detection. Protect hand-to-hand, hand-to-face and opposite-arm approaches.
+  const contacts=Object.fromEntries(['left','right'].map(side=>[side,frames.map(frame=>{
+    if(!completeHand(frame[side]))return 0;
+    const opposite=side==='left'?'right':'left';
+    const targets=[...(frame[opposite]||[]),...(frame.face||[]),frame.pose?.[11],frame.pose?.[12],frame.pose?.[side==='left'?14:13]].filter(validPoint);
+    let nearest=Infinity;
+    for(const a of frame[side])for(const b of targets)nearest=Math.min(nearest,distance(a,b,w,h)/scale);
+    return smoothstep(.05,.10,nearest);
+  })]));
+  const contactWeight=(side,i)=>Math.min(...contacts[side].slice(Math.max(0,i-1),Math.min(n,i+2)));
+  const shifts=frames.map((_,i)=>{
+    const global=shift(body,i,SMOOTHING_LIMITS.body),hands={},arms={};
+    const sharedContactWeight=Math.min(contactWeight('left',i),contactWeight('right',i));
+    for(const side of ['left','right']){
+      const observed=track.observedHands?.[side],weight=contactWeight(side,i);
+      hands[side]=shift(wrists[side],i,SMOOTHING_LIMITS.hand,observed).map(value=>value*weight);
+      // Either hand may be touching the opposite forearm: protect both elbows.
+      arms[side]=shift(elbows[side],i,SMOOTHING_LIMITS.elbow,observed).map(value=>value*sharedContactWeight);
+    }
+    const head=shift(heads,i,SMOOTHING_LIMITS.head).map(value=>value*sharedContactWeight);
+    return{global,hands,arms,head};
+  });
+  const move=(p,delta)=>validPoint(p)&&(delta[0]!==0||delta[1]!==0)?p.map((value,axis)=>axis===0?value+delta[0]/w:axis===1?value+delta[1]/h:value):p;
+  const add=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+  const output=frames.map((frame,i)=>{
+    const delta=shifts[i],result={...frame};
+    for(const side of ['left','right'])if(frame[side])result[side]=frame[side].map(p=>move(p,add(delta.global,delta.hands[side])));
+    if(frame.face)result.face=frame.face.map(p=>move(p,add(delta.global,delta.head)));
+    if(frame.pose)result.pose=frame.pose.map((p,index)=>{
+      const local=index<11?delta.head:index===13?delta.arms.left:index===14?delta.arms.right:index===15?delta.hands.left:index===16?delta.hands.right:zero();
+      return move(p,add(delta.global,local));
+    });
+    return result;
+  });
+  let before2=0,after2=0,count=0,lowBefore2=0,lowAfter2=0,lowCount=0,offset2=0,maxOffset=0,points=0,contactFrames=0,fastFrames=0;
+  for(const side of ['left','right'])for(let i=0;i<n;i++){
+    if(contactWeight(side,i)<1)contactFrames++;
+    if(hasWindow(wrists[side],i,track.observedHands?.[side])&&windowSpeed(wrists[side],i)>=SMOOTHING_LIMITS.fast)fastFrames++;
+    if(!completeHand(frames[i][side])||!completeHand(output[i][side]))continue;
+    const offset=distance(frames[i][side][0],output[i][side][0],w,h)/scale;
+    offset2+=offset*offset;maxOffset=Math.max(maxOffset,offset);points++;
+    if(i<1||i>=n-1||![frames[i-1],frames[i+1]].every(frame=>completeHand(frame[side])))continue;
+    const residual=source=>{
+      const a=point(source[i-1][side][0]),b=point(source[i][side][0]),c=point(source[i+1][side][0]);
+      return length(b,[(a[0]+c[0])/2,(a[1]+c[1])/2])/scale;
+    };
+    const before=residual(frames),after=residual(output);before2+=before*before;after2+=after*after;count++;
+    if(hasWindow(wrists[side],i,track.observedHands?.[side])&&windowSpeed(wrists[side],i)<SMOOTHING_LIMITS.slow){lowBefore2+=before*before;lowAfter2+=after*after;lowCount++;}
+  }
+  const rms=(sum,num)=>num?Math.sqrt(sum/num):0;
+  const metrics={method:'symmetric-adaptive-translation',radius:2,shoulderPixels:scale,frames:n,wristSamples:count,
+    wristCurvatureBefore:rms(before2,count),wristCurvatureAfter:rms(after2,count),
+    slowWristCurvatureBefore:rms(lowBefore2,lowCount),slowWristCurvatureAfter:rms(lowAfter2,lowCount),slowWristSamples:lowCount,
+    rmsWristCorrection:rms(offset2,points),maxWristCorrection:maxOffset,contactProtectedHandFrames:contactFrames,fastProtectedHandFrames:fastFrames};
+  const result={frames:output,metrics};smoothedTracks.set(track,result);return result;
+}
+
+// Curvature is a high-frequency-motion proxy, not a linguistic accuracy score.
+// Metrics are normalized to the clip's median projected shoulder width.
+export function getSmoothingMetrics(track){return track?.frames?.length?{...smoothTrack(track).metrics}:null;}
 
 // Shape-preserving cubic: continuous velocity without inventing overshoot.
 // A reversal has zero tangent; every recorded instant remains exact.
@@ -35,8 +142,9 @@ export function interpolateCoordinate(prev,a,b,next,t){
   return (2*t3-3*t2+1)*a+(t3-2*t2+t)*m0+(-2*t3+3*t2)*b+(t3-t2)*m1;
 }
 
-export function sampleMotion(track,time) {
-  const frames=track?.frames;if(!frames?.length)return null;
+export function sampleMotion(track,time,{smooth=false}={}) {
+  if(!track?.frames?.length)return null;
+  const frames=smooth?smoothTrack(track).frames:track.frames;
   const at=Math.max(0,Math.min(frames.length-1,(Number(time)||0)*track.fps));
   const lo=Math.floor(at),hi=Math.min(frames.length-1,lo+1),t=at-lo;
   const a=frames[lo],b=frames[hi],prev=frames[Math.max(0,lo-1)],next=frames[Math.min(frames.length-1,hi+1)];

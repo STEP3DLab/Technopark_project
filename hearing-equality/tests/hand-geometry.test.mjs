@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {handMetrics,traceDigit} from '../app/hand-geometry.js';
+import {paintHand,skinMaterial} from '../app/avatar-hands.js';
+import {readFileSync,readdirSync} from 'node:fs';
 
 // Sample the emitted contours independently of Canvas. This checks the filled
 // geometry, rather than only checking that drawing commands receive numbers.
@@ -105,4 +107,80 @@ test('fist material thickness follows adjacent knuckles rather than shortened cu
  const m=handMetrics(p,320);
  assert.ok(m.fingerRadius*2>=38*.85);assert.ok(m.fingerRadius*2<=38);
  assert.ok(m.wristRadius>=m.fingerRadius*1.2);
+});
+
+function surfaceRecorder(){
+ const fills=[],paths=[],state={depth:0,strokes:0};let path=[];
+ const point=(...values)=>{assert.ok(values.every(Number.isFinite));path.push(values);};
+ const ctx=new Proxy({
+  save(){state.depth++;},restore(){assert.ok(state.depth>0);state.depth--;},
+  beginPath(){path=[];paths.push(path);},moveTo:point,lineTo:point,
+  quadraticCurveTo:point,closePath(){},
+  arc(...values){assert.ok(values[2]>0);point(...values.slice(0,5));},
+  fill(){fills.push([...path]);},stroke(){state.strokes++;},
+  createLinearGradient(...values){assert.ok(values.every(Number.isFinite));return {addColorStop(position,color){assert.ok(position>=0&&position<=1);assert.equal(typeof color,'string');}}},
+ },{get:(o,key)=>{if(key in o)return o[key];throw new Error(`Unexpected canvas method: ${String(key)}`);}});
+ return {ctx,state,fills,paths};
+}
+
+test('hand surfaces reject incomplete inputs without drawing or changing canvas state',()=>{
+ for(const points of [null,[],Array.from({length:20},()=>[0,0]),Array.from({length:21},(_,i)=>[i===10?NaN:0,0])]){
+  const {ctx,state,fills,paths}=surfaceRecorder();assert.equal(paintHand(ctx,points,200),false);
+  assert.equal(state.depth,0);assert.deepEqual(fills,[]);assert.deepEqual(paths,[]);
+ }
+});
+
+test('extended fingers use continuous fills without knuckle rings, and palm does not inflate the wrist',()=>{
+ const points=Array.from({length:21},()=>[0,0,0]);points[0]=[0,80,0];
+ for(let finger=0;finger<5;finger++){
+  const base=1+finger*4,x=(finger-2)*15;
+  for(let joint=0;joint<4;joint++)points[base+joint]=[x,25-joint*18,0];
+ }
+ const metrics=handMetrics(points,200),{ctx,state,fills}=surfaceRecorder();
+ assert.equal(paintHand(ctx,points,200),true);assert.equal(state.depth,0);
+ assert.equal(fills.length,6);assert.equal(state.strokes,0,'straight fingers do not acquire decorative rings');
+ const palm=fills[0];
+ const vertices=palm.flatMap(command=>Array.from({length:command.length/2},(_,i)=>command.slice(i*2,i*2+2)));
+ assert.ok(vertices.every(p=>p[1]<=80),'palm surface never extends behind this wrist');
+ const wristPoints=vertices.filter(p=>p[1]===80);
+ assert.ok(wristPoints.length>=2);
+ assert.ok(wristPoints.every(p=>Math.abs(p[0])<=metrics.wristRadius+1e-8),'wrist remains within the shared forearm width');
+});
+
+test('hand painter preserves recorded joints and restores canvas state across the real motion corpus',()=>{
+ const root=new URL('../app/assets/motion/',import.meta.url),skin={base:'#D6B49A',light:'#EBD1B9',shade:'#AF866C',line:'#76513C'};
+ for(const file of readdirSync(root).filter(name=>name.endsWith('.json'))){
+  const clip=JSON.parse(readFileSync(new URL(file,root)));
+  for(const frame of clip.frames)for(const side of ['left','right']){
+   if(frame[side]?.length!==21)continue;
+   const points=Object.freeze(frame[side].map(p=>Object.freeze([p[0]*clip.width,p[1]*clip.height,p[2]])));
+   const pose=frame.pose||frame.pose33,shoulder=Math.hypot((pose[11][0]-pose[12][0])*clip.width,(pose[11][1]-pose[12][1])*clip.height);
+   const {ctx,state,fills}=surfaceRecorder();assert.equal(paintHand(ctx,points,shoulder,skin),true);
+   assert.equal(state.depth,0);assert.equal(fills.length,6);
+  }
+ }
+ for(const shoulder of [0,NaN,1,150]){
+  const {ctx,state}=surfaceRecorder();assert.equal(paintHand(ctx,Array.from({length:21},()=>[5,5,0]),shoulder,skin),true);assert.equal(state.depth,0);
+ }
+});
+
+test('matte skin illumination remains continuous as a limb crosses the previous normal-flip angle',()=>{
+ const palette={base:'#D6B49A',light:'#EBD1B9',shade:'#AF866C',line:'#76513C'};
+ const sample=angle=>{
+  const record={coordinates:null,stops:[]};
+  const ctx={createLinearGradient(...coordinates){record.coordinates=coordinates;return {addColorStop(position,color){record.stops.push({position,rgb:color.match(/[\d.]+/g).map(Number)});}};}};
+  const direction=[Math.cos(angle),Math.sin(angle)];
+  skinMaterial(ctx,[-direction[0]*50,-direction[1]*50],[direction[0]*50,direction[1]*50],8,palette);
+  return record;
+ };
+ const oldBoundary=Math.atan2(.76,.65),epsilon=1e-6;
+ for(const boundary of [oldBoundary,oldBoundary+Math.PI]){
+  const before=sample(boundary-epsilon),after=sample(boundary+epsilon);
+  for(let i=0;i<4;i++)assert.ok(Math.abs(before.coordinates[i]-after.coordinates[i])<.001,'gradient direction never jumps to the opposite side');
+  for(let i=0;i<before.stops.length;i++)for(let channel=0;channel<3;channel++)assert.ok(Math.abs(before.stops[i].rgb[channel]-after.stops[i].rgb[channel])<=1,'matte color changes continuously');
+ }
+ // Reversing a segment is the same physical cylinder, with gradient stops
+ // traversed in reverse. Its light must not depend on landmark ordering.
+ const forward=sample(.4),reverse=sample(.4+Math.PI);
+ for(let i=0;i<forward.stops.length;i++)assert.deepEqual(forward.stops[i].rgb,reverse.stops.at(-1-i).rgb);
 });

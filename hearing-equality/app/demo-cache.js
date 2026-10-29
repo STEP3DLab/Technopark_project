@@ -1,6 +1,6 @@
 // Only curated, same-origin demonstration assets are stored. Camera models,
 // microphone audio, uploaded files and conversation content are never cached.
-export const APP_VERSION = '0.10.1';
+export const APP_VERSION = '0.11.0';
 export const APP_BASE = new URL('./', import.meta.url);
 export const CACHE_PREFIX = `hearing-equality-demo:${APP_BASE.pathname}:`;
 export const CACHE_NAME = `${CACHE_PREFIX}${APP_VERSION}`;
@@ -14,6 +14,7 @@ const STATIC_FILES = [
   'platform.css', 'dialogue.css', 'rgsu.css', 'showcase.css',
   'platform.js', 'canvas-avatar.js', 'vision.js', 'catalog.js', 'recognizer.js',
   'session.js', 'trial-protocol.js', 'avatar-motion.js', 'hand-geometry.js',
+  'avatar-hands.js', 'avatar-framing.js',
   'showcase.js', 'demo-cache.js',
   'fonts/manrope.woff2', 'assets/brand/rgsu-blue.svg', 'assets/brand/rgsu-white.svg',
   'assets/sources/slovo-sources.json', 'assets/recognition-library.json', 'assets/evaluation-v07.json',

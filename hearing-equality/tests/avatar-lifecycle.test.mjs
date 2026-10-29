@@ -25,7 +25,7 @@ test('hidden scene defers interpolation and displays the latest requested time w
  setSize(0,0);avatar.resize();avatar.showAt(.2);avatar.showAt(.7);
  assert.equal(reads,0);assert.strictEqual(avatar.frame,frame);assert.equal(avatar.time,.7);
  setSize(340,420);avatar.resize();assert.ok(reads>0);
- assert.deepEqual(avatar.frame,sampleMotion(avatar.track,.7));
+ assert.deepEqual(avatar.frame,sampleMotion(avatar.track,.7,{smooth:true}));
 }));
 
 test('same-size resize keeps the bitmap, while DPR and size changes update it',()=>fixture(({avatar,canvas,setSize,writes})=>{
@@ -50,4 +50,15 @@ test('closed recorded eyelids stay a closed contour rather than a minimum-height
  avatar.ctx.moveTo=(x,y)=>polygon.push([x,y]);avatar.ctx.lineTo=(x,y)=>polygon.push([x,y]);avatar.ctx.ellipse=()=>ellipses++;
  avatar.drawEye([[0,10],[3,10],[7,10],[10,10],[7,10],[3,10]],40);
  assert.equal(ellipses,0);assert.ok(polygon.length>=6);assert.ok(polygon.every(p=>p[1]===10));
+}));
+
+// A still frame must immediately reflect the chosen presentation mode.
+test('smoothing can be toggled at the same timestamp without moving the playback position',()=>fixture(({avatar})=>{
+ avatar.showAt(.45);const time=avatar.time;
+ assert.equal(avatar.smoothing,true);
+ avatar.setSmoothing(false);assert.equal(avatar.time,time);
+ assert.deepEqual(avatar.frame,sampleMotion(avatar.track,time));
+ avatar.setSmoothing(true);assert.equal(avatar.time,time);
+ assert.deepEqual(avatar.frame,sampleMotion(avatar.track,time,{smooth:true}));
+ assert.equal(avatar.container.dataset.smoothing,'smooth');
 }));

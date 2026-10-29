@@ -52,7 +52,12 @@ async function harness({fetchResponse,beforeReady}={}){
   get('avatar-focus').append(get('avatar-focus-label'));
   const nav=['text','camera','video','about'].map(mode=>{const el=new El();el.dataset.mode=mode;return el;});
   const document={hidden:false,activeElement:null,getElementById:get,createElement:()=>new El(),querySelectorAll:()=>nav,querySelector:selector=>selector==='.avatar-card'?get('avatar-card'):new El(),addEventListener(){}};
-  class Avatar{load(){}clear(){}resize(){}showAt(){}setScene(){}setAppearance(){}}
+  const avatars=new Map();
+  class Avatar{
+    constructor(container){avatars.set(container.id,this);this.smoothing=true;}
+    load(){}clear(){}resize(){}showAt(){}setScene(){}setAppearance(){}
+    setSmoothing(enabled){this.smoothing=enabled;}
+  }
   const track=new EventTarget();track.stop=()=>{stopped++;};
   const stream={getTracks:()=>[track]};
   const defaultFetch=async url=>({ok:true,json:async()=>url.includes('slovo-sources')?manifest:url.includes('recognition-library')?library:url.includes('evaluation-v07')?benchmark:motionByUrl.get(url)});
@@ -66,10 +71,26 @@ async function harness({fetchResponse,beforeReady}={}){
   });
   const ready=vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,showResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare,setVisualMode};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
-  const controls={get,document,timers,window:context.window,endCamera:()=>track.dispatchEvent(new Event('ended')),frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
+  const controls={get,document,timers,avatars,window:context.window,endCamera:()=>track.dispatchEvent(new Event('ended')),frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const callbacks=[...timers.values()];timers.clear();for(const cb of callbacks)cb();},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
   await beforeReady?.(controls);
   return{...controls,api:await ready};
 }
+
+test('smoothing toggles both avatars without restarting playback, changing the word or seeking source video',async()=>{
+  const h=await harness(),button=h.get('motion-smoothing');
+  assert.equal(button.getAttribute('aria-pressed'),'true');
+  h.api.setCompare(true);await h.api.playAvatar();h.get('source-video').currentTime=.4;h.frame(16);
+  const time=h.api.s.time,selected=h.api.s.selected,data=h.api.s.data,playToken=h.api.s.playbackToken;
+  button.click();
+  assert.equal(button.getAttribute('aria-pressed'),'false');
+  for(const id of ['platform-avatar','dialogue-avatar'])assert.equal(h.avatars.get(id).smoothing,false);
+  assert.equal(h.api.s.time,time);assert.equal(h.api.s.playing,true);assert.equal(h.api.s.playbackToken,playToken);
+  assert.equal(h.get('source-video').currentTime,.4);assert.equal(h.api.s.selected,selected);assert.equal(h.api.s.data,data);
+  h.get('source-video').currentTime=.7;h.frame(16);assert.equal(h.api.s.time,.7);
+  button.click();
+  for(const id of ['platform-avatar','dialogue-avatar'])assert.equal(h.avatars.get(id).smoothing,true);
+  assert.equal(button.getAttribute('aria-pressed'),'true');assert.equal(h.api.s.playing,true);assert.equal(h.api.s.time,.7);
+});
 
 test('a stalled initial motion body times out, leaves controls usable and cannot replace a later successful retry',async()=>{
   let stalled=false,signal,releaseBody,stalledMotion;

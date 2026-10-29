@@ -298,3 +298,17 @@ button{touch-action:manipulation}
   .avatar-card .stage,.avatar-card .stage.compare{height:310px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Avatar motion: one optional, reversible display setting. */
+.motion-smoothing{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:7px 11px;border:1px solid #C6D9DE;border-radius:8px;background:#F0F7F5;color:#355F59;font:600 10px/1.4 Manrope,Arial,sans-serif;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+.motion-smoothing:before{content:'';width:6px;height:6px;border-radius:50%;background:#5C9781;flex:none}
+.motion-smoothing[aria-pressed=false]{background:#F4F6FA;border-color:#D9E0EB;color:#68788E}
+.motion-smoothing[aria-pressed=false]:before{background:#A0AEC0}
+.motion-smoothing:hover{border-color:#8AAFA7;background:#E7F2EE}
+.motion-smoothing:focus-visible{outline:3px solid #749CDE;outline-offset:3px}
+
+.avatar-card .stage-foot{display:flex;flex-wrap:wrap;align-items:center;gap:9px 12px;padding-top:2px}
+.avatar-card .stage-foot>span{flex:1;min-width:150px;font-size:10px;line-height:1.55}
+.avatar-card .stage-foot .motion-smoothing{margin-left:auto}
+.avatar-card .stage-foot>a{margin:0;flex:none;font-size:10px}
+@media(max-width:700px){.motion-smoothing{min-height:42px;font-size:11px}.avatar-card .stage-foot>span{flex-basis:100%}.avatar-card .stage-foot .motion-smoothing{margin-left:0}}

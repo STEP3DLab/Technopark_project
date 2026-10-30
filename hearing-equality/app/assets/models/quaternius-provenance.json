@@ -1,0 +1,27 @@
+{
+  "name": "Quaternius Universal Base Characters — Standard",
+  "author": "Quaternius",
+  "license": "CC0-1.0",
+  "source": "https://quaternius.com/packs/universalbasecharacters.html",
+  "download_page": "https://quaternius.itch.io/universal-base-characters",
+  "downloaded_utc": "2026-10-30",
+  "archive": "Universal Base Characters[Standard].zip",
+  "archive_sha256": "fdbf1804c90dfc1ea03e992bff7da2dfd1a79318e13270a660180f9308455f40",
+  "sources": [
+    "Base Characters/Godot - UE/Superhero_Male_FullBody.gltf",
+    "Hairstyles/Origin at 0/glTF (Godot)/Hair_SimpleParted.gltf"
+  ],
+  "output": "quaternius-communicator.glb",
+  "output_sha256": "9f68ba3e60d2561271777dc53a5a61b552579314ba65efc96b1b468fe55a974f",
+  "bones": 65,
+  "triangles": 23707,
+  "bytes": 1072844,
+  "adaptation": [
+    "Original artist-made surface and joint hierarchy",
+    "Interpolated subdivision along clothing boundaries",
+    "Original base-color textures sampled into vertex colors",
+    "Navy uniform, dark parted hair",
+    "Original bind matrices retained; additional boundary vertices use interpolated skin weights"
+  ],
+  "animations": "Recorded Slovo motions retargeted at runtime; not embedded in GLB"
+}

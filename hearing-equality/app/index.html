@@ -4,15 +4,15 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#223260"><meta name="description" content="Помощник для общения: составьте сообщение, покажите крупно, озвучьте, скопируйте или передайте в другое приложение. Экспериментальное распознавание шести слов РЖЯ.">
 <title>Равенство по слуху · помощник для общения</title>
-<link rel="stylesheet" href="platform.css?v=0.15.0">
-<link rel="stylesheet" href="dialogue.css?v=0.15.0">
-<link rel="stylesheet" href="rgsu.css?v=0.15.0">
-<link rel="stylesheet" href="showcase.css?v=0.15.0">
-<link rel="stylesheet" href="communication.css?v=0.15.0">
-<link rel="stylesheet" href="practical.css?v=0.15.0">
+<link rel="stylesheet" href="platform.css?v=0.17.0">
+<link rel="stylesheet" href="dialogue.css?v=0.17.0">
+<link rel="stylesheet" href="rgsu.css?v=0.17.0">
+<link rel="stylesheet" href="showcase.css?v=0.17.0">
+<link rel="stylesheet" href="communication.css?v=0.17.0">
+<link rel="stylesheet" href="practical.css?v=0.17.0">
 <link rel="icon" type="image/svg+xml" href="assets/brand/rgsu-blue.svg">
-<link rel="stylesheet" href="avatar-3d.css?v=0.15.0">
-<link rel="stylesheet" href="simple-ui.css?v=0.16.0">
+<link rel="stylesheet" href="avatar-3d.css?v=0.17.0">
+<link rel="stylesheet" href="simple-ui.css?v=0.17.0">
 </head>
 <body>
 <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -165,7 +165,7 @@
     </div>
   </div>
   <div class="avatar-words"><div class="small-heading" id="avatar-words-label">Выберите жест</div><div id="word-chips" class="word-chips" role="group" aria-labelledby="avatar-words-label"></div></div>
-  <div id="avatar-footer" class="stage-foot"><span>Записанное движение · понятность аватара проверяется в пилоте.</span><button id="motion-smoothing" class="motion-smoothing" type="button" aria-pressed="true" title="Выключите, чтобы видеть исходные координаты без сглаживания.">Плавные движения</button><a href="assets/models/rgsu-human-rig.glb" download>Модель .glb ↓</a><a href="studio.html?outfit=indigo">Студия ↗</a></div>
+  <div id="avatar-footer" class="stage-foot"><span>Записанное движение · понятность аватара проверяется в пилоте.</span><button id="motion-smoothing" class="motion-smoothing" type="button" aria-pressed="true" title="Выключите, чтобы видеть исходные координаты без сглаживания.">Плавные движения</button><a href="assets/models/quaternius-communicator.glb" download>Модель .glb ↓</a><a href="studio.html?outfit=indigo">Студия ↗</a></div>
 </section>
 </div>
 <div class="workflow-strip"><div><span>1</span><p><b>Введите слово</b>или используйте голос</p></div><svg><use href="#i-arrow"/></svg><div><span>2</span><p><b>Откройте жест</b>из записанного словаря</p></div><svg><use href="#i-arrow"/></svg><div><span>3</span><p><b>Сравните движение</b>аватара и человека</p></div></div>
@@ -203,7 +203,7 @@
 <article class="card technology-card"><span class="technology-tag pending">Анонс · статус проверен</span><h3>SignGemma</h3><p>Google анонсировал открытую модель понимания жестовых языков. В проверенном журнале релизов Gemma её выпуск не указан.</p><p class="hint">На 29 октября 2026 года доступные веса и публичный API не подтверждены. Интеграция в прототип не заявляется.</p><a href="https://ai.google.dev/gemma/docs/releases" target="_blank" rel="noopener">Официальные релизы ↗</a></article>
 <article class="card technology-card ours"><span class="technology-tag">РЖЯ · наш прототип</span><h3>MediaPipe + образцы</h3><p>MediaPipe Holistic выделяет координаты. Алгоритм сравнивает движения с образцами шести слов, затем человек подтверждает результат.</p><p class="hint">Работаем над русским жестовым языком, двусторонним диалогом и оценкой понятности аватара.</p><a href="https://github.com/STEP3DLab/Technopark_project/blob/main/hearing-equality/docs/GOOGLE_SIGN_REVIEW_2026-10.md" target="_blank" rel="noopener">Разбор и источники ↗</a></article></div></section>
 <div class="section-head"><h2>Следующий шаг — измеримый пилот</h2></div><div class="pilot-grid"><article><span>01</span><h3>20 полных сообщений</h3><p>Выбрать один сценарий обслуживания и подготовить переводы с переводчиком и носителями РЖЯ.</p></article><article><span>02</span><h3>Независимая проверка</h3><p>Разделить обучающие и проверочные записи по людям. Измерить ошибки, отказы и задержку на телефонах.</p></article><article><span>03</span><h3>Оценка понимания</h3><p>Сравнить аватар с видео человека и проверить завершение реальных задач общения.</p></article></div>
-<div class="card sources"><h3>Открытые основания проекта</h3><p>Исходные видео и движения: Slovo, специальная публичная лицензия. Выделение координат: MediaPipe Holistic. Сравнение движений: DTW, экспериментальные пороги. Код интерфейса: MIT.</p><div class="button-row"><a class="button ghost" href="https://github.com/STEP3DLab/Technopark_project/tree/main/hearing-equality" target="_blank" rel="noopener">Исходный код ↗</a><a class="button ghost" href="./assets/sources/SLOVO-LICENSE-en.pdf" target="_blank" rel="noopener">Лицензия данных ↗</a><a class="button ghost" href="studio.html?outfit=indigo">Подробная студия ↗</a></div></div>
+<div class="card sources"><h3>Открытые основания проекта</h3><p>Исходные видео и движения: Slovo, специальная публичная лицензия. Выделение координат: MediaPipe Holistic. Сравнение движений: DTW, экспериментальные пороги. 3D-модель: Quaternius, CC0. Код интерфейса: MIT.</p><div class="button-row"><a class="button ghost" href="https://github.com/STEP3DLab/Technopark_project/tree/main/hearing-equality" target="_blank" rel="noopener">Исходный код ↗</a><a class="button ghost" href="./assets/sources/SLOVO-LICENSE-en.pdf" target="_blank" rel="noopener">Лицензия данных ↗</a><a class="button ghost" href="studio.html?outfit=indigo">Подробная студия ↗</a></div></div>
 </section>
 <footer class="footer"><span>Равенство по слуху <b>·</b> РГСУ / Технопарк</span><span>Создаём пространство для понимания</span></footer>
 </main></div>
@@ -217,7 +217,7 @@
 <dialog id="presentation"><div class="presentation-top"><span>РАВЕНСТВО ПО СЛУХУ / НТС</span><button id="close-presentation" class="button ghost">Закрыть ✕</button></div><div class="presentation-body"><span id="slide-kicker" class="step-label"></span><h2 id="slide-title"></h2><p id="slide-copy"></p><div id="slide-cards" class="slide-cards"></div><button id="slide-action" class="button primary"></button></div><div class="presentation-bottom"><span id="slide-count"></span><div class="button-row"><button id="prev-slide" class="button ghost">← Назад</button><button id="next-slide" class="button primary">Далее →</button></div></div></dialog>
 <dialog id="showcase-guide" aria-labelledby="guide-title"><div class="guide-top"><span class="step-label">ПОМОЩЬ В ОБЩЕНИИ</span><button id="close-guide" class="button ghost" type="button" aria-label="Закрыть памятку">Закрыть ✕</button></div><h2 id="guide-title">От сообщения к ответу.</h2><p class="guide-lead">Выбирайте удобный способ ввода. Текст можно изменить перед любым действием.</p><ol class="guide-steps"><li><b>Составьте сообщение</b><span>Напишите в редакторе или выберите быструю фразу. Черновик сохраняется при переходе между разделами.</span></li><li><b>При желании добавьте слово жестом</b><span>Раскройте камеру, включите её и запишите один жест. Экспериментальный словарь содержит шесть слов. Проверьте вариант и нажмите «Добавить в сообщение».</span></li><li><b>Выберите, как передать текст</b><span>Покажите крупно, озвучьте или скопируйте. «Поделиться» открывает меню устройства, если оно поддерживается. Получателя выбираете вы.</span></li><li><b>Получите ответ</b><span>Собеседник может написать или продиктовать текст. «В диалог» и «Добавить ответ» сохраняют реплики только в истории этой вкладки.</span></li><li><b>Сохраните нужное</b><span>Можно скопировать сообщение или весь диалог, а также скачать .txt. Перед закрытием или перезагрузкой страницы сохраните важный текст.</span></li></ol><div class="guide-note"><b>Для показа без сети</b><p>«Подготовить показ» сохраняет интерфейс, словарь, аватар, видео и готовые координаты. При первом запуске модели камеры нужен интернет. Голос и диктовка зависят от браузера. Черновик и история в набор материалов не входят.</p></div><div class="button-row"><button id="guide-communicate" class="button primary" type="button">Открыть общение</button><button id="guide-prepare" class="button ghost" type="button">Подготовить показ</button><button id="guide-start" class="button ghost" type="button">Посмотреть аватар</button><button id="copy-demo-link" class="text-button" type="button">Ссылка на выбранный жест</button></div><p id="guide-feedback" class="hint" role="status"></p></dialog>
 <noscript><p class="no-script">Для работы аватара включите JavaScript в браузере.</p></noscript>
-<script type="module" src="platform.js?v=0.15.0"></script>
-<script type="module" src="showcase.js?v=0.16.0"></script>
-<script type="module" src="simple-ui.js?v=0.16.0"></script>
+<script type="module" src="platform.js?v=0.17.0"></script>
+<script type="module" src="showcase.js?v=0.17.0"></script>
+<script type="module" src="simple-ui.js?v=0.17.0"></script>
 </body></html>

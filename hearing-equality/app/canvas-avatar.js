@@ -1,10 +1,10 @@
 /** Sculptural digital character. Measured signing landmarks remain the motion source.
  * Presentation interpolation is isolated from recognition and never overwrites assets.
  */
-import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.15.0';
-import { handMetrics } from './hand-geometry.js?v=0.15.0';
-import { paintHand, skinMaterial } from './avatar-hands.js?v=0.15.0';
-import { measureAvatarFrame, fitAvatarFrame } from './avatar-framing.js?v=0.15.0';
+import { prepareMotion, sampleMotion, armLayers } from './avatar-motion.js?v=0.17.0';
+import { handMetrics } from './hand-geometry.js?v=0.17.0';
+import { paintHand, skinMaterial } from './avatar-hands.js?v=0.17.0';
+import { measureAvatarFrame, fitAvatarFrame } from './avatar-framing.js?v=0.17.0';
 const OUTFITS = Object.freeze({
   indigo:{body:'#304B78',light:'#4B6B9A',dark:'#1C2E4E',seam:'#8EA6CC',accent:'#FFFFFF'},
   teal:{body:'#356562',light:'#5D8880',dark:'#244B4D',seam:'#9ABBB0',accent:'#C0DDD0'},

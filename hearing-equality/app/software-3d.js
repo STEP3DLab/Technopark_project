@@ -14,9 +14,11 @@ export class Software3DRenderer {
     const lamp=new T.Vector3(-.5,.8,1).normalize(),fill=new T.Vector3(.8,.25,.5).normalize();
     scene.traverse(mesh=>{
       if(!mesh.isSkinnedMesh||!mesh.visible)return;mesh.skeleton.update();
-      const geometry=mesh.geometry,pos=geometry.attributes.position,norm=geometry.attributes.normal,skinIndex=geometry.attributes.skinIndex,skinWeight=geometry.attributes.skinWeight,index=geometry.index.array,count=pos.count,bones=mesh.skeleton.boneMatrices;
-      let arrays=this.cache.get(geometry);if(!arrays){arrays={x:new Float32Array(count),y:new Float32Array(count),z:new Float32Array(count),light:new Float32Array(count)};this.cache.set(geometry,arrays);}const {x:xs,y:ys,z:zs,light}=arrays;
+      const geometry=mesh.geometry,vertexColor=geometry.attributes.color,pos=geometry.attributes.position,norm=geometry.attributes.normal,skinIndex=geometry.attributes.skinIndex,skinWeight=geometry.attributes.skinWeight,index=geometry.index.array,count=pos.count,bones=mesh.skeleton.boneMatrices;
+      let arrays=this.cache.get(geometry);if(!arrays){arrays={x:new Float32Array(count),y:new Float32Array(count),z:new Float32Array(count),light:new Float32Array(count),red:new Float32Array(count),green:new Float32Array(count),blue:new Float32Array(count)};this.cache.set(geometry,arrays);}const {x:xs,y:ys,z:zs,light,red:reds,green:greens,blue:blues}=arrays;
+      const matColor=mesh.material.color; const srgb=x=>255*(x<=.0031308?12.92*x:1.055*Math.pow(x,1/2.4)-.055);
       for(let i=0;i<count;i++){
+        reds[i]=srgb(matColor.r*(vertexColor?vertexColor.getX(i):1));greens[i]=srgb(matColor.g*(vertexColor?vertexColor.getY(i):1));blues[i]=srgb(matColor.b*(vertexColor?vertexColor.getZ(i):1));
         mesh.getVertexPosition(i,position);position.applyMatrix4(mesh.matrixWorld).applyMatrix4(matrix);xs[i]=(position.x*.5+.5)*w;ys[i]=(-position.y*.5+.5)*h;zs[i]=position.z;
         const nx=norm.getX(i),ny=norm.getY(i),nz=norm.getZ(i);let a=0,b=0,c=0;
         for(let j=0;j<4;j++){const weight=skinWeight.array[i*4+j];if(!weight)continue;const k=skinIndex.array[i*4+j]*16;a+=weight*(bones[k]*nx+bones[k+4]*ny+bones[k+8]*nz);b+=weight*(bones[k+1]*nx+bones[k+5]*ny+bones[k+9]*nz);c+=weight*(bones[k+2]*nx+bones[k+6]*ny+bones[k+10]*nz);}
@@ -31,7 +33,7 @@ export class Software3DRenderer {
         const inv=1/area;
         for(let py=top;py<=bottom;py++)for(let px=left;px<=right;px++){
           const dx=px+.5-x0,dy=py+.5-y0,wb=(dx*(y2-y0)-dy*(x2-x0))*inv,wc=((x1-x0)*dy-(y1-y0)*dx)*inv,wa=1-wb-wc;
-          if(wa<0||wb<0||wc<0)continue;const z=wa*zs[a]+wb*zs[b]+wc*zs[c],i=py*w+px;if(z>=depth[i])continue;depth[i]=z;const shade=wa*light[a]+wb*light[b]+wc*light[c],o=i*4;pixels[o]=Math.min(255,red*shade);pixels[o+1]=Math.min(255,green*shade);pixels[o+2]=Math.min(255,blue*shade);
+          if(wa<0||wb<0||wc<0)continue;const z=wa*zs[a]+wb*zs[b]+wc*zs[c],i=py*w+px;if(z>=depth[i])continue;depth[i]=z;const shade=wa*light[a]+wb*light[b]+wc*light[c],o=i*4;pixels[o]=Math.min(255,(wa*reds[a]+wb*reds[b]+wc*reds[c])*shade);pixels[o+1]=Math.min(255,(wa*greens[a]+wb*greens[b]+wc*greens[c])*shade);pixels[o+2]=Math.min(255,(wa*blues[a]+wb*blues[b]+wc*blues[c])*shade);
         }
       }
     });

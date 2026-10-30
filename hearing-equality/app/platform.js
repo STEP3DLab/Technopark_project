@@ -1,12 +1,12 @@
-import { createPracticalController } from './practical.js?v=0.15.0';
-import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.15.0';
-import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.15.0';
+import { createPracticalController } from './practical.js?v=0.17.0';
+import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.17.0';
+import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.17.0';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.15.0';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.15.0';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.17.0';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.17.0';
 import { TrialProtocol } from './trial-protocol.js';
-import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.15.0';
+import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.17.0';
 const $ = id => document.getElementById(id);
 async function fetchJSON(path,timeout=15000){
   const controller=typeof AbortController!=='undefined'?new AbortController():null;
@@ -282,7 +282,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const data=await fetchJSON('./assets/recognition-library.json?v=0.15.0');
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.17.0');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -576,7 +576,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.15.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.17.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
@@ -636,7 +636,7 @@ window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(m
 // The editor and navigation must work even while the catalog is slow/offline.
 setMode(location.hash.slice(1)||'dialogue');renderHistory();
 try{
-  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.15.0')).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.17.0')).samples);
   if(s.custom.length){s.custom=mergeProfiles([],s.custom,s.catalog);renderPersonalSamples();}
   loadBenchmark();
   for(const item of s.catalog){

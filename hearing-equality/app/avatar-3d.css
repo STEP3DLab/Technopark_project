@@ -8,3 +8,5 @@
 .human-3d-note.error{inset:20% 8% auto;max-width:none;padding:24px;color:#e4efff;background:#213a5e;font-size:14px}
 #platform-avatar.human-3d{min-height:0}.dialogue-stage #dialogue-avatar.human-3d{min-height:360px}
 @media(max-width:600px){.human-3d-toolbar{left:6px;right:6px;bottom:8px;gap:4px}.human-3d-toolbar button{min-height:44px;padding:8px;font-size:10px}#platform-avatar.human-3d{min-height:0}.human-3d-badge{font-size:9px;left:9px;top:9px}.human-3d-note{font-size:9px;max-width:48%}}
+
+.human-3d-note.error{pointer-events:auto}.human-3d-note.error button{margin-left:8px;padding:8px 12px;border-radius:8px;cursor:pointer}

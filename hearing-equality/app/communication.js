@@ -1,4 +1,4 @@
-import {readSavedDraft,writeSavedDraft} from './communication-model.js?v=0.15.0';
+import {readSavedDraft,writeSavedDraft} from './communication-model.js?v=0.17.0';
 // A tab-local editor and explicit text-transfer actions. No network
 // endpoint, clipboard read, or automatic send. Draft storage is explicit opt-in.
 export const MAX_MESSAGE_LENGTH = 2000;

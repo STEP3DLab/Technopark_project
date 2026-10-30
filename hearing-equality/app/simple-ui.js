@@ -1,6 +1,6 @@
 /** Progressive disclosure over the existing controllers. Nodes are moved, never
  * cloned, so confirmation, draft provenance and media lifecycle stay intact. */
-import './platform.js?v=0.15.0';
+import './platform.js?v=0.17.0';
 const $ = id => document.getElementById(id);
 const paths = {
   text:'M5 5h14M12 5v14M8 19h8', camera:'M8 6l2-3h4l2 3h4v14H4V6h4Z M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
@@ -194,7 +194,7 @@ export function installSimpleUI() {
   // A small footnote keeps the scope honest without an essay on every screen.
   const limit=make('p','simple-scope','Экспериментальный набор из 6 слов. Перевод предложений пока не поддерживается.');capture.append(limit);
   const orbit=make('details','simple-3d-options','<summary>Поворот и вид 3D</summary>');
-  const toolbar=$('platform-avatar').querySelector('.human-3d-toolbar');if(toolbar){orbit.append(toolbar);playback.append(orbit);}
+  const attachToolbar=()=>{const toolbar=$('platform-avatar').querySelector('.human-3d-toolbar');if(toolbar){orbit.append(toolbar);playback.append(orbit);}};attachToolbar();$('platform-avatar').addEventListener('avatarready',attachToolbar,{once:true});
   const moreViews=make('details','simple-3d-options','<summary>Дополнительные возможности</summary>');
   moreViews.append($('partner-avatar-detail'),document.querySelector('.communication-checks'));advanced.append(moreViews);
   window.dispatchEvent(new Event('resize'));

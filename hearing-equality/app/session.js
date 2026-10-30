@@ -1,5 +1,5 @@
 // Session-only evidence. Demonstration samples are excluded from field metrics.
-import { MAX_MESSAGE_LENGTH } from './communication.js?v=0.15.0';
+import { MAX_MESSAGE_LENGTH } from './communication.js?v=0.17.0';
 export const DEMO_SOURCES = new Set(['reference', 'known-video']);
 const clean = value => String(value ?? '').trim();
 const equivalent = (a,b) => clean(a).normalize('NFKC').toLocaleLowerCase('ru').replace(/[.!]+$/,'') === clean(b).normalize('NFKC').toLocaleLowerCase('ru').replace(/[.!]+$/,'');

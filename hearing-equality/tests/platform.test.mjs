@@ -29,7 +29,7 @@ test('the actual HTML provides every literal controller ID exactly once and keep
   assert.match(html,/<dialog\b[^>]*\bid=['"]avatar-focus-dialog['"]/,'Large view must use a native dialog');
 });
 
-async function harness({fetchResponse,beforeReady,showcase=false,initialHash='#text',cameraError=null}={}){
+async function harness({fetchResponse,beforeReady,showcase=false,initialHash='#text',initialWord='question',cameraError=null}={}){
   const elements=new Map(),timers=new Map(),rafs=new Map(),documentListeners=new Map(),windowListeners=new Map();let now=0,timerId=0,rafId=0,heldVision=null,cameraDeferred=null,stopped=0;
   const html=readFileSync(new URL('index.html',root),'utf8');
   const tags=new Map([...html.matchAll(/<([a-z]+)\b[^>]*\bid=['"]([^'"]+)['"]/gi)].map(match=>[match[2],match[1]]));
@@ -55,6 +55,7 @@ async function harness({fetchResponse,beforeReady,showcase=false,initialHash='#t
     matches(selector){if(selector==='[data-mode]')return this.dataset.mode!==undefined;if(selector==='[contenteditable=true]')return this.attrs.contenteditable==='true';if(selector==='#word-chips button')return this.tagName==='button'&&Boolean(this.parentNode?.closest('#word-chips'));return selector.startsWith('#')?this.id===selector.slice(1):this.tagName===selector;}
     closest(selectors){for(let node=this;node;node=node.parentNode)if(selectors.split(',').some(selector=>node.matches(selector.trim())))return node;return null;}
     querySelector(selector){for(const child of this.children){if(child.matches(selector))return child;const nested=child.querySelector(selector);if(nested)return nested;}return null;}
+    contains(el){for(let node=el;node;node=node.parentNode)if(node===this)return true;return false;}
     remove(){if(this.parentNode){const i=this.parentNode.children.indexOf(this);if(i>=0)this.parentNode.children.splice(i,1);}this.parentNode=null;}
     append(...els){for(const el of els){el.remove();el.parentNode=this;this.children.push(el);}}
     insertBefore(el,next){el.remove();const i=next?this.children.indexOf(next):this.children.length;if(i<0)throw new Error('Reference node is not a child');el.parentNode=this;this.children.splice(i,0,el);}
@@ -88,14 +89,14 @@ async function harness({fetchResponse,beforeReady,showcase=false,initialHash='#t
   const navigator={mediaDevices:{getUserMedia:()=>cameraError?Promise.reject(cameraError):cameraDeferred?cameraDeferred.promise:Promise.resolve(stream)}};
   const context=vm.createContext({document,CanvasAvatar:Avatar,TrialProtocol,SessionLedger,frameReadiness,DEMO_SOURCES,createCatalog,matchText,validateMotion,makeSequence,classify,sequenceQuality,createCommunicationController,MAX_MESSAGE_LENGTH,createPracticalController,parseProfile,serializeProfile,mergeProfiles,PROFILE_MAX_BYTES,drawLandmarks(){},
     window:{addEventListener:(type,cb)=>addListener(windowListeners,type,cb),speechSynthesis,URL,Blob,emit(type){for(const {cb} of windowListeners.get(type)||[])cb();}},navigator,speechSynthesis,SpeechSynthesisUtterance:class{constructor(text){this.text=text;}},
-    location:{hash:initialHash,search:''},history:{replaceState(){}},URL,URLSearchParams,AbortController,performance:{now:()=>now},
+    location:{hash:initialHash,search:initialWord?'?word='+initialWord:''},history:{replaceState(){}},URL,URLSearchParams,AbortController,performance:{now:()=>now},
     matchMedia:()=>({matches:false}),requestAnimationFrame:cb=>{rafs.set(++rafId,cb);return rafId;},cancelAnimationFrame:id=>rafs.delete(id),
     setTimeout:(cb,ms=0)=>{timers.set(++timerId,{cb,at:now+ms});return timerId;},clearTimeout:id=>timers.delete(id),
     MutationObserver:class{observe(){}},readDemoCacheStatus:async()=>({offlineReady:false}),prepareDemoAssets:async()=>({offlineReady:false}),
     loadVision:()=>heldVision?.promise||Promise.resolve(),resetVision:async()=>{},detect:()=>new Promise(()=>{}),
     fetch:(url,options)=>fetchResponse?fetchResponse(url,options,defaultFetch):defaultFetch(url),console,
   });
-  const ready=vm.runInContext(`(async()=>{${source}\nreturn {s,ledger,communication,practical,showResult,clearResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare,setVisualMode};})()`,context);
+  const ready=vm.runInContext(`(async()=>{${source}\nawait catalogJob; return {s,ledger,communication,practical,showResult,clearResult,confirmResult,selectWord,setMode,startCamera,stopCapture,recordGesture,ensureTemplates,protocolRuns,playAvatar,pauseAvatar,setCompare,setVisualMode};})()`,context);
   const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
   const controls={get,document,timers,avatars,nav,phrases,navigator,spoken,window:context.window,endCamera:()=>track.dispatchEvent(new Event('ended')),frame(ms){now+=ms;const callbacks=[...rafs.values()];rafs.clear();for(const cb of callbacks)cb(now);},advance(ms){now+=ms;const due=[...timers].filter(([,timer])=>timer.at<=now);for(const [id,timer] of due){timers.delete(id);timer.cb();}},stopped:()=>stopped,holdVision(){heldVision=deferred();return heldVision;},holdCamera(){cameraDeferred=deferred();return{...cameraDeferred,stream};}};
   await beforeReady?.(controls);
@@ -492,13 +493,13 @@ test('quarter speed uses real elapsed time and keyboard controls select exact fr
  assert.equal(h.api.s.time,(h.api.s.data.frames.length-2)/fps);assert.equal(h.get('source-video').currentTime,h.api.s.time);
 });
 
-test('communication bootstraps before a failed catalog request and manual text remains usable',async()=>{
+test('compact shell API is ready before a failed catalog request and manual text remains usable',async()=>{
  let rejectCatalog;
  const h=await harness({initialHash:'',fetchResponse(url,options,fallback){
   if(url.includes('slovo-sources'))return new Promise((_,reject)=>{rejectCatalog=reject;});
   return fallback(url);
  },beforeReady(controls){
-  assert.equal(controls.get('view-dialogue').hidden,false);assert.equal(controls.get('mode-crumb').textContent,'Общение');
+  assert.equal(controls.window.hearingEquality.state().mode,'text');assert.equal(controls.window.hearingEquality.state().catalogStatus,'loading');assert.equal(controls.window.hearingEquality.catalog().length,0);controls.window.hearingEquality.mode('dialogue');assert.equal(controls.get('view-dialogue').hidden,false);
   const field=controls.get('conversation');field.value='Мне нужна помощь.\nОтветьте текстом.';field.emit('input');
   assert.equal(controls.get('show-message').disabled,false);
   controls.nav.find(button=>button.dataset.mode==='camera').click();
@@ -650,4 +651,30 @@ test('profile import is a preview until explicit apply and a cancelled pending f
  assert.equal(h.api.s.custom.length,0);assert.equal(h.get('profile-preview').hidden,false);h.get('apply-profile').click();assert.equal(h.api.s.custom.length,1);
  h.get('import-profile').files=[{size:fileText.length,text:async()=>fileText}];await h.get('import-profile').emit('change');h.get('apply-profile').click();assert.equal(h.api.s.custom.length,1);
  let resolve;h.get('import-profile').files=[{size:20,text:()=>new Promise(r=>{resolve=r;})}];const pending=h.get('import-profile').emit('change');h.get('cancel-profile').click();resolve(fileText);await pending;assert.equal(h.get('profile-preview').hidden,true);assert.equal(h.api.s.custom.length,1);
+});
+
+
+test('a new visitor opens the avatar and the greeting without starting unsolicited animation',async()=>{
+ const h=await harness({initialHash:'',initialWord:null});assert.equal(h.api.s.mode,'text');assert.equal(h.api.s.selected.id,'hello');assert.equal(h.api.s.playing,false);assert.equal(h.window.hearingEquality.state().catalogStatus,'ready');
+});
+
+test('catalog retry populates each control once and preserves a manually written draft',async()=>{
+ let attempts=0;
+ const h=await harness({fetchResponse(url,options,fallback){if(url.includes('slovo-sources')&&attempts++===0)return Promise.reject(new Error('Offline'));return fallback(url);}});
+ assert.equal(h.window.hearingEquality.state().catalogStatus,'error');const statuses=[];h.window.hearingEquality.subscribe(type=>{if(type==='catalog')statuses.push(h.window.hearingEquality.state().catalogStatus);});
+ const field=h.get('conversation');field.value='Сохранить мой текст';field.emit('input');
+ const a=h.window.hearingEquality.reload(),b=h.window.hearingEquality.reload();assert.strictEqual(a,b);await a;
+ assert.deepEqual(statuses,['loading','ready']);for(const id of ['word-chips','reply-chips','video-examples'])assert.equal(h.get(id).children.length,6);assert.equal(field.value,'Сохранить мой текст');
+});
+
+test('opening a menu through the public stop action cancels the tour including its scheduled next word',async()=>{
+ const h=await harness({showcase:true});const sequence=h.get('showcase-start').click();await flush();h.advance(350);await flush();assert.equal(h.api.s.playing,true);h.frame(2000);h.advance(80);await flush();
+ const selected=h.api.s.selected.id;h.window.hearingEquality.stop();h.advance(900);await flush();await sequence;
+ assert.equal(h.get('showcase-start').getAttribute('aria-pressed'),'false');assert.equal(h.api.s.playing,false);assert.equal(h.api.s.selected.id,selected);
+});
+
+test('compact player keeps its toolbar and word selection in the same place through large-view cycles',async()=>{
+ const h=await harness(),card=h.get('avatar-card'),top=h.get('compact-toolbar'),controls=h.get('showcase-controls'),words=h.get('word-chips');card.insertBefore(top,h.get('play'));top.append(controls);const wordParent=words.parentNode;
+ h.get('avatar-focus').click();assert.equal(controls.parentNode,top);assert.equal(words.parentNode,wordParent);assert.equal(card.parentNode,h.get('avatar-focus-dialog'));assert.equal(h.get('avatar-focus').getAttribute('aria-label'),'Закрыть крупный просмотр');
+ h.get('avatar-focus').click();assert.equal(controls.parentNode,top);assert.equal(words.parentNode,wordParent);assert.equal(h.get('avatar-focus').getAttribute('aria-label'),'Крупный просмотр');
 });

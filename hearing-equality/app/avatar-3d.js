@@ -1,9 +1,15 @@
-import {Software3DRenderer} from './software-3d.js?v=0.17.0';
+import {Software3DRenderer} from './software-3d.js?v=0.18.0';
 import * as T from './vendor/three.module.min.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {loadStockRig} from './stock-rig.js?v=0.17.0';
-import {prepareStockMotion,applyStockMotion,relaxStockRig} from './stock-motion.js?v=0.17.0';
+import {loadStockRig} from './stock-rig.js?v=0.18.0';
+import {prepareStockMotion,applyStockMotion,relaxStockRig} from './stock-motion.js?v=0.18.0';
 
+// Fixed envelope for the six recorded signs, including finger tips and depth.
+// Do not clamp portrait aspect ratios: that crops hands in a tall scene.
+export function avatarFraming(aspect=1,fullBody=false){
+  const safeAspect=Number.isFinite(aspect)&&aspect>0?aspect:1;
+  return {target:fullBody?.96:1.30,distance:Math.max(fullBody?3.65:2.55,.60/(Math.tan(16*Math.PI/180)*safeAspect)+.56)};
+}
 
 export class HumanAvatar3D {
   constructor(container){
@@ -26,7 +32,7 @@ export class HumanAvatar3D {
     const fill=new T.DirectionalLight(0xb5d2ff,1.6);fill.position.set(-3,2,3);this.world.add(fill);
     const rim=new T.DirectionalLight(0x8bc3ff,2.3);rim.position.set(0,3,-3);this.world.add(rim);
     const floor=new T.Mesh(new T.CircleGeometry(3,64),new T.MeshStandardMaterial({color:0x263b5b,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=.008;floor.receiveShadow=true;this.floor=floor;this.world.add(floor);
-    this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=false;this.controls.enablePan=false;this.controls.minDistance=.9;this.controls.maxDistance=5;this.controls.minPolarAngle=.45;this.controls.maxPolarAngle=2.35;this.controls.addEventListener('change',()=>this.render());
+    this.controls=new OrbitControls(this.camera,this.canvas);this.controls.enableDamping=false;this.controls.enablePan=false;this.controls.minDistance=.9;this.controls.maxDistance=12;this.controls.minPolarAngle=.45;this.controls.maxPolarAngle=2.35;this.controls.addEventListener('change',()=>this.render());
     this.canvas.style.touchAction='none';this.resetView();
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(container);
     this.onResize=()=>this.resize();window.addEventListener('resize',this.onResize);
@@ -57,10 +63,9 @@ export class HumanAvatar3D {
   orbit(angle){const offset=this.camera.position.clone().sub(this.controls.target);offset.applyAxisAngle(new T.Vector3(0,1,0),angle);this.camera.position.copy(this.controls.target).add(offset);this.controls.update();this.render();}
   resetView(){
     if(!this.controls)return;
-    const target=this.fullBody ? .96 : 1.34;this.controls.target.set(0,target,0);
     const aspect=this.width&&this.height?this.width/this.height:1;
-    const distance=this.fullBody?3.65:Math.max(1.88,1.45/Math.max(.55,aspect));
-    this.camera.position.set(.09,target+.02,distance);this.controls.update();this.render();
+    const {target,distance}=avatarFraming(aspect,this.fullBody);this.controls.target.set(0,target,0);
+    this.camera.position.set(0,target,distance);this.controls.update();this.render();
   }
   load(data){this.data=data;this.time=0;this.sampledTime=null;if(!this.rig)return;this.track=prepareStockMotion(this.rig,data,{smooth:this.smoothing});const missing=this.track.observed.some(a=>a.some(v=>!v));this.container.dataset.motionQuality=missing?'partial':'recorded';this.note.hidden=!missing;this.note.textContent=missing?'Есть пропуск кисти · сравните с исходным видео':'';this.showAt(0);}
   clear(){this.data=null;this.track=null;this.sampledTime=null;if(this.rig)relaxStockRig(this.rig);this.note.hidden=true;this.render();}

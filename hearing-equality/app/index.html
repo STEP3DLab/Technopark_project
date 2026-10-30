@@ -4,17 +4,20 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#223260"><meta name="description" content="Помощник для общения: составьте сообщение, покажите крупно, озвучьте, скопируйте или передайте в другое приложение. Экспериментальное распознавание шести слов РЖЯ.">
 <title>Равенство по слуху · помощник для общения</title>
-<link rel="stylesheet" href="platform.css?v=0.17.0">
-<link rel="stylesheet" href="dialogue.css?v=0.17.0">
-<link rel="stylesheet" href="rgsu.css?v=0.17.0">
-<link rel="stylesheet" href="showcase.css?v=0.17.0">
-<link rel="stylesheet" href="communication.css?v=0.17.0">
-<link rel="stylesheet" href="practical.css?v=0.17.0">
+<link rel="stylesheet" href="platform.css?v=0.18.0">
+<link rel="stylesheet" href="dialogue.css?v=0.18.0">
+<link rel="stylesheet" href="rgsu.css?v=0.18.0">
+<link rel="stylesheet" href="showcase.css?v=0.18.0">
+<link rel="stylesheet" href="communication.css?v=0.18.0">
+<link rel="stylesheet" href="practical.css?v=0.18.0">
 <link rel="icon" type="image/svg+xml" href="assets/brand/rgsu-blue.svg">
-<link rel="stylesheet" href="avatar-3d.css?v=0.17.0">
-<link rel="stylesheet" href="simple-ui.css?v=0.17.0">
+<link rel="stylesheet" href="avatar-3d.css?v=0.18.0">
+<link rel="stylesheet" href="simple-ui.css?v=0.18.0">
 </head>
-<body>
+<body class="app-booting">
+<div id="app-start" role="status"><b>Равенство по слуху</b><span>Открываем приложение…</span><button id="app-reload" type="button" hidden onclick="location.reload()">Повторить</button></div>
+<style>.app-booting .shell{visibility:hidden}.app-booting #app-start{display:flex;position:fixed;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:12px;background:#f5f7fb;color:#263e68;font:15px/1.5 Arial,sans-serif}#app-start{display:none}#app-start b{font-size:22px}#app-start button{min-height:44px;padding:10px 22px;background:#2849a6;color:#fff;border:0;border-radius:10px}</style>
+<script>setTimeout(()=>{const retry=document.getElementById('app-reload');if(retry){retry.hidden=false;document.querySelector('#app-start span').textContent='Загрузка занимает больше времени. Проверьте соединение.';}},10000);</script>
 <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M8 5l1-2h6l1 2h4a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2z"/><circle cx="12" cy="12" r="4"/></symbol>
 <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 5h16M12 5v15M8 20h8M4 9V5m16 4V5"/></symbol>
@@ -45,7 +48,7 @@
 <button aria-label="Проверка" data-short="Проверка" data-mode="research"><svg><use href="#i-check"/></svg><span>Проверка<small>Серии и результаты</small></span></button>
 <button aria-label="О проекте" data-short="Проект" data-mode="about"><svg><use href="#i-grid"/></svg><span>О проекте<small>Возможности и развитие</small></span></button>
 </nav>
-<div class="rail-bottom"><div class="rail-card"><span class="dot"></span> Исследовательский прототип<p>Технологии, которые<br>помогают понимать друг друга.</p><b>РГСУ · Технопарк</b></div><a href="studio.html?outfit=indigo">Студия аватара ↗</a><span>Демонстрационная версия 0.15</span></div>
+<div class="rail-bottom"><div class="rail-card"><span class="dot"></span> Исследовательский прототип<p>Технологии, которые<br>помогают понимать друг друга.</p><b>РГСУ · Технопарк</b></div><a href="studio.html?outfit=indigo">Студия аватара ↗</a><span>Версия 0.18</span></div>
 </aside>
 <main id="workspace">
 <h1 class="sr-only">Равенство по слуху — помощник для общения</h1>
@@ -135,7 +138,7 @@
 <form id="text-form"><label for="message" class="sr-only">Слово для аватара</label><textarea id="message" rows="3" maxlength="200" placeholder="Например, «Вопрос»">Вопрос</textarea><div class="input-bottom"><span id="char-count">6 / 200</span><button type="button" id="dictate" class="icon-button" aria-label="Ввести голосом"><svg><use href="#i-mic"/></svg></button></div><button class="button primary wide" id="translate" type="submit">Показать жест <svg><use href="#i-arrow"/></svg></button></form>
 <p class="hint">Выберите слово или введите его выше. Для каждого движения есть исходная запись.</p>
 <div class="composer-vocabulary"><div class="small-heading">Словарь для показа <span>6 слов</span></div><div id="composer-words" class="word-chips" role="group" aria-label="Слова для демонстрации"></div></div>
-<div id="showcase-controls" class="showcase-controls"><button id="showcase-start" type="button" class="button ghost wide" aria-pressed="false" disabled><svg><use href="#i-play"/></svg><span>Автопоказ · 6 жестов</span></button><p id="showcase-status" class="hint" role="status">Шесть движений по очереди. Это словарь отдельных слов.</p></div>
+<div id="showcase-controls" class="showcase-controls"><button id="showcase-start" type="button" class="button ghost wide" aria-pressed="false" disabled><svg><use href="#i-play"/></svg><span>Показать все</span></button><p id="showcase-status" class="hint" role="status">Шесть движений по очереди. Это словарь отдельных слов.</p></div>
 <details class="composer-details"><summary>Как пользоваться</summary><p>«Сравнить» показывает аватар рядом с человеком. «Крупно» увеличивает сцену. Для разбора доступны 0,25× и покадровые кнопки. «Повторять» возвращает тот же жест после короткой паузы. Предложения и отрицания требуют отдельного перевода.</p><p>Клавиши: пробел — воспроизведение, ← / → — кадр, F — крупный просмотр. На шкале Home и End переходят к первому и последнему кадру. При вводе текста клавиши работают как обычно.</p></details>
 <div id="text-notice" class="notice" role="status" hidden></div>
 
@@ -215,9 +218,9 @@
 <dialog id="share-fallback" aria-labelledby="share-title"><div class="share-fallback-heading"><div><span class="step-label">ПЕРЕДАТЬ ТЕКСТ</span><h2 id="share-title">Сообщение готово.</h2></div><button id="share-close" class="button ghost" type="button">Закрыть</button></div><p>Скопируйте текст и вставьте его в нужный чат или сохраните файлом.</p><label for="share-text">Текст для передачи</label><textarea id="share-text" rows="7" readonly></textarea><div class="share-fallback-actions"><button id="share-copy" aria-label="Копировать подготовленный текст" class="button primary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Копировать</button><button id="share-download" aria-label="Скачать подготовленный текст" class="button ghost" type="button"><svg aria-hidden="true"><use href="#i-download"/></svg>Скачать .txt</button></div><p id="share-status" role="status">Получателя и приложение выбираете вы.</p></dialog>
 <dialog id="avatar-focus-dialog" aria-label="Крупный просмотр жеста"></dialog>
 <dialog id="presentation"><div class="presentation-top"><span>РАВЕНСТВО ПО СЛУХУ / НТС</span><button id="close-presentation" class="button ghost">Закрыть ✕</button></div><div class="presentation-body"><span id="slide-kicker" class="step-label"></span><h2 id="slide-title"></h2><p id="slide-copy"></p><div id="slide-cards" class="slide-cards"></div><button id="slide-action" class="button primary"></button></div><div class="presentation-bottom"><span id="slide-count"></span><div class="button-row"><button id="prev-slide" class="button ghost">← Назад</button><button id="next-slide" class="button primary">Далее →</button></div></div></dialog>
-<dialog id="showcase-guide" aria-labelledby="guide-title"><div class="guide-top"><span class="step-label">ПОМОЩЬ В ОБЩЕНИИ</span><button id="close-guide" class="button ghost" type="button" aria-label="Закрыть памятку">Закрыть ✕</button></div><h2 id="guide-title">От сообщения к ответу.</h2><p class="guide-lead">Выбирайте удобный способ ввода. Текст можно изменить перед любым действием.</p><ol class="guide-steps"><li><b>Составьте сообщение</b><span>Напишите в редакторе или выберите быструю фразу. Черновик сохраняется при переходе между разделами.</span></li><li><b>При желании добавьте слово жестом</b><span>Раскройте камеру, включите её и запишите один жест. Экспериментальный словарь содержит шесть слов. Проверьте вариант и нажмите «Добавить в сообщение».</span></li><li><b>Выберите, как передать текст</b><span>Покажите крупно, озвучьте или скопируйте. «Поделиться» открывает меню устройства, если оно поддерживается. Получателя выбираете вы.</span></li><li><b>Получите ответ</b><span>Собеседник может написать или продиктовать текст. «В диалог» и «Добавить ответ» сохраняют реплики только в истории этой вкладки.</span></li><li><b>Сохраните нужное</b><span>Можно скопировать сообщение или весь диалог, а также скачать .txt. Перед закрытием или перезагрузкой страницы сохраните важный текст.</span></li></ol><div class="guide-note"><b>Для показа без сети</b><p>«Подготовить показ» сохраняет интерфейс, словарь, аватар, видео и готовые координаты. При первом запуске модели камеры нужен интернет. Голос и диктовка зависят от браузера. Черновик и история в набор материалов не входят.</p></div><div class="button-row"><button id="guide-communicate" class="button primary" type="button">Открыть общение</button><button id="guide-prepare" class="button ghost" type="button">Подготовить показ</button><button id="guide-start" class="button ghost" type="button">Посмотреть аватар</button><button id="copy-demo-link" class="text-button" type="button">Ссылка на выбранный жест</button></div><p id="guide-feedback" class="hint" role="status"></p></dialog>
-<noscript><p class="no-script">Для работы аватара включите JavaScript в браузере.</p></noscript>
-<script type="module" src="platform.js?v=0.17.0"></script>
-<script type="module" src="showcase.js?v=0.17.0"></script>
-<script type="module" src="simple-ui.js?v=0.17.0"></script>
+<dialog id="showcase-guide" aria-labelledby="guide-title"><div class="guide-top"><span class="step-label">ПОМОЩЬ В ОБЩЕНИИ</span><button id="close-guide" class="button ghost" type="button" aria-label="Закрыть памятку">Закрыть ✕</button></div><h2 id="guide-title">От сообщения к ответу.</h2><p class="guide-lead">Выбирайте удобный способ ввода. Текст можно изменить перед любым действием.</p><ol class="guide-steps"><li><b>Составьте сообщение</b><span>Напишите в редакторе или выберите быструю фразу. Черновик сохраняется при переходе между разделами.</span></li><li><b>При желании добавьте слово жестом</b><span>Откройте «Камера», включите её и запишите один жест. Экспериментальный словарь содержит шесть слов. Проверьте вариант и нажмите «Добавить в сообщение».</span></li><li><b>Выберите, как передать текст</b><span>Покажите крупно, озвучьте или скопируйте. «Поделиться» открывает меню устройства, если оно поддерживается. Получателя выбираете вы.</span></li><li><b>Получите ответ</b><span>Собеседник может написать или продиктовать текст. Нажмите «Ответ собеседника» или «Ответить» в крупном показе. Обе реплики останутся в истории этой вкладки.</span></li><li><b>Сохраните нужное</b><span>Можно скопировать сообщение или весь диалог, а также скачать .txt. Перед закрытием или перезагрузкой страницы сохраните важный текст.</span></li></ol><div class="guide-note"><b>Для показа без сети</b><p>Откройте «Ещё → Показ без интернета» и нажмите «Подготовить показ». Дождитесь готовности материалов. При первом запуске модели камеры нужен интернет. Голос и диктовка зависят от браузера. Черновик и история в набор материалов не входят.</p></div><div class="button-row"><button id="guide-communicate" class="button primary" type="button">Открыть общение</button><button id="guide-prepare" class="button ghost" type="button">Подготовить показ</button><button id="guide-start" class="button ghost" type="button">Посмотреть аватар</button><button id="copy-demo-link" class="text-button" type="button">Ссылка на выбранный жест</button></div><p id="guide-feedback" class="hint" role="status"></p></dialog>
+<noscript><style>.app-booting #app-start{display:none}</style><p class="no-script">Для работы аватара включите JavaScript в браузере.</p></noscript>
+<script type="module" src="platform.js?v=0.18.0"></script>
+<script type="module" src="showcase.js?v=0.18.0"></script>
+<script type="module" src="simple-ui.js?v=0.18.0"></script>
 </body></html>

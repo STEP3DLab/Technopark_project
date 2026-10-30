@@ -5,10 +5,30 @@ import * as T from '../app/vendor/three.module.min.js';
 import {parseStockRig} from '../app/stock-rig.js';
 import {prepareStockMotion,applyStockMotion,relaxStockRig} from '../app/stock-motion.js';
 import {Software3DRenderer} from '../app/software-3d.js';
+import {avatarFraming} from '../app/avatar-3d.js';
 const bytes=readFileSync(new URL('../app/assets/models/quaternius-communicator.glb',import.meta.url));
 const makeRig=()=>parseStockRig(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));
 const manifest=JSON.parse(readFileSync(new URL('../app/assets/sources/slovo-sources.json',import.meta.url)));
 const motions=manifest.samples.map(s=>JSON.parse(readFileSync(new URL('../app/assets/motion/'+s.file.replace('.mp4','.json'),import.meta.url))));
+
+test('all recorded finger joints fit portrait, comparison and landscape views without cropping',async()=>{
+ const rig=await makeRig(),point=new T.Vector3();
+ const cameras=[.35,.45,.62,1,2.5].flatMap(aspect=>[false,true].map(fullBody=>{
+  const {target,distance}=avatarFraming(aspect,fullBody),camera=new T.PerspectiveCamera(32,aspect,.05,30);
+  camera.position.set(0,target,distance);camera.lookAt(0,target,0);camera.updateMatrixWorld(true);return camera;
+ }));
+ for(const motion of motions)for(const smooth of [false,true]){
+  const track=prepareStockMotion(rig,motion,{smooth});
+  for(let i=0;i<track.frames.length;i++){
+   applyStockMotion(rig,track,i/track.fps);
+   for(const side of ['Left','Right'])for(const finger of rig.fingers[side])for(const bone of finger.chain)for(const camera of cameras){
+    bone.getWorldPosition(point).project(camera);
+    assert.ok(Math.abs(point.x)<.95&&Math.abs(point.y)<.95,`${motion.id||'motion'} frame ${i}: finger clipped at aspect ${camera.aspect}`);
+   }
+  }
+ }
+ rig.dispose();
+});
 
 test('downloaded GLB has a complete 65-bone skin, all ten finger chains and a valid bind pose',async()=>{
  const rig=await makeRig();assert.equal(rig.bones.length,65);assert.ok(bytes.length<1300000);

@@ -1,4 +1,4 @@
-import { APP_VERSION, APP_BASE, CACHE_PREFIX, CACHE_NAME, canonicalAssetURL, readPreparedBundle, hasCompleteDemoBundle } from './demo-cache.js?v=0.17.0';
+import { APP_VERSION, APP_BASE, CACHE_PREFIX, CACHE_NAME, canonicalAssetURL, readPreparedBundle, hasCompleteDemoBundle } from './demo-cache.js?v=0.18.0';
 
 // Automatic updates can fetch this script before the new release's offline
 // files exist. Reject installation then: merely leaving a worker waiting would

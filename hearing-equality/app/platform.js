@@ -1,12 +1,12 @@
-import { createPracticalController } from './practical.js?v=0.17.0';
-import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.17.0';
-import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.17.0';
+import { createPracticalController } from './practical.js?v=0.18.0';
+import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.18.0';
+import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.18.0';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.17.0';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.17.0';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.18.0';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.18.0';
 import { TrialProtocol } from './trial-protocol.js';
-import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.17.0';
+import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.18.0';
 const $ = id => document.getElementById(id);
 async function fetchJSON(path,timeout=15000){
   const controller=typeof AbortController!=='undefined'?new AbortController():null;
@@ -18,11 +18,13 @@ async function fetchJSON(path,timeout=15000){
     ]);
   }finally{clearTimeout(timer);}
 }
-const s = { mode:'text', catalog:[], motions:new Map(), templates:[], templatesReady:false, custom:[], selected:null,
+const s = { mode:'text', catalog:[], catalogStatus:'loading', motions:new Map(), templates:[], templatesReady:false, custom:[], selected:null,
   data:null, time:0, playing:false, raf:0, last:0, compare:false, view:'avatar', selectionToken:0, playbackToken:0,
   repeat:false, repeatWaiting:false, repeatTimer:0,
   stream:null, captureToken:0, capturing:false, recordFrames:null, recordTimer:0, recordPending:false, trialContext:null,
   frame:null, analyzing:false, videoReady:false, sampleId:null, videoURL:null, result:null, speech:null };
+const uiListeners=new Set();
+function emitUI(type){for(const listener of uiListeners)listener(type);}
 const ledger = new SessionLedger();
 const protocolRuns=[];let protocol=null;
 let pendingAttempt = null, confirmedAttempt = null, resetArmed = false, manualCandidateId = null, manualCandidateSerial = 0;
@@ -190,16 +192,16 @@ function restoreAvatarCard(){
   showcaseHome=null;showcaseNext=null;
   focusHome.insertBefore(avatarCard,focusNext?.parentNode===focusHome?focusNext:null);
   focusHome=null;focusNext=null;
-  putText('avatar-focus-label','Крупно');putAttribute('avatar-focus','aria-expanded',false);
+  putText('avatar-focus-label','Крупно');putAttribute('avatar-focus','aria-expanded',false);putAttribute('avatar-focus','aria-label','Крупный просмотр');putAttribute('avatar-focus','title','Крупный просмотр · F');const glyph=$('avatar-focus').querySelector('svg');if(glyph)glyph.innerHTML='<use href="#i-screen"/>';
   avatar.resize();renderPlayback();focusReturn?.focus({preventScroll:true});focusReturn=null;
 }
 function openAvatarFocus(){
   if(focusDialog.open){focusDialog.close();return;}
   focusHome=avatarCard.parentNode;focusNext=avatarCard.nextSibling;focusReturn=document.activeElement||$('avatar-focus');
   showcaseHome=showcaseControls.parentNode;showcaseNext=showcaseControls.nextSibling;
-  avatarCard.insertBefore(showcaseControls,$('avatar-footer'));
+  if(!avatarCard.contains?.(showcaseControls))avatarCard.insertBefore(showcaseControls,$('avatar-footer'));
   focusDialog.append(avatarCard);focusDialog.showModal();
-  putText('avatar-focus-label','Закрыть');putAttribute('avatar-focus','aria-expanded',true);
+  putText('avatar-focus-label','Закрыть');putAttribute('avatar-focus','aria-expanded',true);putAttribute('avatar-focus','aria-label','Закрыть крупный просмотр');putAttribute('avatar-focus','title','Закрыть · Esc');const glyph=$('avatar-focus').querySelector('svg');if(glyph)glyph.innerHTML='<path d="m6 6 12 12M6 18 18 6"/>';
   avatar.resize();renderPlayback();$('avatar-focus').focus({preventScroll:true});
 }
 $('avatar-focus').onclick=openAvatarFocus;
@@ -282,7 +284,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const data=await fetchJSON('./assets/recognition-library.json?v=0.17.0');
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.18.0');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -489,11 +491,12 @@ function setMode(mode){
   $('capture-badge').textContent=mode==='video'?'Файл остаётся на вашем устройстве':'Видеопоток обрабатывается на устройстве';
   $('capture-stage').classList.remove('mirrored');$('camera-placeholder').hidden=false;
   notice('capture-notice','Для первого запуска модели нужен интернет. Сравниваются движения, а не смысл произвольной речи на РЖЯ.');
-  clearResult();avatar.resize();dialogueAvatar.resize();updateResearch();renderProtocol();history.replaceState(null,'',`#${mode}`);
+  clearResult();avatar.resize();dialogueAvatar.resize();updateResearch();renderProtocol();history.replaceState(null,'',`#${mode}`);emitUI('mode');
 }
 
 function renderHistory(){
   const target=$('history-messages');target.replaceChildren();
+  $('dialogue-status').textContent='';
   if(!ledger.messages.length){const p=document.createElement('p');p.className='history-empty';p.textContent='Здесь появятся сообщения, которые вы явно добавили в диалог.';target.append(p);communication.updateHistory();return;}
   for(const message of ledger.messages){const row=document.createElement('div');row.className=`message-bubble ${message.role}`;const label=document.createElement('small');label.textContent=(message.role==='visitor'?'Вы':'Собеседник')+(message.kind==='demo'?' · демопример':message.kind==='avatar'?' · слово с аватаром':message.kind==='manual'?' · текст':' · подтверждённое слово');const text=document.createElement('p');text.textContent=message.text;row.append(label,text);target.append(row);}
   communication.updateHistory();
@@ -576,7 +579,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.17.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.18.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
@@ -634,26 +637,36 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){s.repeat=f
 window.addEventListener('pagehide',()=>{s.repeat=false;pauseAvatar();stopCapture();stopDictation();releaseFile();window.speechSynthesis?.cancel();});
 window.addEventListener('hashchange',()=>{const mode=location.hash.slice(1);if(mode!=='workspace')setMode(mode);});
 // The editor and navigation must work even while the catalog is slow/offline.
-setMode(location.hash.slice(1)||'dialogue');renderHistory();
+setMode(location.hash.slice(1)||'text');renderHistory();
+let catalogJob=null;
+async function initializeCatalog(){
+s.catalogStatus='loading';emitUI('catalog');
 try{
-  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.17.0')).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.18.0')).samples);
   if(s.custom.length){s.custom=mergeProfiles([],s.custom,s.catalog);renderPersonalSamples();}
   loadBenchmark();
+  for(const id of ['word-chips','reply-chips','video-examples'])$(id).replaceChildren();
   for(const item of s.catalog){
     const word=document.createElement('button');word.type='button';word.textContent=item.text;word.dataset.id=item.id;word.setAttribute('aria-pressed','false');word.onclick=()=>{stopDictation();return selectWord(item.id,!matchMedia('(prefers-reduced-motion: reduce)').matches);};$('word-chips').append(word);
     const reply=document.createElement('button');reply.type='button';reply.textContent=item.text;reply.onclick=()=>{stopDictation();$('employee-text').value=item.text;};$('reply-chips').append(reply);
     const clip=document.createElement('button');clip.textContent=item.text;clip.type='button';clip.onclick=()=>{releaseFile();$('video-file').value='';loadVideo(item.video,`Slovo / ${item.text}`,item.id);};$('video-examples').append(clip);
   }
+  s.catalogStatus='ready';emitUI('catalog');
   const requested=new URLSearchParams(location.search).get('word');
-  await selectWord(s.catalog.some(x=>x.id===requested)?requested:'question');
-}catch{notice('text-notice','Не удалось загрузить словарь. Проверьте соединение и обновите страницу.','error');$('active-word').textContent='Нет связи';}
+  await selectWord(s.catalog.some(x=>x.id===requested)?requested:'hello');
+}catch{s.catalogStatus='error';emitUI('catalog');notice('text-notice','Не удалось загрузить жесты. Нажмите «Повторить загрузку».','error');$('active-word').textContent='Нет связи';}
+
+}
+function reloadCatalog(){if(s.catalogStatus==='loading'&&catalogJob)return catalogJob;catalogJob=initializeCatalog();return catalogJob;}
 
 // Narrow public interface for the presentation controls; no dialogue contents or camera frames.
 window.hearingEquality=Object.freeze({
   catalog:()=>s.catalog.map(({id,text,motion,video})=>({id,text,motion,video})),
-  state:()=>({mode:s.mode,selected:s.selected?.id||null,ready:Boolean(s.data),playing:s.playing,time:s.time,duration:s.data?.duration||0,view:s.view,repeat:s.repeat}),
+  state:()=>({mode:s.mode,catalogStatus:s.catalogStatus,selected:s.selected?.id||null,ready:Boolean(s.data),playing:s.playing,time:s.time,duration:s.data?.duration||0,view:s.view,repeat:s.repeat}),
   select:async(id,autoplay=false)=>{await selectWord(id,autoplay);return Boolean(s.data&&s.selected?.id===id);},
   play:playAvatar,pause:pauseAvatar,mode:setMode,view:setVisualMode,step:stepFrame,focus:openAvatarFocus,repeat:setRepeat,
-  stop:()=>{pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();},
-  notify:toast,
+  stop:()=>{emitUI('stop');pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();},
+  notify:toast,reload:reloadCatalog,
+  subscribe:listener=>{uiListeners.add(listener);return()=>uiListeners.delete(listener);},
 });
+reloadCatalog();

@@ -437,3 +437,16 @@ body.simple-ui[data-high-contrast=true] :is(.simple-avatar-scope,.scrub-meta,.si
 .simple-ui .avatar-card #text-notice{margin:0 12px 10px;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.5;flex:none}
 .simple-ui .avatar-card #text-notice[hidden]{display:none}
 body.simple-ui[data-large-text=true] #word-chips button{font-size:16px;padding-left:5px;padding-right:5px}
+
+/* Quick transitions for live demonstrations; the current conversation stays open. */
+.simple-ui .footer{display:block;padding:20px 0 24px;border-top:1px solid #dfe5ef;margin-top:22px}
+.project-footer-heading{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px;color:#63738b;font-size:11px}
+.project-footer-heading>span:first-child{font-weight:650;color:#425675}
+.project-links{display:flex;flex-wrap:wrap;gap:7px}
+.project-links a{display:inline-flex;align-items:center;justify-content:space-between;gap:9px;min-height:44px;padding:10px;border:1px solid #dce4ef;border-radius:10px;background:#fff;color:#3a5276;font-size:12px;line-height:1.4;transition:background .15s,border-color .15s}
+.project-links a>span{font-size:13px;color:#6a7e9d}
+.project-links a:hover{background:#eaf0fc;border-color:#9eb4dc}
+.project-links a:focus-visible{outline:3px solid #5479c4;outline-offset:3px}
+body.simple-ui[data-high-contrast=true] .project-links a{color:#132f54;border-color:#617999}
+body.simple-ui[data-large-text=true] .project-links a{font-size:16px}
+@media(max-width:700px){.simple-ui .footer{padding:16px 0 20px;margin-top:16px}.project-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.project-links a{min-width:0;padding:10px;font-size:12px;gap:5px}.project-footer-heading{font-size:10px}}

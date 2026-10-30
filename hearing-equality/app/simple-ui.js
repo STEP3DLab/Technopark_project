@@ -1,7 +1,7 @@
 /** Progressive disclosure over the existing controllers. Nodes are moved, never
  * cloned, so confirmation, draft provenance and media lifecycle stay intact. */
-import './platform.js?v=0.18.0';
-import './showcase.js?v=0.18.0';
+import './platform.js?v=0.18.1';
+import './showcase.js?v=0.18.1';
 const $ = id => document.getElementById(id);
 const paths = {
   expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',compare:'M3 4h18v16H3V4Zm9 0v16',download:'M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4',
@@ -203,7 +203,9 @@ export function installSimpleUI() {
   new MutationObserver(()=>{clearTimeout(statusTimer);const text=$('draft-status').textContent;$('draft-status').dataset.quiet=String(/^(Черновик сохранён в этой вкладке\.|Текст изменён вручную\.|Текст добавлен в сообщение\.)/.test(text));if(text && !/не помещается|не удалось|недоступно|максимум|сократите/i.test(text))statusTimer=setTimeout(()=>{$('draft-status').textContent='';},6500);if(sheet.open){$('simple-sheet-status').textContent=text;$('simple-sheet-status').hidden=!text;}}).observe($('draft-status'),{childList:true});
   // Native message dialog may be triggered by a denied clipboard permission.
   new MutationObserver(()=>{if(messageModal.open && sheet.open)closePanel();}).observe(messageModal,{attributes:true,attributeFilter:['open']});
-  const footer=document.querySelector('.footer');footer.innerHTML='<span>РГСУ · Технопарк</span><span>Равенство по слуху</span>';
+  document.querySelector('.project-links')?.addEventListener('click',event=>{
+    if(event.target.closest('a'))api.stop();
+  });
   const orbit=make('div','simple-3d-options');orbit.append(make('h3','','Модель'));
   const attachToolbar=()=>{const toolbar=$('platform-avatar').querySelector('.human-3d-toolbar');if(toolbar){orbit.append(toolbar);playback.append(orbit);}};attachToolbar();$('platform-avatar').addEventListener('avatarready',attachToolbar,{once:true});
   const moreViews=make('details','simple-3d-options','<summary>Дополнительные возможности</summary>');

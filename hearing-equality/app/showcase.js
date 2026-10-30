@@ -1,5 +1,5 @@
-import './platform.js?v=0.18.0';
-import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.18.0';
+import './platform.js?v=0.18.1';
+import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.18.1';
 
 const api=window.hearingEquality;
 const $=id=>document.getElementById(id);

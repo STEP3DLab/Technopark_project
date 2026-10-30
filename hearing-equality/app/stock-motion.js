@@ -1,6 +1,6 @@
 import * as T from './vendor/three.module.min.js';
-import {solveArm} from './retarget-3d.js?v=0.18.0';
-import {prepareMotion,sampleMotion} from './avatar-motion.js?v=0.18.0';
+import {solveArm} from './retarget-3d.js?v=0.18.1';
+import {prepareMotion,sampleMotion} from './avatar-motion.js?v=0.18.1';
 const V=(x=0,y=0,z=0)=>new T.Vector3(x,y,z),Q=()=>new T.Quaternion(),cap=T.MathUtils.clamp;
 const valid=p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1]);
 const median=a=>{a.sort((x,y)=>x-y);return a[Math.floor(a.length/2)]||1;};

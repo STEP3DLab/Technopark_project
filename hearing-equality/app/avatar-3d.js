@@ -1,8 +1,8 @@
-import {Software3DRenderer} from './software-3d.js?v=0.18.0';
+import {Software3DRenderer} from './software-3d.js?v=0.18.1';
 import * as T from './vendor/three.module.min.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {loadStockRig} from './stock-rig.js?v=0.18.0';
-import {prepareStockMotion,applyStockMotion,relaxStockRig} from './stock-motion.js?v=0.18.0';
+import {loadStockRig} from './stock-rig.js?v=0.18.1';
+import {prepareStockMotion,applyStockMotion,relaxStockRig} from './stock-motion.js?v=0.18.1';
 
 // Fixed envelope for the six recorded signs, including finger tips and depth.
 // Do not clamp portrait aspect ratios: that crops hands in a tall scene.

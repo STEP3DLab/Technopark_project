@@ -1,0 +1,29 @@
+.tech-scene-host { position: relative; isolation: isolate; min-width: 0; min-height: 340px; overflow: hidden; background: #e9effa; border: 1px solid #d8e2f1; border-radius: 18px; }
+.tech-scene-host::after { content: ""; position: absolute; z-index: 1; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 1px 0 rgb(255 255 255 / 80%), inset 0 0 35px rgb(98 126 172 / 5%); background: linear-gradient(180deg, rgb(255 255 255 / 14%), transparent 35%); }
+.tech-scene-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; outline-offset: -5px; }
+.tech-scene-canvas.is-dragging { cursor: grabbing; }
+.tech-scene-canvas:focus-visible { outline: 3px solid #2355ed; }
+.tech-scene-caption { position: absolute; z-index: 2; top: 14px; left: 14px; width: fit-content; max-width: min(520px, calc(100% - 28px)); padding: 7px 11px; box-sizing: border-box; border: 1px solid rgb(255 255 255 / 95%); border-radius: 9px; background: rgb(248 250 255 / 88%); box-shadow: 0 3px 13px rgb(35 62 105 / 5%); pointer-events: none; font-size: 10px; font-weight: 650; line-height: 1.5; letter-spacing: .015em; color: #354b6d; }
+.tech-scene-host[data-scene-exploded="true"] .tech-scene-caption { background: #e8efff; color: #1846bd; border-color: #c4d5ff; }
+.tech-scene-host[data-scene-part="base"] .tech-scene-caption,.tech-scene-host[data-scene-part="wall"] .tech-scene-caption,.tech-scene-host[data-scene-part="ribs"] .tech-scene-caption { background: #f2f8df; color: #33451a; border-color: #bdd779; box-shadow: inset 3px 0 #bdd779,0 3px 13px rgb(35 62 105 / 5%); }
+.tech-scene-guide { position: absolute; z-index: 2; left: 16px; bottom: 14px; right: 16px; width: fit-content; max-width: calc(100% - 32px); padding: 6px 10px; pointer-events: none; border: 1px solid #d6e1f3; border-radius: 7px; background: rgb(248 250 255 / 91%); color: #526683; font-size: 9px; line-height: 1.5; }
+.tech-campus-markers { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+.tech-campus-stem { position: absolute; height: 2px; transform-origin: left center; background: #60789b; box-shadow: 0 1px 0 rgb(255 255 255 / 80%); pointer-events: none; }
+.tech-campus-stem[data-selected="true"] { height: 3px; background: #2355ed; }
+.tech-campus-marker { position: absolute; display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0; transform: translate(-50%, -50%); border: 2px solid #f8faff; border-radius: 50%; box-shadow: 0 4px 12px rgb(20 35 63 / 23%), inset 0 1px 0 rgb(255 255 255 / 14%); background: #14233f; color: #fff; box-sizing: border-box; font-family: inherit; font-size: 12px; font-weight: 750; line-height: 1; cursor: pointer; pointer-events: auto; touch-action: manipulation; transition: background-color .14s ease, box-shadow .14s ease, transform .14s ease; }
+.tech-campus-marker:hover { background: #2355ed; transform: translate(-50%, -50%) scale(1.06); box-shadow: 0 5px 15px rgb(35 85 237 / 27%); }
+.tech-campus-marker[aria-pressed="true"] { background: #c7ed52; color: #14233f; border-color: #2355ed; box-shadow: 0 0 0 3px #f8faff, 0 3px 12px rgb(20 35 63 / 22%); }
+.tech-campus-marker:focus-visible { outline: 3px solid #2355ed; outline-offset: 4px; }
+.tech-campus-marker[data-status="complete"]::after { content: "✓"; position: absolute; top: -4px; right: -4px; display: grid; place-items: center; width: 17px; height: 17px; border: 2px solid #f8faff; border-radius: 50%; background: #c7ed52; color: #14233f; font-size: 10px; font-weight: 800; }
+.tech-campus-marker[data-status="skipped"] { border-style: dashed; }
+.tech-scene-fallback { position: absolute; z-index: 3; inset: 0; display: grid; place-content: center; padding: 35px; text-align: center; background: #f1f5fc; color: #53617a; font-size: 14px; line-height: 1.8; }
+.tech-scene-host [hidden] { display: none !important; }
+@media (max-width: 580px) {
+  .tech-scene-host { min-height: 310px; border-radius: 14px; }
+  .tech-scene-caption { top: 10px; left: 10px; max-width: calc(100% - 20px); padding: 6px 8px; font-size: 9px; }
+  .tech-scene-guide { left: 12px; bottom: 12px; right: 12px; max-width: calc(100% - 24px); padding: 5px 8px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .tech-campus-marker { transition: none; } .tech-campus-marker:hover { transform: translate(-50%, -50%); } }
+@media print {
+  .tech-scene-host { display: none !important; }
+}

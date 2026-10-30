@@ -1,0 +1,39 @@
+/* Interactive robot trial; scoped to the panel, no effect on the editor. */
+.rd{padding:22px;margin:18px 0 0;border:1px solid #cbd8ee;border-radius:16px;background:#f7f9fe;color:#1b3257;min-width:0}
+.rd *{box-sizing:border-box}
+.rd-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:12px}
+.rd-kicker{font-size:10px;font-weight:750;letter-spacing:.11em;color:#2355ed;margin:0 0 8px;line-height:1.5}
+.rd-heading h3{font-size:21px;line-height:1.25;letter-spacing:-.03em;margin:0;color:#182c4f}
+.rd-mode{font-size:10px;line-height:1.4;white-space:nowrap;color:#516783;background:#eaf0fb;padding:6px 9px;border-radius:7px;border:1px solid #d6e0ef}
+.rd-intro{font-size:12px;line-height:1.7;color:#5b6f8d;margin:0 0 18px}
+.rd-dashboard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:14px 16px;border:1px solid #d9e2ef;background:white;border-radius:11px;margin-bottom:16px}
+.rd-dashboard span{display:block;font-size:10px;line-height:1.45;color:#63748e;margin-bottom:5px}
+.rd-dashboard strong{font-size:13px;line-height:1.5;font-weight:650;display:block}
+.rd-commands{display:flex;flex-wrap:wrap;list-style:none;gap:7px;padding:0;margin:0 0 18px;min-height:47px;align-items:center}
+.rd-command{position:relative;display:flex;align-items:center;justify-content:center;gap:5px;min-width:43px;min-height:45px;padding:7px;border:1px solid #cdd8e9;border-radius:9px;background:#fff;color:#607593;margin:0!important;transition:background .12s ease,border-color .12s ease}
+.rd-command small{font-size:9px;line-height:1;color:#637893;align-self:flex-start;margin-top:2px}
+.rd-command>span{font-size:21px;line-height:1}
+.rd-command.is-done{background:#eaf1ff;border-color:#bcd0f5;color:#234fae}
+.rd-command.is-current{background:#2355ed;color:white;border-color:#1742ca;box-shadow:0 0 0 2px #d5e0fb}
+.rd-command.is-current small{color:#eef3ff}
+.rd-command.is-next{outline:1px dashed #6f8cc0;outline-offset:2px}
+.rd-command.is-blocked{background:#fff3db;border-color:#c78a1d;color:#6f4704;box-shadow:0 0 0 2px #f1d7a5}
+.rd-command.is-blocked small{color:#795215}
+.rd-command.is-blocked b{position:absolute;top:-7px;right:-5px;width:17px;height:17px;line-height:17px;border-radius:50%;font-size:11px;text-align:center;background:#8b560b;color:white}
+.rd-empty-command{font-size:12px;line-height:1.6;color:#65748e;margin:0!important}
+.rd-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.rd-controls button{font:inherit;font-size:12px;line-height:1.35;font-weight:650;min-height:44px;min-width:0;padding:10px 8px;background:white;color:#29456f;border:1px solid #bfcee6;border-radius:9px;cursor:pointer;transition:background .12s ease}
+.rd-controls button:hover:not(:disabled){background:#e8efff}
+.rd-controls button:focus-visible{outline:3px solid #2355ed;outline-offset:3px}
+.rd-controls button:disabled{opacity:.5;cursor:default}
+.rd-controls .rd-play{background:#2355ed;color:white;border-color:#2355ed}
+.rd-controls .rd-play:hover:not(:disabled){background:#193fbd}
+.rd-controls .rd-play[aria-pressed=true]{background:#14233f;border-color:#14233f}
+.rd-status{font-size:12px;line-height:1.7;margin:16px 0 0;padding:13px 14px;border-left:3px solid #6584c3;border-radius:0 8px 8px 0;background:#edf2fc;color:#36527d;min-height:66px;overflow-wrap:anywhere}
+.rd[data-robot-status=blocked] .rd-status{border-color:#ad7211;background:#fff4df;color:#795009}
+.rd[data-robot-status=finished] .rd-status{border-color:#2355ed;background:#edf2ff;color:#294d94}
+.rd-footnote{font-size:10px;line-height:1.6;color:#657691;margin:10px 0 0}
+@media(max-width:800px){.rd{padding:17px}.rd-heading{flex-wrap:wrap;gap:10px}.rd-heading h3{font-size:20px}.rd-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.rd-dashboard{padding:12px}.rd-dashboard strong{font-size:12px}}
+@media(max-width:450px){.rd{padding:14px;border-radius:13px}.rd-intro,.rd-status{font-size:12px}.rd-controls button{font-size:13px}.rd-command{min-width:39px;padding:6px}.rd-commands{gap:7px}.rd-dashboard{gap:8px}.rd-dashboard strong{font-size:12px}.rd-footnote{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.rd-command,.rd-controls button{transition:none}}
+@media print{.rd{display:none!important}}

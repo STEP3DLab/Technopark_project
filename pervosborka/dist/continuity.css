@@ -1,0 +1,40 @@
+/* Continue a personal expedition; no effect on task scoring or 3D controls. */
+.continuity-page{max-width:960px}
+.continuity-page>h1{margin-top:14px}
+.continuity-page>.card,.continuity-page>.callout{margin:22px 0}
+.transfer-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 36px}
+.transfer-steps>span{display:flex;align-items:center;gap:10px;font-size:12px;line-height:1.5;color:#385071}
+.transfer-steps b{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;background:#eaf0ff;border-radius:9px;color:#2355ed}
+.transfer-card-head{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.transfer-card-head h2{margin-bottom:0}
+.work-current{border-top:4px solid #2355ed}
+.work-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:23px 0 28px}
+.work-stats>div{border-left:2px solid #dce4f1;padding-left:15px;min-width:0}
+.work-stats strong{display:block;font-size:30px;line-height:1.1;color:#18335a;font-weight:750}
+.work-stats span{display:block;font-size:11px;color:#5d6f89;line-height:1.55;margin-top:8px}
+.transfer-input label{display:block;font-size:14px;font-weight:600;margin:18px 0 10px}
+.transfer-input input[type=file]{display:block;width:100%;max-width:100%;min-width:0;padding:12px;background:#f5f8fe;border:1px dashed #b8c9e5;border-radius:10px;font:inherit;font-size:13px}
+.transfer-input input[type=file]::file-selector-button{padding:12px;margin-right:12px;border:0;background:#e3ebff;color:#2149a9;border-radius:7px;font-weight:600;cursor:pointer}
+.transfer-input input:focus-visible,.import-preview:focus-visible{outline:3px solid #2355ed;outline-offset:4px}
+.transfer-status{min-height:1.5em;font-size:13px;line-height:1.6;color:#385c98;overflow-wrap:anywhere}
+.import-preview{border:2px solid #2355ed;background:#f8faff}
+.import-preview .hero-actions{margin-top:25px}
+.import-preview .notice p:last-child{margin-bottom:0}
+.received-banner{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:24px 30px;margin-top:24px;background:#eaf1ff;border:1px solid #c8d8f4;border-radius:16px}
+.received-banner p{font-size:12px;margin-bottom:5px;line-height:1.6}.received-banner strong{font-size:22px}
+.received-list{margin-top:24px;border:1px solid #d3dfef;border-radius:12px;background:white;padding:16px 20px}
+.received-list>summary{font-weight:650;cursor:pointer;padding:8px 0;min-height:44px}
+.received-rows{list-style:none;margin:10px 0 0;padding:0}
+.received-rows>li{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 0;border-top:1px solid #e1e7f1}
+.received-rows p{font-size:12px;margin:4px 0 0;color:#64768f}
+.received-rows .btn{flex:0 0 auto}
+.project-jump{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px;margin:28px 0;border:1px solid #c6d7f1;border-radius:15px;background:#eef4ff}
+.project-jump p{margin:0;font-size:14px;line-height:1.65}.project-jump h3{margin-bottom:7px}
+.project-jump .btn{flex:0 0 auto}
+.project-brief-art{margin:-28px -28px 24px;overflow:hidden;border-radius:15px 15px 0 0;max-height:160px}
+.project-brief-art .lab-art-tag{display:none}.project-brief-art .lab-art{height:160px;aspect-ratio:auto;margin:0}
+.project-briefs{margin-bottom:32px}.project-briefs>.card{overflow:hidden}
+.source-print{display:none}
+@media(max-width:700px){.transfer-steps{grid-template-columns:1fr;gap:14px;margin:25px 0}.transfer-card-head{align-items:flex-start;flex-direction:column;gap:10px}.work-stats{gap:10px}.work-stats>div{padding-left:10px}.work-stats strong{font-size:26px}.work-stats span{font-size:11px}.received-banner,.project-jump{flex-direction:column;align-items:stretch;padding:20px}.received-rows>li{align-items:flex-start;flex-wrap:wrap}.project-jump .btn{align-self:flex-start}.project-brief-art{margin:-22px -22px 20px}.import-preview .hero-actions>.btn{width:100%}}
+@media(max-width:430px){.work-stats{grid-template-columns:1fr}.work-stats>div{display:flex;align-items:center;gap:12px}.work-stats strong{min-width:38px}.work-stats span{margin:0;font-size:13px}.transfer-input input[type=file]{font-size:12px;padding:8px}.transfer-input input[type=file]::file-selector-button{display:block;margin:0 0 8px}.transfer-card-head .badge{white-space:normal}}
+@media print{.source-print{display:block!important;font-size:9pt}.project-brief-art{display:none}.project-workspace .section-heading{display:block}.project-workspace .section-lead{font-size:10pt}.project-workspace .project-briefs>.card{padding:10pt;margin:10pt 0}.project-workspace .project-briefs h2{font-size:15pt!important;margin-top:7pt}.project-workspace .next-steps{margin:15pt 0}.report-page .route-card:not(.selected){display:none!important}.report-page .route-card.selected{break-inside:avoid}.received-banner,.received-list,.project-jump,.continuity-page .transfer-steps{display:none!important}}

@@ -1,0 +1,96 @@
+/* Enlarged view uses the existing scene and controls. Load after studio.css. */
+.fx-overlay{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:22px;background:rgb(8 18 39 / 89%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box}
+.fx-dialog{display:flex;flex-direction:column;width:min(1460px,100%);height:calc(100vh - 44px);height:calc(100dvh - 44px);max-height:1000px;min-width:0;min-height:0;border:1px solid #ffffff32;border-radius:24px;background:#f5f8fd;box-shadow:0 24px 110px #0007;overflow:hidden;overflow:clip;animation:fx-arrive .18s ease-out both}
+.fx-header{display:flex;align-items:center;justify-content:space-between;flex:none;gap:20px;padding:20px 24px;background:#111e39;color:#fff;border-bottom:1px solid #ffffff1f}
+.fx-heading{min-width:0}
+.fx-kicker{margin:0 0 6px;color:#d9f76e;font-size:11px;line-height:1.4;letter-spacing:.12em;font-weight:750}
+.fx-title{margin:0;color:#fff;font-size:clamp(18px,2.1vw,29px);font-weight:720;letter-spacing:-.035em;line-height:1.16;overflow-wrap:anywhere}
+.fx-hint{margin:8px 0 0;color:#bdcce3;font-size:12px;line-height:1.5}
+.fx-close{display:flex;align-items:center;justify-content:center;flex:none;gap:10px;min-width:44px;min-height:44px;padding:10px 13px;border:1px solid #ffffff40;border-radius:12px;background:#ffffff0d;color:#fff;font-family:inherit;font-size:12px;font-weight:650;line-height:1.3;cursor:pointer;touch-action:manipulation;transition:background .15s,border-color .15s}
+.fx-close:hover{background:#ffffff1f;border-color:#b8ceff}
+.fx-close:focus-visible{outline:3px solid #d9f76e;outline-offset:3px}
+.fx-close-icon{font:300 28px/20px system-ui,sans-serif}
+.fx-escape{padding:3px 5px;border:1px solid #ffffff33;border-radius:5px;background:#fff1;color:#c6d2e8;font:500 11px/1.2 ui-monospace,monospace}
+.fx-workbench{display:grid;grid-template-columns:minmax(0,1fr);flex:1;min-width:0;min-height:0;overflow:hidden}
+.fx-dialog.has-companion .fx-workbench{grid-template-columns:minmax(0,1fr) minmax(285px,340px)}
+.fx-stage{display:flex;flex-direction:column;min-width:0;min-height:0;background:#e8eef8;overflow:hidden}
+.fx-stage>.scene-shell{display:flex;flex-direction:column;flex:1;width:100%;height:100%;min-width:0;min-height:0;max-height:none;margin:0;border:0;border-radius:0;box-shadow:none}
+.fx-stage .scene-toolbar{flex:none;padding:12px 16px;border-radius:0}
+.fx-stage .scene-title{font-size:11px}
+.fx-stage .scene-mount{flex:1;min-height:240px!important;height:auto!important;max-height:none!important;border:0;border-radius:0}
+.fx-stage .tech-scene-host{border:0;border-radius:0;min-height:240px!important}
+.fx-stage .scene-fallback{flex:1;min-height:0;overflow:auto;display:grid;align-content:center;gap:12px;padding:24px}
+.fx-stage .scene-fallback .robot-grid{width:min(100%,470px);max-width:470px}
+.fx-stage .scene-fallback>svg{width:100%;height:min(52vh,480px)}
+.fx-stage .scene-bottom{flex:none;margin:0;padding:12px 16px;border-radius:0;background:#f8faff}
+.fx-stage .scene-bottom p{font-size:12px}
+.fx-stage .scene-tools button{min-width:44px;min-height:44px;font-size:12px}
+.fx-stage .scene-tools [data-action^="scene-focus:"]{display:none!important}
+.fx-stage [hidden]{display:none!important}
+.fx-panel{min-width:0;min-height:0;padding:20px;border-left:1px solid #d6e0ef;background:#f5f8fd;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.fx-panel>.metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 20px}
+.fx-panel>.metrics .metric{min-width:0;padding:12px 5px;border-radius:11px;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.fx-panel>.metrics .metric strong,.fx-panel>.metrics .metric output{font-size:24px;line-height:1.2}
+.fx-panel>.metrics .metric small{font-size:11px}
+.fx-panel>.lab-controls{min-width:0;padding:0}
+.fx-panel>.campus-aside{min-width:0;min-height:100%;margin:0;padding:21px;border-radius:17px}
+.fx-panel .campus-preview-art{margin:-21px -21px 19px;max-height:180px}
+.fx-panel .campus-preview-art .lab-art{min-height:135px;max-height:180px;aspect-ratio:1.9}
+.fx-panel .campus-aside h2{font-size:27px}
+.fx-panel .campus-aside .campus-enter{margin-top:18px}
+.fx-panel .campus-aside .campus-note{margin-top:15px}
+.fx-panel .robot-debugger-slot,.fx-panel .xr-player-slot{width:100%;min-width:0;margin:0}
+.fx-panel .rd,.fx-panel .xr-player{margin:0}
+.fx-panel .rd-heading{align-items:flex-start;gap:10px}
+.fx-panel .rd-heading h3{font-size:21px}
+.fx-panel .rd-heading{flex-wrap:wrap}
+.fx-panel .rd-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fx-panel .rd-dashboard{grid-template-columns:1fr}
+.fx-panel .xp{margin:0;padding:0;border:0;border-radius:0;background:transparent}
+.fx-panel .xp-content,.fx-panel .xp-header>div,.fx-panel .xp-window,.fx-panel .xp-window-body,.fx-panel .xp-ready>div{min-width:0}
+.fx-panel .xp-header{gap:10px;margin-bottom:12px}
+.fx-panel .xp-header h3,.fx-panel .xp-pending h3{font-size:22px;line-height:1.25}
+.fx-panel .xp h4{font-size:24px;line-height:1.2;letter-spacing:-.035em}
+.fx-panel .xp-kicker,.fx-panel .xp-mode-badge,.fx-panel .xp-screen-eyebrow,.fx-panel .xp-object-index,.fx-panel .xp-barrier-note,.fx-panel .xp-footnote,.fx-panel .xp-outside-controls>span{font-size:11px}
+.fx-panel .xp-kicker,.fx-panel .xp-screen-eyebrow,.fx-panel .xp-object-index{letter-spacing:.07em}
+.fx-panel .xp-mode-badge{min-width:0;max-width:100%}
+.fx-panel .xp-flow{gap:5px}
+.fx-panel .xp-flow li{flex-direction:column;align-items:flex-start;gap:4px;padding:8px 7px;font-size:11px}
+.fx-panel .xp-flow li>span{font-size:11px}
+.fx-panel .xp-window-bar{flex-wrap:wrap;gap:6px 8px;padding:10px;font-size:11px;letter-spacing:.04em}
+.fx-panel .xp-window-state{margin-left:0;flex-basis:100%;font-size:11px}
+.fx-panel .xp-window-body{min-height:0}
+.fx-panel .xp-ready{grid-template-columns:minmax(0,1fr);gap:14px;padding:16px}
+.fx-panel .xp-ready-art{display:flex;align-items:center;justify-content:center;height:106px;max-height:106px;border-radius:10px}
+.fx-panel .xp-ready-art .xp-orbit-art{max-height:150px}
+.fx-panel .xp-intro,.fx-panel .xp-autoride{padding:0 16px 20px}
+.fx-panel .xp-intro-art,.fx-panel .xp-camera-pass{height:110px;margin:0 -16px 16px}
+.fx-panel .xp-selection,.fx-panel .xp-barrier,.fx-panel .xp-outcome{padding:18px 16px}
+.fx-panel .xp-object-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+.fx-panel .xp-object-card{padding:12px}
+.fx-panel .xp-object-art{max-height:120px}
+.fx-panel .xp-object-name{font-size:16px}
+.fx-panel .xp-outcome{min-height:0}
+.fx-panel .xp-outcome-object{width:min(180px,100%);margin:0 auto 8px}
+.fx-panel .xp-large-icon{width:48px;height:48px;border-radius:14px;margin-bottom:16px}
+.fx-panel .xp-closed{min-height:220px}
+.fx-panel .xp-button{max-width:100%;white-space:normal}
+.fx-panel .xp-outside-controls{gap:8px}
+.fx-panel .xp-outside-controls>span{width:100%;margin-top:0}
+.fx-panel .xp-outside-controls>div{display:grid;grid-template-columns:minmax(0,1fr);width:100%;gap:8px}
+.fx-panel .xp-outside-controls .xp-button{min-height:44px;font-size:12px!important}
+.fx-panel .xp-pending{flex-direction:column;gap:10px}
+.fx-panel input[type=range]{width:100%;min-height:44px}
+.fx-panel .range-row{margin-bottom:25px}
+.fx-panel .range-row label{line-height:1.5}
+.fx-overlay :focus-visible{outline-offset:3px}
+@keyframes fx-arrive{from{opacity:0;transform:translateY(9px) scale(.99)}to{opacity:1;transform:none}}
+/* Only the side panel (or the mobile workbench) should scroll on focus. */
+@media(min-width:901px){.fx-workbench,.fx-stage{overflow:clip}}
+@media(min-width:601px) and (max-width:900px){.fx-panel .xp-object-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1000px){.fx-overlay{padding:14px}.fx-dialog{height:calc(100vh - 28px);height:calc(100dvh - 28px);border-radius:20px}.fx-header{padding:16px 20px}.fx-dialog.has-companion .fx-workbench{grid-template-columns:minmax(0,1fr) minmax(250px,300px)}.fx-panel{padding:15px}.fx-panel .campus-aside h2{font-size:24px}}
+@media(max-width:900px){.fx-overlay{padding:0;align-items:stretch}.fx-dialog{width:100%;height:100vh;height:100dvh;max-height:none;border:0;border-radius:0}.fx-header{padding:14px 16px;gap:12px}.fx-title{font-size:20px;line-height:1.2}.fx-kicker{font-size:11px;letter-spacing:.1em}.fx-hint{font-size:12px;margin-top:6px}.fx-close{width:44px;height:44px;padding:0;border-radius:12px}.fx-close-copy,.fx-escape{display:none}.fx-workbench{overflow:auto;align-content:start}.fx-dialog:not(.has-companion) .fx-stage{min-height:500px;height:100%}.fx-dialog.has-companion .fx-workbench{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;overflow:auto;align-content:start}.fx-dialog.has-companion .fx-stage{min-height:480px;height:63vh;height:63dvh;max-height:700px;flex:none}.fx-dialog.has-companion .fx-stage>.scene-shell{height:100%;min-height:0}.fx-stage .scene-toolbar{padding:10px 12px}.fx-stage .scene-title{font-size:11px}.fx-stage .scene-bottom{padding:10px 12px}.fx-panel{overflow:visible;border-left:0;border-top:1px solid #d6e0ef;padding:18px}.fx-panel>.campus-aside{min-height:0}.fx-panel .campus-preview-art .lab-art{aspect-ratio:2.5}.fx-panel .rd-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.fx-header{padding:12px 13px}.fx-title{font-size:18px}.fx-stage .scene-tools{gap:5px}.fx-stage .scene-tools button{padding:6px 8px;font-size:12px}.fx-stage .scene-bottom .scene-tools{width:100%;justify-content:space-between}.fx-stage .scene-bottom p{flex-basis:100%;font-size:12px}.fx-panel{padding:14px}.fx-panel .rd-dashboard{grid-template-columns:1fr}.fx-stage .scene-fallback{padding:15px}.fx-dialog.has-companion .fx-stage{min-height:510px}}
+@media(max-height:540px) and (min-width:901px){.fx-header{padding:10px 18px}.fx-hint,.fx-kicker{display:none}.fx-stage .scene-mount,.fx-stage .tech-scene-host{min-height:150px!important}.fx-stage .scene-bottom p{display:none}}
+@media(prefers-reduced-motion:reduce){.fx-dialog{animation:none}.fx-close{transition:none}}
+@media print{.fx-overlay{display:none!important}}

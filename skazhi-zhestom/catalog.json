@@ -1,0 +1,129 @@
+{
+  "version": "1.0.0",
+  "items": [
+    {
+      "id": "hello",
+      "label": "Привет!",
+      "emoji": "👋",
+      "category": "greeting",
+      "description": "Приветствие с улыбкой и взмахом лапы.",
+      "tags": [
+        "привет",
+        "здравствуй",
+        "здравствуйте",
+        "добрый день",
+        "начать",
+        "hello"
+      ],
+      "poster": "cat-motion/hello-poster.webp",
+      "preview": "cat-motion/hello-preview.webm",
+      "webm": "cat-motion/hello.webm",
+      "png": "cat/hello.png",
+      "bytes": 244265,
+      "rsl_verified": false
+    },
+    {
+      "id": "thanks",
+      "label": "Спасибо!",
+      "emoji": "🙏",
+      "category": "warm",
+      "description": "Тёплая благодарность: кивок и лапа у сердца.",
+      "tags": [
+        "спасибо",
+        "благодарю",
+        "благодарность",
+        "thanks"
+      ],
+      "poster": "cat-motion/thanks-poster.webp",
+      "preview": "cat-motion/thanks-preview.webm",
+      "webm": "cat-motion/thanks.webm",
+      "png": "cat/thanks.png",
+      "bytes": 236631,
+      "rsl_verified": false
+    },
+    {
+      "id": "hug",
+      "label": "Обнимаю",
+      "emoji": "🤗",
+      "category": "warm",
+      "description": "Котик тянет лапы навстречу. Отправь тому, кого хочется обнять.",
+      "tags": [
+        "обнимаю",
+        "обнять",
+        "объятие",
+        "люблю",
+        "поддержка",
+        "тепло",
+        "hug"
+      ],
+      "poster": "cat-motion/hug-poster.webp",
+      "preview": "cat-motion/hug-preview.webm",
+      "webm": "cat-motion/hug.webm",
+      "png": "cat/hug.png",
+      "bytes": 213578,
+      "rsl_verified": false
+    },
+    {
+      "id": "super",
+      "label": "Ты супер!",
+      "emoji": "👍",
+      "category": "warm",
+      "description": "Поднятый палец и одобрительный кивок. Маленькая порция поддержки.",
+      "tags": [
+        "ты супер",
+        "молодец",
+        "класс",
+        "круто",
+        "поддержка",
+        "super"
+      ],
+      "poster": "cat-motion/super-poster.webp",
+      "preview": "cat-motion/super-preview.webm",
+      "webm": "cat-motion/super.webm",
+      "png": "cat/super.png",
+      "bytes": 221713,
+      "rsl_verified": false
+    },
+    {
+      "id": "confused",
+      "label": "Не понял",
+      "emoji": "🤔",
+      "category": "question",
+      "description": "Пожимает плечами и наклоняет голову: можно объяснить ещё раз?",
+      "tags": [
+        "не понял",
+        "непонятно",
+        "поясни",
+        "вопрос",
+        "что",
+        "почему"
+      ],
+      "poster": "cat-motion/confused-poster.webp",
+      "preview": "cat-motion/confused-preview.webm",
+      "webm": "cat-motion/confused.webm",
+      "png": "cat/confused.png",
+      "bytes": 234040,
+      "rsl_verified": false
+    },
+    {
+      "id": "bye",
+      "label": "Пока!",
+      "emoji": "👋",
+      "category": "greeting",
+      "description": "Помахал лапкой и подмигнул. До следующего сообщения.",
+      "tags": [
+        "пока",
+        "до свидания",
+        "прощание",
+        "до встречи",
+        "bye"
+      ],
+      "poster": "cat-motion/bye-poster.webp",
+      "preview": "cat-motion/bye-preview.webm",
+      "webm": "cat-motion/bye.webm",
+      "png": "cat/bye.png",
+      "bytes": 244883,
+      "rsl_verified": false
+    }
+  ]
+}

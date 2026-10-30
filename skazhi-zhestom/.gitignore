@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+telegram/.state.json
+telegram/__pycache__/
+__pycache__/
+node_modules/
+.render/

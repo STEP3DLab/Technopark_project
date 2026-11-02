@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   createProject, DEFAULT_POSE, DEFAULT_SETTINGS, POSE_LIMITS, sanitizePose,
   validateProject, sampleTimeline, upsertKeyframe, removeKeyframe, toProgram,
+  buildFrameSchedule, timeToFrame, stepFrameTime,
 } from './motion.js';
 
 const frame = (id, time, base, subject = 0) => ({ id, time, pose: { ...DEFAULT_POSE, base, subject } });
@@ -114,12 +115,93 @@ test('editing keys replaces ID or time, sorts and preserves caller-owned state',
   assert.equal(original[1].time, 4);
 });
 
-test('program explicitly identifies simulator format and exports each interval plus final still', () => {
+test('program identifies simulator and auto-aim semantics and exports exactly the film schedule', () => {
   const code = toProgram(project());
   assert.match(code, /Не является программой для физического робота/);
-  assert.match(code, /FRAMES 97/);
-  assert.equal((code.match(/^CAPTURE /gm) ?? []).length, 97);
-  assert.match(code, /AT 8s\nMOVE J1=22 .*SUBJECT=100/);
+  assert.match(code, /FRAMES 96/);
+  assert.match(code, /TIMELINE_DURATION 8\nCLIP_DURATION 8/);
+  assert.equal((code.match(/^CAPTURE /gm) ?? []).length, 96);
+  assert.match(code, /AT 7\.916667s\nMOVE /);
+  assert.doesNotMatch(code, /^AT 8s$/m);
+  assert.match(code, /AUTO_AIM ON/);
+  assert.match(code, /локальные смещения кадра/);
   assert.ok(!code.includes('NaN') && !code.includes('Infinity'));
   assert.match(code, /WAIT UNTIL_POSE_READY/);
+});
+
+test('frame schedule has no appended endpoint and correct exact playback length', () => {
+  const schedule = buildFrameSchedule({ duration: 8, fps: 12 });
+  assert.equal(schedule.count, 96);
+  assert.equal(schedule.times.length, 96);
+  assert.equal(schedule.times[0], 0);
+  assert.equal(schedule.times.at(-1), 95 / 12);
+  assert.equal(schedule.requestedDuration, 8);
+  assert.equal(schedule.playbackDuration, 8);
+  assert.equal(schedule.quantized, false);
+  assert.equal(new Set(schedule.times).size, schedule.count);
+});
+
+test('floating integer boundaries do not create phantom frames', () => {
+  assert.ok(1.1 * 50 > 55, 'This input reproduces the original floating-point defect.');
+  const schedule = buildFrameSchedule({ duration: 1.1, fps: 50 });
+  assert.equal(schedule.count, 55);
+  assert.equal(schedule.playbackDuration, 1.1);
+  assert.equal(schedule.quantized, false);
+  assert.equal(schedule.times.at(-1), 54 / 50);
+  const p = createProject({ duration: 1.1, fps: 50 });
+  assert.equal((toProgram(p).match(/^CAPTURE /gm) ?? []).length, 55);
+});
+
+test('fractional frames expose quantized clip duration without changing requested timeline', () => {
+  const schedule = buildFrameSchedule({ duration: 1.01, fps: 12 });
+  assert.equal(schedule.count, 13);
+  assert.equal(schedule.requestedDuration, 1.01);
+  assert.equal(schedule.playbackDuration, 13 / 12);
+  assert.equal(schedule.quantized, true);
+  assert.equal(schedule.times.at(-1), 1);
+  const code = toProgram(createProject({ duration: 1.01, fps: 12 }));
+  assert.match(code, /TIMELINE_DURATION 1\.01\nCLIP_DURATION 1\.083333/);
+  assert.equal((code.match(/^CAPTURE /gm) ?? []).length, 13);
+});
+
+test('frame index floors and clamps, including exact representational boundaries', () => {
+  const p = createProject({ duration: 8, fps: 12 });
+  assert.equal(timeToFrame(p, -3), 0);
+  assert.equal(timeToFrame(p, NaN), 0);
+  assert.equal(timeToFrame(p, .04), 0);
+  assert.equal(timeToFrame(p, .09), 1);
+  assert.equal(timeToFrame(p, 8), 95);
+  assert.equal(timeToFrame(p, 99), 95);
+  for (const fps of [12, 24, 30, 50, 60]) {
+    const sequence = { duration: 8, fps };
+    for (let frame = 0; frame < fps * 8; frame++) {
+      assert.equal(timeToFrame(sequence, frame / fps), frame);
+    }
+  }
+});
+
+test('frame stepping snaps arbitrary scrubber positions and keeps endpoint inspectable', () => {
+  const p = createProject({ duration: 8, fps: 12 });
+  assert.equal(stepFrameTime(p, .1, 1), 2 / 12);
+  assert.equal(stepFrameTime(p, .1, -1), 1 / 12);
+  assert.equal(stepFrameTime(p, 2 / 12, 1), 3 / 12);
+  assert.equal(stepFrameTime(p, 2 / 12, -1), 1 / 12);
+  assert.equal(stepFrameTime(p, 0, -1), 0);
+  assert.equal(stepFrameTime(p, 95 / 12, 1), 8);
+  assert.equal(stepFrameTime(p, 8, 1), 8);
+  assert.equal(stepFrameTime(p, 8, -1), 95 / 12);
+  const fractional = { duration: 1.01, fps: 12 };
+  assert.equal(stepFrameTime(fractional, 1, 1), 1.01);
+  assert.equal(stepFrameTime(fractional, 1.01, -1), 1);
+});
+
+test('schedule rejects invalid rates and durations and bounds maximum allocation', () => {
+  assert.throws(() => buildFrameSchedule({ duration: Infinity, fps: 12 }), /Длительность/);
+  assert.throws(() => buildFrameSchedule({ duration: 8, fps: 0 }), /Частота/);
+  assert.throws(() => buildFrameSchedule({ duration: 8, fps: 12.5 }), /Частота/);
+  assert.equal(buildFrameSchedule({ duration: 120, fps: 60 }).count, 7200);
+  const single = { duration: 1, fps: 1 };
+  assert.deepEqual(buildFrameSchedule(single).times, [0]);
+  assert.equal(stepFrameTime(single, 0, 1), 1);
+  assert.equal(stepFrameTime(single, 1, -1), 0);
 });

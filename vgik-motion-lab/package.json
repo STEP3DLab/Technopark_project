@@ -1,1 +1,9 @@
-{"name":"rgsu-vgik-motion-lab","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node --test motion.test.mjs zip.test.mjs"}}
+{
+  "name": "rgsu-vgik-motion-lab",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test motion.test.mjs editor.test.mjs scene.test.mjs zip.test.mjs"
+  }
+}

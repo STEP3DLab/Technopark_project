@@ -39,6 +39,68 @@ const finite = (value) => typeof value === 'number' && Number.isFinite(value);
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const cleanText = (text, limit) => String(text).replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, limit);
 
+// Correct only floating-point noise close to integer frame boundaries. A real
+// fractional frame must still extend the clip to the next complete frame.
+function snapNearInteger(value) {
+  const integer = Math.round(value);
+  const tolerance = Math.max(1, Math.abs(value)) * Number.EPSILON * 16;
+  return Math.abs(value - integer) <= tolerance ? integer : value;
+}
+
+function frameScheduleInfo({ duration, fps } = {}) {
+  if (!finite(duration) || duration < PROJECT_LIMITS.minDuration || duration > PROJECT_LIMITS.maxDuration) {
+    throw new Error(`Длительность должна быть от ${PROJECT_LIMITS.minDuration} до ${PROJECT_LIMITS.maxDuration} с.`);
+  }
+  if (!Number.isInteger(fps) || fps < PROJECT_LIMITS.minFps || fps > PROJECT_LIMITS.maxFps) {
+    throw new Error(`Частота должна быть целым числом от ${PROJECT_LIMITS.minFps} до ${PROJECT_LIMITS.maxFps} кадров/с.`);
+  }
+  const count = Math.ceil(snapNearInteger(duration * fps));
+  const playbackDuration = count / fps;
+  const tolerance = Math.max(1, duration, playbackDuration) * Number.EPSILON * 16;
+  return {
+    count,
+    requestedDuration: duration,
+    playbackDuration,
+    quantized: Math.abs(playbackDuration - duration) > tolerance,
+  };
+}
+
+/**
+ * A film contains N complete frames sampled at 0/fps … (N−1)/fps.
+ * The terminal key remains editable at duration, but is not appended as an
+ * extra image. A fractional requested frame extends playback to N/fps.
+ */
+export function buildFrameSchedule(project) {
+  const info = frameScheduleInfo(project);
+  return { times: Array.from({ length: info.count }, (_, i) => i / project.fps), ...info };
+}
+
+/** Zero-based frame at a time; the terminal key maps to the last film frame. */
+export function timeToFrame(project, time) {
+  const { count } = frameScheduleInfo(project);
+  const position = finite(time) ? time : 0;
+  return clamp(Math.floor(snapNearInteger(position * project.fps)), 0, count - 1);
+}
+
+/**
+ * Step to the next/previous frame grid point from arbitrary scrubber time.
+ * A forward step beyond the last sampled frame reaches project.duration so
+ * its terminal key can still be inspected. That endpoint is not a film frame.
+ * A backward step from the endpoint returns to the final sampled grid point.
+ */
+export function stepFrameTime(project, time, direction) {
+  const { count } = frameScheduleInfo(project);
+  const position = clamp(finite(time) ? time : 0, 0, project.duration);
+  if (!finite(direction) || direction === 0) return position;
+  const framePosition = snapNearInteger(position * project.fps);
+  if (direction > 0) {
+    const next = Math.floor(framePosition) + 1;
+    return next >= count ? project.duration : next / project.fps;
+  }
+  const previous = Math.ceil(framePosition) - 1;
+  return clamp(previous, 0, count - 1) / project.fps;
+}
+
 /** Tolerant UI boundary: discard unknown properties and clamp valid numbers. */
 export function sanitizePose(pose = {}, fallback = DEFAULT_POSE) {
   const source = isObject(pose) ? pose : {};
@@ -210,30 +272,33 @@ export function removeKeyframe(keyframes, id) {
 /**
  * Export an explicit, readable simulation sequence. This is intentionally not
  * a firmware dialect, G-code, ROS command stream or physical robot controller.
- * The final timeline endpoint is included as a final reference still.
+ * Exactly the film schedule is exported; there is no extra endpoint still.
  */
 export function toProgram(input) {
   const project = validateProject(input);
-  const frameIntervals = Math.ceil(project.duration * project.fps);
-  const count = frameIntervals + 1;
-  const number = (value) => Number(value.toFixed(3)).toString();
+  const schedule = buildFrameSchedule(project);
+  const number = (value) => Number(value.toFixed(6)).toString();
   const lines = [
     '; РГСУ × ВГИК · программа визуального симулятора',
     '; Учебный формат. Не является программой для физического робота.',
     '; J1…J6 — градусы; FOCAL — мм; SUBJECT — положение персонажа, %.',
-    '; Последняя точка включена как завершающий опорный кадр.',
+    '; Кадры снимаются в моменты 0/fps … (N−1)/fps; конечный ключ не дублируется.',
+    '; TIMELINE_DURATION — запрошенная длина; CLIP_DURATION — N/fps.',
+    '; При AUTO_AIM ON камера направлена на объект, J4…J6 задают локальные смещения кадра.',
+    '; При AUTO_AIM OFF J4…J6 задают локальные оси запястья виртуального робота.',
     `PROJECT ${JSON.stringify(project.name)}`,
     `FPS ${project.fps}`,
-    `DURATION ${number(project.duration)}`,
+    `TIMELINE_DURATION ${number(schedule.requestedDuration)}`,
+    `CLIP_DURATION ${number(schedule.playbackDuration)}`,
     `EASING ${project.easing.toUpperCase()}`,
     `SCENE ${project.settings.subjectType.toUpperCase()}`,
     `LIGHTING ${project.settings.lighting.toUpperCase()}`,
     `AUTO_AIM ${project.settings.autoAim ? 'ON' : 'OFF'}`,
-    `FRAMES ${count}`,
+    `FRAMES ${schedule.count}`,
     '',
   ];
-  for (let frame = 0; frame <= frameIntervals; frame++) {
-    const time = frame === frameIntervals ? project.duration : frame / project.fps;
+  for (let frame = 0; frame < schedule.count; frame++) {
+    const time = schedule.times[frame];
     const pose = sampleTimeline(project.keyframes, time, { easing: project.easing });
     lines.push(
       `AT ${number(time)}s`,

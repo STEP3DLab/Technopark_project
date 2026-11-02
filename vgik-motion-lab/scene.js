@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
+import { POSE_LIMITS } from './motion.js';
 
 export const defaultPose = Object.freeze({
   base: 0, shoulder: 40, elbow: 55, wrist: 0, tilt: 0, roll: 0, focal: 20, subject: 0,
@@ -77,6 +78,8 @@ export class StudioScene {
   constructor({ viewport, monitor, onStatus = () => {} }) {
     if (!viewport || !monitor) throw new Error('Нужны контейнеры 3D-сцены и камеры.');
     this.viewport = viewport; this.monitor = monitor; this.onStatus = onStatus;
+    this.disposed=false;this.contextLost=false;this._mainDirty=true;this._monitorDirty=true;
+    this._captureSession=null;this._poseSignature=null;this._lostContexts=new Set();
     this.pose = { ...defaultPose }; this.autoAim = true;
     this.view = 'perspective'; this.subjectType = 'robot';
     this.helperState = { grid: true, path: true, frustum: false };
@@ -92,6 +95,7 @@ export class StudioScene {
         { emissive: 0x29cbea, emissiveIntensity: .4 }),
       rubber: material(0x1c2638, .88), floor: material(0xe4eaf2, .75),
     };
+    try {
     this.renderer = this._makeRenderer(viewport, false);
     this.monitorRenderer = this._makeRenderer(monitor, true);
     this.camera = new THREE.PerspectiveCamera(37, 1, .05, 60);
@@ -105,6 +109,8 @@ export class StudioScene {
     this.controls.minDistance = 3.3; this.controls.maxDistance = 16;
     this.controls.maxPolarAngle = Math.PI / 2 - .025;
     this.controls.enablePan = true;
+    this._onOrbitChange=()=>{this._mainDirty=true;};
+    this.controls.addEventListener('change',this._onOrbitChange);
     this.controls.update();
     this._buildStudio(); this._buildRobot(); this._buildStage(); this._buildLights();
     this.pathGroup = new THREE.Group(); this.scene.add(this.pathGroup);
@@ -114,11 +120,15 @@ export class StudioScene {
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(viewport); this.resizeObserver.observe(monitor);
     this.resize();
-    this._contextLost = (event) => { event.preventDefault(); this.onStatus({ type: 'error',
+    this._contextLost = (event) => { event.preventDefault();this._lostContexts.add(event.target);this.contextLost=true;this._invalidate(true,true);this.onStatus({ type: 'error',
       message: 'Графический контекст потерян. Обновите страницу, чтобы продолжить.' }); };
+    this._contextRestored=(event)=>{this._lostContexts.delete(event.target);this.contextLost=this._lostContexts.size>0;this._invalidate(true,true);if(!this.contextLost)this.onStatus({type:'ready',message:'3D-сцена восстановлена'});};
     this.renderer.domElement.addEventListener('webglcontextlost', this._contextLost);
     this.monitorRenderer.domElement.addEventListener('webglcontextlost', this._contextLost);
+    this.renderer.domElement.addEventListener('webglcontextrestored',this._contextRestored);
+    this.monitorRenderer.domElement.addEventListener('webglcontextrestored',this._contextRestored);
     this.onStatus({ type: 'ready', message: '3D-сцена готова' });
+    } catch(error) {this.dispose();throw error;}
   }
 
   _makeRenderer(container, preserve) {
@@ -128,6 +138,7 @@ export class StudioScene {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12;
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
     renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;touch-action:none;outline:none';
     renderer.domElement.setAttribute('aria-label', preserve ? 'Вид через камеру робота' : 'Интерактивная 3D-сцена съёмочного стенда');
     container.appendChild(renderer.domElement);
@@ -230,7 +241,17 @@ export class StudioScene {
     this._link(this.elbowPivot, 1.12, .245, 2);
     this.tip = new THREE.Object3D(); this.tip.position.y = 1.12; this.elbowPivot.add(this.tip);
     this._joint(this.tip, .145, .28);
-    this.cameraMount = new THREE.Group(); this.scene.add(this.cameraMount);
+    this._armMeshes=[];this.shoulderPivot.traverse(o=>{if(o.isMesh)this._armMeshes.push(o);});
+    this.wristRoot=new THREE.Group();this.wristRoot.rotation.z=Math.PI/2;this.tip.add(this.wristRoot);
+    this.wristYaw=new THREE.Group();this.wristRoot.add(this.wristYaw);
+    this.wristPitch=new THREE.Group();this.wristYaw.add(this.wristPitch);
+    this.wristRoll=new THREE.Group();this.wristPitch.add(this.wristRoll);
+    this.cameraMount = new THREE.Group();this.wristRoll.add(this.cameraMount);
+    // Intersecting wrist axes form a spherical joint; the three local pivots
+    // inherit the orientation of the forearm in manual mode.
+    cylinder(this.wristRoot,.15,.035,[0,0,0],m.steel);
+    cylinder(this.wristYaw,.148,.031,[0,0,0],m.navy,[0,0,Math.PI/2]);
+    cylinder(this.wristPitch,.143,.027,[0,0,0],m.blue,[Math.PI/2,0,0]);
     // A compact spherical wrist allows the tracked three-axis camera orientation.
     mesh(new THREE.SphereGeometry(.13, 24, 16), m.darkSteel, this.cameraMount);
     cylinder(this.cameraMount, .14, .07, [0, .11, 0], m.white);
@@ -258,6 +279,7 @@ export class StudioScene {
     screenGlow.rotation.x = -.18;
     // The shot camera is physically fixed at the front glass of the lens.
     this.shotCamera.position.set(0, 0, -.371); this.cameraBody.add(this.shotCamera);
+    this._cameraMeshes=[];this.wristRoot.traverse(o=>{if(o.isMesh)this._cameraMeshes.push(o);});
     this.robotLabel = label(this.scene, 'PRINTED MOTION SYSTEM', 1.15, .14, [-2.48, .13, .58]);
     this.robotLabel.rotation.x = -Math.PI / 2;
   }
@@ -370,37 +392,61 @@ export class StudioScene {
       this._lightStand(v3(1.0,.1,2.15),0xfff2df,12,this.target,.62)];
   }
 
+  _invalidate(monitor=true,shadows=false) {
+    this._mainDirty=true;
+    if(monitor)this._monitorDirty=true;
+    if(shadows)for(const renderer of [this.renderer,this.monitorRenderer])if(renderer?.shadowMap)renderer.shadowMap.needsUpdate=true;
+  }
+
+  _setLocalWrist(quaternion) {
+    const euler=new THREE.Euler().setFromQuaternion(quaternion,'YXZ');
+    this.wristYaw.rotation.y=euler.y;
+    this.wristPitch.rotation.x=euler.x;
+    this.wristRoll.rotation.z=euler.z;
+    this._localWrist={yaw:euler.y/DEG+90,pitch:euler.x/DEG,roll:euler.z/DEG};
+  }
+
   setPose(next = {}) {
-    for (const key of Object.keys(defaultPose)) this.pose[key]=finite(next[key],this.pose[key]);
+    for(const key of Object.keys(defaultPose)) {
+      const value=finite(next[key],this.pose[key]);
+      this.pose[key]=clamp(value,...POSE_LIMITS[key]);
+    }
     const p=this.pose;
-    p.focal=clamp(p.focal,12,150);p.subject=clamp(p.subject,0,100);
-    p.base=clamp(p.base,-150,150);p.shoulder=clamp(p.shoulder,-35,90);
-    p.elbow=clamp(p.elbow,-135,110);p.wrist=clamp(p.wrist,-120,120);
-    p.tilt=clamp(p.tilt,-70,70);p.roll=clamp(p.roll,-180,180);
+    const signature=Object.values(p).join('|')+'|'+this.autoAim+'|'+this.subjectType;
+    if(signature===this._poseSignature)return {...p};
     this.basePivot.rotation.y=p.base*DEG;
     this.shoulderPivot.rotation.z=-p.shoulder*DEG;
     this.elbowPivot.rotation.z=-p.elbow*DEG;
     this.scene.updateMatrixWorld(true);
-    this.tip.getWorldPosition(this.cameraMount.position);
     if(this.autoAim){
-      // Account for the lens offset; iterations converge to the optical centre.
-      let lensOrigin=this.cameraMount.position.clone();
+      const parentInverse=this.wristRoot.getWorldQuaternion(new THREE.Quaternion()).invert();
+      let lensOrigin=this.tip.getWorldPosition(new THREE.Vector3());
+      const desiredWorld=new THREE.Quaternion(),desiredLocal=new THREE.Quaternion();
       for(let i=0;i<7;i++){
         const rot=new THREE.Matrix4().lookAt(lensOrigin,this.target,v3(0,1,0));
-        this.cameraMount.quaternion.setFromRotationMatrix(rot);
-        this.cameraMount.updateMatrixWorld(true);
+        desiredWorld.setFromRotationMatrix(rot);
+        desiredLocal.copy(parentInverse).multiply(desiredWorld);
+        this._setLocalWrist(desiredLocal);
+        this.wristRoot.updateMatrixWorld(true);
         this.shotCamera.getWorldPosition(lensOrigin);
       }
-      this.cameraMount.rotateY(p.wrist*DEG);
-      this.cameraMount.rotateX(p.tilt*DEG);
-      this.cameraMount.rotateZ(p.roll*DEG);
+      // Tracking values are optical offsets. Diagnostics expose the resulting
+      // local wrist angles separately from those operator inputs.
+      desiredWorld.multiply(new THREE.Quaternion().setFromAxisAngle(v3(0,1,0),p.wrist*DEG));
+      desiredWorld.multiply(new THREE.Quaternion().setFromAxisAngle(v3(1,0,0),p.tilt*DEG));
+      desiredWorld.multiply(new THREE.Quaternion().setFromAxisAngle(v3(0,0,1),p.roll*DEG));
+      this._setLocalWrist(parentInverse.multiply(desiredWorld));
     }else{
-      this.cameraMount.rotation.set(p.tilt*DEG,-Math.PI/2+p.base*DEG+p.wrist*DEG,p.roll*DEG,'YXZ');
+      this.wristYaw.rotation.y=-Math.PI/2+p.wrist*DEG;
+      this.wristPitch.rotation.x=p.tilt*DEG;
+      this.wristRoll.rotation.z=p.roll*DEG;
+      this._localWrist={yaw:p.wrist,pitch:p.tilt,roll:p.roll};
     }
     this.shotCamera.setFocalLength(p.focal);
     this._poseSubject(p.subject);
     this.scene.updateMatrixWorld(true);
     if(this.frustumHelper?.visible)this.frustumHelper.update();
+    this._poseSignature=signature;this._invalidate(true,true);
     return {...this.pose};
   }
 
@@ -422,6 +468,79 @@ export class StudioScene {
     this.abstractKnot.rotation.set(phase*.5,phase*.8,phase*.3);
   }
 
+  _meshBounds(meshes) {
+    const bounds=new THREE.Box3(),local=new THREE.Box3();
+    for(const object of meshes){
+      if(!object.geometry.boundingBox)object.geometry.computeBoundingBox();
+      local.copy(object.geometry.boundingBox).applyMatrix4(object.matrixWorld);bounds.union(local);
+    }
+    return bounds;
+  }
+
+  _assessCurrent(extraIssues=[]) {
+    this.scene.updateMatrixWorld(true);
+    const issues=[...extraIssues],cameraPosition=this.getCameraPosition();
+    const cameraBox=this._meshBounds(this._cameraMeshes),armBox=this._meshBounds(this._armMeshes);
+    const minCameraY=cameraBox.min.y,minArmY=armBox.min.y;
+    const localWrist={...this._localWrist};
+    const allFinite=[...Object.values(cameraPosition),minCameraY,minArmY,...Object.values(localWrist)].every(Number.isFinite);
+    if(!allFinite)issues.push({code:'non_finite_geometry',severity:'error',message:'Не удалось рассчитать конечное положение камеры.'});
+    if(minCameraY<.106)issues.push({code:'camera_below_table',severity:'error',message:'Камера пересекает рабочую плоскость стенда. Уменьшите угол плеча или локтя.'});
+    if(minArmY<.106)issues.push({code:'arm_below_table',severity:'error',message:'Звено руки пересекает рабочую плоскость стенда. Измените плечо и локоть.'});
+    const subjectBox=new THREE.Box3().setFromObject(this.subjects[this.subjectType||'robot']);
+    const lens=v3(cameraPosition.x,cameraPosition.y,cameraPosition.z);
+    if(cameraBox.intersectsBox(subjectBox)||subjectBox.distanceToPoint(lens)<this.shotCamera.near*2){
+      issues.push({code:'camera_subject_overlap',severity:'error',message:'Камера слишком близко к области объекта. Отведите руку назад.'});
+    }else if(subjectBox.distanceToPoint(lens)<.2){
+      issues.push({code:'camera_subject_clearance',severity:'warning',message:'Между камерой и объектом осталось мало места.'});
+    }
+    const targetCamera=this.target.clone().applyMatrix4(this.shotCamera.matrixWorldInverse);
+    const targetFrame=this.target.clone().project(this.shotCamera);
+    if(targetCamera.z>=-this.shotCamera.near)issues.push({code:'target_behind_camera',severity:'warning',message:'Объект находится за камерой. Измените запястье и наклон или включите слежение.'});
+    else if(Math.abs(targetFrame.x)>1||Math.abs(targetFrame.y)>1)issues.push({code:'target_outside_frame',severity:'warning',message:'Объект вышел из кадра. Поправьте направление камеры.'});
+    return{valid:allFinite&&!issues.some(i=>i.severity==='error'),issues,cameraPosition,minCameraY,minArmY,localWrist};
+  }
+
+  _withPoseSnapshot(callback) {
+    const pose={...this.pose},mainDirty=this._mainDirty,monitorDirty=this._monitorDirty;
+    const shadowStates=[this.renderer?.shadowMap?.needsUpdate,this.monitorRenderer?.shadowMap?.needsUpdate];
+    try{return callback();}
+    finally{
+      this._poseSignature=null;this.setPose(pose);
+      this._mainDirty=mainDirty;this._monitorDirty=monitorDirty;
+      [this.renderer,this.monitorRenderer].forEach((renderer,i)=>{if(renderer?.shadowMap)renderer.shadowMap.needsUpdate=shadowStates[i];});
+    }
+  }
+
+  _poseInputIssues(pose) {
+    const extraIssues=[];
+    if(!pose||typeof pose!=='object')extraIssues.push({code:'invalid_pose',severity:'error',message:'Положение должно содержать числовые параметры.'});
+    else for(const key of Object.keys(defaultPose))if(pose[key]!==undefined&&!Number.isFinite(Number(pose[key]))) {
+      extraIssues.push({code:'invalid_pose',severity:'error',message:'Параметры положения должны быть конечными числами.'});break;
+    }
+    return extraIssues;
+  }
+
+  assessPose(pose=this.pose) {
+    const extraIssues=this._poseInputIssues(pose);
+    if(pose===this.pose)return this._assessCurrent(extraIssues);
+    return this._withPoseSnapshot(()=>{this.setPose(pose||{});return this._assessCurrent(extraIssues);});
+  }
+
+  analyzeProgram(poses) {
+    if(!Array.isArray(poses)||!poses.length)return{valid:false,issues:[{code:'empty_program',severity:'error',message:'В программе нет положений для проверки.'}],sampleCount:0,firstInvalidIndex:0,minCameraY:null,minArmY:null};
+    return this._withPoseSnapshot(()=>{
+      let firstInvalidIndex=null,minCameraY=Infinity,minArmY=Infinity;const issues=[],seen=new Set();
+      poses.forEach((pose,sampleIndex)=>{
+        const inputIssues=this._poseInputIssues(pose);this.setPose(pose||{});const result=this._assessCurrent(inputIssues);
+        if(!result.valid&&firstInvalidIndex===null)firstInvalidIndex=sampleIndex;
+        minCameraY=Math.min(minCameraY,result.minCameraY);minArmY=Math.min(minArmY,result.minArmY);
+        for(const issue of result.issues)if(!seen.has(issue.code)){seen.add(issue.code);issues.push({...issue,sampleIndex});}
+      });
+      return{valid:firstInvalidIndex===null,issues,sampleCount:poses.length,firstInvalidIndex,minCameraY,minArmY};
+    });
+  }
+
   setAutoAim(enabled) { this.autoAim=Boolean(enabled);this.setPose(this.pose); }
   setSubjectType(type) {
     if(!this.subjects[type])return false;
@@ -437,6 +556,7 @@ export class StudioScene {
     this.hemisphere.intensity=settings[2];this.rim.color.set(settings[3]);this.rim.intensity=settings[4];
     this.renderer.toneMappingExposure=settings[5];this.monitorRenderer.toneMappingExposure=settings[5];
     this.lighting=type;
+    this._invalidate(true,true);
   }
   setHelpers(next={}) {
     Object.assign(this.helperState,next);
@@ -444,12 +564,13 @@ export class StudioScene {
     this.pathGroup.visible=Boolean(this.helperState.path);
     this.frustumHelper.visible=Boolean(this.helperState.frustum);
     if(this.frustumHelper.visible)this.frustumHelper.update();
+    this._invalidate(false,false);
   }
   setPath(poses=[]) {
     for(const child of [...this.pathGroup.children]){
       this.pathGroup.remove(child);child.traverse(o=>{o.geometry?.dispose();if(o.material){const a=Array.isArray(o.material)?o.material:[o.material];a.forEach(m=>m.dispose());}});
     }
-    if(poses.length<2)return;
+    this._invalidate(false,false);if(poses.length<2)return;
     const current={...this.pose},points=[];
     for(const pose of poses){this.setPose(pose);points.push(this.shotCamera.getWorldPosition(new THREE.Vector3()));}
     this.setPose(current);
@@ -484,76 +605,103 @@ export class StudioScene {
     this.camera.fov=2*Math.atan(Math.tan(37*DEG/2)*fitScale)/DEG;
     this.camera.updateProjectionMatrix();
     const mw=Math.max(160,this.monitor.clientWidth),mh=Math.max(90,this.monitor.clientHeight);
-    this.monitorRenderer.setSize(mw,mh,false);
+    if(!this._captureSession)this.monitorRenderer.setSize(mw,mh,false);
+    this._invalidate(true,false);
   }
-  _renderMonitor() {
-    const w=this.monitorRenderer.domElement.width/(this.monitorRenderer.getPixelRatio()||1);
-    const h=this.monitorRenderer.domElement.height/(this.monitorRenderer.getPixelRatio()||1);
+  _renderShot(renderer,w,h) {
     const viewH=Math.min(h,w*9/16),viewW=viewH*16/9,x=(w-viewW)/2,y=(h-viewH)/2;
-    const saved={ grid:this.grid.visible,path:this.pathGroup.visible,frustum:this.frustumHelper.visible };
-    this.grid.visible=false;this.pathGroup.visible=false;this.frustumHelper.visible=false;
-    this.monitorRenderer.setScissorTest(false);this.monitorRenderer.setClearColor(0x101b32,1);this.monitorRenderer.clear();
-    this.monitorRenderer.setViewport(x,y,viewW,viewH);this.monitorRenderer.setScissor(x,y,viewW,viewH);
-    this.monitorRenderer.setScissorTest(true);this.monitorRenderer.render(this.scene,this.shotCamera);
-    this.monitorRenderer.setScissorTest(false);
-    this.grid.visible=saved.grid;this.pathGroup.visible=saved.path;this.frustumHelper.visible=saved.frustum;
+    const helpers=[this.grid,this.pathGroup,this.frustumHelper];
+    const visibility=helpers.map(helper=>helper.visible);
+    const viewport=renderer.getViewport(new THREE.Vector4()),scissor=renderer.getScissor(new THREE.Vector4());
+    const scissorTest=renderer.getScissorTest(),clearColor=renderer.getClearColor(new THREE.Color()),clearAlpha=renderer.getClearAlpha();
+    try{
+      helpers.forEach(helper=>{helper.visible=false;});
+      renderer.setScissorTest(false);renderer.setClearColor(0x101b32,1);renderer.clear();
+      renderer.setViewport(x,y,viewW,viewH);renderer.setScissor(x,y,viewW,viewH);
+      renderer.setScissorTest(true);renderer.render(this.scene,this.shotCamera);
+    }finally{
+      helpers.forEach((helper,i)=>{helper.visible=visibility[i];});
+      renderer.setViewport(viewport);renderer.setScissor(scissor);renderer.setScissorTest(scissorTest);
+      renderer.setClearColor(clearColor,clearAlpha);
+    }
+  }
+  _renderMonitor({force=false}={}) {
+    if(this.contextLost||this.disposed)return false;
+    if(!force&&!this._monitorDirty)return false;
+    const size=this.monitorRenderer.getSize(new THREE.Vector2());
+    this._renderShot(this.monitorRenderer,size.x,size.y);
+    this._monitorDirty=false;return true;
   }
   render() {
-    if(this.disposed)return;
-    this.controls.update();this.scene.updateMatrixWorld(true);
-    if(this.frustumHelper.visible)this.frustumHelper.update();
-    if(this.view==='camera'){
-      const w=this.viewport.clientWidth,h=this.viewport.clientHeight;
-      const vh=Math.min(h,w*9/16),vw=vh*16/9;
-      const saved=[this.pathGroup.visible,this.frustumHelper.visible,this.grid.visible];
-      this.pathGroup.visible=false;this.frustumHelper.visible=false;this.grid.visible=false;
-      this.renderer.setScissorTest(false);this.renderer.setClearColor(0x101b32,1);this.renderer.clear();
-      this.renderer.setViewport((w-vw)/2,(h-vh)/2,vw,vh);
-      this.renderer.setScissor((w-vw)/2,(h-vh)/2,vw,vh);this.renderer.setScissorTest(true);
-      this.renderer.render(this.scene,this.shotCamera);this.renderer.setScissorTest(false);
-      [this.pathGroup.visible,this.frustumHelper.visible,this.grid.visible]=saved;
-    }else{
-      this.renderer.setViewport(0,0,this.viewport.clientWidth,this.viewport.clientHeight);
-      this.renderer.setScissorTest(false);this.renderer.render(this.scene,this.camera);
+    if(this.disposed||this.contextLost)return false;
+    this.controls.update();
+    if(!this._mainDirty&&!this._monitorDirty)return false;
+    this.scene.updateMatrixWorld(true);
+    let drew=false;
+    if(this._mainDirty){
+      if(this.frustumHelper.visible)this.frustumHelper.update();
+      if(this.view==='camera')this._renderShot(this.renderer,this.viewport.clientWidth,this.viewport.clientHeight);
+      else{
+        this.renderer.setViewport(0,0,this.viewport.clientWidth,this.viewport.clientHeight);
+        this.renderer.setScissorTest(false);this.renderer.render(this.scene,this.camera);
+      }
+      this._mainDirty=false;drew=true;
     }
-    this._renderMonitor();
+    return this._renderMonitor()||drew;
   }
+
   getCameraPosition() {
     this.scene.updateMatrixWorld(true);
     const p=this.shotCamera.getWorldPosition(new THREE.Vector3());return{x:p.x,y:p.y,z:p.z};
   }
+  beginCapture({width=1280,height=720}={}) {
+    if(this.contextLost||this.disposed)throw new Error('3D-сцена недоступна для съёмки.');
+    if(this._captureSession)return;
+    if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width>4096||height>4096)throw new Error('Недопустимый размер кадра.');
+    this._captureSession={pixelRatio:this.monitorRenderer.getPixelRatio(),size:this.monitorRenderer.getSize(new THREE.Vector2())};
+    try{this.monitorRenderer.setPixelRatio(1);this.monitorRenderer.setSize(width,height,false);this._monitorDirty=true;}
+    catch(error){this.endCapture();throw error;}
+  }
+  endCapture() {
+    const session=this._captureSession;if(!session)return;
+    this._captureSession=null;
+    try{this.monitorRenderer.setPixelRatio(session.pixelRatio);this.monitorRenderer.setSize(session.size.x,session.size.y,false);}
+    finally{this._invalidate(true,false);}
+  }
   captureFrame() {
-    // Dedicated 1280 × 720 render avoids monitor size and UI overlays in exported frames.
-    const pixelRatio=this.monitorRenderer.getPixelRatio();
-    const size=this.monitorRenderer.getSize(new THREE.Vector2());
-    this.monitorRenderer.setPixelRatio(1);this.monitorRenderer.setSize(1280,720,false);
-    this._renderMonitor();
-    const data=this.monitorRenderer.domElement.toDataURL('image/png');
-    this.monitorRenderer.setPixelRatio(pixelRatio);this.monitorRenderer.setSize(size.x,size.y,false);
-    this._renderMonitor();return data;
+    if(this.contextLost||this.disposed)throw new Error('3D-сцена недоступна для съёмки.');
+    const assessment=this.assessPose();
+    if(!assessment.valid)throw new Error(assessment.issues.find(issue=>issue.severity==='error')?.message||'Положение недопустимо для съёмки.');
+    const ownSession=!this._captureSession;
+    try{
+      if(ownSession)this.beginCapture();
+      this._renderMonitor({force:true});
+      return this.monitorRenderer.domElement.toDataURL('image/png');
+    }finally{if(ownSession)this.endCapture();}
   }
   getDiagnostics() {
-    const position=this.getCameraPosition();
-    const finiteValues=Object.values(position).every(Number.isFinite)&&Object.values(this.pose).every(Number.isFinite);
-    const tip=this.tip.getWorldPosition(new THREE.Vector3());
-    const dist=new THREE.Vector3(position.x,position.y,position.z).distanceTo(this.target);
-    const warnings=[];
-    if(tip.y<.32)warnings.push('Камера ниже поверхности стенда');
-    if(dist<.4)warnings.push('Камера слишком близко к объекту');
-    return{finite:finiteValues,camera:position,distance:dist,aboveTable:tip.y>.32,warnings,
-      webgl:this.renderer.getContext().getParameter(this.renderer.getContext().VERSION),autoAim:this.autoAim,
-      drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles};
+    const assessment=this.assessPose(),position=assessment.cameraPosition;
+    let webgl=null;
+    if(this.renderer&&!this.contextLost)try{const gl=this.renderer.getContext();webgl=gl.getParameter(gl.VERSION);}catch{}
+    return{...assessment,finite:Object.values(position).every(Number.isFinite),camera:position,
+      distance:v3(position.x,position.y,position.z).distanceTo(this.target),aboveTable:assessment.minCameraY>=.106&&assessment.minArmY>=.106,
+      warnings:assessment.issues.map(issue=>issue.message),webgl,autoAim:this.autoAim,contextLost:this.contextLost,disposed:this.disposed,
+      drawCalls:this.renderer?.info?.render?.calls??0,triangles:this.renderer?.info?.render?.triangles??0};
   }
+
   dispose() {
-    this.disposed=true;this.resizeObserver?.disconnect();this.controls?.dispose();
-    this.renderer.domElement.removeEventListener('webglcontextlost',this._contextLost);
-    this.monitorRenderer.domElement.removeEventListener('webglcontextlost',this._contextLost);
-    const geometries=new Set(),materials=new Set(),textures=new Set();
-    this.scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);
+    if(this.disposed)return;
+    this.disposed=true;this._captureSession=null;this.resizeObserver?.disconnect();
+    this.controls?.removeEventListener('change',this._onOrbitChange);this.controls?.dispose();
+    for(const renderer of [this.renderer,this.monitorRenderer]){
+      renderer?.domElement?.removeEventListener('webglcontextlost',this._contextLost);
+      renderer?.domElement?.removeEventListener('webglcontextrestored',this._contextRestored);
+    }
+    const geometries=new Set(),materials=new Set(Object.values(this.materials||{})),textures=new Set();
+    this.scene?.traverse(o=>{if(o.geometry)geometries.add(o.geometry);
       const mats=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];
       mats.forEach(mat=>{materials.add(mat);if(mat.map)textures.add(mat.map);});});
     geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());
-    this.renderer.dispose();this.monitorRenderer.dispose();
-    this.renderer.domElement.remove();this.monitorRenderer.domElement.remove();
+    for(const renderer of [this.renderer,this.monitorRenderer]){renderer?.dispose();renderer?.domElement?.remove();}
   }
 }

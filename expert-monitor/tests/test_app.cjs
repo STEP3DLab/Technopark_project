@@ -140,7 +140,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   };
   document.body = new Node('body');
   document.body.innerHTML = fs.readFileSync(path.join(APP_DIR, 'index.html'), 'utf8');
-  const location = {hostname: 'localhost', href: 'http://localhost/expert-monitor/#opportunities', hash: '#opportunities'};
+  const location = {hostname: options.hostname || 'localhost', href: 'http://localhost/expert-monitor/#opportunities', hash: '#opportunities'};
   const history = {replaceState(_state, _title, url) {
     const next = new URL(url, location.href); location.href = next.href; location.hash = next.hash;
   }};
@@ -169,6 +169,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
     addEventListener(name, fn) {if (!windowListeners.has(name)) windowListeners.set(name, []); windowListeners.get(name).push(fn);},
     fetch: async url => ({ok: true, json: async () => {
       if (String(url).includes('source-config')) return responses.config;
+      if (options.publishedResponse) return options.publishedResponse(String(url));
       if (String(url).includes('monitoring')) return responses.monitor;
       if (registryParseError) throw new SyntaxError('Unexpected token in registry JSON');
       return responses.registry;
@@ -1080,4 +1081,24 @@ test('Switching detail tabs and arrow-key navigation retain unsaved work',async(
   assert.equal(app.get('detail-facts').hidden,false);assert.equal(app.get('detail-work-panel').hidden,true);
   assert.equal(app.get('detail-note').value,'Текст сохраняется при переключении вкладок');
   await app.click('save-note');assert.equal(app.stored().notes[id].text,'Текст сохраняется при переключении вкладок');
+});
+
+for (const newest of ['raw','pages']) test(`Published data selects the newer ${newest} snapshot when both CDN responses succeed`, async () => {
+  const base=JSON.parse(fs.readFileSync(path.join(APP_DIR,'data/registry.json'),'utf8'));
+  const snapshot=(fresh)=>({...base,meta:{...base.meta,asOf:'2026-11-02',generatedAt:fresh?'2026-11-02T22:49:25+03:00':'2026-11-02T09:00:00+03:00',nationalMonitoring:{},reviewState:{}},
+    opportunities:[{...futureRecord(fresh?'fresh':'stale'),title:fresh?'FRESH_PUBLISHED_RECORD':'STALE_PUBLISHED_RECORD'}]});
+  const app=await boot(W.emptyWorkspace(),{hostname:'step3dlab.github.io',publishedResponse:url=>url.includes('monitoring')?{sources:[],lastRunAt:'2026-11-02T00:00:00Z'}:
+    snapshot((url.startsWith('https://raw.')?'raw':'pages')===newest)});
+  assert.match(app.get('main').innerHTML,/FRESH_PUBLISHED_RECORD/);
+  assert.doesNotMatch(app.get('main').innerHTML,/STALE_PUBLISHED_RECORD/);
+  assert.equal(app.get('refresh-button').disabled,false);
+});
+
+test('A malformed newer primary snapshot cannot replace a valid Pages copy',async()=>{
+  const base=JSON.parse(fs.readFileSync(path.join(APP_DIR,'data/registry.json'),'utf8'));
+  const good={...base,opportunities:[{...futureRecord(),title:'VALID_FALLBACK_RECORD'}]};
+  const app=await boot(W.emptyWorkspace(),{hostname:'step3dlab.github.io',publishedResponse:url=>url.includes('monitoring')?{sources:[]}:
+    url.startsWith('https://raw.')?{meta:{generatedAt:'2099-01-01'},opportunities:null}:good});
+  assert.match(app.get('main').innerHTML,/VALID_FALLBACK_RECORD/);
+  assert.equal(app.get('refresh-button').disabled,false);
 });

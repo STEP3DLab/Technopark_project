@@ -335,8 +335,18 @@
   }
   async function fetchPublished(name) {
     async function read(base){const data=await fetchJson(base+name+'?v='+Math.floor(Date.now()/60000));if(!validPublished(name,data))throw new Error('Неверный формат '+name);return data;}
-    try{return await read(DATA_BASE);}
-    catch(error){if(DATA_BASE==='./data/')throw error;const data=await read('./data/');state.dataFallback=true;return data;}
+    if(DATA_BASE==='./data/')return read(DATA_BASE);
+    // Raw GitHub and Pages can refresh at different times. A successful stale
+    // CDN response must not hide a newer reviewed snapshot already on the site.
+    const results=await Promise.allSettled([read(DATA_BASE),read('./data/')]);
+    const available=results.filter(result=>result.status==='fulfilled');
+    if(!available.length)throw results[0].reason;
+    const timestamp=data=>Math.max(0,...(name==='registry.json'
+      ?[data.meta?.generatedAt,data.meta?.asOf,data.meta?.nationalMonitoring?.lastResearchRun?.completedAt,data.meta?.reviewState?.lastResearchAt]
+      :[data.lastRunAt]).map(value=>Date.parse(value)||0));
+    available.sort((a,b)=>timestamp(b.value)-timestamp(a.value));
+    if(results[0].status==='rejected')state.dataFallback=true;
+    return available[0].value;
   }
   async function loadData(userInitiated=false) {
     if(state.loading)return;

@@ -85,6 +85,33 @@
       return rank(a)-rank(b)||stamp(b.publishedAt)-stamp(a.publishedAt)||a.id.localeCompare(b.id);
     });
   }
-  const api={defaults,deadlineTime,isActive,dueSoon,matchesWork,sortItems,normalizeRegion,geographyLabel,publishedBudget,matchesAmount};
+
+  const DISTRICTS = [{"id": "central", "name": "Центр", "regions": ["Москва", "Московская область", "Белгородская область", "Брянская область", "Владимирская область", "Воронежская область", "Ивановская область", "Калужская область", "Костромская область", "Курская область", "Липецкая область", "Орловская область", "Рязанская область", "Смоленская область", "Тамбовская область", "Тверская область", "Тульская область", "Ярославская область"]}, {"id": "northwest", "name": "Северо-Запад", "regions": ["Санкт-Петербург", "Ленинградская область", "Республика Карелия", "Республика Коми", "Архангельская область", "Вологодская область", "Калининградская область", "Мурманская область", "Новгородская область", "Псковская область", "Ненецкий автономный округ"]}, {"id": "south", "name": "Юг", "regions": ["Республика Адыгея", "Республика Калмыкия", "Краснодарский край", "Астраханская область", "Волгоградская область", "Ростовская область", "Республика Крым", "Севастополь"]}, {"id": "caucasus", "name": "Северный Кавказ", "regions": ["Республика Дагестан", "Республика Ингушетия", "Кабардино-Балкарская Республика", "Карачаево-Черкесская Республика", "Республика Северная Осетия — Алания", "Чеченская Республика", "Ставропольский край"]}, {"id": "volga", "name": "Поволжье", "regions": ["Республика Башкортостан", "Республика Марий Эл", "Республика Мордовия", "Республика Татарстан", "Удмуртская Республика", "Чувашская Республика", "Пермский край", "Кировская область", "Нижегородская область", "Оренбургская область", "Пензенская область", "Самарская область", "Саратовская область", "Ульяновская область"]}, {"id": "ural", "name": "Урал", "regions": ["Курганская область", "Свердловская область", "Тюменская область", "Челябинская область", "Ханты-Мансийский автономный округ — Югра", "Ямало-Ненецкий автономный округ"]}, {"id": "siberia", "name": "Сибирь", "regions": ["Республика Алтай", "Республика Тыва", "Республика Хакасия", "Алтайский край", "Красноярский край", "Иркутская область", "Кемеровская область", "Новосибирская область", "Омская область", "Томская область"]}, {"id": "fareast", "name": "Дальний Восток", "regions": ["Республика Бурятия", "Республика Саха (Якутия)", "Забайкальский край", "Камчатский край", "Приморский край", "Хабаровский край", "Амурская область", "Магаданская область", "Сахалинская область", "Еврейская автономная область", "Чукотский автономный округ"]}];
+  function objectSubject(record) {
+    if (typeof record?.objectSubject === 'string' && record.objectSubject.trim()) return record.objectSubject.trim();
+    const coarse=normalizeRegion(record);
+    if(coarse==='moscow')return 'Москва';
+    if(coarse==='oblast')return 'Московская область';
+    if(coarse==='unknown')return 'Не уточнён';
+    const raw=String(record?.objectRegion||record?.locationRegion||record?.region||'');
+    const clauses=raw.split(';');
+    const text=(clauses.find(c=>/объект/.test(c)&&!/заказчик/.test(c))||clauses.filter(c=>!/заказчик|регистраци/.test(c)).join(';')).toLowerCase().replace(/ё/g,'е');
+    for(const group of DISTRICTS)for(const name of group.regions){
+      const base=name.toLowerCase().replace(/ё/g,'е');
+      if(text.includes(base)||base.startsWith('республика ')&&text.includes(base.slice(11)))return name;
+    }
+    return 'Не уточнён';
+  }
+  function districtOf(record) {
+    const subject=objectSubject(record);
+    return DISTRICTS.find(g=>g.regions.includes(subject))?.id||'unknown';
+  }
+  function matchesNational(record, filters={}) {
+    return (!filters.subject||filters.subject==='all'||objectSubject(record)===filters.subject)
+      && (!filters.district||filters.district==='all'||districtOf(record)===filters.district);
+  }
+
+  const api={DISTRICTS,objectSubject,districtOf,matchesNational,defaults,deadlineTime,isActive,dueSoon,matchesWork,sortItems,normalizeRegion,geographyLabel,publishedBudget,matchesAmount};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ExpertMonitorUtils=api;
 })(typeof window==='undefined'?globalThis:window);
+

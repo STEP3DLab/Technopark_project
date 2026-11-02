@@ -26,7 +26,7 @@
   const CHECK_FIELDS = new Set(['stage', 'scope', 'eligibility', 'materials', 'deadline', 'channel']);
   const FILTER_FIELDS = new Set([
     'search', 'status', 'region', 'court', 'sourceType', 'workStatus', 'due',
-    'sort', 'favorite', 'category', 'minAmount', 'maxAmount', 'fit'
+    'sort', 'favorite', 'category', 'minAmount', 'maxAmount', 'fit', 'subject', 'district'
   ]);
   const PROFILE_FIELDS = new Set(['regions', 'categories', 'includeWords', 'excludeWords', 'minBudget', 'maxBudget']);
   const PROFILE_REGIONS = new Set(['moscow', 'oblast', 'other', 'unknown']);
@@ -261,3 +261,4 @@
     validBackup, validDraft, validEstimate, validProfile, mergeWorkspaces, draftComparable, isDraftDirty
   });
 });
+

@@ -17,7 +17,8 @@
     "status": "manual_required",
     "notes": "Проверить номер дела, последние определения, кандидатуры экспертов и срок ответа. Публичный запрос не заменяет проверку карточки.",
     "autoFetch": false,
-    "extractLinks": false
+    "extractLinks": false,
+    "scope": "Вся Россия"
   },
   {
     "id": "as-moscow",
@@ -47,7 +48,8 @@
     "status": "manual_required",
     "notes": "Самостоятельный канал закупок; не все судебные экспертизы являются закупками. Проверить извещение, сроки, требования и обеспечение.",
     "autoFetch": false,
-    "extractLinks": false
+    "extractLinks": false,
+    "scope": "Вся Россия"
   },
   {
     "id": "moscow-data",
@@ -77,7 +79,8 @@
     "status": "secondary",
     "notes": "Источник сигналов и ориентиров. Текущую стадию и документацию подтверждать в ЕИС/на площадке.",
     "autoFetch": false,
-    "extractLinks": false
+    "extractLinks": false,
+    "scope": "Вся Россия"
   },
   {
     "id": "sudact",
@@ -87,7 +90,8 @@
     "status": "secondary",
     "notes": "Архивный исследовательский источник. Завершённый акт не означает открытый заказ.",
     "autoFetch": false,
-    "extractLinks": false
+    "extractLinks": false,
+    "scope": "Вся Россия"
   },
   {
     "id": "reputation",
@@ -97,6 +101,84 @@
     "status": "secondary",
     "notes": "Использованы только доступные части текстов; часть документов ограничена. Первоисточник — карточка суда.",
     "autoFetch": false,
-    "extractLinks": false
+    "extractLinks": false,
+    "scope": "Вся Россия"
+  },
+  {
+    "id": "ras",
+    "name": "Банк решений арбитражных судов",
+    "url": "https://ras.arbitr.ru/",
+    "type": "court_search",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Вся Россия"
+  },
+  {
+    "id": "sudrf",
+    "name": "ГАС «Правосудие» — суды России",
+    "url": "https://sudrf.ru/index.php?id=300",
+    "type": "court_search",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Вся Россия"
+  },
+  {
+    "id": "arbitr-directory",
+    "name": "Арбитражные суды — федеральный справочник",
+    "url": "https://arbitr.ru/index.php",
+    "type": "directory",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": true,
+    "extractLinks": false,
+    "region": "Вся Россия"
+  },
+  {
+    "id": "as-spb",
+    "name": "АС Санкт-Петербурга и Ленинградской области",
+    "url": "https://spb.arbitr.ru/",
+    "type": "court_official",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": true,
+    "extractLinks": true,
+    "region": "Санкт-Петербург / Ленинградская область"
+  },
+  {
+    "id": "as-tatarstan",
+    "name": "АС Республики Татарстан",
+    "url": "https://tatarstan.arbitr.ru/",
+    "type": "court_official",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": true,
+    "extractLinks": true,
+    "region": "Республика Татарстан"
+  },
+  {
+    "id": "as-sverdlovsk",
+    "name": "АС Свердловской области",
+    "url": "https://ekaterinburg.arbitr.ru/",
+    "type": "court_official",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": true,
+    "extractLinks": true,
+    "region": "Свердловская область"
+  },
+  {
+    "id": "as-khabarovsk",
+    "name": "АС Хабаровского края",
+    "url": "https://khabarovsk.arbitr.ru/",
+    "type": "court_official",
+    "status": "not_checked",
+    "notes": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+    "autoFetch": true,
+    "extractLinks": true,
+    "region": "Хабаровский край"
   }
 ]

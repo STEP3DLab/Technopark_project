@@ -2,7 +2,7 @@ name: Expert monitor — public source checks
 
 on:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '17 4 * * *'
   workflow_dispatch:
   push:
     paths:
@@ -45,3 +45,4 @@ jobs:
           # A concurrent upstream change rejects this push. Do not rebase a
           # derived database onto a newer registry or force-push another task.
           git push origin HEAD:main
+

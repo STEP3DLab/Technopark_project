@@ -227,7 +227,8 @@ def run(data_dir, offline=False):
         row = {"id": source["id"], "name": source["name"], "url": source["url"],
                "automatic": bool(source.get("autoFetch")), "type": source.get("type", ""),
                "status": "manual_required", "checkedAt": None, "httpStatus": None,
-               "error": "", "resultMessage": source.get("notes", ""), "lastSuccessAt": prior.get("lastSuccessAt")}
+               "error": "", "resultMessage": source.get("notes", ""), "lastSuccessAt": prior.get("lastSuccessAt"),
+               "region": source.get("region", "Вся Россия")}
         for key in ("contentHash", "lastLinkScanAt", "lastCandidateCount"):
             if key in prior:
                 row[key] = prior[key]
@@ -285,7 +286,9 @@ def run(data_dir, offline=False):
               "sources": checks, "newCandidates": list(candidates.values())[-500:],
               "registryRecords": len(registry.get("opportunities", [])),
               "automaticSources": len(automatic), "successfulSources": len(active), "manualSources": len(checks) - len(automatic),
-              "automaticSending": False}
+              "automaticSending": False,
+              "research": previous.get("research"),
+              "schedule": "Ежедневно в 07:17 МСК"}
     write_json(data_dir / "monitoring.json", report)
     print(json.dumps({"sources": len(checks), "available": len(active), "candidates": len(candidates), "status": report["status"]}, ensure_ascii=False))
     return report
@@ -297,3 +300,4 @@ if __name__ == "__main__":
     parser.add_argument("--offline", action="store_true")
     args = parser.parse_args()
     run(args.data_dir, args.offline)
+

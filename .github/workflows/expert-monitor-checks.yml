@@ -33,6 +33,8 @@ jobs:
       - name: Validate application syntax
         run: |
           node --check expert-monitor/app.js
+          node --check expert-monitor/atlas-ui.js
+          node --check expert-monitor/russia-map-data.js
           node --check expert-monitor/monitor-utils.js
           node --check expert-monitor/workspace-utils.js
           node --check expert-monitor/estimate-utils.js
@@ -49,6 +51,8 @@ jobs:
         run: |
           node expert-monitor/tests/test_filters.cjs
           node expert-monitor/tests/test_national.cjs
+          node expert-monitor/tests/test_atlas.cjs
+          node expert-monitor/tests/test_map.cjs
           node expert-monitor/tests/test_workspace.cjs
           node expert-monitor/tests/test_estimates.cjs
           node expert-monitor/tests/test_opportunities.cjs

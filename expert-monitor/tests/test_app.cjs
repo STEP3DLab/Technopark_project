@@ -177,7 +177,7 @@ async function boot(initial = W.emptyWorkspace(), options = {}) {
   context.window = context;
   vm.runInContext('globalThis.structuredClone = value => JSON.parse(JSON.stringify(value));', context);
   for (const filename of ['monitor-utils.js', 'estimate-utils.js', 'workspace-utils.js', 'registry-utils.js', 'workbench-utils.js', 'opportunity-utils.js',
-    'export-utils.js', 'proposal-utils.js', 'selection-ui.js', 'estimate-ui.js', 'workbench-ui.js', 'experience-ui.js', 'app.js'])
+    'export-utils.js', 'proposal-utils.js', 'selection-ui.js', 'estimate-ui.js', 'workbench-ui.js', 'experience-ui.js', 'russia-map-data.js', 'atlas-ui.js', 'app.js'])
     vm.runInContext(fs.readFileSync(path.join(APP_DIR, filename), 'utf8'), context, {filename});
   for (let i = 0; i < 6; i++) await new Promise(resolve => setImmediate(resolve));
   async function dispatchDocument(name, event) {
@@ -1059,4 +1059,25 @@ test('Escape closes the active modal without also hiding its mobile-menu focus o
   assert.equal(app.get('sidebar').classList.contains('open'),true);
   await app.get('experience-help-dialog').dispatch('cancel');assert.equal(app.get('experience-help-dialog').open,false);
   await app.keydown({key:'Escape',target:app.get('mobile-menu')});assert.equal(app.get('sidebar').classList.contains('open'),false);
+});
+
+
+test('Map selection opens the same active regional subset in the registry',async()=>{
+  const rows=[{id:'map-ural',title:'Урал тест',objectSubject:'Свердловская область',status:'needs_review',sourceType:'procurement_adjacent',deadline:'2099-01-01T12:00:00+03:00'},{id:'map-closed',title:'Архив',objectSubject:'Свердловская область',status:'closed',sourceType:'procurement_adjacent'}];
+  const app=await boot(W.emptyWorkspace(),{records:rows});await app.view('overview');
+  const select=[...app.document.querySelectorAll('[data-action="atlas-district"]')].find(x=>x.dataset.district==='ural');
+  await app.clickElement(select);await app.click('atlas-open');
+  assert.equal(app.get('district-filter').value,'ural');assert.match(app.get('main').innerHTML,/data-open-id="map-ural"/);assert.doesNotMatch(app.get('main').innerHTML,/data-open-id="map-closed"/);
+});
+
+test('Switching detail tabs and arrow-key navigation retain unsaved work',async()=>{
+  const app=await boot();const id=app.registry.opportunities[0].id;await app.click('open-detail',id);
+  assert.equal(app.get('detail-work-panel').hidden,true);
+  await app.clickElement(app.get('detail-work-tab'));
+  assert.equal(app.get('detail-work-panel').hidden,false);assert.equal(app.get('detail-facts').hidden,true);
+  await app.input('detail-note','Текст сохраняется при переключении вкладок');
+  await app.keydown({key:'ArrowLeft',target:app.get('detail-work-tab')});
+  assert.equal(app.get('detail-facts').hidden,false);assert.equal(app.get('detail-work-panel').hidden,true);
+  assert.equal(app.get('detail-note').value,'Текст сохраняется при переключении вкладок');
+  await app.click('save-note');assert.equal(app.stored().notes[id].text,'Текст сохраняется при переключении вкладок');
 });

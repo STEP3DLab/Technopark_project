@@ -9,3 +9,5 @@
 @media(max-width:620px){.node text{font-size:24px}.node .node-sub{font-size:18px}.node .node-letter{font-size:20px}.edge{stroke-width:2}.edge.active{stroke-width:3}.graph-controls button{width:36px;height:36px}}
 
 .tabs,.filters{scrollbar-width:none}.tabs::-webkit-scrollbar,.filters::-webkit-scrollbar{display:none}
+
+@media(max-width:620px){#focus-toggle{display:none}}

@@ -1,0 +1,670 @@
+{
+  "checkedAt": "2026-11-02T22:49:25+03:00",
+  "before": {
+    "opportunities": 29,
+    "courts": 47
+  },
+  "after": {
+    "opportunities": 78,
+    "courts": 71
+  },
+  "newOpportunityIds": [
+    "proc-32616539114",
+    "proc-1262061",
+    "proc-ир610918",
+    "proc-1260636",
+    "proc-32616523586",
+    "proc-32616523396",
+    "proc-гп646720",
+    "proc-рн61006044",
+    "proc-32616533182",
+    "proc-32616533929",
+    "proc-113505443",
+    "proc-рн61101102",
+    "proc-atom02112600272",
+    "proc-rh02112600059",
+    "proc-050-0046-26-1135446",
+    "proc-32616524695",
+    "proc-0116300000126001156",
+    "proc-0339100008826000223",
+    "proc-0120300013726000022",
+    "proc-com27102600081",
+    "proc-0150600008126000061",
+    "proc-0132600021226000041",
+    "proc-0157600003526000036",
+    "proc-0817200000326016726",
+    "proc-32616526498",
+    "proc-32616511355",
+    "proc-0120300013726000021",
+    "proc-0116300000226000208",
+    "proc-100181955126100343",
+    "proc-0356500001426009547",
+    "proc-4656516",
+    "proc-32616526846",
+    "proc-32616531704",
+    "proc-32616529464",
+    "proc-0373100081226000032",
+    "proc-0891200000626010517",
+    "proc-32616503228",
+    "proc-32616497171",
+    "proc-32616531525",
+    "proc-0137600004226000175",
+    "proc-32616494413",
+    "proc-0802600001926000046",
+    "proc-0318300018326000095",
+    "proc-0302300040926000069",
+    "proc-32616530280",
+    "proc-0152600003126000107",
+    "proc-0111300016126000022",
+    "proc-32616506332",
+    "proc-0159600017226000063"
+  ],
+  "newCourtIds": [
+    "as_voronezh",
+    "as_yaroslavl",
+    "as_tula",
+    "as_arkhangelsk",
+    "as_murmansk",
+    "as_kaliningrad",
+    "as_rostov",
+    "as_krasnodar",
+    "as_volgograd",
+    "as_dagestan",
+    "as_stavropol",
+    "as_alania",
+    "as_samara",
+    "as_bashkortostan",
+    "as_nizhny_novgorod",
+    "as_tyumen",
+    "as_chelyabinsk",
+    "as_kurgan",
+    "as_novosibirsk",
+    "as_krasnoyarsk",
+    "as_irkutsk",
+    "as_primorye",
+    "as_sakha",
+    "as_amur"
+  ],
+  "limitations": [
+    "49 новых записей — закупки и запросы цен, а не подтверждённые судебные назначения. Статус needs_review сохранён для каждой.",
+    "Сроки и цены зафиксированы по открытым или индексированным карточкам. ЕИС и часть ЭТП недоступны; перед участием проверить текущую редакцию.",
+    "Дата без времени не означает подтверждённый приём до конца суток. Расхождения сроков и цены отмечены в карточках; неизвестные суммы пустые.",
+    "Условия МСП, СМП/СОНКО, СРО и промышленного допуска не доказывают возможность прямого участия АНО. Комплексные цены не являются гонораром эксперта.",
+    "Новых открытых судебных приглашений с актуальным сроком в проведённом поиске не подтверждено. Контакты 24 судов — справочник, а не канал автоматической подачи."
+  ],
+  "excluded": [
+    "Дубли процедур по номеру извещения",
+    "Просроченные находки без подтверждения продления",
+    "Поставки оборудования, обучение и непрофильные услуги",
+    "Судебные акты о ранее назначенных или завершённых экспертизах"
+  ],
+  "evidence": [
+    {
+      "id": "proc-32616539114",
+      "sourceUrl": "https://energybase.ru/tender/01a19d3f-f9a9-701d-bae6-03b7acb9bdd5",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-1262061",
+      "sourceUrl": "https://zakupki.kontur.ru/IS85788071",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/tenderpro/1262061--sverdlovskaya-obl-kompleksnoe-obsledovanie-zdaniya-ceha-1-v-chasti",
+        "https://energybase.ru/tender/01a19d1d-5720-72e8-952f-e32fbaab3ba4"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-ир610918",
+      "sourceUrl": "https://energybase.ru/tender/01a18d6c-a7ec-7000-8eea-758c9ff7b6ce",
+      "additionalSources": [
+        "https://energybase.ru/tender/catalog/geotechnical-monitoring"
+      ],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-1260636",
+      "sourceUrl": "https://energybase.ru/tender/01a18d6b-92c6-72b0-bb73-2b9d9f898d9e",
+      "additionalSources": [
+        "https://synapsenet.ru/search/populyarnie-zaprosi/obsledovanie-zdanij-i-sooruzhenij"
+      ],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616523586",
+      "sourceUrl": "https://energybase.ru/tender/01a18690-0db4-7022-90cf-582e8a6aaa94",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616523396",
+      "sourceUrl": "https://zakupki.kontur.ru/32616523396",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a186a4-ec1b-70de-99a7-f209f8be2471",
+        "https://tendem.ru/tenders/14870808"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-гп646720",
+      "sourceUrl": "https://zakupki.kontur.ru/GP646720",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a1927d-98be-7291-a751-864f0e9dfcb1"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-рн61006044",
+      "sourceUrl": "https://zakupki.kontur.ru/IS85499420",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a188b7-e179-72df-a148-46a6f40afa6e"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616533182",
+      "sourceUrl": "https://zakupki.kontur.ru/32616533182",
+      "additionalSources": [
+        "https://tendik.ru/tender/eis223/32616533182"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616533929",
+      "sourceUrl": "https://energybase.ru/tender/01a1928e-75fa-7275-ab3c-826f7d4a298b",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/fz223/32616533929%231--sanktpeterburg-provedenie-obsledovaniya-tehnicheskogo"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-113505443",
+      "sourceUrl": "https://energybase.ru/tender/01a19d32-9d26-72c6-968a-54512478b9ca",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-рн61101102",
+      "sourceUrl": "https://energybase.ru/tender/01a19be1-f69d-7228-ab5a-a8d7b820d543",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-atom02112600272",
+      "sourceUrl": "https://energybase.ru/tender/01a19d30-0196-716a-81fc-312a6e257137",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-rh02112600059",
+      "sourceUrl": "https://energybase.ru/tender/01a19d19-3ea9-7302-9d4f-aaf4f715a3e0",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-050-0046-26-1135446",
+      "sourceUrl": "https://energybase.ru/tender/01a19d4b-049a-71df-be2a-84d15c5b9f17",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616524695",
+      "sourceUrl": "https://zakupki.kontur.ru/32616524695",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/fz223/32616524695%231--hakasiya-resp-vipolnenie-rabot-podryadnim-sposobom",
+        "https://zakupki.tochka.com/search/32616524695/"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0116300000126001156",
+      "sourceUrl": "https://zakupki.kontur.ru/0116300000126001156",
+      "additionalSources": [
+        "https://tendik.ru/tender/eis/0116300000126001156",
+        "https://tendem.ru/tenders/14992974"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0339100008826000223",
+      "sourceUrl": "https://zakupki.kontur.ru/RQ0339100008826000223",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0120300013726000022",
+      "sourceUrl": "https://zakupki.kontur.ru/RQ0120300013726000022",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-com27102600081",
+      "sourceUrl": "https://zakupki.kontur.ru/IS84872782",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/tmkgroup/com27102600081%231--rostovskaya-obl-provedenie-kompleksnogo-obsledovaniya"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0150600008126000061",
+      "sourceUrl": "https://zakupki.kontur.ru/0150600008126000061",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0132600021226000041",
+      "sourceUrl": "https://zakupki.kontur.ru/0132600021226000041",
+      "additionalSources": [
+        "https://kontendus.ru/tender/0132600021226000041"
+      ],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0157600003526000036",
+      "sourceUrl": "https://tendem.ru/tenders/15539742",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0817200000326016726",
+      "sourceUrl": "https://zakupki.kontur.ru/0817200000326016726",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616526498",
+      "sourceUrl": "https://zakupki.kontur.ru/32616526498",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/rts/4081862%231--moskovskaya-obl-vipolnenie-kompleksa-meropriyatij-po-obsledovaniyu"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616511355",
+      "sourceUrl": "https://www.b2b-center.ru/market/9375191-epb-stroitelnykh-konstruktsii-teplovykh-setei-raiona-1-g/tender-4657713/",
+      "additionalSources": [
+        "https://zakupki.kontur.ru/32616511355"
+      ],
+      "verification": "Прочитана индексированная карточка официальной площадки; прямое открытие недоступно, стадию перепроверить.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0120300013726000021",
+      "sourceUrl": "https://zakupki.kontur.ru/RQ0120300013726000021",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0116300000226000208",
+      "sourceUrl": "https://zakupki.kontur.ru/0116300000226000208",
+      "additionalSources": [
+        "https://goszakupki.pro/tender/5434205"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-100181955126100343",
+      "sourceUrl": "https://zakupki.kontur.ru/IS86298650",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0356500001426009547",
+      "sourceUrl": "https://zakupki.kontur.ru/0356500001426009547",
+      "additionalSources": [
+        "https://goszakupki.pro/tender/5440960"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-4656516",
+      "sourceUrl": "https://zakupki.kontur.ru/4656516_458",
+      "additionalSources": [],
+      "verification": "Прочитана открытая или индексированная карточка вторичного источника. Актуальный приём на официальной площадке не подтверждён.",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616526846",
+      "sourceUrl": "https://zakupki.kontur.ru/32616526846",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/fz223/32616526846%231--moskva-okazanie-uslug-po-vipolneniyu-kadastrovih-i-proektnih"
+      ],
+      "verification": "secondary_crosschecked_primary_unavailable",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616531704",
+      "sourceUrl": "https://zakupki.kontur.ru/32616531704",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a1928d-ea08-715b-a556-286f3c6ff1fb"
+      ],
+      "verification": "secondary_crosschecked_primary_unavailable",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616529464",
+      "sourceUrl": "https://zakupki.kontur.ru/4662806_4",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a1928d-0d9b-71b6-b1eb-0b6eba3c1fd0"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0373100081226000032",
+      "sourceUrl": "https://zakupki.kontur.ru/0373100081226000032",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/fz44/0373100081226000032%231--moskva-uslugi-po-tehnicheskoj-inventarizacii"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0891200000626010517",
+      "sourceUrl": "https://synapsenet.ru/zakupki/fz44/0891200000626010517%231--zabajkalskij-kraj-okazanie-uslug-po-mezhevaniyu",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616503228",
+      "sourceUrl": "https://synapsenet.ru/zakupki/fz223/32616503228%231--sanktpeterburg-vipolnenie-kadastrovih-rabot-v-otnoshenii",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616497171",
+      "sourceUrl": "https://zakupki.kontur.ru/32616497171",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a167c2-c9dd-728a-be90-0d5d3a14659a"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616531525",
+      "sourceUrl": "https://zakupki.kontur.ru/32616531525",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0137600004226000175",
+      "sourceUrl": "https://zakupki.kontur.ru/0137600004226000175",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/fz44/0137600004226000175%231--kaluzhskaya-obl-vipolnenie-kadastrovih-rabot-po"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616494413",
+      "sourceUrl": "https://zakupki.kontur.ru/32616494413",
+      "additionalSources": [
+        "https://synapsenet.ru/zakupki/fz223/32616494413%231--sanktpeterburg-okazanie-uslug-po-provedeniyu-kadastrovih-rabot"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0802600001926000046",
+      "sourceUrl": "https://zakupki.kontur.ru/0802600001926000046",
+      "additionalSources": [
+        "https://tendik.ru/tender/eis/0802600001926000046"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0318300018326000095",
+      "sourceUrl": "https://zakupki.kontur.ru/0318300018326000095",
+      "additionalSources": [
+        "https://kontendus.ru/tender/0318300018326000095"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0302300040926000069",
+      "sourceUrl": "https://kontendus.ru/tender/0302300040926000069",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616530280",
+      "sourceUrl": "https://zakupki.kontur.ru/32616530280",
+      "additionalSources": [
+        "https://energybase.ru/tender/01a1928c-4efe-72e6-8f77-6acf84a6c230"
+      ],
+      "verification": "secondary_crosschecked",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0152600003126000107",
+      "sourceUrl": "https://zakupki.kontur.ru/0152600003126000107",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0111300016126000022",
+      "sourceUrl": "https://zakupki.kontur.ru/0111300016126000022",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-32616506332",
+      "sourceUrl": "https://zakupki.kontur.ru/32616506332",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "proc-0159600017226000063",
+      "sourceUrl": "https://zakupki.kontur.ru/0159600017226000063",
+      "additionalSources": [],
+      "verification": "secondary_card_primary_unverified",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_voronezh",
+      "sourceUrl": "https://voronej.arbitr.ru/about/mode",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_yaroslavl",
+      "sourceUrl": "https://oblsud--jrs.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_tula",
+      "sourceUrl": "https://usd--tula.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_arkhangelsk",
+      "sourceUrl": "https://oblsud--arh.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_murmansk",
+      "sourceUrl": "https://usd--mrm.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_kaliningrad",
+      "sourceUrl": "https://kaliningvs--kln.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_rostov",
+      "sourceUrl": "https://rostov.arbitr.ru/about/mode",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_krasnodar",
+      "sourceUrl": "https://krasnodar.arbitr.ru/about/mode",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_volgograd",
+      "sourceUrl": "https://volgograd.arbitr.ru/about/mode",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_dagestan",
+      "sourceUrl": "https://usd--dag.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_stavropol",
+      "sourceUrl": "https://stavropol.arbitr.ru/about/mode",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_alania",
+      "sourceUrl": "https://vs--wlk.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_samara",
+      "sourceUrl": "https://samara.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_bashkortostan",
+      "sourceUrl": "https://ufa.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_nizhny_novgorod",
+      "sourceUrl": "https://nnov.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_tyumen",
+      "sourceUrl": "https://tumen.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_chelyabinsk",
+      "sourceUrl": "https://chel.arbitr.ru/about/mode",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_kurgan",
+      "sourceUrl": "https://usd--krg.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_novosibirsk",
+      "sourceUrl": "https://sovetsky--nsk.sudrf.ru/modules.php?name=sud",
+      "additionalSources": [],
+      "verification": "official_directory",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_krasnoyarsk",
+      "sourceUrl": "https://krasnoyarsk.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_irkutsk",
+      "sourceUrl": "https://irkutsk.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_primorye",
+      "sourceUrl": "https://primkray.arbitr.ru/adres",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_sakha",
+      "sourceUrl": "https://yakutsk.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "as_amur",
+      "sourceUrl": "https://amuras.arbitr.ru/",
+      "additionalSources": [],
+      "verification": "official_contact_page",
+      "checkedAt": "2026-11-02"
+    }
+  ]
+}

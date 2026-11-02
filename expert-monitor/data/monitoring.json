@@ -1,5 +1,5 @@
 {
-  "lastRunAt": "2026-11-02T11:04:02Z",
+  "lastRunAt": "2026-11-02T18:53:35Z",
   "lastSuccessfulSearchAt": null,
   "status": "degraded",
   "mode": "public-source-links",
@@ -12,11 +12,12 @@
       "automatic": true,
       "type": "court_search",
       "status": "error",
-      "checkedAt": "2026-11-02T11:04:02Z",
+      "checkedAt": "2026-11-02T18:53:35Z",
       "httpStatus": null,
       "error": "<urlopen error timed out>",
       "resultMessage": "",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "kad",
@@ -29,7 +30,8 @@
       "httpStatus": null,
       "error": "",
       "resultMessage": "Проверить номер дела, последние определения, кандидатуры экспертов и срок ответа. Публичный запрос не заменяет проверку карточки.",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "as-moscow",
@@ -38,13 +40,14 @@
       "automatic": true,
       "type": "court_official",
       "status": "ok",
-      "checkedAt": "2026-11-02T11:04:02Z",
+      "checkedAt": "2026-11-02T18:53:35Z",
       "httpStatus": 200,
       "error": "",
       "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
-      "lastSuccessAt": "2026-11-02T11:04:02Z",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Вся Россия",
       "contentHash": "4b81000a35ac867110215cd4c44b8f09af7beaff9add4ce9f997f2de136c321f",
-      "lastLinkScanAt": "2026-11-02T11:04:02Z",
+      "lastLinkScanAt": "2026-11-02T18:53:35Z",
       "lastCandidateCount": 0
     },
     {
@@ -53,14 +56,15 @@
       "url": "https://asmo.arbitr.ru/",
       "automatic": true,
       "type": "court_official",
-      "status": "changed",
-      "checkedAt": "2026-11-02T11:04:02Z",
+      "status": "ok",
+      "checkedAt": "2026-11-02T18:53:35Z",
       "httpStatus": 200,
       "error": "",
       "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
-      "lastSuccessAt": "2026-11-02T11:04:02Z",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Вся Россия",
       "contentHash": "8f9bae2c8718809a687736b2ca0b5219aa50e3018a270687ff5c99ababf1bb7a",
-      "lastLinkScanAt": "2026-11-02T11:04:02Z",
+      "lastLinkScanAt": "2026-11-02T18:53:35Z",
       "lastCandidateCount": 0
     },
     {
@@ -74,7 +78,8 @@
       "httpStatus": null,
       "error": "",
       "resultMessage": "Самостоятельный канал закупок; не все судебные экспертизы являются закупками. Проверить извещение, сроки, требования и обеспечение.",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "moscow-data",
@@ -87,7 +92,8 @@
       "httpStatus": null,
       "error": "",
       "resultMessage": "Официальный портал требует JavaScript; автоматическая выгрузка судебных актов в этой версии не подключена.",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "official-directory",
@@ -96,11 +102,12 @@
       "automatic": true,
       "type": "directory",
       "status": "error",
-      "checkedAt": "2026-11-02T11:04:02Z",
+      "checkedAt": "2026-11-02T18:53:35Z",
       "httpStatus": null,
       "error": "Перенаправление на другой источник: требуется ручная проверка",
       "resultMessage": "",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "kontur",
@@ -113,7 +120,8 @@
       "httpStatus": null,
       "error": "",
       "resultMessage": "Источник сигналов и ориентиров. Текущую стадию и документацию подтверждать в ЕИС/на площадке.",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "sudact",
@@ -126,7 +134,8 @@
       "httpStatus": null,
       "error": "",
       "resultMessage": "Архивный исследовательский источник. Завершённый акт не означает открытый заказ.",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
     },
     {
       "id": "reputation",
@@ -139,13 +148,127 @@
       "httpStatus": null,
       "error": "",
       "resultMessage": "Использованы только доступные части текстов; часть документов ограничена. Первоисточник — карточка суда.",
-      "lastSuccessAt": null
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
+    },
+    {
+      "id": "ras",
+      "name": "Банк решений арбитражных судов",
+      "url": "https://ras.arbitr.ru/",
+      "automatic": false,
+      "type": "court_search",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "",
+      "resultMessage": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
+    },
+    {
+      "id": "sudrf",
+      "name": "ГАС «Правосудие» — суды России",
+      "url": "https://sudrf.ru/index.php?id=300",
+      "automatic": false,
+      "type": "court_search",
+      "status": "manual_required",
+      "checkedAt": null,
+      "httpStatus": null,
+      "error": "",
+      "resultMessage": "Федеральный контур. Проверка страницы и ссылок не подтверждает полноту поиска дел. Актуальный запрос и последующие акты проверяются отдельно.",
+      "lastSuccessAt": null,
+      "region": "Вся Россия"
+    },
+    {
+      "id": "arbitr-directory",
+      "name": "Арбитражные суды — федеральный справочник",
+      "url": "https://arbitr.ru/index.php",
+      "automatic": true,
+      "type": "directory",
+      "status": "ok",
+      "checkedAt": "2026-11-02T18:53:35Z",
+      "httpStatus": 200,
+      "error": "",
+      "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Вся Россия",
+      "contentHash": "4725c3d6af37bc29ff8dd3082d1a4a177d314b5ac26960ddf3ff838a851d92ad"
+    },
+    {
+      "id": "as-spb",
+      "name": "АС Санкт-Петербурга и Ленинградской области",
+      "url": "https://spb.arbitr.ru/",
+      "automatic": true,
+      "type": "court_official",
+      "status": "ok",
+      "checkedAt": "2026-11-02T18:53:35Z",
+      "httpStatus": 200,
+      "error": "",
+      "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Санкт-Петербург / Ленинградская область",
+      "contentHash": "b03de9138e40af07f78bfc977b4552b11c906bafb69383580bd5e0b121dd3890",
+      "lastLinkScanAt": "2026-11-02T18:53:35Z",
+      "lastCandidateCount": 0
+    },
+    {
+      "id": "as-tatarstan",
+      "name": "АС Республики Татарстан",
+      "url": "https://tatarstan.arbitr.ru/",
+      "automatic": true,
+      "type": "court_official",
+      "status": "ok",
+      "checkedAt": "2026-11-02T18:53:35Z",
+      "httpStatus": 200,
+      "error": "",
+      "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Республика Татарстан",
+      "contentHash": "8b7fd85df6654677acc0c4ffd349229675da38935e96b2ef42892b49c756ef10",
+      "lastLinkScanAt": "2026-11-02T18:53:35Z",
+      "lastCandidateCount": 0
+    },
+    {
+      "id": "as-sverdlovsk",
+      "name": "АС Свердловской области",
+      "url": "https://ekaterinburg.arbitr.ru/",
+      "automatic": true,
+      "type": "court_official",
+      "status": "ok",
+      "checkedAt": "2026-11-02T18:53:35Z",
+      "httpStatus": 200,
+      "error": "",
+      "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Свердловская область",
+      "contentHash": "8c938d8b6deefcd22c3375c8fa38a9385ba95fec4081a1afc25ffaccd381c109",
+      "lastLinkScanAt": "2026-11-02T18:53:35Z",
+      "lastCandidateCount": 0
+    },
+    {
+      "id": "as-khabarovsk",
+      "name": "АС Хабаровского края",
+      "url": "https://khabarovsk.arbitr.ru/",
+      "automatic": true,
+      "type": "court_official",
+      "status": "ok",
+      "checkedAt": "2026-11-02T18:53:35Z",
+      "httpStatus": 200,
+      "error": "",
+      "resultMessage": "Страница доступна; это не подтверждение полноты поиска дел",
+      "lastSuccessAt": "2026-11-02T18:53:35Z",
+      "region": "Хабаровский край",
+      "contentHash": "43bb699ab5e6f3457a152a67aab4cbfba1be62b06f90ecf47bb5f4cc53d9b293",
+      "lastLinkScanAt": "2026-11-02T18:53:35Z",
+      "lastCandidateCount": 0
     }
   ],
   "newCandidates": [],
-  "registryRecords": 27,
-  "automaticSources": 4,
-  "successfulSources": 2,
-  "manualSources": 6,
-  "automaticSending": false
+  "registryRecords": 29,
+  "automaticSources": 9,
+  "successfulSources": 7,
+  "manualSources": 8,
+  "automaticSending": false,
+  "research": null,
+  "schedule": "Ежедневно в 07:17 МСК"
 }

@@ -1,0 +1,58 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+import {webcrypto} from 'node:crypto';
+const read=f=>fs.readFileSync(new URL(f,import.meta.url),'utf8');
+const D=JSON.parse(read('./data.json'));
+const ctx={window:{},URL,crypto:webcrypto,Uint8Array};vm.createContext(ctx);
+vm.runInContext(read('./memory-core.js'),ctx);ctx.MemoryCore=ctx.window.MemoryCore;
+vm.runInContext(read('./meeting-core.js'),ctx);const C=ctx.MemoryCore,M=ctx.window.MeetingCore;
+const pack=materials=>({format:'engineering-memory-personal',version:2,materials});
+const old={id:'local-12345678-abcd',title:'Архивная заметка',text:'Батанов: исходный текст',url:'',year:'1987',links:['batanov'],createdAt:'2026-11-01T00:00:00Z'};
+const legacy={format:'engineering-memory-personal',version:1,materials:[old]};
+const migrated=C.validateArchive(legacy,D.nodes).materials[0];
+assert.equal(migrated.updatedAt,'2026-11-01T00:00:00.000Z');assert.equal(migrated.history.length,0);assert.equal(legacy.version,1);
+const revised=C.reviseMaterial(migrated,{text:'Уточнение: Мобот-Ч-ХВ-2',links:['mobot2']},D.nodes,'2026-11-02T00:00:00Z');
+assert.equal(revised.history.length,1);assert.equal(revised.history[0].text,old.text);assert.equal(revised.history[0].links[0],'batanov');
+assert.equal(migrated.text,old.text);assert.equal(revised.id,old.id);
+const restored=C.reviseMaterial(revised,revised.history[0],D.nodes,'2026-11-03T00:00:00Z');
+assert.equal(restored.text,old.text);assert.equal(restored.history.length,2);assert.equal(restored.history[1].text,revised.text);
+assert.equal(C.reviseMaterial(restored,{...restored},D.nodes,'2026-11-03T01:00:00Z').history.length,2);
+assert.equal(C.mergeArchives(pack([restored]),pack([restored]),D.nodes).skipped,1);
+assert.throws(()=>C.mergeArchives(pack([revised]),pack([restored]),D.nodes),/разные версии/);
+assert.equal(C.mergeArchives(pack([restored]),pack([{...migrated,id:'local-abcdefab-abcd'}]),D.nodes).added,1,'Distinct history must not be deduplicated away');
+for(const bad of [{...restored,updatedAt:'2026-10-01'}, {...restored,history:[{...restored.history[0],savedAt:'2027-01-01'}]}, {...restored,history:Array(21).fill(restored.history[0])}])assert.throws(()=>C.validateArchive(pack([bad]),D.nodes));
+const maxed={...restored,history:Array(20).fill({...restored.history[0],savedAt:migrated.createdAt})};
+assert.throws(()=>C.reviseMaterial(maxed,{text:'21-я правка'},D.nodes,'2026-11-04T00:00:00Z'),/20/);assert.equal(maxed.history.length,20);
+assert.equal(JSON.stringify(C.validateArchive(JSON.parse(JSON.stringify(pack([restored]))),D.nodes)),JSON.stringify(pack([restored])));
+console.log('PASS v4: migration, revision snapshots, restoration, no-op edits, archive round-trip, history limits and conflict preservation');
+
+const q={id:'q-12345678-abcd',origin:'comparison:cable',question:'Почему изменён укладчик?',node:'cable',sources:['sktb'],context:'Сравнение 1986 и 1987',status:'open',createdAt:'2026-11-01T00:00:00Z',updatedAt:'2026-11-01T00:00:00Z',responses:[]};
+const folder=items=>({...M.empty(),items});
+const r={id:'r-12345678-abcd',text:'Нужно сверить чертёж.',who:'Тест',url:'https://example.com/',locator:'00:15:32',createdAt:'2026-11-02T00:00:00Z'};
+const answered={...q,status:'recorded',responses:[r],updatedAt:r.createdAt};
+assert.equal(M.validate(folder([answered]),D.nodes,D.sources).items[0].responses.length,1);
+assert.equal(M.merge(folder([q]),folder([q]),D.nodes,D.sources).skipped,1);
+assert.throws(()=>M.merge(folder([q]),folder([answered]),D.nodes,D.sources),/разные версии/);assert.equal(q.responses.length,0);
+assert.equal(M.merge(folder([q]),folder([{...q,id:'q-abcdefab-abcd'}]),D.nodes,D.sources).added,1);
+for(const bad of [{...q,status:'recorded'},{...q,node:'unknown'},{...q,sources:['unknown']},{...q,question:' '},{...q,updatedAt:'2025-01-01'},{...answered,responses:[{...r,url:'javascript:alert(1)'}]},{...answered,responses:[{...r,createdAt:'2027-01-01'}]},{...answered,responses:[r,r]}])assert.throws(()=>M.validate(folder([bad]),D.nodes,D.sources));
+assert.match(M.uid(),/^[a-f0-9]{32}$/);
+assert.throws(()=>M.validate(pack([]),D.nodes,D.sources));
+assert.equal(M.validate(folder([answered]),D.nodes,D.sources).items[0].responses[0].locator,'00:15:32');
+for(const row of D.comparison){assert.ok(D.nodes.some(n=>n.id===row.node));assert.ok(row.sources.length);for(const id of row.sources)assert.ok(D.sources.some(s=>s.id===id));assert.ok(row.before&&row.after&&row.question&&row.locator)}
+assert.equal(D.comparison.length,6);assert.equal(D.comparison.filter(r=>r.changed).length,5);
+console.log('PASS v4: meeting validation, backup merge, response provenance, invalid URLs/dates/statuses, unique IDs and comparison references');
+
+// Exercise HTML escaping and optimistic writes without invoking the browser or its storage.
+const dom={},storage=new Map();const doc={addEventListener(){}};
+const ui={D,MeetingCore:M,MemoryCore:C,document:doc,localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)},$:s=>dom[s]||null,source:id=>D.sources.find(s=>s.id===id),byId:id=>D.nodes.find(n=>n.id===id),esc:s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))};
+vm.createContext(ui);vm.runInContext(read('./research-v4.js'),ui);
+const hostile={...answered,question:'<script>alert(1)</script>',context:'<img src=x onerror=alert(1)>',responses:[{...r,text:'<iframe src=x>',who:'<svg onload=alert(1)>'}]};
+const html=ui.meetingDocument(M.validate(folder([hostile]),D.nodes,D.sources));
+assert.ok(html.includes('&lt;script&gt;'));assert.ok(!/<script|<iframe|<img|<svg/.test(html));assert.ok(html.includes('@page'));assert.ok(html.includes('https://example.com/'));
+ui.initializeV4();ui.saveMeeting(folder([q]));const saved=storage.get('engineering-memory-meeting-v1');
+storage.set('engineering-memory-meeting-v1','changed in another tab');assert.throws(()=>ui.saveMeeting(folder([answered])),/другой вкладке/);
+assert.equal(storage.get('engineering-memory-meeting-v1'),'changed in another tab');
+storage.set('engineering-memory-meeting-v1',saved);ui.localStorage.setItem=()=>{throw Error('QuotaExceeded')};assert.throws(()=>ui.saveMeeting(folder([answered])),/QuotaExceeded/);
+assert.equal(storage.get('engineering-memory-meeting-v1'),saved);
+console.log('PASS v4: offline meeting document escaping, concurrent-tab conflict protection and storage failure preservation');

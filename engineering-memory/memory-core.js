@@ -19,27 +19,45 @@ window.MemoryCore = (() => {
     return nodes.map(n=>{const hits=found.filter(f=>f.id===n.id&&!found.some(g=>g.id!==f.id&&g.start<=f.start&&g.end>=f.end&&(g.end-g.start)>(f.end-f.start)));return hits.length?{id:n.id,alias:hits.sort((a,b)=>b.alias.length-a.alias.length)[0].alias}:null}).filter(Boolean);
   }
   function validateArchive(input,nodes) {
-    if (!input||input.format!=='engineering-memory-personal'||input.version!==1||!Array.isArray(input.materials)) throw Error('Нужен личный архив Живой инженерной памяти версии 1. Открытый корпус — другой формат.');
+    if (!input||input.format!=='engineering-memory-personal'||![1,2].includes(input.version)||!Array.isArray(input.materials)) throw Error('Нужен личный архив Живой инженерной памяти версии 1 или 2.');
     if(input.materials.length>100)throw Error('Лимит — 100 материалов в личном архиве.');
     const known=new Set(nodes.filter(n=>n.status!=='local').map(n=>n.id)), ids=new Set();let size=0;
-    const materials=input.materials.map(m=>{
-      if(!m||typeof m.id!=='string'||!/^local-[a-f0-9-]{8,80}$/.test(m.id)||ids.has(m.id))throw Error('Повторяющийся или неверный идентификатор материала.');ids.add(m.id);
+    const date=value=>{if(typeof value!=='string'||!Number.isFinite(Date.parse(value)))throw Error('Неверная дата версии.');return new Date(value).toISOString()};
+    function fields(m){
+      if(!m||typeof m!=='object')throw Error('Неверная запись материала.');
       for(const [key,max,min] of [['title',160,1],['text',40000,1],['url',2000,0],['year',4,0]])if(typeof m[key]!=='string'||m[key].length>max||m[key].trim().length<min)throw Error('Проверьте название, текст, год и ссылку материала.');
       if(m.year&&!/^(1[0-9]{3}|20[0-9]{2})$/.test(m.year))throw Error('Год должен быть от 1000 до 2099 или пустым.');
       if(m.url&&!safeURL(m.url))throw Error('Допускаются только ссылки HTTP/HTTPS без логина и пароля.');
       if(!Array.isArray(m.links)||m.links.length>100||m.links.some(id=>!known.has(id)))throw Error('В архиве есть связи с неизвестными объектами.');
-      if(typeof m.createdAt!=='string'||!Number.isFinite(Date.parse(m.createdAt)))throw Error('Неверная дата создания материала.');
       size+=m.text.length;
-      return {id:m.id,title:m.title.trim(),text:m.text.trim(),url:safeURL(m.url),year:m.year,links:[...new Set(m.links)],createdAt:new Date(m.createdAt).toISOString()};
+      return {title:m.title.trim(),text:m.text.trim(),url:safeURL(m.url),year:m.year,links:[...new Set(m.links)]};
+    }
+    const materials=input.materials.map(m=>{
+      if(!m||typeof m.id!=='string'||!/^local-[a-f0-9-]{8,80}$/.test(m.id)||ids.has(m.id))throw Error('Повторяющийся или неверный идентификатор материала.');ids.add(m.id);
+      const current=fields(m),createdAt=date(m.createdAt),updatedAt=date(input.version===1?m.createdAt:m.updatedAt),rawHistory=input.version===1?[]:m.history;
+      if(!Array.isArray(rawHistory)||rawHistory.length>20)throw Error('Допускается до 20 предыдущих версий материала.');
+      let previous=createdAt;
+      const history=rawHistory.map(h=>{const savedAt=date(h.savedAt);if(savedAt<previous||savedAt>updatedAt)throw Error('Нарушен порядок дат в истории.');previous=savedAt;return {...fields(h),savedAt}});
+      if(updatedAt<createdAt)throw Error('Дата изменения предшествует созданию.');
+      return {id:m.id,...current,createdAt,updatedAt,history};
     });
-    if(size>1000000)throw Error('Общий объём текстов превышает 1 млн символов.');
-    return {format:'engineering-memory-personal',version:1,materials};
+    if(size>1000000)throw Error('Общий объём текстов и предыдущих версий превышает 1 млн символов.');
+    return {format:'engineering-memory-personal',version:2,materials};
+  }
+  function reviseMaterial(material,changes,nodes,now=new Date().toISOString()) {
+    const pack=m=>({format:'engineering-memory-personal',version:2,materials:[m]});
+    const base=validateArchive(pack(material),nodes).materials[0];
+    const {title,text,url,year,links}=base,old={title,text,url,year,links};
+    const next=validateArchive(pack({...base,...changes,id:base.id,createdAt:base.createdAt,updatedAt:now,history:base.history}),nodes).materials[0];
+    if(['title','text','url','year'].every(k=>next[k]===base[k])&&[...next.links].sort().join() === [...base.links].sort().join())return base;
+    return validateArchive(pack({...next,history:[...base.history,{...old,savedAt:base.updatedAt}]}),nodes).materials[0];
   }
   function mergeArchives(current,incoming,nodes) {
     const a=validateArchive(current,nodes), b=validateArchive(incoming,nodes), merged=[...a.materials];let skipped=0;
-    for(const m of b.materials){const same=merged.find(n=>n.id===m.id);if(same){if(JSON.stringify(same)!==JSON.stringify(m))throw Error('Одна запись имеет две разные версии. Сначала сохраните их с разными названиями в исходном архиве.');skipped++;continue;}if(merged.some(n=>normalize(n.title)===normalize(m.title)&&n.text===m.text&&n.url===m.url&&n.year===m.year&&[...n.links].sort().join() === [...m.links].sort().join())){skipped++;continue;}merged.push(m);}
+    for(const m of b.materials){const same=merged.find(n=>n.id===m.id);if(same){if(JSON.stringify(same)!==JSON.stringify(m))throw Error('У одной записи разные версии. Объединение остановлено; оба архива сохранены без изменений. Импортируйте нужную запись как новый материал, чтобы сохранить обе ветви.');skipped++;continue;}if(merged.some(n=>normalize(n.title)===normalize(m.title)&&n.text===m.text&&n.url===m.url&&n.year===m.year&&JSON.stringify(n.history)===JSON.stringify(m.history)&&[...n.links].sort().join() === [...m.links].sort().join())){skipped++;continue;}merged.push(m);}
     return {archive:validateArchive({...a,materials:merged},nodes),added:merged.length-a.materials.length,skipped};
   }
   function materialNode(m,index) {return {id:m.id,title:m.title,short:m.title.length>23?m.title.slice(0,21)+'…':m.title,type:'document',year:m.year||'без даты',summary:m.text.length>240?m.text.slice(0,240)+'…':m.text,body:m.text,sources:[],locator:'Личный материал. Связи — выбранные пользователем упоминания; содержание источника не проверено.',status:'local',url:m.url,aliases:[],x:100+index*20,y:100};}
-  return {normalize,safeURL,detectMentions,validateArchive,mergeArchives,materialNode};
+  return {normalize,safeURL,detectMentions,validateArchive,mergeArchives,reviseMaterial,materialNode};
 })();
+

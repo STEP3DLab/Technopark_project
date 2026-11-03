@@ -1,0 +1,49 @@
+name: Assemble verified MOBOT media
+on:
+  push:
+    branches: [main]
+    paths: ['.github/mobot-upload/manifest.json']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: mobot-media-publication
+  cancel-in-progress: false
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Assemble and verify original MP4 files
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          manifest = pathlib.Path('.github/mobot-upload/manifest.json')
+          if not manifest.exists():
+              print('Media already assembled.')
+              raise SystemExit(0)
+          for item in json.loads(manifest.read_text()):
+              target = pathlib.Path(item['path'])
+              assert target.as_posix().startswith('mobot/assets/') and target.suffix == '.mp4'
+              parts = [pathlib.Path(p) for p in item['chunks']]
+              assert all(p.as_posix().startswith('.github/mobot-upload/') for p in parts)
+              data = b''.join(p.read_bytes() for p in parts)
+              assert len(data) == item['size']
+              assert hashlib.sha256(data).hexdigest() == item['sha256']
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(data)
+              for p in parts: p.unlink()
+              print(target, len(data), item['sha256'])
+          manifest.unlink()
+          PY
+      - name: Save verified media
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add mobot/assets .github/mobot-upload
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Assemble verified MOBOT MP4 files without re-encoding'
+          git push origin main

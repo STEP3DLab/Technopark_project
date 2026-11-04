@@ -614,7 +614,7 @@
       "Ленобласть 32616531465: 14 лотов, только МСП, не прямая возможность АНО.",
       "Все новые процедуры — закупки, не подтверждённые судебные приглашения."
     ],
-    "sheetSyncStatus": "pending",
+    "sheetSyncStatus": "synced",
     "completedAt": "2026-11-04T10:30:26.783+03:00",
     "errors": [
       "КАД/Банк решений: формы поиска без извлечённых актуальных определений",
@@ -829,7 +829,26 @@
         "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
       }
     ],
-    "caseCardsVerified": 0
+    "caseCardsVerified": 0,
+    "sheetVerification": {
+      "newRowsAdded": 2,
+      "existingRowsUpdated": 3,
+      "userEditedRowsPreserved": 2,
+      "originalRowsPreserved": 114,
+      "readbackOK": true,
+      "pricingColumnMPreserved": true,
+      "proposalSheetUntouched": true,
+      "updatedIds": [
+        "proc-32616507429",
+        "proc-0361200015026004780",
+        "proc-32616538578"
+      ],
+      "preservedUserEditedIds": [
+        "proc-0148300000626001128",
+        "proc-0148300000626001150"
+      ]
+    },
+    "sheetSyncBlocker": null
   },
   "schedule": "Ежедневно в 07:17 МСК"
 }

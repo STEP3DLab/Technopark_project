@@ -433,6 +433,25 @@
     "Ленобласть 32616531465: 14 лотов, только МСП, не прямая возможность АНО.",
     "Все новые процедуры — закупки, не подтверждённые судебные приглашения."
   ],
-  "sheetSyncStatus": "pending",
-  "noExternalCorrespondence": true
+  "sheetSyncStatus": "synced",
+  "noExternalCorrespondence": true,
+  "sheetVerification": {
+    "newRowsAdded": 2,
+    "existingRowsUpdated": 3,
+    "userEditedRowsPreserved": 2,
+    "originalRowsPreserved": 114,
+    "readbackOK": true,
+    "pricingColumnMPreserved": true,
+    "proposalSheetUntouched": true,
+    "updatedIds": [
+      "proc-32616507429",
+      "proc-0361200015026004780",
+      "proc-32616538578"
+    ],
+    "preservedUserEditedIds": [
+      "proc-0148300000626001128",
+      "proc-0148300000626001150"
+    ]
+  },
+  "sheetSyncBlocker": null
 }

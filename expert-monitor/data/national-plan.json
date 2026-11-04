@@ -514,7 +514,26 @@
       }
     ],
     "caseCardsVerified": 0,
-    "sheetSyncStatus": "pending"
+    "sheetSyncStatus": "synced",
+    "sheetVerification": {
+      "newRowsAdded": 2,
+      "existingRowsUpdated": 3,
+      "userEditedRowsPreserved": 2,
+      "originalRowsPreserved": 114,
+      "readbackOK": true,
+      "pricingColumnMPreserved": true,
+      "proposalSheetUntouched": true,
+      "updatedIds": [
+        "proc-32616507429",
+        "proc-0361200015026004780",
+        "proc-32616538578"
+      ],
+      "preservedUserEditedIds": [
+        "proc-0148300000626001128",
+        "proc-0148300000626001150"
+      ]
+    },
+    "sheetSyncBlocker": null
   },
   "history": [
     {
@@ -1898,7 +1917,26 @@
         }
       ],
       "caseCardsVerified": 0,
-      "sheetSyncStatus": "pending"
+      "sheetSyncStatus": "synced",
+      "sheetVerification": {
+        "newRowsAdded": 2,
+        "existingRowsUpdated": 3,
+        "userEditedRowsPreserved": 2,
+        "originalRowsPreserved": 114,
+        "readbackOK": true,
+        "pricingColumnMPreserved": true,
+        "proposalSheetUntouched": true,
+        "updatedIds": [
+          "proc-32616507429",
+          "proc-0361200015026004780",
+          "proc-32616538578"
+        ],
+        "preservedUserEditedIds": [
+          "proc-0148300000626001128",
+          "proc-0148300000626001150"
+        ]
+      },
+      "sheetSyncBlocker": null
     }
   ]
 }

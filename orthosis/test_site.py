@@ -28,7 +28,7 @@ def main():
     assert 'THREE' in js and 'STLLoader' in js and 'GLTFLoader' in js
     assert 'printFootprint' in js and 'fitsBed' in js and 'moveNames' in js
     assert 'fallback.js' in html and (ROOT/'fallback.js').is_file()
-    assert len(re.findall(r'<article class="pcard" data-code="A\\d{2}"',html))==17
+    assert len(re.findall(r'<article class="pcard" data-code="A\d{2}"',html))==17
     match=re.search(r'const printSize=\{(.*?)\};',js,re.S)
     assert match,'Missing dimensions'
     size=json.loads('{'+re.sub(r'\b(A\d{2}):',r'"\1":',match.group(1))+'}')

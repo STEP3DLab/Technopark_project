@@ -28,6 +28,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Validate JavaScript syntax
-        run: node --check orthosis/app.js
+        run: |
+          node --check orthosis/app.js
+          node --check orthosis/fallback.js
       - name: Validate model metadata and downloadable file integrity
         run: python orthosis/test_site.py

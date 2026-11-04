@@ -1,0 +1,57 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
+const $=id=>document.getElementById(id);
+const catalog=[
+["A01","Бедренная рама с неподвижной щекой",1,"frame","Опора шарнира, нижняя манжета"],
+["A02","Голенная рама с подвижной ступицей",1,"frame","Две посадки под подшипники 608"],
+["A03","Телескопическая вставка бедра",1,"frame","Регулировка длины бедра"],
+["A04","Телескопическая вставка голени",1,"frame","Регулировка длины голени"],
+["A05","Проксимальная бедренная манжета",1,"frame","Опора и крепление привода"],
+["A06","Дистальная голенная манжета",1,"frame","Нижняя опора"],
+["A07","Площадка привода",1,"other","Универсальная монтажная полка"],
+["A08","Кожух привода",1,"other","Отдельный эскизный кожух"],
+["A09","Сменный механический упор",2,"joint","Ограничение сгибания"],
+["A10","Кольцо фиксации подшипника",2,"joint","Крепление обоймы 608"],
+["A11","Корпус натяжителя троса M5",1,"cable","Основание ручной регулировки"],
+["A12","Карман тензодатчика",1,"other","Опциональный стендовый образец"],
+["A13","Звено защиты троса",5,"cable","Шарнирная защита"],
+["A14","Крышка звена защиты",5,"cable","Фиксация на M3"],
+["A15","Прямая гильза 140 мм",1,"cable","Направляющая оболочки"],
+["A16","Прямая гильза 160 мм",1,"cable","Направляющая оболочки"],
+["A17","Калибр посадок и отверстий",1,"other","Печатать первым: Ø22 и M3–M5"]
+];
+const moveNames=new Set(["A02","A04","A06","A10_inner","A10_outer","A11","R01_a","R01_b","R03"]);
+const guardNames=new Set(["A13_1","A13_2","A13_3","A13_4","A13_5","A14_1","A14_2","A14_3","A14_4","A14_5","A15","A16","R06"]);
+const refNames=new Set(["R01_a","R01_b","R02","R03","R04","R05","R06"]);
+let angle=0,playing=false,preview=null,assembly=null,filter="all",q="",token=0,phase=0;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x152733);scene.fog=new THREE.Fog(0x152733,850,1800);
+const camera=new THREE.PerspectiveCamera(40,1,.2,4000);camera.position.set(620,240,640);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.65;
+$("viewport").appendChild(renderer.domElement);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.dampingFactor=.08;orbit.target.set(0,0,45);orbit.minDistance=65;orbit.maxDistance=2200;
+scene.add(new THREE.HemisphereLight(0xeefaf6,0x5f6c76,2.4));
+const key=new THREE.DirectionalLight(0xffffff,2.9);key.position.set(330,430,470);scene.add(key);
+const rim=new THREE.DirectionalLight(0x96cfcf,1.6);rim.position.set(-350,170,-420);scene.add(rim);
+const grid=new THREE.GridHelper(1200,28,0x426471,0x2c4550);grid.position.y=-295;scene.add(grid);
+function resize(){const host=$("viewport"),w=host.clientWidth,h=host.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h)}new ResizeObserver(resize).observe($("viewport"));resize();
+function loading(txt,sub){$("loading").classList.remove("hide");$("loading").innerHTML='<span class="spin"></span><b>'+txt+'</b><small>'+sub+'</small>'}
+function loaded(){$("loading").classList.add("hide")}
+function fit(obj){if(!obj)return;const box=new THREE.Box3().setFromObject(obj);if(box.isEmpty())return;const size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());const m=Math.max(size.x,size.y,size.z);let d=m/Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*.80;camera.position.copy(center).add(new THREE.Vector3(.8*d,.38*d,.9*d));orbit.target.copy(center);orbit.update()}
+function visibility(){if(!assembly)return;assembly.traverse(o=>{if(guardNames.has(o.name))o.visible=angle===0&&$("cable").checked;else if(refNames.has(o.name))o.visible=$("refs").checked})}
+function setAngle(v){angle=Math.max(0,Math.min(120,Number(v)||0));$("angle").value=angle;$("angleText").textContent=Math.round(angle);document.querySelectorAll("[data-a]").forEach(x=>x.classList.toggle("active",Number(x.dataset.a)===angle));if(assembly){assembly.traverse(o=>{if(moveNames.has(o.name))o.rotation.x=-angle*Math.PI/180});visibility()}
+$("caution").textContent=angle>0?"!  Движение рам — кинематическая демонстрация. Защита троса скрыта: её траектория не разработана. Геометрия проверена только при 0/30/60/90/120°, не в непрерывном движении.":"!  Показан поворот рам в шарнире. Привод, усилия и движение троса не симулируются. V01 не предназначена для эксплуатации на человеке."}
+function loadAssembly(){loading("Загрузка инженерной модели","Точная 3D-геометрия из CAD");new GLTFLoader().load("./files/Orthosis_V01_assembly.glb",gltf=>{assembly=gltf.scene;scene.add(assembly);assembly.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.roughness=.55;o.material.metalness=o.name[0]==="R"?.54:.15;o.material.side=THREE.DoubleSide}});visibility();setAngle(angle);fit(assembly);loaded();$("stageStatus").textContent="31 CAD ТЕЛО"},undefined,e=>{console.error(e);loading("Файл 3D-сборки не найден","Дождитесь завершения публикации файлов на GitHub");$("stageStatus").textContent="ОЖИДАНИЕ GLB"})}
+function releasePreview(){if(preview){scene.remove(preview);preview.traverse(o=>o.geometry&&o.geometry.dispose());preview=null}}
+function mode(single){$("angle").disabled=!!single;$("play").disabled=!!single;$("cable").disabled=!!single;$("refs").disabled=!!single;document.querySelectorAll("[data-a]").forEach(x=>x.disabled=!!single);if(assembly)assembly.visible=!single}
+function returnToAssembly(){token++;releasePreview();mode(false);$("viewLabel").textContent="СБОРКА / 3D";$("stageStatus").textContent="31 CAD ТЕЛО";document.querySelectorAll(".pcard").forEach(x=>x.style.borderColor="");if(assembly)fit(assembly);else loadAssembly();loaded()}
+function showPart(code){let current=++token;playing=false;updatePlay();releasePreview();mode(true);$("viewLabel").textContent="ДЕТАЛЬ / "+code;$("stageStatus").textContent="STL / ММ";document.querySelectorAll(".pcard").forEach(x=>x.style.borderColor=x.dataset.code===code?"#67b6a2":"");loading("Загрузка "+code+".stl","Нормализованная ориентация для печати");
+new STLLoader().load("./files/STL/"+code+".stl",geometry=>{if(current!==token){geometry.dispose();return}geometry.computeVertexNormals();const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:0x8dd5c1,metalness:.08,roughness:.49,side:THREE.DoubleSide}));mesh.rotation.x=-Math.PI/2;preview=new THREE.Group();preview.add(mesh);scene.add(preview);fit(preview);loaded();location.hash="model"},undefined,e=>{console.error(e);loading("Нет файла "+code+".stl","Проверьте публикацию STL в репозитории")})}
+function cards(){let list=catalog.filter(p=>(filter==="all"||p[3]===filter)&&p.join(" ").toLowerCase().includes(q));$("partGrid").innerHTML=list.length?list.map(p=>'<article class="pcard" data-code="'+p[0]+'"><div class="part-top"><span>'+p[0]+'</span><span>×'+p[2]+' ШТ.</span></div><h3>'+p[1]+'</h3><p>'+p[4]+'</p><div class="part-actions"><button data-view="'+p[0]+'">3D ВИД ↗</button><a href="./files/STL/'+p[0]+'.stl" download>STL ↓</a><a href="./files/STEP/'+p[0]+'.step" download>STEP ↓</a></div></article>').join(""):'<p>Ничего не найдено.</p>';document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showPart(b.dataset.view))}
+function updatePlay(){$("play").textContent=playing?"Ⅱ Пауза":"▶ Анимация"}
+$("angle").oninput=e=>{playing=false;updatePlay();setAngle(e.target.value)};document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{playing=false;updatePlay();setAngle(b.dataset.a)});
+$("play").onclick=()=>{playing=!playing;updatePlay()};$("back").onclick=returnToAssembly;$("resetBtn").onclick=()=>{if(preview)returnToAssembly();playing=false;updatePlay();setAngle(0);fit(assembly)};$("fitBtn").onclick=()=>fit(preview||assembly);
+$("gridBtn").onclick=()=>{grid.visible=!grid.visible;$("gridBtn").setAttribute("aria-pressed",String(grid.visible))};$("cable").onchange=visibility;$("refs").onchange=visibility;
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filter=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.classList.toggle("active",x===b));cards()});$("search").oninput=e=>{q=e.target.value.trim().toLowerCase();cards()};
+let last=0;function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(playing&&!preview){phase+=dt*1.15;setAngle(Math.round(60-60*Math.cos(phase)))}orbit.update();renderer.render(scene,camera)}renderer.setAnimationLoop(frame);cards();loadAssembly();

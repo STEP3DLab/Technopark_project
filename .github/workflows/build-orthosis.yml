@@ -1,0 +1,73 @@
+name: Build ORTHOSIS V01 actual CAD and STL
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'orthosis/source_bundle.b64'
+      - '.github/workflows/build-orthosis.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: build-orthosis-v01
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Decode original engineering source with SHA-256 check
+        run: |
+          python - <<'PY'
+          import pathlib,base64,hashlib,lzma,io,tarfile
+          p=base64.b64decode(pathlib.Path('orthosis/source_bundle.b64').read_text().strip())
+          assert hashlib.sha256(p).hexdigest()=='01f882d1186e1a947a457e60780184f55a58d3ed44afc987560b1037cd74dc0e'
+          folder=pathlib.Path('orthosis/source');folder.mkdir(parents=True,exist_ok=True)
+          with tarfile.open(fileobj=io.BytesIO(lzma.decompress(p)),mode='r:') as tar:
+              for m in tar.getmembers():
+                  assert m.name in ['build_orthosis.py','clean_stl.py','parameters.json','requirements.txt']
+                  (folder/m.name).write_bytes(tar.extractfile(m).read())
+          PY
+      - name: Install CadQuery and numerical geometry tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cadquery==2.7.0 trimesh numpy
+      - name: Generate original solid bodies, printable meshes and assembly GLB
+        run: python orthosis/source/build_orthosis.py
+      - name: Package downloadable files
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,shutil,json,hashlib
+          base=pathlib.Path('orthosis');dest=base/'files';dest.mkdir(exist_ok=True)
+          assert len(list((base/'STL').glob('A*.stl')))==17
+          assert len(list((base/'STEP').glob('*.step')))==23
+          for folder in ['STL','STEP','source']:
+              shutil.copytree(base/folder,dest/folder,dirs_exist_ok=True)
+          for filename in ['Orthosis_V01_assembly.glb','Orthosis_V01_assembly.step','Orthosis_V01_structural_90deg.step','BOM.csv']:
+              shutil.copyfile(base/filename,dest/filename)
+          with zipfile.ZipFile(dest/'Orthosis_V01_CAD.zip','w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+              for f in sorted(dest.rglob('*')):
+                  if f.is_file() and f.name!='Orthosis_V01_CAD.zip':
+                      z.write(f,arcname='Orthosis_V01/'+str(f.relative_to(dest)))
+              z.write(base/'README.md',arcname='Orthosis_V01/README.md')
+          (dest/'manifest.json').write_text(json.dumps({'revision':'V01','stl':17,'cad_step':23,
+                  'zip_sha256':hashlib.sha256((dest/'Orthosis_V01_CAD.zip').read_bytes()).hexdigest()},indent=2))
+          PY
+      - name: Commit generated models for GitHub Pages
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add orthosis/STL orthosis/STEP orthosis/source orthosis/files orthosis/BOM.csv orthosis/Orthosis_V01_assembly.glb orthosis/Orthosis_V01_assembly.step orthosis/Orthosis_V01_structural_90deg.step
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'build(orthosis): generate authentic V01 STL STEP and GLB assets'
+          for i in 1 2 3 4 5; do
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 12
+            git fetch origin main
+            git rebase origin/main || exit 1
+          done
+          exit 1

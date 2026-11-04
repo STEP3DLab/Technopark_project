@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'orthosis/source_bundle.b64'
+      - 'orthosis/optimize_glb.py'
       - '.github/workflows/build-orthosis.yml'
   workflow_dispatch:
 permissions:
@@ -38,6 +39,8 @@ jobs:
           python -m pip install cadquery==2.7.0 trimesh numpy
       - name: Generate original solid bodies, printable meshes and assembly GLB
         run: python orthosis/source/build_orthosis.py
+      - name: Optimize display GLB to 31 meshes without changing CAD geometry
+        run: python orthosis/optimize_glb.py
       - name: Package downloadable files
         run: |
           python - <<'PY'

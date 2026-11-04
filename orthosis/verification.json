@@ -1,0 +1,29 @@
+{
+  "revision": "V01",
+  "date": "2026-11-04",
+  "source": "Orthosis_V01_CAD.zip/checks",
+  "purpose": "bench geometry only",
+  "original_glb_patches": 1733,
+  "optimized_viewer_parts": 31,
+  "stl_files": 17,
+  "watertight_by_edge_count": 17,
+  "step_part_models": 23,
+  "step_assembly_solids": 31,
+  "nominal_intersections_above_0_05_mm3": 0,
+  "tested_discrete_bend_angles_deg": [
+    0,
+    30,
+    60,
+    90,
+    120
+  ],
+  "frame_intersections_at_tested_angles": [],
+  "limitations": [
+    "no continuous collision-free motion validation",
+    "no anatomical fit",
+    "no fatigue or tensile validation",
+    "no safe motor/transmission verification",
+    "no continuous cable guard path",
+    "no verified printing process"
+  ]
+}

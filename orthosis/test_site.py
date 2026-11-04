@@ -26,7 +26,7 @@ def main():
     for x in ['viewport','partGrid','bedWidth','bedDepth','bedSummary','angle','play','verification']:
         assert ('id="'+x+'"') in html or ('class="'+x+'"') in html,x
     assert 'THREE' in js and 'STLLoader' in js and 'GLTFLoader' in js
-    assert 'printFootprint' in js and 'fitsBed' in js and 'moving' in js
+    assert 'printFootprint' in js and 'fitsBed' in js and 'moveNames' in js
     match=re.search(r'const printSize=\{(.*?)\};',js,re.S)
     assert match,'Missing dimensions'
     size=json.loads('{'+re.sub(r'\b(A\d{2}):',r'"\1":',match.group(1))+'}')

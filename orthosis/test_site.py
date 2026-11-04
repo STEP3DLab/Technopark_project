@@ -85,6 +85,7 @@ def main():
     print('Verified V02: 3 added STL and STEP models, web GLB, assembly and motion data')
     from runpy import run_path
     run_path(str(ROOT / 'bench-v03/verify_bench.py'), run_name='__main__')
+    run_path(str(ROOT / 'bench-v04/verify_v04.py'), run_name='__main__')
     print('Orthosis public downloads and local source verified')
 
 if __name__=='__main__':main()

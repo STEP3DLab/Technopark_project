@@ -1,0 +1,35 @@
+{
+  "basis": "V03 B04 with a single Ø2 mm layer, nominal fixed straight tangents; sector is a conservative XY screen only.",
+  "source_step_sha256": "d2bb7aeeb3658a69285b318f9b0b841c960e26eb0f7966dd302bc1fec92728d3",
+  "eyelet_center_radius_mm": 13.65,
+  "eyelet_center_chord_mm": 7.065759931298817,
+  "mouth_only_sector_deg": 45.57866798991157,
+  "inflated_sector_deg": 54.103046802303766,
+  "hard_projection_boundary_per_side_deg": 152.94847659884812,
+  "geometry_screen_interval_deg": [
+    -157.5,
+    157.5
+  ],
+  "sampling_step_deg": 0.1,
+  "outlet_check": "Minimum plane distance of the R13.65 eyelet-centre arc to the X=[0,42] straight cord centreline, minus (1.85+1.00) mm, min of A and B.",
+  "straight_outlet_limit_deg": 117.09251401579178,
+  "straight_outlet_margins_mm": {
+    "0": 22.334887528845783,
+    "90": 5.617120034350599,
+    "120": -0.5020075631963725,
+    "157.5": -2.8499999999999983
+  },
+  "ideal_turn_mm": 75.39822368615503,
+  "coupon": {
+    "triangles": 7192,
+    "step_solids": 1,
+    "watertight": true,
+    "consistent_winding": true,
+    "volume_mm3": 1334.661,
+    "stl_bounds_mm": [
+      50.994,
+      20.932,
+      2.4
+    ]
+  }
+}

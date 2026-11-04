@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="88mm" viewBox="0 0 100 88">
+<title>Ручной стенд B04. Неподвижная бумажная шкала. Масштаб 1:1</title>
+<rect width="100" height="88" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#152c35" text-anchor="middle">
+<text x="50.000" y="4.700" font-size="3.1" font-weight="bold">B04   /   ШКАЛА РУЧНОГО ПРОГОНА</text>
+<circle cx="50" cy="36" r="28" fill="none" stroke="#182d36" stroke-width="0.2" />
+<circle cx="50" cy="36" r="10.3" fill="none" stroke="#182d36" stroke-width="0.2" />
+<line x1="62.600" y1="57.824" x2="63.775" y2="59.859" stroke="#92a0a2" stroke-width="0.35"/>
+<line x1="65.257" y1="57.789" x2="65.802" y2="58.568" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="67.098" y1="56.377" x2="67.709" y2="57.105" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="68.809" y1="54.809" x2="69.481" y2="55.481" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="70.377" y1="53.098" x2="71.105" y2="53.709" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="71.789" y1="51.257" x2="72.568" y2="51.802" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="71.824" y1="48.600" x2="73.859" y2="49.775" stroke="#182d36" stroke-width="0.35"/>
+<text x="69.659" y="48.150" font-size="2.2" font-weight="bold">-120°</text>
+<line x1="74.108" y1="47.242" x2="74.969" y2="47.643" stroke="#182d36" stroke-width="0.15"/>
+<line x1="74.996" y1="45.098" x2="75.889" y2="45.423" stroke="#182d36" stroke-width="0.15"/>
+<line x1="75.694" y1="42.885" x2="76.611" y2="43.130" stroke="#182d36" stroke-width="0.15"/>
+<line x1="76.196" y1="40.619" x2="77.131" y2="40.784" stroke="#182d36" stroke-width="0.15"/>
+<line x1="76.499" y1="38.318" x2="77.445" y2="38.401" stroke="#182d36" stroke-width="0.15"/>
+<line x1="75.200" y1="36.000" x2="77.550" y2="36.000" stroke="#182d36" stroke-width="0.35"/>
+<text x="72.700" y="36.800" font-size="2.2" font-weight="bold">-90°</text>
+<line x1="76.499" y1="33.682" x2="77.445" y2="33.599" stroke="#182d36" stroke-width="0.15"/>
+<line x1="76.196" y1="31.381" x2="77.131" y2="31.216" stroke="#182d36" stroke-width="0.15"/>
+<line x1="75.694" y1="29.115" x2="76.611" y2="28.870" stroke="#182d36" stroke-width="0.15"/>
+<line x1="74.996" y1="26.902" x2="75.889" y2="26.577" stroke="#182d36" stroke-width="0.15"/>
+<line x1="74.108" y1="24.758" x2="74.969" y2="24.357" stroke="#182d36" stroke-width="0.15"/>
+<line x1="71.824" y1="23.400" x2="73.859" y2="22.225" stroke="#182d36" stroke-width="0.35"/>
+<text x="69.659" y="25.450" font-size="2.2" font-weight="bold">-60°</text>
+<line x1="71.789" y1="20.743" x2="72.568" y2="20.198" stroke="#182d36" stroke-width="0.15"/>
+<line x1="70.377" y1="18.902" x2="71.105" y2="18.291" stroke="#182d36" stroke-width="0.15"/>
+<line x1="68.809" y1="17.191" x2="69.481" y2="16.519" stroke="#182d36" stroke-width="0.15"/>
+<line x1="67.098" y1="15.623" x2="67.709" y2="14.895" stroke="#182d36" stroke-width="0.15"/>
+<line x1="65.257" y1="14.211" x2="65.802" y2="13.432" stroke="#182d36" stroke-width="0.15"/>
+<line x1="62.600" y1="14.176" x2="63.775" y2="12.141" stroke="#182d36" stroke-width="0.35"/>
+<text x="61.350" y="17.141" font-size="2.2" font-weight="bold">-30°</text>
+<line x1="61.242" y1="11.892" x2="61.643" y2="11.031" stroke="#182d36" stroke-width="0.15"/>
+<line x1="59.098" y1="11.004" x2="59.423" y2="10.111" stroke="#182d36" stroke-width="0.15"/>
+<line x1="56.885" y1="10.306" x2="57.130" y2="9.389" stroke="#182d36" stroke-width="0.15"/>
+<line x1="54.619" y1="9.804" x2="54.784" y2="8.869" stroke="#182d36" stroke-width="0.15"/>
+<line x1="52.318" y1="9.501" x2="52.401" y2="8.555" stroke="#182d36" stroke-width="0.15"/>
+<line x1="50.000" y1="10.800" x2="50.000" y2="8.450" stroke="#182d36" stroke-width="0.35"/>
+<text x="50.000" y="14.100" font-size="2.2" font-weight="bold">0°</text>
+<line x1="47.682" y1="9.501" x2="47.599" y2="8.555" stroke="#182d36" stroke-width="0.15"/>
+<line x1="45.381" y1="9.804" x2="45.216" y2="8.869" stroke="#182d36" stroke-width="0.15"/>
+<line x1="43.115" y1="10.306" x2="42.870" y2="9.389" stroke="#182d36" stroke-width="0.15"/>
+<line x1="40.902" y1="11.004" x2="40.577" y2="10.111" stroke="#182d36" stroke-width="0.15"/>
+<line x1="38.758" y1="11.892" x2="38.357" y2="11.031" stroke="#182d36" stroke-width="0.15"/>
+<line x1="37.400" y1="14.176" x2="36.225" y2="12.141" stroke="#182d36" stroke-width="0.35"/>
+<text x="38.650" y="17.141" font-size="2.2" font-weight="bold">+30°</text>
+<line x1="34.743" y1="14.211" x2="34.198" y2="13.432" stroke="#182d36" stroke-width="0.15"/>
+<line x1="32.902" y1="15.623" x2="32.291" y2="14.895" stroke="#182d36" stroke-width="0.15"/>
+<line x1="31.191" y1="17.191" x2="30.519" y2="16.519" stroke="#182d36" stroke-width="0.15"/>
+<line x1="29.623" y1="18.902" x2="28.895" y2="18.291" stroke="#182d36" stroke-width="0.15"/>
+<line x1="28.211" y1="20.743" x2="27.432" y2="20.198" stroke="#182d36" stroke-width="0.15"/>
+<line x1="28.176" y1="23.400" x2="26.141" y2="22.225" stroke="#182d36" stroke-width="0.35"/>
+<text x="30.341" y="25.450" font-size="2.2" font-weight="bold">+60°</text>
+<line x1="25.892" y1="24.758" x2="25.031" y2="24.357" stroke="#182d36" stroke-width="0.15"/>
+<line x1="25.004" y1="26.902" x2="24.111" y2="26.577" stroke="#182d36" stroke-width="0.15"/>
+<line x1="24.306" y1="29.115" x2="23.389" y2="28.870" stroke="#182d36" stroke-width="0.15"/>
+<line x1="23.804" y1="31.381" x2="22.869" y2="31.216" stroke="#182d36" stroke-width="0.15"/>
+<line x1="23.501" y1="33.682" x2="22.555" y2="33.599" stroke="#182d36" stroke-width="0.15"/>
+<line x1="24.800" y1="36.000" x2="22.450" y2="36.000" stroke="#182d36" stroke-width="0.35"/>
+<text x="27.300" y="36.800" font-size="2.2" font-weight="bold">+90°</text>
+<line x1="23.501" y1="38.318" x2="22.555" y2="38.401" stroke="#182d36" stroke-width="0.15"/>
+<line x1="23.804" y1="40.619" x2="22.869" y2="40.784" stroke="#182d36" stroke-width="0.15"/>
+<line x1="24.306" y1="42.885" x2="23.389" y2="43.130" stroke="#182d36" stroke-width="0.15"/>
+<line x1="25.004" y1="45.098" x2="24.111" y2="45.423" stroke="#182d36" stroke-width="0.15"/>
+<line x1="25.892" y1="47.242" x2="25.031" y2="47.643" stroke="#182d36" stroke-width="0.15"/>
+<line x1="28.176" y1="48.600" x2="26.141" y2="49.775" stroke="#182d36" stroke-width="0.35"/>
+<text x="30.341" y="48.150" font-size="2.2" font-weight="bold">+120°</text>
+<line x1="28.211" y1="51.257" x2="27.432" y2="51.802" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="29.623" y1="53.098" x2="28.895" y2="53.709" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="31.191" y1="54.809" x2="30.519" y2="55.481" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="32.902" y1="56.377" x2="32.291" y2="57.105" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="34.743" y1="57.789" x2="34.198" y2="58.568" stroke="#92a0a2" stroke-width="0.15"/>
+<line x1="37.400" y1="57.824" x2="36.225" y2="59.859" stroke="#92a0a2" stroke-width="0.35"/>
+<line x1="67.700" y1="36.000" x2="69.800" y2="36.000" stroke="#182d36" stroke-width="0.4"/>
+<line x1="50.000" y1="18.300" x2="50.000" y2="16.200" stroke="#182d36" stroke-width="0.4"/>
+<line x1="32.300" y1="36.000" x2="30.200" y2="36.000" stroke="#182d36" stroke-width="0.4"/>
+<text x="50.000" y="35.800" font-size="2.25" font-weight="normal">ВЫРЕЗАТЬ</text>
+<text x="50.000" y="39.000" font-size="2.1" font-weight="normal">Ø20,6</text>
+<text x="50.000" y="56.000" font-size="2.3" font-weight="normal">B04 / V04</text>
+<text x="50.000" y="59.000" font-size="1.8" font-weight="normal">ВИД СВЕРХУ</text>
+<text x="50.000" y="69.000" font-size="2.6" font-weight="normal">Направляющие справа (+X). Ноль сверху (+Y).</text>
+<text x="50.000" y="73.000" font-size="2.15" font-weight="normal">Печать 100%. Вырезать оба контура и надеть на стойку до установки ротора.</text>
+<line x1="25.000" y1="80.000" x2="75.000" y2="80.000" stroke="#182d36" stroke-width="0.32"/>
+<line x1="25.000" y1="78.800" x2="25.000" y2="81.200" stroke="#182d36" stroke-width="0.3"/>
+<line x1="75.000" y1="78.800" x2="75.000" y2="81.200" stroke="#182d36" stroke-width="0.3"/>
+<text x="50.000" y="85.000" font-size="2.3" font-weight="bold">Контроль масштаба   ·   50,0 мм</text>
+</g>
+</svg>

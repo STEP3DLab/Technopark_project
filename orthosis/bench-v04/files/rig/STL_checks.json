@@ -1,0 +1,17 @@
+{
+  "D02_wheel.stl": {
+    "triangles": 5032,
+    "every_edge_twice": true,
+    "volume_mm3": 2496.44
+  },
+  "D01_base.stl": {
+    "triangles": 9176,
+    "every_edge_twice": true,
+    "volume_mm3": 39974.14
+  },
+  "D03_foot.stl": {
+    "triangles": 1008,
+    "every_edge_twice": true,
+    "volume_mm3": 500.88
+  }
+}

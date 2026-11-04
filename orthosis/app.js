@@ -45,7 +45,7 @@ const matMoving=new THREE.MeshStandardMaterial({color:0xeca27d,roughness:.52,met
 const matMetal=new THREE.MeshStandardMaterial({color:0xb4c4d0,roughness:.38,metalness:.62,side:THREE.DoubleSide});
 const matGuard=new THREE.MeshStandardMaterial({color:0x789baa,roughness:.63,metalness:.04,side:THREE.DoubleSide});
 const matAccent=new THREE.MeshStandardMaterial({color:0xf0ce91,roughness:.54,metalness:.12,side:THREE.DoubleSide});
-function appearanceFor(mesh){let node=mesh;while(node&&!/^[AR]\\d{2}/.test(node.name||""))node=node.parent;const name=node?.name||mesh.name||"";if(name.startsWith("R")||name.startsWith("A10"))return matMetal;if(name.startsWith("A13")||name.startsWith("A14")||name.startsWith("A15")||name.startsWith("A16"))return matGuard;if(name.startsWith("A09")||name.startsWith("A11"))return matAccent;return moveNames.has(name)?matMoving:matFixed}
+function appearanceFor(mesh){let node=mesh;while(node&&!/^[AR]\d{2}/.test(node.name||""))node=node.parent;const name=node?.name||mesh.name||"";if(name.startsWith("R")||name.startsWith("A10"))return matMetal;if(name.startsWith("A13")||name.startsWith("A14")||name.startsWith("A15")||name.startsWith("A16"))return matGuard;if(name.startsWith("A09")||name.startsWith("A11"))return matAccent;return moveNames.has(name)?matMoving:matFixed}
 const grid=new THREE.GridHelper(1200,28,0x426471,0x2c4550);grid.position.y=-295;scene.add(grid);
 function resize(){const host=$("viewport"),w=host.clientWidth,h=host.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h)}new ResizeObserver(resize).observe($("viewport"));resize();
 function loading(txt,sub){$("loading").classList.remove("hide");$("loading").innerHTML='<span class="spin"></span><b>'+txt+'</b><small>'+sub+'</small>'}

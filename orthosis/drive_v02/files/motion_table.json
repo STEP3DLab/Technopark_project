@@ -32,7 +32,7 @@
       "motor_output_deg": 0.0,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 5,
@@ -42,7 +42,7 @@
       "motor_output_deg": 13.125,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 10,
@@ -52,7 +52,7 @@
       "motor_output_deg": 26.25,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 15,
@@ -62,7 +62,7 @@
       "motor_output_deg": 39.375,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 20,
@@ -72,7 +72,7 @@
       "motor_output_deg": 52.5,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 25,
@@ -82,7 +82,7 @@
       "motor_output_deg": 65.625,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 30,
@@ -92,7 +92,7 @@
       "motor_output_deg": 78.75,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 35,
@@ -102,7 +102,7 @@
       "motor_output_deg": 91.875,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 40,
@@ -112,7 +112,7 @@
       "motor_output_deg": 105.0,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 45,
@@ -122,7 +122,7 @@
       "motor_output_deg": 118.125,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 50,
@@ -132,7 +132,7 @@
       "motor_output_deg": 131.25,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 55,
@@ -142,7 +142,7 @@
       "motor_output_deg": 144.375,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 60,
@@ -152,7 +152,7 @@
       "motor_output_deg": 157.5,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 65,
@@ -162,7 +162,7 @@
       "motor_output_deg": 170.625,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 70,
@@ -172,7 +172,7 @@
       "motor_output_deg": 183.75,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 75,
@@ -182,7 +182,7 @@
       "motor_output_deg": 196.875,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 80,
@@ -192,7 +192,7 @@
       "motor_output_deg": 210.0,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 85,
@@ -202,7 +202,7 @@
       "motor_output_deg": 223.125,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 90,
@@ -212,7 +212,7 @@
       "motor_output_deg": 236.25,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 95,
@@ -222,7 +222,7 @@
       "motor_output_deg": 249.375,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 100,
@@ -232,7 +232,7 @@
       "motor_output_deg": 262.5,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 105,
@@ -242,7 +242,7 @@
       "motor_output_deg": 275.625,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 110,
@@ -252,7 +252,7 @@
       "motor_output_deg": 288.75,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 115,
@@ -262,7 +262,7 @@
       "motor_output_deg": 301.875,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     },
     {
       "knee_deg": 120,
@@ -272,7 +272,7 @@
       "motor_output_deg": 315.0,
       "ideal_tension_difference_N": 63.492063,
       "motor_output_torque_Nm_assumed": 1.172161,
-      "motor_output_rpm_assumed": 52.5
+      "motor_output_rpm_assumed": 20.0
     }
   ],
   "disclaimer": "Ideal geometric linkage: no friction/hysteresis/backlash/continuous-contact/clinical validation."

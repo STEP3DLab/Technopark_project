@@ -1,0 +1,32 @@
+{
+  "model": "B04 / bench hub fit",
+  "units": "mm",
+  "CAD": "STEP re-imported; one valid solid",
+  "stl_mesh": {
+    "faces": 25492,
+    "watertight": true,
+    "winding_consistent": true,
+    "bodies": 1,
+    "volume_mm3": 7833.96,
+    "bbox_mm": [
+      33.979,
+      33.989,
+      14.0
+    ]
+  },
+  "cad_interference_mm3": {
+    "hub_envelope": 0.0,
+    "shaft_tip": 0.0,
+    "screw_0": 0.0,
+    "screw_90": 0.0,
+    "screw_180": 0.0,
+    "screw_270": 0.0,
+    "eyelet_30": 0.0,
+    "eyelet_60": 0.0,
+    "eyelet_210": 0.0,
+    "eyelet_240": 0.0,
+    "cord_loop_0": 0.0,
+    "cord_loop_1": 0.0
+  },
+  "check_scope": "Nominal cylinders stand in for hub and screws, toruses for seated cord; excludes tails, flange crossover, strength, motor envelope, bracket and print errors."
+}

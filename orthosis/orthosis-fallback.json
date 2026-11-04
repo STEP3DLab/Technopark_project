@@ -1,0 +1,75 @@
+{
+  "format": "WebP, RGBA",
+  "atlas": [
+    2500,
+    2700
+  ],
+  "cell": [
+    500,
+    540
+  ],
+  "cols": 5,
+  "rows": 5,
+  "order": "row-major",
+  "angles_deg": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100,
+    105,
+    110,
+    115,
+    120
+  ],
+  "cad_rotation": "Rx(-angle) in CAD coordinates, about hinge origin [0,0,0]",
+  "camera": "orthographic, fixed across all frames",
+  "camera_direction_cad_xyz": [
+    0.9138996452548421,
+    -0.34728186519684,
+    0.2101969184086137
+  ],
+  "visible_parts": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A09_extension",
+    "A09_flexion",
+    "A10_inner",
+    "A10_outer",
+    "A11"
+  ],
+  "moving_parts": [
+    "A02",
+    "A04",
+    "A06",
+    "A10_inner",
+    "A10_outer",
+    "A11"
+  ],
+  "source_commit": "568621a9a0d169fb4ee13fbc915515c2a33b199d",
+  "source_path": "orthosis/files/Orthosis_V01_assembly.glb",
+  "source_git_blob": "0e228ef43aa38025dcf8767830e6f76c47d393ee",
+  "triangles_per_frame": 327806,
+  "display": "index = clamp(round(angle/5),0,24); x=(index%5)*500; y=floor(index/5)*540. Play frame indices forward and then backward."
+}

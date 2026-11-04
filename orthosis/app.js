@@ -47,7 +47,7 @@ const matMetal=new THREE.MeshStandardMaterial({color:0xb4c4d0,roughness:.38,meta
 const matGuard=new THREE.MeshStandardMaterial({color:0x789baa,roughness:.63,metalness:.04,side:THREE.DoubleSide});
 const matAccent=new THREE.MeshStandardMaterial({color:0xf0ce91,roughness:.54,metalness:.12,side:THREE.DoubleSide});
 function appearanceFor(mesh){let node=mesh;while(node&&!/^[AR]\d{2}/.test(node.name||""))node=node.parent;const name=node?.name||mesh.name||"";if(name.startsWith("R")||name.startsWith("A10"))return matMetal;if(name.startsWith("A13")||name.startsWith("A14")||name.startsWith("A15")||name.startsWith("A16"))return matGuard;if(name.startsWith("A09")||name.startsWith("A11"))return matAccent;return moveNames.has(name)?matMoving:matFixed}
-const drive=createDrive(scene);
+let drive;
 const grid=new THREE.GridHelper(1200,28,0x426471,0x2c4550);grid.position.y=-295;scene.add(grid);
 function resize(){const host=$("viewport"),w=host.clientWidth,h=host.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h)}new ResizeObserver(resize).observe($("viewport"));resize();
 function loading(txt,sub){$("loading").classList.remove("hide");$("loading").innerHTML='<span class="spin"></span><b>'+txt+'</b><small>'+sub+'</small>'}
@@ -77,18 +77,45 @@ function optimizeCAD(root){
    node.add(single);
  }
 }
-function loadAssembly(){loading("Загрузка инженерной модели","Точная 3D-геометрия из CAD");new GLTFLoader().load("./files/Orthosis_V01_assembly.glb",gltf=>{assembly=gltf.scene;optimizeCAD(assembly);scene.add(assembly);assembly.traverse(o=>{if(o.isMesh){o.material=appearanceFor(o)}});visibility();setAngle(angle);fit(assembly);loaded();$("stageStatus").textContent="31 CAD ТЕЛО";if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){playing=true;phase=0;updatePlay()}},event=>{if(event.lengthComputable&&event.total){const s=$("loading").querySelector("small");if(s)s.textContent="Загружено "+Math.round(event.loaded/event.total*100)+"% · "+(event.total/1024/1024).toFixed(1)+" МБ"}},e=>{console.error(e);loading("Файл 3D-сборки не найден","Дождитесь завершения публикации файлов на GitHub");$("stageStatus").textContent="ОЖИДАНИЕ GLB"})}
+function loadAssembly(){
+  new GLTFLoader().load("./files/Orthosis_V01_assembly.glb", gltf => {
+    assembly=gltf.scene; optimizeCAD(assembly); scene.add(assembly);
+    assembly.traverse(o=>{if(o.isMesh)o.material=appearanceFor(o)});
+    fit(assembly);
+    renderer.render(scene,camera);
+    if(renderer.getContext().isContextLost())return;
+    // Only a rendered CAD assembly can replace the working local preview.
+    drive=createDrive(scene);
+    const saved=window.__ORTHOSIS_FALLBACK?.takeOver();
+    if(saved)({angle,playing,phase,filter,q}=saved);
+    else playing=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.__ORTHOSIS_APP_READY=true;
+    loaded();
+    $("stageStatus").textContent="31 CAD ТЕЛО";
+    bindControls(); setAngle(angle); updatePlay(); cards();
+    renderer.setAnimationLoop(frame);
+  },undefined,error=>{
+    console.error("Assembly unavailable",error);
+    $("stageStatus").textContent="25 КАДРОВ CAD";
+  });
+}
 function releasePreview(){if(preview){scene.remove(preview);preview.traverse(o=>o.geometry&&o.geometry.dispose());preview=null}}
 function mode(single){drive.setPreview(single);$("angle").disabled=!!single;$("play").disabled=!!single;$("cable").disabled=!!single;$("refs").disabled=!!single;document.querySelectorAll("[data-a]").forEach(x=>x.disabled=!!single);if(assembly)assembly.visible=!single}
-function returnToAssembly(){token++;releasePreview();mode(false);$("viewLabel").textContent="СБОРКА / 3D";$("stageStatus").textContent="31 CAD ТЕЛО";document.querySelectorAll(".pcard").forEach(x=>x.style.borderColor="");if(assembly)fit(assembly);else loadAssembly();loaded()}
+function returnToAssembly(){token++;releasePreview();mode(false);$("viewLabel").textContent="СБОРКА / 3D";$("stageStatus").textContent="31 CAD ТЕЛО";document.querySelectorAll(".pcard").forEach(x=>x.style.borderColor="");if(assembly)fit(assembly);loaded()}
 function showPart(code){let current=++token;playing=false;updatePlay();releasePreview();mode(true);$("viewLabel").textContent="ДЕТАЛЬ / "+code;$("stageStatus").textContent="STL / ММ";document.querySelectorAll(".pcard").forEach(x=>x.style.borderColor=x.dataset.code===code?"#67b6a2":"");loading("Загрузка "+code+".stl","Нормализованная ориентация для печати");
 new STLLoader().load("./files/STL/"+code+".stl",geometry=>{if(current!==token){geometry.dispose();return}geometry.computeVertexNormals();const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:0x8dd5c1,metalness:.08,roughness:.49,side:THREE.DoubleSide}));mesh.rotation.x=-Math.PI/2;preview=new THREE.Group();preview.add(mesh);scene.add(preview);fit(preview);loaded();location.hash="model"},undefined,e=>{console.error(e);loading("Нет файла "+code+".stl","Проверьте публикацию STL в репозитории")})}
 function cards(){bedSummary();let list=catalog.filter(p=>(filter==="all"||p[3]===filter)&&p.join(" ").toLowerCase().includes(q));$("partGrid").innerHTML=list.length?list.map(p=>'<article class="pcard" data-code="'+p[0]+'"><div class="part-top"><span>'+p[0]+'</span><span>×'+p[2]+' ШТ.</span></div><h3>'+p[1]+'</h3><p>'+p[4]+'</p>'+printFootprint(p[0])+'<div class="part-actions"><button data-view="'+p[0]+'">3D ВИД ↗</button><a href="./files/STL/'+p[0]+'.stl" download>STL ↓</a><a href="./files/STEP/'+p[0]+'.step" download>STEP ↓</a></div></article>').join(""):'<p>Ничего не найдено.</p>';document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showPart(b.dataset.view))}
-function updatePlay(){$("play").textContent=playing?"Ⅱ Пауза":"▶ Анимация"}
-$("angle").oninput=e=>{playing=false;updatePlay();setAngle(e.target.value)};document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{playing=false;updatePlay();setAngle(b.dataset.a)});
-$("play").onclick=()=>{playing=!playing;updatePlay()};$("back").onclick=returnToAssembly;$("resetBtn").onclick=()=>{if(preview)returnToAssembly();playing=false;updatePlay();setAngle(0);fit(assembly)};$("fitBtn").onclick=()=>fit(preview||assembly);
+function updatePlay(){$("play").textContent=playing?"Ⅱ Пауза":"▶ Анимация";$("play").setAttribute("aria-pressed",String(playing))}
+function chooseAngle(value){playing=false;updatePlay();setAngle(value);phase=Math.acos(1-angle/60)}
+function bindControls(){
+$("angle").oninput=e=>chooseAngle(e.target.value);document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>chooseAngle(b.dataset.a));
+$("play").onclick=()=>{playing=!playing;updatePlay()};$("back").onclick=returnToAssembly;$("resetBtn").onclick=()=>{if(preview)returnToAssembly();chooseAngle(0);fit(assembly)};$("fitBtn").onclick=()=>fit(preview||assembly);
 $("gridBtn").onclick=()=>{grid.visible=!grid.visible;$("gridBtn").setAttribute("aria-pressed",String(grid.visible))};$("cable").onchange=visibility;$("refs").onchange=visibility;
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filter=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.classList.toggle("active",x===b));cards()});$("search").oninput=e=>{q=e.target.value.trim().toLowerCase();cards()};
 for(const id of ["bedWidth","bedDepth"])$(id).addEventListener("input",()=>cards());
 document.querySelectorAll("[data-bed]").forEach(b=>b.addEventListener("click",()=>{$("bedWidth").value=b.dataset.bed;$("bedDepth").value=b.dataset.bed;cards()}));
-let last=0;let stageVisible=true;const stageObserver=new IntersectionObserver(entries=>{stageVisible=entries[0].isIntersecting},{rootMargin:"120px"});stageObserver.observe($("model"));function frame(t){if(document.hidden||!stageVisible){last=t;return}const dt=Math.min((t-last)/1000||0,.05);last=t;if(playing&&!preview){phase+=dt*1.15;setAngle(Math.round(60-60*Math.cos(phase)))}orbit.update();renderer.render(scene,camera)}renderer.setAnimationLoop(frame);cards();loadAssembly();window.__ORTHOSIS_APP_READY=true;
+}
+let last=0,stageVisible=true;
+if("IntersectionObserver" in window)new IntersectionObserver(entries=>{stageVisible=entries[0].isIntersecting}).observe($("viewport").closest(".stage"));
+function frame(t){if(document.hidden||!stageVisible){last=t;return}const dt=Math.min((t-last)/1000||0,.05);last=t;if(playing&&!preview){phase+=dt*1.15;setAngle(Math.round(60-60*Math.cos(phase)))}orbit.update();renderer.render(scene,camera)}
+loadAssembly();

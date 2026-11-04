@@ -83,6 +83,8 @@ def main():
     assert (v02/'Orthosis_V02_Bowden_CAD.zip').stat().st_size>100000
     assert (v02/'motion_table.csv').is_file() and (v02/'verification_v02.json').is_file()
     print('Verified V02: 3 added STL and STEP models, web GLB, assembly and motion data')
+    from runpy import run_path
+    run_path(str(ROOT / 'bench-v03/verify_bench.py'), run_name='__main__')
     print('Orthosis public downloads and local source verified')
 
 if __name__=='__main__':main()

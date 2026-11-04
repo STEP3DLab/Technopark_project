@@ -1,0 +1,11 @@
+#part-canvas {
+  display: block;
+  width: 100%;
+  height: clamp(250px, 48vw, 450px);
+  touch-action: none;
+  background: #ecf2ee;
+  border-radius: 8px;
+  cursor: grab;
+}
+#part-canvas:active { cursor: grabbing; }
+#part-canvas:focus-visible { outline: 3px solid #245e54; outline-offset: 2px; }

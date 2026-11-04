@@ -1,0 +1,26 @@
+{
+  "C01_base": {
+    "triangles": 3158,
+    "mesh_volume_mm3": 12594.29,
+    "edge_incidence_two": true,
+    "consistent_winding": true
+  },
+  "C02_slide": {
+    "triangles": 1708,
+    "mesh_volume_mm3": 3374.59,
+    "edge_incidence_two": true,
+    "consistent_winding": true
+  },
+  "fastener_envelopes": {
+    "positions_checked": 33,
+    "max_unintended_intersection_mm3": 0.0,
+    "M4x10_tip_above_bench_mm": 0.8,
+    "M4x10_nominal_nut_overlap_mm": 2.6,
+    "M5x40_distance_under_head_to_rear_wall_mm": [
+      4,
+      12
+    ]
+  },
+  "travel_mm": 8,
+  "base_slider_positions_checked": 33
+}

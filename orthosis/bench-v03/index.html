@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#102d37"><title>Стенд тросового привода V03 · Orthosis Lab</title>
+<meta name="description" content="Работа двух тросов коленного ортеза, 3D-модели стендовых деталей, скачивание STL и STEP и журнал ручного прогона.">
+<link rel="stylesheet" href="bench.css"><link rel="stylesheet" href="viewer.css"><script defer src="bench.js"></script><script defer src="viewer.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">К содержимому</a>
+<header class="top"><div class="wrap bar"><a class="brand" href="../index.html" aria-label="На главную страницу проекта"><span class="mark">∠</span> STEP3D <small>/ ORTHOSIS LAB</small></a><nav aria-label="Разделы"><a href="#motion">Движение</a><a href="#models">3D и файлы</a><a href="#test">Испытание</a></nav></div></header>
+<main id="main">
+<section class="hero"><div class="wrap hero-grid">
+<div><a class="back" href="../index.html">← К сборке ортеза</a><p class="tag"><span class="pilot"></span> ПРОТОТИП / V03</p><h1>Стенд тросового<br><em>привода</em></h1>
+<p class="intro">Как движение барабана сгибает коленный шарнир и как выставить свободный ход двух тросов перед испытанием.</p>
+<div class="actions"><a class="button solid" href="#motion">Запустить модель ↓</a><a class="button ghost" href="files/Orthosis_V03_Bench.zip" download>Скачать STL и CAD ↓</a></div></div>
+<figure class="hero-figure"><div class="figure-head"><span>СБОРОЧНЫЙ ВИД</span><span>V03 / C01 + C02</span></div><img src="bench-assembly.png" width="620" height="340" alt="Два независимых стендовых регулятора с винтами M5 и фиксаторами M4"><figcaption><span class="small-dot"></span> Два независимых регулятора оболочек</figcaption></figure>
+</div></section>
+
+<section id="motion" class="wrap block"><div class="head"><div><p class="section-id">01 / КИНЕМАТИКА</p><h2>Две ветви, один шарнир</h2></div><p>Выберите угол или запустите цикл. Пока одна ветвь наматывается, вторая отдаёт такую же длину троса.</p></div>
+<div class="motion-grid"><div class="drawing"><div class="draw-info"><span>СХЕМА ПЕРЕДАЧИ</span><span>Вид сбоку · условно</span></div>
+<svg id="motion-figure" viewBox="0 0 540 255" role="img" aria-labelledby="fig-title fig-desc"><title id="fig-title">Моторный барабан и коленный шарнир</title><desc id="fig-desc">Два троса соединяют барабаны. Оранжевые и бирюзовые метки показывают движение ветвей. Ниже показаны ход, угол и число оборотов.</desc>
+<defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="#335563"/></pattern></defs>
+<rect width="540" height="255" fill="url(#grid)"/>
+<g fill="none" stroke-linecap="round"><path d="M105 82C183 82 239 58 355 58" stroke="#f1ae74" stroke-width="4"/><path d="M105 142C184 142 233 166 355 166" stroke="#78d4c3" stroke-width="4"/>
+<g stroke="#70929b" stroke-width="1" stroke-dasharray="4 4"><path d="M54 112H151m150 0h122"/><path d="M105 67v91m250-121v154"/></g>
+<circle cx="105" cy="112" r="30" fill="#1c404b" stroke="#c4d9d8" stroke-width="3"/>
+<g id="spool" stroke="#f2c5a4" stroke-width="3"><path d="M105 112l0-23m0 23 20 12m-20-12-20 12"/></g>
+<path d="M355 111V24" stroke="#5b7c87" stroke-width="14"/><circle cx="355" cy="112" r="54" fill="#183741" stroke="#8aa6ad" stroke-width="3"/>
+<g id="joint" transform="rotate(-60 355 112)"><path d="M355 112v104" stroke="#abd4cd" stroke-width="12"/><path d="M355 119v92" stroke="#577d81" stroke-width="2"/><circle cx="355" cy="214" r="6" fill="#76c9ba" stroke="#a1dbcf"/></g>
+<circle cx="355" cy="112" r="10" fill="#132d36" stroke="#e0ece7" stroke-width="3"/><circle cx="105" cy="112" r="5" fill="#d3e7de" stroke="#bfded4"/>
+</g><g id="marker-a"><circle r="6" fill="#ffb57b" stroke="#172b31" stroke-width="2"/></g><g id="marker-b"><rect x="-5" y="-5" width="10" height="10" fill="#75d8c7" stroke="#172b31" stroke-width="2"/></g>
+<g fill="#bdd5d4" font-family="sans-serif" font-size="13"><text x="61" y="205">Барабан</text><text x="281" y="240">Коленный шарнир</text></g></svg>
+<div class="legend"><span><i class="copper"></i>Сгибание</span><span><i class="teal"></i>Разгибание</span></div></div>
+<div class="controls"><div class="metric-label"><label for="angle">Угол сгибания</label><output id="angle-value" for="angle">60°</output></div>
+<input type="range" id="angle" min="0" max="120" step="1" value="60" aria-valuetext="60 градусов"><div class="range-labels"><span>0°</span><span>60°</span><span>120°</span></div>
+<div class="play-row"><button id="play" type="button" aria-pressed="false">▶ Запустить цикл</button><button id="zero" type="button">В начало</button></div>
+<div class="readings"><div><small>Ход ветви</small><b id="travel">32,99 мм</b></div><div><small>Обороты барабана</small><b id="turns">0,438</b></div></div>
+<p class="hint">Расчёт по радиусам 31,5 и 12 мм. Трос Ø2 мм лежит в один слой. Проскальзывание, растяжение и трение в схему не входят.</p></div></div></section>
+
+<section id="models" class="models"><div class="wrap block"><div class="head"><div><p class="section-id">02 / ЧЕРТЕЖИ И ПЕЧАТЬ</p><h2>Посмотреть и изготовить</h2></div><p>В окне открывается тот же STL, который получает слайсер. Для изменений размеров есть STEP и параметрические исходники.</p></div>
+<div class="parts-grid"><div class="viewer"><div class="viewer-bar"><label for="part-select">Деталь</label><select id="part-select">
+<option value="files/regulator/C01_base.stl">C01 · Основание регулятора</option><option value="files/regulator/C02_slide.stl">C02 · Ползун оболочки</option><option value="files/drum/B04.stl">B04 · Моторный барабан</option>
+</select></div><div class="canvas-inner"><canvas id="part-canvas" tabindex="0" aria-label="3D-вид детали. Стрелки поворачивают модель, плюс и минус меняют масштаб."></canvas></div>
+<div class="viewer-foot"><span id="part-status" role="status">Загрузка STL…</span><div><button id="part-zoom-out" aria-label="Уменьшить модель">−</button><button id="part-zoom-in" aria-label="Увеличить модель">+</button><button id="part-reset" aria-label="Исходный ракурс" title="Исходный ракурс">↺</button></div></div></div>
+<div class="downloads">
+<article><span class="chip">C01</span><div><h3>Основание регулятора</h3><p>По одному на ветвь · печать 2 шт.</p><div class="filelinks"><a href="files/regulator/C01_base.stl" download>STL ↓</a><a href="files/regulator/C01_base.step" download>STEP ↓</a></div></div></article>
+<article><span class="chip">C02</span><div><h3>Ползун оболочки</h3><p>Под оболочку Ø5 мм · печать 2 шт.</p><div class="filelinks"><a href="files/regulator/C02_slide.stl" download>STL ↓</a><a href="files/regulator/C02_slide.step" download>STEP ↓</a></div></div></article>
+<article><span class="chip">B04</span><div><h3>Моторный барабан</h3><p>Под ступицу Pololu № 1997 · печать 1 шт.</p><div class="filelinks"><a href="files/drum/B04.stl" download>STL ↓</a><a href="files/drum/B04.step" download>STEP ↓</a></div></div></article>
+</div></div>
+<div class="pack"><div><h3>Комплект стенда V03</h3><p>STL в миллиметрах, STEP, исходники и инструкция. Основания и ползуны уже ориентированы для печати.</p></div><a class="button dark" href="files/Orthosis_V03_Bench.zip" download>Скачать комплект ↓</a></div>
+<div class="morefiles"><a href="files/regulator/pair_midstroke.step" download>Пара регуляторов в сборе · STEP ↓</a><a href="files/regulator/README.md" download>Сборка и крепёж · MD ↓</a><a href="files/drum/B04_assembly_RU.md" download>Монтаж B04 · MD ↓</a><a href="../files/Orthosis_V01_CAD.zip" download>Рамы ортеза V01 · ZIP ↓</a><a href="../drive_v02/files/Orthosis_V02_Bowden_CAD.zip" download>Барабаны и опора V02 · ZIP ↓</a></div>
+</div></section>
+
+<section id="test" class="wrap block"><div class="head"><div><p class="section-id">03 / РУЧНАЯ ПРОВЕРКА</p><h2>Первый прогон на столе</h2></div><p>Начните с отсоединённым двигателем. Закрепите одну пару C01/C02 на плите, поставьте винты M5 и M4 по инструкции и подготовьте короткую оболочку, трос и штангенциркуль.</p></div>
+<div class="test-grid"><ol class="steps"><li><div><h3>Проверьте посадку</h3><p>Оболочка Ø5 мм должна упираться в уступ ползуна. Протяните трос рукой и убедитесь, что он свободно проходит через канал.</p></div></li><li><div><h3>Установите исходную точку</h3><p>Ослабьте фиксатор M4 при снятой тяге. Подведите плоский конец M5 к ползуну. Замерьте положение ползуна от края основания.</p></div></li><li><div><h3>Сравните ход и возврат</h3><p>Один оборот M5×0,8 даёт 0,8 мм перемещения. Рабочий диапазон 8 мм. При обратном ходе подведите ползун рукой, затяните M4 и повторите для второй ветви.</p></div></li></ol>
+<form id="log" class="log"><p class="mini">ЖУРНАЛ ЗАМЕРОВ</p><h3>Записать замер</h3><div class="fields"><label>Ветвь<select name="branch"><option>Сгибание</option><option>Разгибание</option></select></label><label>Обороты M5 от нуля<input name="wind" type="number" min="0" max="10" step="0.25" required value="5"></label><label>Начало, мм<input name="start" type="number" step="0.01" required placeholder="Напр. 19,00"></label><label>Конец, мм<input name="end" type="number" step="0.01" required placeholder="Напр. 23,00"></label></div>
+<p class="log-expected">Расчётный ход <b id="expected">4,00 мм</b></p><div class="log-actions"><button type="submit">Добавить замер</button><button type="button" id="csv" disabled>Скачать CSV ↓</button></div><p id="log-status" role="status" class="hint">Записи хранятся в этом браузере.</p><ul id="entries" aria-label="Последние замеры"></ul></form></div>
+<details class="engineering" open><summary>Какой двигатель проверяем для стенда</summary><div class="engine-body"><div><p><b>Pololu 25D LP, № 4887.</b> У мотор-редуктора есть энкодер и D-вал Ø4 мм, выступающий на 12,5 мм. В B03 отверстие Ø8,2 мм. Барабан B04 крепится к алюминиевой ступице № 1997 четырьмя винтами M3. Его наружный диаметр 34 мм, на 3 мм больше B03. Предстоит проверить зазор до кожуха и опору вала при боковой тяге.</p><p>По паспорту в точке максимального КПД при 12 В момент на выходе составляет 0,137 Н·м при 47 об/мин. Показатели относятся к одной рабочей точке мотора.</p><a href="https://www.pololu.com/product/4887/specs" target="_blank" rel="noopener">Паспорт Pololu № 4887 ↗</a> · <a href="https://www.pololu.com/file/0J663/1997-4mm-m3-hub-dimensions.pdf" target="_blank" rel="noopener">Чертёж ступицы ↗</a></div><div class="calc-box"><p class="mini">ПРОВЕРКА ПРИМЕРА V02</p><strong>1,17 Н·м</strong><p>Столько требуется от моторного барабана, чтобы получить 2 Н·м на колене при принятом КПД 65%. Это выше даже экстраполированного момента остановки двигателя, 0,85 Н·м. Для такой нагрузки двигатель не подходит.</p></div></div></details>
+<p class="bench-note"><b>Статус модели.</b> Детали предназначены для ручной примерки на столе. Монтаж на голени, заделки тросов, торможение при отключении питания и прочность под тягой требуют отдельных испытаний. Прогоны на человеке не предусмотрены.</p>
+</section></main><footer><div class="wrap"><span>STEP3D / ORTHOSIS LAB</span><a href="../index.html#model">Открыть полную 3D-сборку ортеза ↗</a></div></footer>
+</body></html>

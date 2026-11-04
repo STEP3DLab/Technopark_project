@@ -32,8 +32,14 @@ export function createDrive(scene){
     cables.add(lineTube([[63,R,43],[63,R,0]],1.0,extendColor));
     const theta=THREE.MathUtils.degToRad(angle);
     // Flexion cable wrap shortens as the drum rotates; extension cable pays out equally.
-    cables.add(arcTube(55,Math.PI,Math.PI+2.40-theta,R,flexColor));
-    cables.add(arcTube(63,0,-.30-theta,R,extendColor));
+    const flexEnd=Math.PI+2.40-theta,extendEnd=-.30-theta;
+    cables.add(arcTube(55,Math.PI,flexEnd,R,flexColor));
+    cables.add(arcTube(63,0,extendEnd,R,extendColor));
+    // Radial tails lead from the pitch circle to provisional Ø2.7 mm CAD ferrule holes.
+    cables.add(lineTube([[55,R*Math.cos(flexEnd),R*Math.sin(flexEnd)],
+      [55,25*Math.cos(flexEnd),25*Math.sin(flexEnd)]],.99,flexColor));
+    cables.add(lineTube([[63,R*Math.cos(extendEnd),R*Math.sin(extendEnd)],
+      [63,25*Math.cos(extendEnd),25*Math.sin(extendEnd)]],.99,extendColor));
   }
   function updateMetrics(){
     const load=Number($("driveLoad")?.value)||2,eta=Number($("driveEta")?.value)||.65;

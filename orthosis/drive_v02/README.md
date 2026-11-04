@@ -27,3 +27,6 @@ n_мотора = s/(2πRm); ΔT=1000·τ_колена/Rk (Н при τ в Н·м
 Литература:
 - https://pmc.ncbi.nlm.nih.gov/articles/PMC9611146/
 - https://pmc.ncbi.nlm.nih.gov/articles/PMC9352506/
+
+## V02 anchor geometry refinement
+Provisional Ø2.7 mm cable anchor apertures on B01 are located at radius 25 mm in the moving rotor, using polar reference angles π+2.40 rad (flexion) and −0.30 rad (extension) in CAD YZ coordinates. These positions match the endpoint rotations drawn in the interactive viewer, but **do not constitute a safe cable termination**.

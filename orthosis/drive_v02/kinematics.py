@@ -22,7 +22,7 @@ def state(knee_deg,knee_torque_Nm=None,radius_mm=None,spool_mm=None,eff=None,mot
     if not (0<=knee_deg<=120 and R>0 and r>0 and 0<eta<=1 and rpm>=0 and tau>=0):
         raise ValueError('Invalid bench scenario')
     s=R*math.radians(knee_deg)
-    return State(knee_deg,s,-s,s/(2*math.pi*r),s/r*180/math.pi,1000*tau/R,tau*r/R/eta,rpm*R/r)
+    return State(knee_deg,s,-s,s/(2*math.pi*r),s/r*180/math.pi,1000*tau/R,tau*r/R/eta,rpm)
 def export():
     rows=[]
     for deg in range(0,121,5):

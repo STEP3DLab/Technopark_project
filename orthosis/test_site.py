@@ -75,6 +75,14 @@ def main():
     assert count>=31
     if count>31:print('Warning: original CAD patches still published, optimizer pending:',count)
     else:print('Viewer GLB optimized:',count,'meshes')
+    v02=ROOT/'drive_v02'/'files'
+    assert (v02/'Orthosis_V02_drive_concept.glb').is_file()
+    assert len(list((v02/'STL').glob('B*.stl')))==3
+    assert len(list((v02/'STEP').glob('B*.step')))==3
+    assert (v02/'Orthosis_V02_drive_concept.step').stat().st_size>100000
+    assert (v02/'Orthosis_V02_Bowden_CAD.zip').stat().st_size>100000
+    assert (v02/'motion_table.csv').is_file() and (v02/'verification_v02.json').is_file()
+    print('Verified V02: 3 added STL and STEP models, web GLB, assembly and motion data')
     print('Orthosis public downloads and local source verified')
 
 if __name__=='__main__':main()

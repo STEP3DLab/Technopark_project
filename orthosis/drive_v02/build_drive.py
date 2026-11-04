@@ -35,7 +35,8 @@ for x in [52,58,66]:drum=drum.fuse(cylinder(R+4.5,2,(x,0,0)))
 for y in [-14,14]:drum=drum.fuse(cylinder(4.7,6.6,(68,y,0)))
 drum=drum.cut(cylinder(4.25,23,(52,0,0)))
 for y in [-14,14]:drum=drum.cut(cylinder(1.8,25,(51,y,0)))
-for x,y in [(56,-25),(64,25)]:drum=drum.cut(cylinder(1.35,7,(x-3.5,y,0)))
+for x,phi in [(56,math.pi+2.40),(64,-0.30)]:
+    drum=drum.cut(cylinder(1.35,7,(x-3.5,25*math.cos(phi),25*math.sin(phi))))
 put('B01','Двухканальный коленный барабан',drum,
     'R31.5; two M3 holes match A10 nominally; fastening and cable ferrules NOT load verified.',
     (0.93,0.59,0.30))

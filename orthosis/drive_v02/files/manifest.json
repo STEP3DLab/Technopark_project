@@ -1,0 +1,61 @@
+{
+  "revision": "V02_kinematic_concept_bench_only",
+  "parts": {
+    "B01": {
+      "name": "Двухканальный коленный барабан",
+      "volume_cm3": 53.12,
+      "bbox_mm": [
+        22.61,
+        72.0,
+        72.02
+      ],
+      "stl_bytes": 252084
+    },
+    "B02": {
+      "name": "Фиксатор оболочек Bowden",
+      "volume_cm3": 49.64,
+      "bbox_mm": [
+        77.49,
+        80.0,
+        125.0
+      ],
+      "stl_bytes": 806084
+    },
+    "B03": {
+      "name": "Двухканальный барабан мотор-редуктора",
+      "volume_cm3": 6.8,
+      "bbox_mm": [
+        14.01,
+        31.0,
+        31.01
+      ],
+      "stl_bytes": 164184
+    }
+  },
+  "assumptions": {
+    "revision": "V02_kinematic_concept_bench_only",
+    "units": "mm",
+    "architecture": "paired antagonistic Bowden cables and two-groove joint/motor pulleys",
+    "joint_pulley_pitch_radius": 31.5,
+    "motor_spool_pitch_radius": 12,
+    "cable_diameter": 2,
+    "bowden_outer_diameter_assumed": 5,
+    "tension_preload_N_assumed": 10,
+    "nominal_demo_joint_torque_Nm": 2,
+    "assumed_end_to_end_efficiency": 0.65,
+    "max_demo_joint_angle_deg": 120,
+    "reference_joint_angle_deg": 0,
+    "assumed_motor_output_speed_rpm": 20,
+    "drawings_unverified": [
+      "motor shaft and mounting pattern",
+      "cable end anchor",
+      "Bowden sheaths in 3D",
+      "cable pretension compliance",
+      "cross-roller joint collisions",
+      "wear and fatigue",
+      "clinical safety"
+    ]
+  },
+  "disclaimer": "Bench geometry only; no clinical safety, cable anchor strength, or fatigue testing.",
+  "archive_sha256": "d9f1405ea048e131ea80fb3f052f602f5ddd590e81e6baaac1662919f5919ae6"
+}

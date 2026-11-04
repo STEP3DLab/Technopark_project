@@ -1,0 +1,279 @@
+{
+  "parameters": {
+    "revision": "V02_kinematic_concept_bench_only",
+    "units": "mm",
+    "architecture": "paired antagonistic Bowden cables and two-groove joint/motor pulleys",
+    "joint_pulley_pitch_radius": 31.5,
+    "motor_spool_pitch_radius": 12,
+    "cable_diameter": 2,
+    "bowden_outer_diameter_assumed": 5,
+    "tension_preload_N_assumed": 10,
+    "nominal_demo_joint_torque_Nm": 2,
+    "assumed_end_to_end_efficiency": 0.65,
+    "max_demo_joint_angle_deg": 120,
+    "reference_joint_angle_deg": 0,
+    "assumed_motor_output_speed_rpm": 20,
+    "drawings_unverified": [
+      "motor shaft and mounting pattern",
+      "cable end anchor",
+      "Bowden sheaths in 3D",
+      "cable pretension compliance",
+      "cross-roller joint collisions",
+      "wear and fatigue",
+      "clinical safety"
+    ]
+  },
+  "rows": [
+    {
+      "knee_deg": 0,
+      "cable_flex_delta_mm": 0.0,
+      "cable_extend_delta_mm": -0.0,
+      "motor_output_turns": 0.0,
+      "motor_output_deg": 0.0,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 5,
+      "cable_flex_delta_mm": 2.748894,
+      "cable_extend_delta_mm": -2.748894,
+      "motor_output_turns": 0.036458,
+      "motor_output_deg": 13.125,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 10,
+      "cable_flex_delta_mm": 5.497787,
+      "cable_extend_delta_mm": -5.497787,
+      "motor_output_turns": 0.072917,
+      "motor_output_deg": 26.25,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 15,
+      "cable_flex_delta_mm": 8.246681,
+      "cable_extend_delta_mm": -8.246681,
+      "motor_output_turns": 0.109375,
+      "motor_output_deg": 39.375,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 20,
+      "cable_flex_delta_mm": 10.995574,
+      "cable_extend_delta_mm": -10.995574,
+      "motor_output_turns": 0.145833,
+      "motor_output_deg": 52.5,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 25,
+      "cable_flex_delta_mm": 13.744468,
+      "cable_extend_delta_mm": -13.744468,
+      "motor_output_turns": 0.182292,
+      "motor_output_deg": 65.625,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 30,
+      "cable_flex_delta_mm": 16.493361,
+      "cable_extend_delta_mm": -16.493361,
+      "motor_output_turns": 0.21875,
+      "motor_output_deg": 78.75,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 35,
+      "cable_flex_delta_mm": 19.242255,
+      "cable_extend_delta_mm": -19.242255,
+      "motor_output_turns": 0.255208,
+      "motor_output_deg": 91.875,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 40,
+      "cable_flex_delta_mm": 21.991149,
+      "cable_extend_delta_mm": -21.991149,
+      "motor_output_turns": 0.291667,
+      "motor_output_deg": 105.0,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 45,
+      "cable_flex_delta_mm": 24.740042,
+      "cable_extend_delta_mm": -24.740042,
+      "motor_output_turns": 0.328125,
+      "motor_output_deg": 118.125,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 50,
+      "cable_flex_delta_mm": 27.488936,
+      "cable_extend_delta_mm": -27.488936,
+      "motor_output_turns": 0.364583,
+      "motor_output_deg": 131.25,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 55,
+      "cable_flex_delta_mm": 30.237829,
+      "cable_extend_delta_mm": -30.237829,
+      "motor_output_turns": 0.401042,
+      "motor_output_deg": 144.375,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 60,
+      "cable_flex_delta_mm": 32.986723,
+      "cable_extend_delta_mm": -32.986723,
+      "motor_output_turns": 0.4375,
+      "motor_output_deg": 157.5,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 65,
+      "cable_flex_delta_mm": 35.735616,
+      "cable_extend_delta_mm": -35.735616,
+      "motor_output_turns": 0.473958,
+      "motor_output_deg": 170.625,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 70,
+      "cable_flex_delta_mm": 38.48451,
+      "cable_extend_delta_mm": -38.48451,
+      "motor_output_turns": 0.510417,
+      "motor_output_deg": 183.75,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 75,
+      "cable_flex_delta_mm": 41.233404,
+      "cable_extend_delta_mm": -41.233404,
+      "motor_output_turns": 0.546875,
+      "motor_output_deg": 196.875,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 80,
+      "cable_flex_delta_mm": 43.982297,
+      "cable_extend_delta_mm": -43.982297,
+      "motor_output_turns": 0.583333,
+      "motor_output_deg": 210.0,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 85,
+      "cable_flex_delta_mm": 46.731191,
+      "cable_extend_delta_mm": -46.731191,
+      "motor_output_turns": 0.619792,
+      "motor_output_deg": 223.125,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 90,
+      "cable_flex_delta_mm": 49.480084,
+      "cable_extend_delta_mm": -49.480084,
+      "motor_output_turns": 0.65625,
+      "motor_output_deg": 236.25,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 95,
+      "cable_flex_delta_mm": 52.228978,
+      "cable_extend_delta_mm": -52.228978,
+      "motor_output_turns": 0.692708,
+      "motor_output_deg": 249.375,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 100,
+      "cable_flex_delta_mm": 54.977871,
+      "cable_extend_delta_mm": -54.977871,
+      "motor_output_turns": 0.729167,
+      "motor_output_deg": 262.5,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 105,
+      "cable_flex_delta_mm": 57.726765,
+      "cable_extend_delta_mm": -57.726765,
+      "motor_output_turns": 0.765625,
+      "motor_output_deg": 275.625,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 110,
+      "cable_flex_delta_mm": 60.475659,
+      "cable_extend_delta_mm": -60.475659,
+      "motor_output_turns": 0.802083,
+      "motor_output_deg": 288.75,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 115,
+      "cable_flex_delta_mm": 63.224552,
+      "cable_extend_delta_mm": -63.224552,
+      "motor_output_turns": 0.838542,
+      "motor_output_deg": 301.875,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    },
+    {
+      "knee_deg": 120,
+      "cable_flex_delta_mm": 65.973446,
+      "cable_extend_delta_mm": -65.973446,
+      "motor_output_turns": 0.875,
+      "motor_output_deg": 315.0,
+      "ideal_tension_difference_N": 63.492063,
+      "motor_output_torque_Nm_assumed": 1.172161,
+      "motor_output_rpm_assumed": 52.5
+    }
+  ],
+  "disclaimer": "Ideal geometric linkage: no friction/hysteresis/backlash/continuous-contact/clinical validation."
+}

@@ -1,0 +1,8 @@
+﻿Код;Наименование;Количество;Тип;Статус;Примечание
+B01;Двухканальный коленный барабан;1;PETG: стендовый тест;Не испытано под нагрузкой;"R31.5; two M3 holes match A10 nominally; fastening and cable ferrules NOT load verified."
+B02;Фиксатор оболочек Bowden;1;PETG: стендовый тест;Не испытано под нагрузкой;"Two ID5.4 passages, provisional M5 mount to A01 at z140/160; not strength rated."
+B03;Двухканальный барабан мотор-редуктора;1;PETG: стендовый тест;Не испытано под нагрузкой;R12, ID8.2 ASSUMED. Real shaft, reducer, brake and mounting pattern not selected.
+R07;Dyneema inner cable Ø2;2;purchased/assumed;Unverified;end fitting not selected
+R08;Bowden PTFE sheath OD5 ID3;2;purchased/assumed;Unverified;curvature and length not verified
+R09;motor gearbox with brake;1;purchased/assumed;Unverified;not selected
+R10;cable pretension mechanism;2;purchased/assumed;Unverified;not designed

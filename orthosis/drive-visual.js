@@ -5,8 +5,8 @@ const $=id=>document.getElementById(id);
 const R=31.5,RM=12,flexColor=0xf4ae79,extendColor=0x87def4;
 const round=(n,dec=1)=>Number(n).toFixed(dec).replace(".",",");
 function lineTube(points,r,color){
-  const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));
-  return new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(10,points.length*5),r,7,false),new THREE.MeshStandardMaterial({color,roughness:.6,metalness:.02,transparent:color===0x93a8b5,opacity:color===0x93a8b5?.67:1}));
+  const curve=new THREE.CatmullRomCurve3(points.map(([x,y,z])=>new THREE.Vector3(x,z,-y)));
+  return new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(10,points.length*5),r,7,false),new THREE.MeshStandardMaterial({color,roughness:.6,metalness:.02,transparent:color===0x93a8b5,opacity:color===0x93a8b5?0.67:1}));
 }
 function arcTube(x,start,end,r,color){
   const n=Math.max(8,Math.ceil(Math.abs(end-start)*28)),points=[];
@@ -72,10 +72,10 @@ export function createDrive(scene){
     });
     rotor=root.getObjectByName("B01");motor=root.getObjectByName("B03");
     if(!rotor||!motor)throw Error("V02 component nodes B01/B03 not found");
-    // The GLB uses world-positioned vertices. Move motor vertices to its own
-    // pivot before rotating the motor spool about the real X-axis through y=-127,z=234.
-    motor.traverse(o=>{if(o.isMesh){o.geometry=o.geometry.clone();o.geometry.translate(0,127,-234)}});
-    motor.position.set(0,-127,234);
+    // glTF is Y-up. CAD (x,y,z) -> viewer (x,z,-y).
+    // Move motor vertices to the pivot (x=0,y=234,z=127) in viewer coordinates.
+    motor.traverse(o=>{if(o.isMesh){o.geometry=o.geometry.clone();o.geometry.translate(0,-234,-127)}});
+    motor.position.set(0,234,127);
     layer.add(root);ready=true;
     updateCables();setAngle(angle);syncVisibility();
     if($("driveStatus"))$("driveStatus").textContent="V02: "+modelCount+" CAD-компонента, два маршрута троса · расчётная кинематика";

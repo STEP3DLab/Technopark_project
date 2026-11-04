@@ -28,6 +28,8 @@ def main():
     assert 'THREE' in js and 'STLLoader' in js and 'GLTFLoader' in js
     assert 'printFootprint' in js and 'fitsBed' in js and 'moveNames' in js
     assert 'fallback.js' in html and (ROOT/'fallback.js').is_file()
+    assert 'drive-visual.js' in js and (ROOT/'drive-visual.js').is_file()
+    assert 'id="driveStroke"' in html and 'id="driveToggle"' in html
     assert len(re.findall(r'<article class="pcard" data-code="A\d{2}"',html))==17
     match=re.search(r'const printSize=\{(.*?)\};',js,re.S)
     assert match,'Missing dimensions'

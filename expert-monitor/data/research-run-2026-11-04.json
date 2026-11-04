@@ -1,0 +1,292 @@
+{
+  "date": "2026-11-04",
+  "at": "2026-11-04T07:32:16+03:00",
+  "scope": "Россия",
+  "nationalCursorBefore": 12,
+  "nationalCursorAfter": 24,
+  "sourceQueries": [
+    {
+      "id": "central",
+      "query": "ЦФО Москва Московская область суд судебная строительная экспертиза предоставить стоимость сроки ноябрь 2026; закупки обследования",
+      "sourceUrl": "https://zakupki.kontur.ru/32616530390",
+      "result": "Смежная комплексная закупка МО только для МСП, не судебный запрос"
+    },
+    {
+      "id": "northwest",
+      "query": "СЗФО Санкт-Петербург ноябрь 2026 обследование конструкций инженерная экспертиза закупка",
+      "sourceUrl": "https://zakupki.kontur.ru/32616507429",
+      "result": "Новый сигнал геотехнического обследования коллектора, не судебный запрос"
+    },
+    {
+      "id": "south",
+      "query": "ЮФО Краснодар Ростов суд запрос экспертным организациям строительно-техническая экспертиза 2026",
+      "sourceUrl": "https://rostov.arbitr.ru/",
+      "result": "Актуальный открытый запрос не подтверждён"
+    },
+    {
+      "id": "caucasus",
+      "query": "СКФО Дагестан Ставрополь суд предоставить стоимость землеустроительная строительно техническая экспертиза 2026",
+      "sourceUrl": "https://sudrf.ru/index.php?id=300",
+      "result": "Публичный индекс не подтвердил открытый судебный запрос"
+    },
+    {
+      "id": "volga",
+      "query": "ПФО Татарстан Башкортостан обследование зданий дефекты объемы работ закупка ноябрь 2026",
+      "sourceUrl": "https://zakupki.kontur.ru/32616538578",
+      "result": "ТГК-16, 2 лота, только МСП, не судебный запрос"
+    },
+    {
+      "id": "ural",
+      "query": "УФО Екатеринбург Тюмень ХМАО экспертная оценка сооружений обследование 2026 закупка",
+      "sourceUrl": "https://zakupki.kontur.ru/RQ0387300016826000002",
+      "result": "Ранее известный запрос цен по Нижневартовску; новых подтвержденных судебных запросов нет"
+    },
+    {
+      "id": "siberia",
+      "query": "СФО Новосибирск Иркутск Красноярск строительная экспертиза судебный запрос 2026; тендер обследование",
+      "sourceUrl": "https://kad.arbitr.ru/",
+      "result": "Текущие судебные акты через форму не извлечены"
+    },
+    {
+      "id": "fareast",
+      "query": "ДФО Сахалин Хабаровск Якутия обследование конструкций зданий закупка ноябрь 2026",
+      "sourceUrl": "https://zakupki.kontur.ru/0361200015026004780",
+      "result": "2 новых обследования объектов здравоохранения Сахалина, 44-ФЗ, не судебный запрос"
+    }
+  ],
+  "regionalResults": [
+    {
+      "region": "Рязанская область",
+      "sourceUrl": "https://ryazan.arbitr.ru/",
+      "query": "\"Рязанская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Смоленская область",
+      "sourceUrl": "https://smolensk.arbitr.ru/",
+      "query": "\"Смоленская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Тамбовская область",
+      "sourceUrl": "https://tambov.arbitr.ru/",
+      "query": "\"Тамбовская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Тверская область",
+      "sourceUrl": "https://tver.arbitr.ru/",
+      "query": "\"Тверская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Тульская область",
+      "sourceUrl": "https://tula.arbitr.ru/",
+      "query": "\"Тульская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Ярославская область",
+      "sourceUrl": "https://yaroslavl.arbitr.ru/",
+      "query": "\"Ярославская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "http_403_or_indexed_only",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Санкт-Петербург",
+      "sourceUrl": "https://spb.arbitr.ru/",
+      "query": "\"Санкт-Петербург\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "http_403_or_indexed_only",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Ленинградская область",
+      "sourceUrl": "https://spb.arbitr.ru/",
+      "query": "\"Ленинградская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "http_403_or_indexed_only",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Республика Карелия",
+      "sourceUrl": "https://karelia.arbitr.ru/",
+      "query": "\"Республика Карелия\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Республика Коми",
+      "sourceUrl": "https://komi.arbitr.ru/",
+      "query": "\"Республика Коми\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Архангельская область",
+      "sourceUrl": "https://arhangelsk.arbitr.ru/",
+      "query": "\"Архангельская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    },
+    {
+      "region": "Вологодская область",
+      "sourceUrl": "https://vologda.arbitr.ru/",
+      "query": "\"Вологодская область\" \"экспертным организациям\" \"строительно-технической экспертизы\" 2026",
+      "officialDirectoryUrl": "https://sudrf.ru/index.php?id=300",
+      "officialHomepageStatus": "timeout_or_unavailable",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Прямой запрос к региональному официальному суду/каталогу и адресный вторичный поиск: актуальное определение о запросе эксперту с подтвержденной стадией не получено; попытка не приравнивается к проверке дел."
+    }
+  ],
+  "checkedUrls": [
+    "https://kad.arbitr.ru/",
+    "https://ras.arbitr.ru/",
+    "https://sudrf.ru/index.php?id=300",
+    "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+    "https://arbitr.ru/materials/as/subj",
+    "https://ryazan.arbitr.ru/",
+    "https://smolensk.arbitr.ru/",
+    "https://tambov.arbitr.ru/",
+    "https://tver.arbitr.ru/",
+    "https://tula.arbitr.ru/",
+    "https://yaroslavl.arbitr.ru/",
+    "https://spb.arbitr.ru/",
+    "https://karelia.arbitr.ru/",
+    "https://komi.arbitr.ru/",
+    "https://arhangelsk.arbitr.ru/",
+    "https://vologda.arbitr.ru/",
+    "https://zakupki.kontur.ru/32616507429",
+    "https://zakupki.kontur.ru/0361200015026004780",
+    "https://zakupki.kontur.ru/0361200015026004796",
+    "https://zakupki.kontur.ru/32616538578",
+    "https://zakupki.kontur.ru/32616530390",
+    "https://zakupki.kontur.ru/32616538831",
+    "https://zakupki.kontur.ru/0148300000626001128",
+    "https://zakupki.kontur.ru/0148300000626001150",
+    "https://zakupki.kontur.ru/0816500000626016430",
+    "https://zakupki.kontur.ru/32616526498",
+    "https://zakupki.kontur.ru/32616502360"
+  ],
+  "errors": [
+    "КАД и Банк решений: в этом интерфейсе доступны поисковые формы, но не проверяемые результаты по актуальным определениям.",
+    "ГАС Правосудие: публичная общая форма без извлеченных свежих актов по адресным запросам.",
+    "ЕИС: первичные извещения и протоколы недоступны через веб-инструмент (timeout).",
+    "Региональные судебные сайты: попытки 12 регионов, подтверждённых актуальных актов 0 (недоступность/ограниченная индексация)."
+  ],
+  "limitations": [
+    "04.11: 12 очередных регионов проверены как ПОПЫТКИ официального каталога/сайтов и адресного вторичного поиска; 0 текущих дел проверено по первичным актам, успешных регионов 0; повтор обязателен.",
+    "6 новых записей — только закупки, по вторичным карточкам; прямое подтверждение текущего приема и протоколов ЕИС отсутствует, статус needs_review.",
+    "Три закупки по 223-ФЗ имеют ограничение только МСП, не являются прямым подтвержденным заказом для АНО; сахалинские 44-ФЗ для СМП/СОНКО требуют членство в СРО инженерных изысканий или законного исключения.",
+    "Истечение 9 вторичных сроков отмечено как закрытие по опубликованному сроку без доказательства продления; checkedAt старых записей сохранен."
+  ],
+  "newIds": [
+    "proc-32616507429",
+    "proc-0361200015026004780",
+    "proc-0361200015026004796",
+    "proc-32616538578",
+    "proc-32616530390",
+    "proc-32616538831"
+  ],
+  "changedIds": [
+    "proc-0348100009126000079",
+    "proc-0120300013726000022",
+    "proc-com27102600081",
+    "proc-0150600008126000061",
+    "proc-0120300013726000021",
+    "proc-100181955126100343",
+    "proc-32616497171",
+    "proc-0124300021026000816",
+    "proc-10810324"
+  ],
+  "excludedIds": [
+    "proc-0348100009126000079",
+    "proc-0120300013726000022",
+    "proc-com27102600081",
+    "proc-0150600008126000061",
+    "proc-0120300013726000021",
+    "proc-100181955126100343",
+    "proc-32616497171",
+    "proc-0124300021026000816",
+    "proc-10810324"
+  ],
+  "sheetSyncStatus": "synced",
+  "recordCounts": {
+    "opportunities": 114,
+    "courts": 87
+  },
+  "primaryJudicialRequestsVerified": 0
+}

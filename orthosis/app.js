@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 const $=id=>document.getElementById(id);
 const catalog=[
 ["A01","Бедренная рама с неподвижной щекой",1,"frame","Опора шарнира, нижняя манжета"],
@@ -42,7 +43,28 @@ function fit(obj){if(!obj)return;const box=new THREE.Box3().setFromObject(obj);i
 function visibility(){if(!assembly)return;assembly.traverse(o=>{if(guardNames.has(o.name))o.visible=angle===0&&$("cable").checked;else if(refNames.has(o.name))o.visible=$("refs").checked})}
 function setAngle(v){angle=Math.max(0,Math.min(120,Number(v)||0));$("angle").value=angle;$("angleText").textContent=Math.round(angle);document.querySelectorAll("[data-a]").forEach(x=>x.classList.toggle("active",Number(x.dataset.a)===angle));if(assembly){assembly.traverse(o=>{if(moveNames.has(o.name))o.rotation.x=-angle*Math.PI/180});visibility()}
 $("caution").textContent=angle>0?"!  Движение рам — кинематическая демонстрация. Защита троса скрыта: её траектория не разработана. Геометрия проверена только при 0/30/60/90/120°, не в непрерывном движении.":"!  Показан поворот рам в шарнире. Привод, усилия и движение троса не симулируются. V01 не предназначена для эксплуатации на человеке."}
-function loadAssembly(){loading("Загрузка инженерной модели","Точная 3D-геометрия из CAD");new GLTFLoader().load("./files/Orthosis_V01_assembly.glb",gltf=>{assembly=gltf.scene;scene.add(assembly);assembly.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.roughness=.55;o.material.metalness=o.name[0]==="R"?.54:.15;o.material.side=THREE.DoubleSide}});visibility();setAngle(angle);fit(assembly);loaded();$("stageStatus").textContent="31 CAD ТЕЛО"},undefined,e=>{console.error(e);loading("Файл 3D-сборки не найден","Дождитесь завершения публикации файлов на GitHub");$("stageStatus").textContent="ОЖИДАНИЕ GLB"})}
+// Reduce individual CAD surface primitives to one renderable mesh per part when possible.
+// Keep component nodes, positions and names intact so hinge movement remains precise.
+function optimizeCAD(root){
+ root.updateMatrixWorld(true);
+ const candidates=[];
+ root.traverse(o=>{if(o.name&&/^[AR]\d{2}(?:_|$)/.test(o.name)&&!o.isMesh)candidates.push(o)});
+ for(const node of candidates){
+   const meshes=[];node.traverse(o=>{if(o.isMesh)meshes.push(o)});
+   if(meshes.length<2)continue;
+   const material=meshes[0].material;
+   if(Array.isArray(material)||meshes.some(m=>Array.isArray(m.material)||m.material!==material))continue;
+   const inv=node.matrixWorld.clone().invert();
+   const pieces=meshes.map(m=>{const g=m.geometry.clone();g.applyMatrix4(inv.clone().multiply(m.matrixWorld));return g});
+   const joined=mergeGeometries(pieces,false);
+   pieces.forEach(g=>g.dispose());
+   if(!joined)continue;
+   meshes.forEach(m=>m.parent.remove(m));
+   const single=new THREE.Mesh(joined,material);single.name=node.name+"__combined";
+   node.add(single);
+ }
+}
+function loadAssembly(){loading("Загрузка инженерной модели","Точная 3D-геометрия из CAD");new GLTFLoader().load("./files/Orthosis_V01_assembly.glb",gltf=>{assembly=gltf.scene;optimizeCAD(assembly);scene.add(assembly);assembly.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.roughness=.55;o.material.metalness=o.name[0]==="R"?.54:.15;o.material.side=THREE.DoubleSide}});visibility();setAngle(angle);fit(assembly);loaded();$("stageStatus").textContent="31 CAD ТЕЛО";if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){playing=true;phase=0;updatePlay()}},undefined,e=>{console.error(e);loading("Файл 3D-сборки не найден","Дождитесь завершения публикации файлов на GitHub");$("stageStatus").textContent="ОЖИДАНИЕ GLB"})}
 function releasePreview(){if(preview){scene.remove(preview);preview.traverse(o=>o.geometry&&o.geometry.dispose());preview=null}}
 function mode(single){$("angle").disabled=!!single;$("play").disabled=!!single;$("cable").disabled=!!single;$("refs").disabled=!!single;document.querySelectorAll("[data-a]").forEach(x=>x.disabled=!!single);if(assembly)assembly.visible=!single}
 function returnToAssembly(){token++;releasePreview();mode(false);$("viewLabel").textContent="СБОРКА / 3D";$("stageStatus").textContent="31 CAD ТЕЛО";document.querySelectorAll(".pcard").forEach(x=>x.style.borderColor="");if(assembly)fit(assembly);else loadAssembly();loaded()}

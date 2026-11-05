@@ -161,26 +161,26 @@
     "https://zakupki.gov.ru/epz/order/extendedsearch/results.html"
   ],
   "lastResearchRun": {
-    "date": "2026-11-04",
-    "completedAt": "2026-11-04T10:30:26.783+03:00",
+    "date": "2026-11-05",
+    "completedAt": "2026-11-05T07:59:27.286+03:00",
     "status": "partial_secondary_candidates_primary_access_limited",
-    "summary": "Продолжение федерального исследования: 8 направлений, 12 региональных попыток, 0 судебных актов первоисточника; 2 смежные закупки, 5 уточнённых карточек, 25 улучшений данных.",
+    "summary": "8 федеральных направлений; 12 адресных региональных попыток, 0 проверенных актуальных судебных актов; 4 новые смежные закупки, 2 закрытия по сроку.",
     "newIds": [
-      "proc-0331100005326000012",
-      "proc-32616531465"
+      "proc-392-037",
+      "proc-10821920",
+      "proc-RAD260055416",
+      "proc-0167200003426008981"
     ],
     "changedIds": [
-      "proc-0148300000626001128",
-      "proc-0148300000626001150",
-      "proc-32616507429",
-      "proc-0361200015026004780",
-      "proc-32616538578"
+      "proc-0891200000626010517",
+      "proc-0302300040926000069"
     ],
     "excludedIds": [],
     "errors": [
-      "КАД/Банк решений: формы поиска без извлечённых актуальных определений",
-      "ГАС Правосудие и ЕИС: актуальные результаты/протоколы не извлечены",
-      "Сайты Краснодарского края и Астраханской области: timeout"
+      "КАД и Банк решений: доступны лишь формы, актуальные документы по запросам не извлечены",
+      "ГАС Правосудие: timeout",
+      "ЕИС и последующие протоколы: timeout",
+      "12 регионов: поисковая выдача без проверенных актуальных актов"
     ],
     "checkedUrls": [
       "https://kad.arbitr.ru/",
@@ -188,42 +188,36 @@
       "https://sudrf.ru/index.php?id=300",
       "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
       "https://arbitr.ru/materials/as/subj",
-      "https://kaliningrad.arbitr.ru/",
-      "https://murmansk.arbitr.ru/",
-      "https://novgorod.arbitr.ru/",
-      "https://pskov.arbitr.ru/",
-      "https://arhangelsk.arbitr.ru/",
-      "https://adyg.arbitr.ru/",
-      "https://kalmyk.arbitr.ru/",
-      "https://krasnodar.arbitr.ru/",
-      "https://astrahan.arbitr.ru/",
-      "https://volgograd.arbitr.ru/",
-      "https://rostov.arbitr.ru/",
-      "https://crimea.arbitr.ru/",
-      "https://zakupki.kontur.ru/0331100005326000012",
-      "https://zakupki.tochka.com/search/0331100005326000012/",
-      "https://zakupki.kontur.ru/32616531465",
-      "https://energybase.ru/tender/01a19285-cd8a-727c-8b73-6398087751a0",
-      "https://zakupki.kontur.ru/32616538578",
-      "https://zakupki.kontur.ru/RQ0387300016826000002",
-      "https://goszakupki.pro/tender/5429992",
+      "https://sevastopol.arbitr.ru/",
+      "https://mahachkala.arbitr.ru/",
+      "https://ingushetia.arbitr.ru/",
+      "https://askb.arbitr.ru/",
+      "https://askchr.arbitr.ru/",
+      "https://alania.arbitr.ru/",
+      "https://chechnya.arbitr.ru/",
+      "https://stavropol.arbitr.ru/",
+      "https://ufa.arbitr.ru/",
+      "https://mari-el.arbitr.ru/",
+      "https://asrm.arbitr.ru/",
+      "https://tatarstan.arbitr.ru/",
+      "https://zakupki.kontur.ru/IS86234687",
+      "https://synapsenet.ru/zakupki/bidzaar/392-037--primorskij-kraj-provedenie-tehnicheskogo-obsledovaniya-zdanij-i",
+      "https://zakupki.kontur.ru/IS86374282",
+      "https://zakupki.kontur.ru/IS86628156",
+      "https://zakupki.kontur.ru/0167200003426008981",
+      "https://kontendus.ru/tender/0167200003426008981",
       "https://zakupki.kontur.ru/0148300000626001128",
-      "https://goszakupki.pro/tender/5413204",
-      "https://tendik.ru/tender/eis/0148300000626001128",
-      "https://kontendus.ru/tender/0148300000626001128",
       "https://zakupki.kontur.ru/0148300000626001150",
-      "https://tendik.ru/tender/eis/0148300000626001150",
-      "https://zakupki.kontur.ru/32616507429",
-      "https://kontendus.ru/tender/32616507429",
-      "https://energybase.ru/tender/01a17c1d-47b9-732a-aa63-0ec4fe75df6e",
-      "https://zakupki.kontur.ru/0361200015026004780",
-      "https://tendik.ru/tender/eis/0361200015026004780"
+      "https://zakupki.kontur.ru/32616502360",
+      "https://zakupki.kontur.ru/IS85091883",
+      "https://zakupki.kontur.ru/IS84863887",
+      "https://synapsenet.ru/zakupki/fz44/0891200000626010517%231--zabajkalskij-kraj-okazanie-uslug-po-mezhevaniyu",
+      "https://kontendus.ru/tender/0302300040926000069"
     ],
     "limitations": [
-      "10 официальных домашних страниц доступны, 2 timeout; 0 актуальных судебных актов получено, все 12 регионов требуют повторной проверки.",
-      "Воронеж 0331100005326000012: конфликт часа срока между вторичными карточками; date_only 18.11, без предположения 23:59.",
-      "Ленобласть 32616531465: 14 лотов, только МСП, не прямая возможность АНО.",
-      "Все новые процедуры — закупки, не подтверждённые судебные приглашения."
+      "Региональные попытки не равны проверке всех дел; успешных обходов актов 0.",
+      "№392-037: вторичные карточки противоречат 08:00/10:00 МСК; отмечена дата без известного часа.",
+      "4 новые записи — смежные закупки, не подтверждённые судебные приглашения. Условия СРО/МСП/выезда требуют проверки."
     ],
     "searchedDistricts": [
       "central",
@@ -236,34 +230,36 @@
       "fareast"
     ],
     "districtsCompleted": [],
+    "rotationStart": 36,
+    "rotationEnd": 48,
     "regionsAttempted": [
-      "Калининградская область",
-      "Мурманская область",
-      "Новгородская область",
-      "Псковская область",
-      "Ненецкий автономный округ",
-      "Республика Адыгея",
-      "Республика Калмыкия",
-      "Краснодарский край",
-      "Астраханская область",
-      "Волгоградская область",
-      "Ростовская область",
-      "Республика Крым"
+      "Севастополь",
+      "Республика Дагестан",
+      "Республика Ингушетия",
+      "Кабардино-Балкарская Республика",
+      "Карачаево-Черкесская Республика",
+      "Республика Северная Осетия — Алания",
+      "Чеченская Республика",
+      "Ставропольский край",
+      "Республика Башкортостан",
+      "Республика Марий Эл",
+      "Республика Мордовия",
+      "Республика Татарстан"
     ],
     "regionsSuccessful": [],
     "regionsBlocked": [
-      "Калининградская область",
-      "Мурманская область",
-      "Новгородская область",
-      "Псковская область",
-      "Ненецкий автономный округ",
-      "Республика Адыгея",
-      "Республика Калмыкия",
-      "Краснодарский край",
-      "Астраханская область",
-      "Волгоградская область",
-      "Ростовская область",
-      "Республика Крым"
+      "Севастополь",
+      "Республика Дагестан",
+      "Республика Ингушетия",
+      "Кабардино-Балкарская Республика",
+      "Карачаево-Черкесская Республика",
+      "Республика Северная Осетия — Алания",
+      "Чеченская Республика",
+      "Ставропольский край",
+      "Республика Башкортостан",
+      "Республика Марий Эл",
+      "Республика Мордовия",
+      "Республика Татарстан"
     ],
     "retryRegions": [
       "Москва",
@@ -301,239 +297,244 @@
       "Астраханская область",
       "Волгоградская область",
       "Ростовская область",
-      "Республика Крым"
+      "Республика Крым",
+      "Севастополь",
+      "Республика Дагестан",
+      "Республика Ингушетия",
+      "Кабардино-Балкарская Республика",
+      "Карачаево-Черкесская Республика",
+      "Республика Северная Осетия — Алания",
+      "Чеченская Республика",
+      "Ставропольский край",
+      "Республика Башкортостан",
+      "Республика Марий Эл",
+      "Республика Мордовия",
+      "Республика Татарстан"
     ],
-    "rotationStart": 24,
-    "rotationEnd": 36,
     "sourceQueries": [
       {
         "id": "central",
-        "query": "ЦФО Москва Московская область суд запрос экспертам стройтехническая экспертиза дефекты стоимость 2026",
-        "sourceUrl": "https://zakupki.kontur.ru/0331100005326000012",
-        "result": "Смежный контракт на ГТС, не судебный запрос"
+        "query": "ЦФО Москва МО суд направить запрос экспертам строительно-техническая экспертиза ноябрь 2026",
+        "sourceUrl": "https://kad.arbitr.ru/",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "northwest",
-        "query": "СЗФО Санкт-Петербург Ленинградская область техническое обследование сетей конструкций ноябрь 2026",
-        "sourceUrl": "https://zakupki.kontur.ru/32616531465",
-        "result": "14 лотов только МСП, не судебное назначение"
+        "query": "СЗФО Санкт Петербург Ленинградская область обследование конструкций ноябрь 2026",
+        "sourceUrl": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "south",
-        "query": "ЮФО Ростов Краснодар Крым арбитраж представить кандидатуры строительной экспертизы 2026",
-        "sourceUrl": "https://rostov.arbitr.ru/",
-        "result": "Текущая судебная карточка не извлечена"
+        "query": "ЮФО Севастополь Крым Ростов Краснодар судебная строительная экспертиза 2026",
+        "sourceUrl": "https://sevastopol.arbitr.ru/",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "caucasus",
-        "query": "СКФО Дагестан Ставрополь судебная землеустроительная экспертиза запрос экспертным организациям 2026",
-        "sourceUrl": "https://sudrf.ru/index.php?id=300",
-        "result": "Акты недоступны, отсутствие спроса не доказано"
+        "query": "СКФО Дагестан Ингушетия Ставрополь экспертным организациям земельная строительная экспертиза 2026",
+        "sourceUrl": "https://stavropol.arbitr.ru/",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "volga",
-        "query": "ПФО Татарстан Башкортостан обследование зданий сооружений дефекты объемы работ ноябрь 2026",
-        "sourceUrl": "https://zakupki.kontur.ru/32616538578",
-        "result": "Два рыночных лота только МСП"
+        "query": "ПФО Татарстан Башкортостан Марий Эл Мордовия обследование дефекты сооружений суд 2026",
+        "sourceUrl": "https://tatarstan.arbitr.ru/",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "ural",
-        "query": "УФО Тюмень Свердловск ХМАО суд строительная экспертиза обследование 2026",
-        "sourceUrl": "https://zakupki.kontur.ru/RQ0387300016826000002",
-        "result": "Запрос цен, не судебный запрос"
+        "query": "УФО Златоуст Тюмень Челябинск техническое обследование конструкций 2026",
+        "sourceUrl": "https://zakupki.kontur.ru/IS86628156",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "siberia",
-        "query": "СФО Новосибирск Омск Красноярск суд экспертная организация обследование строительных конструкций 2026",
+        "query": "СФО Новосибирск Омск Красноярск суд строительная экспертиза ноябрь 2026",
         "sourceUrl": "https://kad.arbitr.ru/",
-        "result": "Без подтверждённых свежих определений"
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       },
       {
         "id": "fareast",
-        "query": "ДФО Якутия Сахалин Хабаровск обследование несущих конструкций закупка 2026",
-        "sourceUrl": "https://goszakupki.pro/tender/5429992",
-        "result": "Смежная закупка Якутии, не запрос суда"
+        "query": "ДФО Приморский край Якутия Сахалин обследование сооружений закупка 2026",
+        "sourceUrl": "https://zakupki.kontur.ru/IS86234687",
+        "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
       }
     ],
     "regionalResults": [
       {
-        "region": "Калининградская область",
-        "sourceUrl": "https://kaliningrad.arbitr.ru/",
-        "query": "site:kaliningrad.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Севастополь",
+        "query": "site:sevastopol.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://sevastopol.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Мурманская область",
-        "sourceUrl": "https://murmansk.arbitr.ru/",
-        "query": "site:murmansk.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Дагестан",
+        "query": "site:mahachkala.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://mahachkala.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Новгородская область",
-        "sourceUrl": "https://novgorod.arbitr.ru/",
-        "query": "site:novgorod.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Ингушетия",
+        "query": "site:ingushetia.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://ingushetia.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Псковская область",
-        "sourceUrl": "https://pskov.arbitr.ru/",
-        "query": "site:pskov.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Кабардино-Балкарская Республика",
+        "query": "site:askb.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://askb.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Ненецкий автономный округ",
-        "sourceUrl": "https://arhangelsk.arbitr.ru/",
-        "query": "site:arhangelsk.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Карачаево-Черкесская Республика",
+        "query": "site:askchr.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://askchr.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Республика Адыгея",
-        "sourceUrl": "https://adyg.arbitr.ru/",
-        "query": "site:adyg.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Северная Осетия — Алания",
+        "query": "site:alania.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://alania.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Республика Калмыкия",
-        "sourceUrl": "https://kalmyk.arbitr.ru/",
-        "query": "site:kalmyk.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Чеченская Республика",
+        "query": "site:chechnya.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://chechnya.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Краснодарский край",
-        "sourceUrl": "https://krasnodar.arbitr.ru/",
-        "query": "site:krasnodar.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Ставропольский край",
+        "query": "site:stavropol.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://stavropol.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "timeout",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Астраханская область",
-        "sourceUrl": "https://astrahan.arbitr.ru/",
-        "query": "site:astrahan.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Башкортостан",
+        "query": "site:ufa.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://ufa.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "timeout",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Волгоградская область",
-        "sourceUrl": "https://volgograd.arbitr.ru/",
-        "query": "site:volgograd.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Марий Эл",
+        "query": "site:mari-el.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://mari-el.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Ростовская область",
-        "sourceUrl": "https://rostov.arbitr.ru/",
-        "query": "site:rostov.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Мордовия",
+        "query": "site:asrm.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://asrm.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       },
       {
-        "region": "Республика Крым",
-        "sourceUrl": "https://crimea.arbitr.ru/",
-        "query": "site:crimea.arbitr.ru 2026 \"строительно-технической экспертизы\" \"экспертным организациям\"",
+        "region": "Республика Татарстан",
+        "query": "site:tatarstan.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+        "sourceUrl": "https://tatarstan.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "reachable",
+        "officialHomepageStatus": "indexed_or_general_page_only",
         "officialActsStatus": "blocked_case_search",
         "caseCardsVerified": 0,
         "successful": false,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный вторичный поиск без доказанного открытого актуального судебного запроса; главная страница не равна проверке дел."
+        "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
       }
+    ],
+    "officialCatalogAdditionalRegions": [
+      "Донецкая Народная Республика",
+      "Луганская Народная Республика",
+      "Запорожская область",
+      "Херсонская область"
     ],
     "caseCardsVerified": 0,
     "sheetSyncStatus": "synced",
+    "sheetSyncBlocker": null,
     "sheetVerification": {
-      "newRowsAdded": 2,
-      "existingRowsUpdated": 3,
-      "userEditedRowsPreserved": 2,
-      "originalRowsPreserved": 114,
+      "rowsAdded": 4,
       "readbackOK": true,
+      "originalRowsPreserved": 116,
       "pricingColumnMPreserved": true,
-      "proposalSheetUntouched": true,
-      "updatedIds": [
-        "proc-32616507429",
-        "proc-0361200015026004780",
-        "proc-32616538578"
-      ],
-      "preservedUserEditedIds": [
-        "proc-0148300000626001128",
-        "proc-0148300000626001150"
-      ]
-    },
-    "sheetSyncBlocker": null
+      "proposalSheetUntouched": true
+    }
   },
   "history": [
     {
@@ -1937,6 +1938,382 @@
         ]
       },
       "sheetSyncBlocker": null
+    },
+    {
+      "date": "2026-11-05",
+      "completedAt": "2026-11-05T07:59:27.286+03:00",
+      "status": "partial_secondary_candidates_primary_access_limited",
+      "summary": "8 федеральных направлений; 12 адресных региональных попыток, 0 проверенных актуальных судебных актов; 4 новые смежные закупки, 2 закрытия по сроку.",
+      "newIds": [
+        "proc-392-037",
+        "proc-10821920",
+        "proc-RAD260055416",
+        "proc-0167200003426008981"
+      ],
+      "changedIds": [
+        "proc-0891200000626010517",
+        "proc-0302300040926000069"
+      ],
+      "excludedIds": [],
+      "errors": [
+        "КАД и Банк решений: доступны лишь формы, актуальные документы по запросам не извлечены",
+        "ГАС Правосудие: timeout",
+        "ЕИС и последующие протоколы: timeout",
+        "12 регионов: поисковая выдача без проверенных актуальных актов"
+      ],
+      "checkedUrls": [
+        "https://kad.arbitr.ru/",
+        "https://ras.arbitr.ru/",
+        "https://sudrf.ru/index.php?id=300",
+        "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+        "https://arbitr.ru/materials/as/subj",
+        "https://sevastopol.arbitr.ru/",
+        "https://mahachkala.arbitr.ru/",
+        "https://ingushetia.arbitr.ru/",
+        "https://askb.arbitr.ru/",
+        "https://askchr.arbitr.ru/",
+        "https://alania.arbitr.ru/",
+        "https://chechnya.arbitr.ru/",
+        "https://stavropol.arbitr.ru/",
+        "https://ufa.arbitr.ru/",
+        "https://mari-el.arbitr.ru/",
+        "https://asrm.arbitr.ru/",
+        "https://tatarstan.arbitr.ru/",
+        "https://zakupki.kontur.ru/IS86234687",
+        "https://synapsenet.ru/zakupki/bidzaar/392-037--primorskij-kraj-provedenie-tehnicheskogo-obsledovaniya-zdanij-i",
+        "https://zakupki.kontur.ru/IS86374282",
+        "https://zakupki.kontur.ru/IS86628156",
+        "https://zakupki.kontur.ru/0167200003426008981",
+        "https://kontendus.ru/tender/0167200003426008981",
+        "https://zakupki.kontur.ru/0148300000626001128",
+        "https://zakupki.kontur.ru/0148300000626001150",
+        "https://zakupki.kontur.ru/32616502360",
+        "https://zakupki.kontur.ru/IS85091883",
+        "https://zakupki.kontur.ru/IS84863887",
+        "https://synapsenet.ru/zakupki/fz44/0891200000626010517%231--zabajkalskij-kraj-okazanie-uslug-po-mezhevaniyu",
+        "https://kontendus.ru/tender/0302300040926000069"
+      ],
+      "limitations": [
+        "Региональные попытки не равны проверке всех дел; успешных обходов актов 0.",
+        "№392-037: вторичные карточки противоречат 08:00/10:00 МСК; отмечена дата без известного часа.",
+        "4 новые записи — смежные закупки, не подтверждённые судебные приглашения. Условия СРО/МСП/выезда требуют проверки."
+      ],
+      "searchedDistricts": [
+        "central",
+        "northwest",
+        "south",
+        "caucasus",
+        "volga",
+        "ural",
+        "siberia",
+        "fareast"
+      ],
+      "districtsCompleted": [],
+      "rotationStart": 36,
+      "rotationEnd": 48,
+      "regionsAttempted": [
+        "Севастополь",
+        "Республика Дагестан",
+        "Республика Ингушетия",
+        "Кабардино-Балкарская Республика",
+        "Карачаево-Черкесская Республика",
+        "Республика Северная Осетия — Алания",
+        "Чеченская Республика",
+        "Ставропольский край",
+        "Республика Башкортостан",
+        "Республика Марий Эл",
+        "Республика Мордовия",
+        "Республика Татарстан"
+      ],
+      "regionsSuccessful": [],
+      "regionsBlocked": [
+        "Севастополь",
+        "Республика Дагестан",
+        "Республика Ингушетия",
+        "Кабардино-Балкарская Республика",
+        "Карачаево-Черкесская Республика",
+        "Республика Северная Осетия — Алания",
+        "Чеченская Республика",
+        "Ставропольский край",
+        "Республика Башкортостан",
+        "Республика Марий Эл",
+        "Республика Мордовия",
+        "Республика Татарстан"
+      ],
+      "retryRegions": [
+        "Москва",
+        "Московская область",
+        "Белгородская область",
+        "Брянская область",
+        "Владимирская область",
+        "Воронежская область",
+        "Ивановская область",
+        "Калужская область",
+        "Костромская область",
+        "Курская область",
+        "Липецкая область",
+        "Орловская область",
+        "Рязанская область",
+        "Смоленская область",
+        "Тамбовская область",
+        "Тверская область",
+        "Тульская область",
+        "Ярославская область",
+        "Санкт-Петербург",
+        "Ленинградская область",
+        "Республика Карелия",
+        "Республика Коми",
+        "Архангельская область",
+        "Вологодская область",
+        "Калининградская область",
+        "Мурманская область",
+        "Новгородская область",
+        "Псковская область",
+        "Ненецкий автономный округ",
+        "Республика Адыгея",
+        "Республика Калмыкия",
+        "Краснодарский край",
+        "Астраханская область",
+        "Волгоградская область",
+        "Ростовская область",
+        "Республика Крым",
+        "Севастополь",
+        "Республика Дагестан",
+        "Республика Ингушетия",
+        "Кабардино-Балкарская Республика",
+        "Карачаево-Черкесская Республика",
+        "Республика Северная Осетия — Алания",
+        "Чеченская Республика",
+        "Ставропольский край",
+        "Республика Башкортостан",
+        "Республика Марий Эл",
+        "Республика Мордовия",
+        "Республика Татарстан"
+      ],
+      "sourceQueries": [
+        {
+          "id": "central",
+          "query": "ЦФО Москва МО суд направить запрос экспертам строительно-техническая экспертиза ноябрь 2026",
+          "sourceUrl": "https://kad.arbitr.ru/",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "northwest",
+          "query": "СЗФО Санкт Петербург Ленинградская область обследование конструкций ноябрь 2026",
+          "sourceUrl": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "south",
+          "query": "ЮФО Севастополь Крым Ростов Краснодар судебная строительная экспертиза 2026",
+          "sourceUrl": "https://sevastopol.arbitr.ru/",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "caucasus",
+          "query": "СКФО Дагестан Ингушетия Ставрополь экспертным организациям земельная строительная экспертиза 2026",
+          "sourceUrl": "https://stavropol.arbitr.ru/",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "volga",
+          "query": "ПФО Татарстан Башкортостан Марий Эл Мордовия обследование дефекты сооружений суд 2026",
+          "sourceUrl": "https://tatarstan.arbitr.ru/",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "ural",
+          "query": "УФО Златоуст Тюмень Челябинск техническое обследование конструкций 2026",
+          "sourceUrl": "https://zakupki.kontur.ru/IS86628156",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "siberia",
+          "query": "СФО Новосибирск Омск Красноярск суд строительная экспертиза ноябрь 2026",
+          "sourceUrl": "https://kad.arbitr.ru/",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        },
+        {
+          "id": "fareast",
+          "query": "ДФО Приморский край Якутия Сахалин обследование сооружений закупка 2026",
+          "sourceUrl": "https://zakupki.kontur.ru/IS86234687",
+          "result": "Тематический поиск проведён, действующий судебный запрос первоисточником не подтверждён"
+        }
+      ],
+      "regionalResults": [
+        {
+          "region": "Севастополь",
+          "query": "site:sevastopol.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://sevastopol.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Дагестан",
+          "query": "site:mahachkala.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://mahachkala.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Ингушетия",
+          "query": "site:ingushetia.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://ingushetia.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Кабардино-Балкарская Республика",
+          "query": "site:askb.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://askb.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Карачаево-Черкесская Республика",
+          "query": "site:askchr.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://askchr.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Северная Осетия — Алания",
+          "query": "site:alania.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://alania.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Чеченская Республика",
+          "query": "site:chechnya.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://chechnya.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Ставропольский край",
+          "query": "site:stavropol.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://stavropol.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Башкортостан",
+          "query": "site:ufa.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://ufa.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Марий Эл",
+          "query": "site:mari-el.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://mari-el.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Мордовия",
+          "query": "site:asrm.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://asrm.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        },
+        {
+          "region": "Республика Татарстан",
+          "query": "site:tatarstan.arbitr.ru 2026 строительно-техническая экспертиза запрос экспертным организациям",
+          "sourceUrl": "https://tatarstan.arbitr.ru/",
+          "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+          "officialHomepageStatus": "indexed_or_general_page_only",
+          "officialActsStatus": "blocked_case_search",
+          "caseCardsVerified": 0,
+          "successful": false,
+          "retryNeeded": true,
+          "secondarySearchAttempted": true,
+          "notes": "Найдена общая/индексированная информация либо пустая тематическая выдача; актуальный запрос суда не подтверждён."
+        }
+      ],
+      "officialCatalogAdditionalRegions": [
+        "Донецкая Народная Республика",
+        "Луганская Народная Республика",
+        "Запорожская область",
+        "Херсонская область"
+      ],
+      "caseCardsVerified": 0,
+      "sheetSyncStatus": "synced",
+      "sheetSyncBlocker": null,
+      "sheetVerification": {
+        "rowsAdded": 4,
+        "readbackOK": true,
+        "originalRowsPreserved": 116,
+        "pricingColumnMPreserved": true,
+        "proposalSheetUntouched": true
+      }
     }
   ]
 }

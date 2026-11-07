@@ -18,6 +18,7 @@ if (!groupButtons.some(button => button.dataset.family === activeGroup)) activeG
 const queryField = byId('sku-search');
 const sorting = byId('sku-sort');
 const order = new Map();
+const invalidQuantities = new Map();
 
 function readList(encoded) {
   const list = new Map();
@@ -74,13 +75,13 @@ groupButtons.forEach(button => button.addEventListener('click', () => {
     catalogLinked = false;
     queryField.value = '';
   }
-  const url = new URL(location.href);
-  if (activeGroup === 'all') url.searchParams.delete('group');
-  else url.searchParams.set('group', activeGroup);
-  history.replaceState(null, '', url);
+  syncCatalogUrl();
   presentCatalog();
 }));
-queryField.addEventListener('input', () => { catalogLinked = false; presentCatalog(); });
+queryField.addEventListener('input', () => {
+  if (catalogLinked) { catalogLinked = false; syncCatalogUrl(); }
+  presentCatalog();
+});
 sorting.addEventListener('change', presentCatalog);
 byId('reset-skus').addEventListener('click', () => {
   catalogLinked = false;
@@ -100,9 +101,20 @@ function orderStats() {
     count += qty;
     lines.push(item.name + ' · ' + mass(item.grams) + ' × ' + qty + ' уп. — ' + fmt(item.price * qty) + ' ₽');
   }
-  const body = ['Здравствуйте! Прошу подтвердить наличие и выставить счёт.', '', ...lines,
-    '', 'Общая масса материалов: ' + mass(grams) + '.', 'Ориентир по каталогу: ' + fmt(price) + ' ₽ без доставки.'].join('\n');
-  return {price, grams, count, body};
+  const isOffer = byId('quote-type').value === 'offer';
+  const method = byId('quote-method').value;
+  const city = byId('quote-city').value.trim();
+  const company = byId('quote-company').value.trim();
+  const deadline = byId('quote-deadline').value.trim();
+  const requirements = [
+    method === 'pickup' ? 'Получение: самовывоз в Москве.' : '',
+    method === 'delivery' ? 'Получение: доставка' + (city ? ' в город ' + city : '') + '.' : '',
+    company ? 'Организация: ' + company : '',
+    deadline ? 'Желаемый срок: ' + deadline : ''
+  ].filter(Boolean);
+  const body = [isOffer ? 'Здравствуйте! Прошу подготовить коммерческое предложение и подтвердить наличие.' : 'Здравствуйте! Прошу подтвердить наличие и выставить счёт.', '', ...lines,
+    '', 'Общая масса материалов: ' + mass(grams) + '.', 'Ориентир по каталогу: ' + fmt(price) + ' ₽ без доставки.', ...requirements].join('\n');
+  return {price, grams, count, body, isOffer};
 }
 const targetMass = byId('target-mass');
 const recipeSelect = byId('plan-material');
@@ -120,6 +132,26 @@ if (catalogLinked) {
   recipeSelect.value = linkedRecipe;
   queryField.value = recipes.get(linkedRecipe)[0].name;
   byId('pack-calculator').open = true;
+  if (activeGroup !== 'all' && recipes.get(linkedRecipe)[0].group !== activeGroup) {
+    catalogLinked = false;
+    queryField.value = '';
+    syncCatalogUrl();
+  }
+} else if (recipes.has(currentUrl.searchParams.get('plan'))) {
+  recipeSelect.value = currentUrl.searchParams.get('plan');
+}
+function syncCatalogUrl() {
+  const url = new URL(location.href);
+  if (activeGroup === 'all') url.searchParams.delete('group');
+  else url.searchParams.set('group', activeGroup);
+  if (catalogLinked) {
+    url.searchParams.set('material', recipeSelect.value);
+    url.searchParams.delete('plan');
+  } else {
+    url.searchParams.delete('material');
+    url.searchParams.set('plan', recipeSelect.value);
+  }
+  history.replaceState(null, '', url);
 }
 function requestedGrams() {
   const raw = targetMass.value.trim().replace(',', '.');
@@ -150,7 +182,7 @@ function renderPlan() {
   const saving = singleCosts.length ? Math.min(...singleCosts) - plan.cost : 0;
   byId('plan-saving').textContent = saving > 0 ? 'На ' + fmt(saving) + ' ₽ дешевле самого выгодного варианта из упаковок одного размера.' : '';
   const desiredCounts = new Map(plan.lines.map(([item, qty]) => [item.id, qty]));
-  const applied = options.every(item => (order.get(item.id) || 0) === (desiredCounts.get(item.id) || 0));
+  const applied = options.every(item => !invalidQuantities.has(item.id) && (order.get(item.id) || 0) === (desiredCounts.get(item.id) || 0));
   const alreadyInOrder = options.some(item => order.has(item.id));
   const button = byId('apply-plan');
   button.disabled = applied;
@@ -159,7 +191,7 @@ function renderPlan() {
 byId('apply-plan').addEventListener('click', () => {
   const plan = currentPlan();
   if (!plan) return;
-  for (const item of recipes.get(recipeSelect.value)) order.delete(item.id);
+  for (const item of recipes.get(recipeSelect.value)) { order.delete(item.id); invalidQuantities.delete(item.id); }
   for (const [item, qty] of plan.lines) order.set(item.id, qty);
   persist();
   renderOrder();
@@ -172,6 +204,7 @@ recipeSelect.addEventListener('change', () => {
     activeGroup = 'all';
     presentCatalog();
   }
+  syncCatalogUrl();
   renderPlan();
 });
 byId('share-plan').addEventListener('click', () => {
@@ -201,12 +234,23 @@ function updateTotals() {
   document.querySelectorAll('[data-basket-count]').forEach(el => { el.textContent = fmt(stats.count); });
   byId('empty-basket').hidden = order.size > 0;
   byId('order-summary').hidden = order.size === 0;
-  byId('order-cost').textContent = fmt(stats.price) + ' ₽';
-  byId('order-weight').textContent = mass(stats.grams);
-  byId('mobile-sum').textContent = fmt(stats.price) + ' ₽';
+  const valid = invalidQuantities.size === 0;
+  byId('order-cost').textContent = valid ? fmt(stats.price) + ' ₽' : '—';
+  byId('order-weight').textContent = valid ? mass(stats.grams) : '—';
+  byId('mobile-sum').textContent = valid ? fmt(stats.price) + ' ₽' : 'Проверить';
+  byId('qty-status').textContent = valid ? '' : 'Проверьте количество упаковок, чтобы подготовить запрос.';
   showMobileOrder();
   renderPlan();
-  byId('order-mail').href = emailDraft('Запрос счёта на материалы МылКо', stats.body);
+  const mail = byId('order-mail');
+  mail.firstChild.textContent = stats.isOffer ? 'Запросить КП ' : 'Запросить счёт ';
+  if (valid) {
+    mail.href = emailDraft(stats.isOffer ? 'Запрос КП на материалы МылКо' : 'Запрос счёта на материалы МылКо', stats.body);
+    mail.removeAttribute('aria-disabled');
+  } else {
+    mail.removeAttribute('href');
+    mail.setAttribute('aria-disabled', 'true');
+  }
+  for (const id of ['copy-order','download-order','share-order']) byId(id).disabled = !valid;
   skuCards.forEach(card => {
     const count = order.get(card.dataset.sku) || 0;
     card.classList.toggle('in-order', count > 0);
@@ -215,7 +259,7 @@ function updateTotals() {
     const plan = card.querySelector('.pack-plan');
     plan.hidden = !targetMass.value.trim();
     plan.textContent = packs ? 'На заданную массу: ' + packs + ' уп. · ' + fmt(packs * item.price) + ' ₽' : 'Введите положительную массу в килограммах.';
-    button.disabled = !packs || count + packs > 1000000;
+    button.disabled = invalidQuantities.has(item.id) || !packs || count + packs > 1000000;
     button.firstChild.textContent = !plan.hidden && packs ? 'Добавить ' + packs + ' уп. ' : count ? 'Ещё одну · ' + count + ' ' : 'В список ';
     button.setAttribute('aria-label','Добавить ' + item.name + ', ' + mass(item.grams) + ', упаковок: ' + packs);
   });
@@ -234,28 +278,46 @@ function renderOrder() {
     label.textContent = 'Упаковок ';
     const field = document.createElement('input');
     field.type = 'number'; field.min = '1'; field.max = '1000000'; field.step = '1';
-    field.value = qty; field.inputMode = 'numeric';
+    field.required = true;
+    field.value = invalidQuantities.has(id) ? invalidQuantities.get(id) : qty;
+    field.inputMode = 'numeric';
+    const error = document.createElement('p');
+    error.className = 'qty-error';
+    error.id = 'qty-error-' + id;
+    error.textContent = 'Введите целое число упаковок от 1 до 1 000 000.';
+    error.hidden = !invalidQuantities.has(id);
+    field.setAttribute('aria-describedby', error.id);
+    field.setAttribute('aria-invalid', String(!error.hidden));
     field.setAttribute('aria-label','Количество '+title.textContent);
     field.addEventListener('input', () => {
       const number = field.valueAsNumber;
-      if (Number.isInteger(number) && number >= 1 && number <= 1000000) {
+      const valid = Number.isInteger(number) && number >= 1 && number <= 1000000;
+      field.setAttribute('aria-invalid', String(!valid));
+      error.hidden = valid;
+      if (valid) {
+        invalidQuantities.delete(id);
         order.set(id, number);
-        byId('basket-status').replaceChildren();
-        updateTotals(); persist();
+        persist();
+      } else {
+        invalidQuantities.set(id, field.value);
       }
+      byId('basket-status').replaceChildren();
+      updateTotals();
     });
-    field.addEventListener('change', () => { field.value = order.get(id); });
     label.append(field);
     const remove = document.createElement('button');
     remove.type = 'button'; remove.textContent = 'Убрать';
     remove.setAttribute('aria-label', 'Убрать '+title.textContent);
     remove.addEventListener('click', () => {
+      const rowIndex = Array.from(order.keys()).indexOf(id);
+      invalidQuantities.delete(id);
       order.delete(id); persist(); renderOrder();
       byId('basket-status').textContent = item.name + ' удалён из списка.';
-      const next = container.querySelector('button') || item.card.querySelector('.add-sku');
-      if (next?.offsetParent) next.focus({preventScroll:true});
+      const buttons = container.querySelectorAll('button');
+      const next = buttons[Math.min(rowIndex, buttons.length - 1)] || byId('order-title');
+      next.focus();
     });
-    line.append(label, remove); row.append(title,line); container.append(row);
+    line.append(label, remove); row.append(title,line,error); container.append(row);
   }
   updateTotals();
 }
@@ -273,7 +335,17 @@ byId('share-order').addEventListener('click', () => copyText(shareUrl().href, by
 byId('download-order').addEventListener('click', () => downloadText('Mylco-zakupka.txt', orderStats().body));
 byId('order-mail').addEventListener('click', () => record('order_email_open', 'materials'));
 
+for (const id of ['quote-type','quote-method','quote-city','quote-company','quote-deadline']) {
+  byId(id).addEventListener('input', () => {
+    const method = byId('quote-method').value;
+    byId('quote-city-field').hidden = method !== 'delivery';
+    byId('pickup-note').hidden = method !== 'pickup';
+    byId('basket-status').replaceChildren();
+    updateTotals();
+  });
+}
 function restore(encoded) {
+  invalidQuantities.clear();
   order.clear();
   readList(encoded).forEach((qty, id) => order.set(id, qty));
   renderOrder();

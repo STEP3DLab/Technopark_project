@@ -84,7 +84,7 @@ function calculate() {
 [volume, density, reserve].forEach(field => field.addEventListener('input', calculate));
 
 const service = byId('service'), detail = byId('extra'), project = byId('project');
-const savedDetails = new Map();
+const serviceDrafts = new Map();
 let currentService = service.value;
 let contextLine = '';
 const modelSource = byId('model-source');
@@ -99,7 +99,8 @@ function showModelTip() {
 modelSource.addEventListener('change', showModelTip);
 showModelTip();
 function chooseService(key) {
-  savedDetails.set(currentService, detail.value);
+  serviceDrafts.set(currentService, {description:project.value, extra:detail.value, context:contextLine});
+  const previous = serviceDrafts.get(key);
   currentService = key;
   service.value = key;
   byId('model-fields').hidden = key !== 'model';
@@ -107,13 +108,23 @@ function chooseService(key) {
   const info = serviceInfo[key];
   byId('extra-label').textContent = info.label + ' · необязательно';
   detail.placeholder = info.example;
-  detail.value = savedDetails.get(key) || '';
+  detail.value = previous?.extra || '';
+  project.value = previous?.description || '';
   project.placeholder = info.placeholder;
   byId('service-hint').textContent = info.hint;
-  contextLine = '';
-  project.required = true;
+  contextLine = previous?.context || '';
+  project.required = !contextLine;
+  const headings = {model:['Расчёт', '3D-заказа'], b2b:['Запросить', 'КП']};
+  const [lead, accent] = headings[key] || ['Обсудим', 'вашу задачу?'];
+  byId('brief-lead').textContent = lead;
+  byId('brief-accent').textContent = accent;
+  byId('brief-photo').hidden = key !== 'model';
+  byId('brief-intro').textContent = key === 'model'
+    ? 'Укажите, что уже есть и какой результат нужен. По размерам и количеству мастерская сможет оценить работу.'
+    : key === 'b2b' ? 'Укажите позиции и количества. Если спецификация уже готова, приложите её к письму.'
+    : 'Опишите изделие или оборудование. К подготовленному письму можно приложить фото, чертёж или список закупки.';
   project.setCustomValidity('');
-  byId('request-context').textContent = '';
+  byId('request-context').textContent = contextLine;
 }
 const selectedService = new URL(location.href).searchParams.get('service');
 chooseService(Object.hasOwn(serviceInfo, selectedService) ? selectedService : currentService);

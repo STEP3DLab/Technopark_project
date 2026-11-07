@@ -96,3 +96,15 @@
 #plan-share-status:empty{display:none}.target-mass #plan-share-status{color:var(--blue)}.target-mass textarea{width:100%}
 
 @media(max-width:650px){.sku-actions .btn.small,.order-links button,.order-row button{min-height:44px}.sku-actions .source-link,.plan-actions .subtle-link{display:inline-flex;align-items:center;min-height:44px}}
+.quote-options{border-block:1px solid #c3c3b8;margin:10px 0 15px;padding:11px 0;font-size:13px}
+.quote-options summary{cursor:pointer;font-weight:650}
+.quote-options label{display:grid;gap:4px;margin:10px 0;font-size:12px;font-weight:600}
+.quote-options input,.quote-options select{min-width:0;width:100%;padding:7px 9px;background:white;border:1px solid #aaac9f;border-radius:8px;font-size:14px}
+.quote-options p,.quote-options a{font-size:12px;line-height:1.5;margin:7px 0}
+.quote-options a{text-decoration:underline}
+.quote-options [hidden],.qty-error[hidden]{display:none}
+.qty-error,#qty-status{color:#852b13;font-size:12px;line-height:1.45;margin:7px 0}
+#qty-status:empty{display:none}.order-row input[aria-invalid=true]{border:2px solid #96371d}
+#order-mail[aria-disabled=true],.order-links button:disabled{opacity:.6;cursor:default}
+#order-title:focus{outline:2px solid var(--blue);outline-offset:4px}
+@media(max-width:350px){.sku-info{min-width:0}.sku-use{overflow-wrap:anywhere}}

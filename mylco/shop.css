@@ -156,3 +156,16 @@
   #print-sheet th, #print-sheet td { padding: 5pt; text-align: left; border: 1px solid #777; }
   #print-sheet tr { break-inside: avoid; }
 }
+
+.calc-selects { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.calc-selects .volume-mode, .calc-selects select { width: 100%; max-width: none; min-width: 0; }
+.calc-body .profile-note, .calc-body .calc-hint { margin: 8px 0 15px; font-size: .85rem; }
+.calc-body .calc-source, .calc-body .mix-transfer { color: #ffe1c9; text-decoration: underline; text-underline-offset: .2em; }
+.calc-body .mix-transfer { border: 0; background: transparent; padding: 5px 0; cursor: pointer; font: inherit; }
+.calc-body .geo-fields input, .calc-body .calc-fields input { min-width: 0; }
+.guide-actions { flex-wrap: wrap; }
+.planner-measure { display: inline-block; margin-top: 9px; }
+@media(max-width:600px) { .calc-selects { grid-template-columns: minmax(0,1fr); } }
+
+.version-field { max-width: 540px; margin-top: 12px; }
+.version-field select { width: 100%; }

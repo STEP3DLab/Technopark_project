@@ -121,6 +121,7 @@ const planGoal = byId('plan-goal'), planPieces = byId('plan-pieces');
 if (currentUrl.searchParams.get('goal') === 'surplus') planGoal.value = 'surplus';
 const incomingPieces = Number(currentUrl.searchParams.get('pieces'));
 if (Number.isInteger(incomingPieces) && incomingPieces >= 1 && incomingPieces <= 1000000) planPieces.value = String(incomingPieces);
+if (!currentUrl.searchParams.has('pieces') && currentUrl.searchParams.get('basis') === 'unset') planPieces.value = '';
 let removedItem = null;
 function clearUndo() {
   removedItem = null;
@@ -169,14 +170,29 @@ function requestedGrams() {
   const grams = Math.ceil(Number((Number(raw) * 1000).toPrecision(14)));
   return Number.isSafeInteger(grams) && grams > 0 ? grams : 0;
 }
+const versionField = byId('plan-version');
+if ([...versionField.options].some(opt => opt.value === currentUrl.searchParams.get('version'))) versionField.value = currentUrl.searchParams.get('version');
+versionField.addEventListener('change', renderPlan);
 function currentPlan() {
-  return leastCostPacks(recipes.get(recipeSelect.value) || [], requestedGrams(), 1000000, planGoal.value);
+  const items = recipes.get(recipeSelect.value) || [], desired = requestedGrams(), goal = planGoal.value;
+  if (recipeSelect.value !== 'caspol-one') return leastCostPacks(items,desired,1000000,goal);
+  // The two packs have different working times. Quote one formulation for the entire run.
+  const plans = items.filter(item => !versionField.value || item.id === versionField.value)
+    .map(item => leastCostPacks([item],desired,1000000,goal)).filter(Boolean);
+  plans.sort((a,b) => goal === 'surplus' ? a.grams-b.grams || a.cost-b.cost : a.cost-b.cost || a.grams-b.grams);
+  return plans[0] || null;
 }
 function renderPlan() {
   byId('plan-share-status').replaceChildren();
   const desired = requestedGrams();
   const options = recipes.get(recipeSelect.value);
   const plan = currentPlan();
+  const caspol = recipeSelect.value === 'caspol-one';
+  byId('version-field').hidden = !caspol;
+  const measureParams = new URLSearchParams({material:recipeSelect.value});
+  if (caspol && versionField.value) measureParams.set('version', versionField.value);
+  if (planPieces.value && planPieces.validity.valid) measureParams.set('pieces',planPieces.value);
+  byId('plan-measure').href = './?' + measureParams + '#rashod';
   const output = byId('plan-result');
   output.hidden = !plan;
   byId('plan-hint').textContent = plan || !targetMass.value.trim() ? '' :
@@ -185,10 +201,14 @@ function renderPlan() {
   if (!plan) return;
   byId('plan-price').textContent = fmt(plan.cost) + ' ₽';
   byId('plan-combination').textContent = plan.lines.map(([item, qty]) => mass(item.grams) + ' × ' + fmt(qty) + ' уп.').join(' + ');
+  if (caspol) {
+    const version = [...versionField.options].find(opt => opt.value === plan.lines[0][0].id);
+    byId('plan-combination').textContent += ' · ' + version.textContent.split(' · ')[0];
+  }
   byId('plan-weight').textContent = mass(plan.grams) + (plan.grams === desired ? ' · точно по расчёту' : ' · остаток ' + mass(plan.grams - desired));
   const pieces = planPieces.valueAsNumber;
   byId('batch-budget').textContent = Number.isInteger(pieces) && pieces >= 1 && pieces <= 1000000
-    ? 'Закупка на одну отливку — ' + fmt(Math.round(plan.cost / pieces * 100) / 100) + ' ₽ при тираже ' + fmt(pieces) + ' шт. Учтены целые упаковки, включая остаток. Доставка и работа оплачиваются отдельно.'
+    ? 'Закупка в пересчёте на одно изделие — ' + fmt(Math.round(plan.cost / pieces * 100) / 100) + ' ₽ при тираже ' + fmt(pieces) + ' шт. Учтены целые упаковки, включая остаток. Доставка и работа оплачиваются отдельно.'
     : 'Введите целый тираж от 1 до 1 000 000 шт. для расчёта на одну отливку.';
   const singleCosts = options.filter(item => Math.ceil(desired / item.grams) <= 1000000)
     .map(item => Math.ceil(desired / item.grams) * item.price);
@@ -226,6 +246,8 @@ byId('share-plan').addEventListener('click', () => {
   const url = new URL(location.href);
   url.search = new URLSearchParams({material:recipeSelect.value, grams:String(requestedGrams()), goal:planGoal.value});
   if (planPieces.validity.valid && planPieces.value) url.searchParams.set('pieces',planPieces.value);
+  if (recipeSelect.value === 'caspol-one' && versionField.value) url.searchParams.set('version',versionField.value);
+  if (!planPieces.value) url.searchParams.set('basis','unset');
   url.hash = 'pack-calculator';
   copyText(url.href, byId('plan-share-status'), 'Ссылка на расчёт скопирована.');
 });

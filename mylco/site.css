@@ -128,3 +128,14 @@ dialog {width:min(520px,calc(100% - 28px));max-height:90dvh;overflow:auto;paddin
 #rent-request{margin-top:17px;padding-top:17px;border-top:1px solid var(--line)}#rent-request h3{font-size:23px}#rent-summary{font-size:14px;line-height:1.5;margin:9px 0 13px}.rent-phone{display:inline-block;font-size:13px;text-decoration:underline;margin-top:12px}
 @media(max-width:850px){.rent-layout{grid-template-columns:1fr}.rental-calc{max-width:650px}.rental-photo{height:180px}.rent-intro h1{max-width:690px}}
 @media(max-width:650px){.catalog-search{display:grid;gap:9px;padding:12px}.catalog-search label{font-size:13px}.search-input input{font-size:13px;padding:9px}.search-input .btn.small{font-size:11px;padding:9px 11px;gap:6px}.breadcrumbs{margin:16px 0 27px}.rent-layout{margin-top:27px}.kit-grid{gap:9px}.rental-photo{height:118px;padding:8px}.rental-description{padding:10px;gap:6px}.rental-description h3{font-size:18px}.rental-description .rate{font-size:18px}.rental-description .source-link{font-size:11px}.rental-description p{font-size:12px}.rental-page .rent-intro h1{font-size:47px}.rent-fields{grid-template-columns:1.3fr .7fr}}
+
+.bar nav .menu-service{display:none}
+.model-fields{margin:9px 0 15px;padding:13px 16px 15px;border:1px solid var(--line);border-radius:12px}
+.model-fields legend{font-size:14px;font-weight:650;padding:0 5px}
+.model-fields label,.model-fields select{display:block;width:100%}
+.model-fields select{margin:5px 0 10px}
+.model-fields .field-hint{margin:8px 0 0}
+@media(max-width:650px){
+ .bar nav .menu-service{display:block}.bar nav.open{max-height:calc(100dvh - 72px);overflow-y:auto}
+ .head-phone,.menu,.head-cta .btn.small{min-height:44px;min-width:44px}
+}

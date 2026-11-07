@@ -87,10 +87,23 @@ const service = byId('service'), detail = byId('extra'), project = byId('project
 const savedDetails = new Map();
 let currentService = service.value;
 let contextLine = '';
+const modelSource = byId('model-source');
+const modelHints = {
+  sample: 'Для оценки приложите к письму фото с линейкой. Отметьте утраченные элементы и размеры, которые важно сохранить.',
+  file: 'Укажите формат файла, габариты, тираж и назначение детали. Файл или ссылку можно приложить к письму.',
+  drawing: 'Укажите габариты и количество. К готовому письму приложите эскиз или чертёж с основными размерами.'
+};
+function showModelTip() {
+  byId('model-tip').textContent = modelHints[modelSource.value];
+}
+modelSource.addEventListener('change', showModelTip);
+showModelTip();
 function chooseService(key) {
   savedDetails.set(currentService, detail.value);
   currentService = key;
   service.value = key;
+  byId('model-fields').hidden = key !== 'model';
+  byId('model-fields').disabled = key !== 'model';
   const info = serviceInfo[key];
   byId('extra-label').textContent = info.label + ' · необязательно';
   detail.placeholder = info.example;
@@ -102,7 +115,8 @@ function chooseService(key) {
   project.setCustomValidity('');
   byId('request-context').textContent = '';
 }
-chooseService(currentService);
+const selectedService = new URL(location.href).searchParams.get('service');
+chooseService(Object.hasOwn(serviceInfo, selectedService) ? selectedService : currentService);
 const consultation = new Map([
   ['alcorsil-20', 'Alcorsil 20 для гибкой формы'],
   ['mold-star-15', 'Mold Star 15 Slow для формы со сложным рельефом'],
@@ -138,7 +152,11 @@ byId('enquiry-form').addEventListener('submit', event => {
     return;
   }
   const subject = 'МылКо — ' + service.options[service.selectedIndex].text;
-  const lines = ['Здравствуйте!', '', subject, contextLine, description, detail.value.trim() ? serviceInfo[service.value].label + ': ' + detail.value.trim() : ''].filter((line, index) => index === 1 || line);
+  const modelLines = service.value === 'model' ? [
+    'Исходный материал: ' + modelSource.selectedOptions[0].text,
+    'Нужный результат: ' + byId('model-result').value
+  ] : [];
+  const lines = ['Здравствуйте!', '', subject, contextLine, ...modelLines, description, detail.value.trim() ? serviceInfo[service.value].label + ': ' + detail.value.trim() : ''].filter((line, index) => index === 1 || line);
   const body = lines.join('\n');
   byId('draft-text').value = body;
   byId('send-mail').href = 'mailto:' + email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);

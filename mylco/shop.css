@@ -94,3 +94,5 @@
 @media(max-width:960px){.guide-cards{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.guide-hero{grid-template-columns:1fr;gap:14px;margin:0 0 20px}.guide-hero figure{height:156px}.guide-hero .btn{margin-top:12px}.guide-cards{grid-template-columns:1fr}.guide-card{padding:16px}.guide-filter{font-size:12px;padding:9px 11px}.guide-filters{gap:5px}.guide-product img{width:64px;height:64px}.guide-body{margin:11px 0}.planner-fields{gap:8px}.target-mass{padding:12px}.catalog-guide{font-size:13px}.planner-fields select,.planner-fields input{font-size:16px;min-width:0}}
 #plan-share-status:empty{display:none}.target-mass #plan-share-status{color:var(--blue)}.target-mass textarea{width:100%}
+
+@media(max-width:650px){.sku-actions .btn.small,.order-links button,.order-row button{min-height:44px}.sku-actions .source-link,.plan-actions .subtle-link{display:inline-flex;align-items:center;min-height:44px}}

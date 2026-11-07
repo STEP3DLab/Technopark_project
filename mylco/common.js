@@ -13,7 +13,14 @@ function setMenu(open) {
   menu.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
   menu.querySelector('use').setAttribute('href', open ? '#ic-close' : '#ic-menu');
 }
-menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') !== 'true'));
+menu.addEventListener('click', event => {
+  const open = menu.getAttribute('aria-expanded') !== 'true';
+  setMenu(open);
+  if (open && event.detail === 0) navigation.querySelector('a').focus();
+});
+document.querySelector('.header').addEventListener('focusout', event => {
+  if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setMenu(false);
+});
 document.addEventListener('click', event => {
   if (!event.target.closest('.header') || event.target.closest('nav a')) setMenu(false);
   const link = event.target.closest('[data-event]');

@@ -20,6 +20,7 @@ function localToday() {
 
 function updateQuote() {
   requestPanel.hidden = true;
+  byId('rent-copy-status').replaceChildren();
   startField.min = localToday();
   const camera = cameraOptions.find(option => option.checked);
   const rate = Number(camera.dataset.rate);
@@ -62,3 +63,8 @@ rentalForm.addEventListener('submit', event => {
   record('rental_quote_prepared', quote.kit);
 });
 byId('rent-mail').addEventListener('click', () => record('rental_mail_opened', cameraOptions.find(option => option.checked).value));
+
+byId('rent-copy').addEventListener('click', () => {
+  const body = new URL(byId('rent-mail').href).searchParams.get('body');
+  copyText(body, byId('rent-copy-status'), 'Запрос скопирован. Адрес мастерской — order@mylco.ru.');
+});

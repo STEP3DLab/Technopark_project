@@ -27,3 +27,36 @@ document.addEventListener('keydown', event => {
 });
 window.matchMedia('(max-width:650px)').addEventListener('change', () => setMenu(false));
 
+
+function emailDraft(subject, body) {
+  return 'mailto:order@mylco.ru?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
+
+function downloadText(name, text) {
+  const url = URL.createObjectURL(new Blob(['\uFEFF', text], {type:'text/plain;charset=utf-8'}));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+async function copyText(value, status, message) {
+  try {
+    await navigator.clipboard.writeText(value);
+    status.textContent = message;
+  } catch {
+    const field = document.createElement('textarea');
+    field.setAttribute('aria-label', 'Текст для ручного копирования');
+    field.readOnly = true;
+    field.value = value;
+    status.replaceChildren('Скопируйте выделенный текст.', field);
+    field.focus();
+    field.select();
+    try {
+      if (document.execCommand('copy')) status.textContent = message;
+    } catch { /* The selected field remains available for manual copying. */ }
+  }
+}

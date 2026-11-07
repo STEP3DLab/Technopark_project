@@ -45,6 +45,10 @@ taskButtons.forEach(button => button.addEventListener('click', () => {
   byId('pick-img').alt = topic.alt;
   byId('pick-category').href = shop + topic.url;
   byId('pick-help').dataset.brief = topic.brief;
+  const compare = byId('pick-compare');
+  const groups = {form:'silicone', cast:'plastic', clear:'epoxy'};
+  compare.href = selectedTask === 'vacuum' ? 'kamery.html' : 'materialy.html?group=' + groups[selectedTask];
+  compare.textContent = selectedTask === 'vacuum' ? 'Сравнить камеры' : 'Цены и фасовки';
   record('task_selected', selectedTask);
 }));
 
@@ -64,11 +68,14 @@ function calculate() {
   const valid = ml > 0 && rho > 0 && extra >= 0 && extra <= 100;
   calculation = '';
   byId('calc-ask').hidden = !valid;
+  byId('calc-packs').hidden = !valid;
   if (!valid) {
     byId('estimate').textContent = (!volume.value || !density.value) ? 'Введите объём и плотность для расчёта массы смеси.' : 'Проверьте значения. Объём и плотность должны быть больше нуля, запас — от 0 до 100%.';
     return;
   }
   const grams = ml * rho * (1 + extra / 100);
+  const packs = new URLSearchParams({grams:String(Math.ceil(Number(grams.toPrecision(12))))});
+  byId('calc-packs').href = 'materialy.html?' + packs + '#pack-calculator';
   const weight = grams >= 1000 ? number(grams / 1000) + ' кг' : number(grams) + ' г';
   calculation = 'Оценка расхода: ' + number(ml) + ' мл, плотность ' + number(rho) + ' г/см³, запас ' + number(extra) + '%. Всего около ' + weight + ' смеси.';
   byId('estimate').textContent = 'Понадобится около ' + weight + ' готовой смеси с учётом запаса.';
@@ -90,6 +97,8 @@ function chooseService(key) {
   project.placeholder = info.placeholder;
   byId('service-hint').textContent = info.hint;
   contextLine = '';
+  project.required = true;
+  project.setCustomValidity('');
   byId('request-context').textContent = '';
 }
 chooseService(currentService);
@@ -98,6 +107,7 @@ document.querySelectorAll('[data-brief]').forEach(link => link.addEventListener(
   chooseService(link.dataset.brief);
   if (link.id === 'pick-help') contextLine = topics[selectedTask].request;
   if (link.id === 'calc-ask') contextLine = calculation;
+  project.required = !contextLine;
   byId('request-context').textContent = contextLine;
   record('brief_started', service.value);
 }));
@@ -107,7 +117,7 @@ let lastSubmit = null;
 byId('enquiry-form').addEventListener('submit', event => {
   event.preventDefault();
   const description = project.value.trim();
-  if (description.length < 3) {
+  if (!contextLine && description.length < 3) {
     project.setCustomValidity('Напишите несколько слов о задаче.');
     project.reportValidity();
     return;
@@ -156,3 +166,34 @@ document.querySelector('.catalog-search').addEventListener('submit', event => {
   }
   record('catalog_search', 'shop');
 });
+
+
+const volumeMode = byId('volume-mode');
+let manualVolume = '';
+function geometryVolume() {
+  const mode = volumeMode.value;
+  const geometric = mode !== 'known';
+  byId('geo-fields').hidden = !geometric;
+  volume.readOnly = geometric;
+  if (geometric) {
+    const isBox = mode === 'box';
+    byId('geo-a-label').textContent = isBox ? 'Длина, мм' : 'Диаметр, мм';
+    byId('geo-b-label').hidden = !isBox;
+    const a = decimal(byId('geo-a')), b = decimal(byId('geo-b')), h = decimal(byId('geo-h'));
+    const displaced = byId('displaced');
+    const model = displaced.value.trim() ? decimal(displaced) : 0;
+    const measured = (isBox ? a * b : Math.PI * a * a / 4) * h / 1000;
+    const net = measured - model;
+    const valid = a > 0 && h > 0 && (!isBox || b > 0) && model >= 0 && Number.isFinite(net) && net > 0;
+    volume.value = valid ? String(Number(net.toPrecision(9))) : '';
+    calculate();
+    if (!valid && Number.isFinite(measured) && model >= measured)
+      byId('estimate').textContent = 'Объём мастер-модели должен быть меньше объёма заливки.';
+  } else {
+    volume.value = manualVolume;
+    calculate();
+  }
+}
+volume.addEventListener('input', () => { if (!volume.readOnly) manualVolume = volume.value; });
+volumeMode.addEventListener('change', geometryVolume);
+byId('geo-fields').addEventListener('input', geometryVolume);

@@ -1,7 +1,7 @@
 'use strict';
 
 // Prices and masses in the catalogue are whole roubles and grams.
-function leastCostPacks(options, target, limit = 1000000) {
+function leastCostPacks(options, target, limit = 1000000, goal = 'cost') {
   if (!Number.isSafeInteger(target) || target <= 0 || !options.length || options.length > 2) return null;
   const [bulk, other] = [...options].sort((a, b) =>
     a.price * b.grams - b.price * a.grams || b.grams - a.grams);
@@ -21,8 +21,12 @@ function leastCostPacks(options, target, limit = 1000000) {
     const cost = m * bulk.price + n * other.price;
     const grams = m * bulk.grams + n * other.grams;
     const count = m + n;
-    if (best && (cost > best.cost || (cost === best.cost &&
-      (grams > best.grams || (grams === best.grams && count >= best.count))))) continue;
+    if (best) {
+      const difference = goal === 'surplus'
+        ? grams - best.grams || cost - best.cost
+        : cost - best.cost || grams - best.grams;
+      if (difference > 0 || (difference === 0 && count >= best.count)) continue;
+    }
     best = {lines:[[bulk, m], [other, n]].filter(([, qty]) => qty), cost, grams, count};
   }
   return best;

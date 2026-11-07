@@ -39,8 +39,8 @@ function emailDraft(subject, body) {
   return 'mailto:order@mylco.ru?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
 
-function downloadText(name, text) {
-  const url = URL.createObjectURL(new Blob(['\uFEFF', text], {type:'text/plain;charset=utf-8'}));
+function downloadText(name, text, type = 'text/plain;charset=utf-8') {
+  const url = URL.createObjectURL(new Blob(['\uFEFF', text], {type}));
   const link = document.createElement('a');
   link.href = url;
   link.download = name;

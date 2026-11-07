@@ -66,22 +66,23 @@ const number = value => new Intl.NumberFormat('ru-RU', {maximumFractionDigits: 3
 let calculation = '';
 function calculate() {
   const ml = decimal(volume), rho = decimal(density), extra = decimal(reserve);
-  const valid = ml > 0 && rho > 0 && extra >= 0 && extra <= 100;
+  const pieces = byId('batch-pieces').valueAsNumber;
+  const grams = ml * rho * (1 + extra / 100) * pieces;
+  const valid = ml > 0 && rho > 0 && extra >= 0 && extra <= 100 && Number.isInteger(pieces) && pieces > 0 && pieces <= 1000000 && Number.isSafeInteger(Math.ceil(grams));
   calculation = '';
   byId('calc-ask').hidden = !valid;
   byId('calc-packs').hidden = !valid;
   if (!valid) {
-    byId('estimate').textContent = (!volume.value || !density.value) ? 'Введите объём и плотность для расчёта массы смеси.' : 'Проверьте значения. Объём и плотность должны быть больше нуля, запас — от 0 до 100%.';
+    byId('estimate').textContent = (!volume.value || !density.value) ? 'Введите объём и плотность для расчёта массы смеси.' : 'Проверьте объём, плотность, запас (0–100%) и тираж (от 1 до 1 000 000 шт.).';
     return;
   }
-  const grams = ml * rho * (1 + extra / 100);
-  const packs = new URLSearchParams({grams:String(Math.ceil(Number(grams.toPrecision(12))))});
+  const packs = new URLSearchParams({grams:String(Math.ceil(Number(grams.toPrecision(14)))), pieces:String(pieces)});
   byId('calc-packs').href = 'materialy.html?' + packs + '#pack-calculator';
   const weight = grams >= 1000 ? number(grams / 1000) + ' кг' : number(grams) + ' г';
-  calculation = 'Оценка расхода: ' + number(ml) + ' мл, плотность ' + number(rho) + ' г/см³, запас ' + number(extra) + '%. Всего около ' + weight + ' смеси.';
-  byId('estimate').textContent = 'Понадобится около ' + weight + ' готовой смеси с учётом запаса.';
+  calculation = 'Оценка расхода: ' + number(ml) + ' мл, плотность ' + number(rho) + ' г/см³, запас ' + number(extra) + '%. Тираж ' + number(pieces) + ' шт. Всего около ' + weight + ' смеси.';
+  byId('estimate').textContent = 'На ' + number(pieces) + ' шт. понадобится около ' + weight + ' смеси с запасом. На отливку — ' + number(grams / pieces) + ' г.';
 }
-[volume, density, reserve].forEach(field => field.addEventListener('input', calculate));
+[volume, density, reserve, byId('batch-pieces')].forEach(field => field.addEventListener('input', calculate));
 
 const service = byId('service'), detail = byId('extra'), project = byId('project');
 const serviceDrafts = new Map();
@@ -139,6 +140,13 @@ const consultation = new Map([
 if (consultation) {
   chooseService('material');
   contextLine = 'Прошу помочь с подбором материала. Рассматриваю ' + consultation + '.';
+  project.required = false;
+  byId('request-context').textContent = contextLine;
+}
+const machine = new Map([['mt9','MT 9 без насоса'], ['mt9m','MT9M/2S с насосом ZenSen 2S']]).get(new URL(location.href).searchParams.get('equipment'));
+if (machine) {
+  chooseService('b2b');
+  contextLine = 'Прошу подтвердить наличие и стоимость камеры ' + machine + ' и сообщить условия получения.';
   project.required = false;
   byId('request-context').textContent = contextLine;
 }
@@ -241,3 +249,16 @@ function geometryVolume() {
 volume.addEventListener('input', () => { if (!volume.readOnly) manualVolume = volume.value; });
 volumeMode.addEventListener('change', geometryVolume);
 byId('geo-fields').addEventListener('input', geometryVolume);
+
+function splitMix() {
+  const [weight, a, b] = ['mix-mass','mix-a','mix-b'].map(id => byId(id).valueAsNumber);
+  const massA = weight * (a / (a + b));
+  byId('mix-result').textContent = [weight,a,b].every(n => Number.isFinite(n) && n > 0) && Number.isFinite(a + b)
+    ? 'Компонент A — ' + number(massA) + ' г. Компонент B — ' + number(weight - massA) + ' г.'
+    : 'Укажите массу и обе части пропорции.';
+}
+for (const id of ['mix-mass','mix-a','mix-b']) byId(id).addEventListener('input', splitMix);
+byId('draft-save').addEventListener('click', () => downloadText('Mylco-zapros.txt', byId('draft-text').value));
+function openCalculator() { if (location.hash === '#rashod') byId('rashod').open = true; }
+openCalculator();
+window.addEventListener('hashchange', openCalculator);

@@ -108,3 +108,51 @@
 #order-mail[aria-disabled=true],.order-links button:disabled{opacity:.6;cursor:default}
 #order-title:focus{outline:2px solid var(--blue);outline-offset:4px}
 @media(max-width:350px){.sku-info{min-width:0}.sku-use{overflow-wrap:anywhere}}
+
+/* Tools for preparing an order */
+.work-panel {
+  min-width: 0;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.work-panel h3, .work-panel summary { margin: 0; font-size: 1rem; font-weight: 650; }
+.work-panel summary { cursor: pointer; }
+.work-panel p, .work-panel output, #pot-context, #batch-budget { font-size: .875rem; line-height: 1.5; }
+.work-panel output { display: block; margin: 10px 0; }
+.work-fields { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,130px),1fr)); gap: 12px; margin: 12px 0; }
+.work-fields label, .work-select { display: grid; gap: 5px; font-size: .83rem; font-weight: 600; }
+.work-fields input, .work-fields select, .work-select select { width: 100%; min-width: 0; box-sizing: border-box; }
+.work-select { margin: 0 0 12px; }
+.quote-comparison p { margin: 7px 0 0; }
+.rent-tools { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 9px 0; }
+.rent-tools a { cursor: pointer; }
+.rent-layout > *, .rent-fields > *, .planner-fields > * { min-width: 0; }
+.kit-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.row-subtotal { display: block; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.calc-body .work-panel { border-color: #8792b1; }
+.calc-body .work-panel input { background: white; color: var(--ink); }
+.machine .text-action { display: flex; width: fit-content; }
+#spec-share { justify-self: start; }
+#spec-share-status:empty { margin: 0; }
+#print-sheet { display: none; }
+@media(max-width:850px) { .rent-layout { grid-template-columns: minmax(0,1fr); } }
+@media(max-width:540px) {
+  .planner-fields, .calc-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .rent-fields { grid-template-columns: minmax(0,1fr); }
+  .rent-fields input, .calc-fields input { width: 100%; min-width: 0; }
+}
+@media(max-width:460px) { .kit-grid { grid-template-columns: minmax(0,1fr); } }
+@media(max-width:380px) {
+  .planner-fields, .dim-grid, .calc-fields { grid-template-columns: minmax(0,1fr); }
+  .dialog-actions { flex-wrap: wrap; }
+}
+@media print {
+  body.printing-spec > :not(#print-sheet) { display: none !important; }
+  body.printing-spec #print-sheet { display: block; color: #000; background: #fff; font: 11pt/1.45 Arial,sans-serif; }
+  #print-sheet h1 { font-size: 19pt; }
+  #print-sheet table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+  #print-sheet th, #print-sheet td { padding: 5pt; text-align: left; border: 1px solid #777; }
+  #print-sheet tr { break-inside: avoid; }
+}

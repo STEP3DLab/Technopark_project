@@ -114,9 +114,18 @@ function orderStats() {
   ].filter(Boolean);
   const body = [isOffer ? 'Здравствуйте! Прошу подготовить коммерческое предложение и подтвердить наличие.' : 'Здравствуйте! Прошу подтвердить наличие и выставить счёт.', '', ...lines,
     '', 'Общая масса материалов: ' + mass(grams) + '.', 'Ориентир по каталогу: ' + fmt(price) + ' ₽ без доставки.', ...requirements].join('\n');
-  return {price, grams, count, body, isOffer};
+  return {price, grams, count, body, isOffer, requirements};
 }
 const targetMass = byId('target-mass');
+const planGoal = byId('plan-goal'), planPieces = byId('plan-pieces');
+if (currentUrl.searchParams.get('goal') === 'surplus') planGoal.value = 'surplus';
+const incomingPieces = Number(currentUrl.searchParams.get('pieces'));
+if (Number.isInteger(incomingPieces) && incomingPieces >= 1 && incomingPieces <= 1000000) planPieces.value = String(incomingPieces);
+let removedItem = null;
+function clearUndo() {
+  removedItem = null;
+  byId('undo-order').hidden = true;
+}
 const recipeSelect = byId('plan-material');
 const recipes = new Map();
 for (const [id, item] of catalog) {
@@ -161,7 +170,7 @@ function requestedGrams() {
   return Number.isSafeInteger(grams) && grams > 0 ? grams : 0;
 }
 function currentPlan() {
-  return leastCostPacks(recipes.get(recipeSelect.value) || [], requestedGrams());
+  return leastCostPacks(recipes.get(recipeSelect.value) || [], requestedGrams(), 1000000, planGoal.value);
 }
 function renderPlan() {
   byId('plan-share-status').replaceChildren();
@@ -177,6 +186,10 @@ function renderPlan() {
   byId('plan-price').textContent = fmt(plan.cost) + ' ₽';
   byId('plan-combination').textContent = plan.lines.map(([item, qty]) => mass(item.grams) + ' × ' + fmt(qty) + ' уп.').join(' + ');
   byId('plan-weight').textContent = mass(plan.grams) + (plan.grams === desired ? ' · точно по расчёту' : ' · остаток ' + mass(plan.grams - desired));
+  const pieces = planPieces.valueAsNumber;
+  byId('batch-budget').textContent = Number.isInteger(pieces) && pieces >= 1 && pieces <= 1000000
+    ? 'Закупка на одну отливку — ' + fmt(Math.round(plan.cost / pieces * 100) / 100) + ' ₽ при тираже ' + fmt(pieces) + ' шт. Учтены целые упаковки, включая остаток. Доставка и работа оплачиваются отдельно.'
+    : 'Введите целый тираж от 1 до 1 000 000 шт. для расчёта на одну отливку.';
   const singleCosts = options.filter(item => Math.ceil(desired / item.grams) <= 1000000)
     .map(item => Math.ceil(desired / item.grams) * item.price);
   const saving = singleCosts.length ? Math.min(...singleCosts) - plan.cost : 0;
@@ -191,6 +204,7 @@ function renderPlan() {
 byId('apply-plan').addEventListener('click', () => {
   const plan = currentPlan();
   if (!plan) return;
+  if (removedItem && recipes.get(recipeSelect.value).some(item => item.id === removedItem.id)) clearUndo();
   for (const item of recipes.get(recipeSelect.value)) { order.delete(item.id); invalidQuantities.delete(item.id); }
   for (const [item, qty] of plan.lines) order.set(item.id, qty);
   persist();
@@ -210,7 +224,8 @@ recipeSelect.addEventListener('change', () => {
 byId('share-plan').addEventListener('click', () => {
   if (!currentPlan()) return;
   const url = new URL(location.href);
-  url.search = new URLSearchParams({material:recipeSelect.value, grams:String(requestedGrams())});
+  url.search = new URLSearchParams({material:recipeSelect.value, grams:String(requestedGrams()), goal:planGoal.value});
+  if (planPieces.validity.valid && planPieces.value) url.searchParams.set('pieces',planPieces.value);
   url.hash = 'pack-calculator';
   copyText(url.href, byId('plan-share-status'), 'Ссылка на расчёт скопирована.');
 });
@@ -250,7 +265,7 @@ function updateTotals() {
     mail.removeAttribute('href');
     mail.setAttribute('aria-disabled', 'true');
   }
-  for (const id of ['copy-order','download-order','share-order']) byId(id).disabled = !valid;
+  for (const id of ['copy-order','download-order','share-order','csv-order','print-order']) byId(id).disabled = !valid;
   skuCards.forEach(card => {
     const count = order.get(card.dataset.sku) || 0;
     card.classList.toggle('in-order', count > 0);
@@ -273,6 +288,9 @@ function renderOrder() {
     row.className = 'order-row';
     const title = document.createElement('strong');
     title.textContent = item.name + ' · ' + mass(item.grams);
+    const subtotal = document.createElement('span');
+    subtotal.className = 'row-subtotal';
+    subtotal.textContent = invalidQuantities.has(id) ? '—' : fmt(item.price * qty) + ' ₽';
     const line = document.createElement('div');
     const label = document.createElement('label');
     label.textContent = 'Упаковок ';
@@ -294,6 +312,7 @@ function renderOrder() {
       const valid = Number.isInteger(number) && number >= 1 && number <= 1000000;
       field.setAttribute('aria-invalid', String(!valid));
       error.hidden = valid;
+      subtotal.textContent = valid ? fmt(item.price * number) + ' ₽' : '—';
       if (valid) {
         invalidQuantities.delete(id);
         order.set(id, number);
@@ -310,14 +329,16 @@ function renderOrder() {
     remove.setAttribute('aria-label', 'Убрать '+title.textContent);
     remove.addEventListener('click', () => {
       const rowIndex = Array.from(order.keys()).indexOf(id);
+      removedItem = {id, qty:order.get(id), index:rowIndex};
+      byId('undo-order').hidden = false;
       invalidQuantities.delete(id);
       order.delete(id); persist(); renderOrder();
       byId('basket-status').textContent = item.name + ' удалён из списка.';
       const buttons = container.querySelectorAll('button');
-      const next = buttons[Math.min(rowIndex, buttons.length - 1)] || byId('order-title');
+      const next = buttons[Math.min(rowIndex, buttons.length - 1)] || byId('undo-order');
       next.focus();
     });
-    line.append(label, remove); row.append(title,line,error); container.append(row);
+    line.append(label, remove); row.append(title,subtotal,line,error); container.append(row);
   }
   updateTotals();
 }
@@ -326,6 +347,7 @@ skuCards.forEach(card => card.querySelector('.add-sku').addEventListener('click'
   const count = order.get(id) || 0;
   const packs = requiredPacks(catalog.get(id));
   if (!packs || count + packs > 1000000) return;
+  if (removedItem?.id === id) clearUndo();
   order.set(id, count + packs); persist(); renderOrder();
   byId('basket-status').textContent = 'Добавлено: ' + catalog.get(id).name + ', ' + mass(catalog.get(id).grams) + '.';
   record('sku_added', id);
@@ -345,6 +367,7 @@ for (const id of ['quote-type','quote-method','quote-city','quote-company','quot
   });
 }
 function restore(encoded) {
+  clearUndo();
   invalidQuantities.clear();
   order.clear();
   readList(encoded).forEach((qty, id) => order.set(id, qty));
@@ -356,6 +379,8 @@ if (gramsFromCalculator > 0 && Number.isSafeInteger(gramsFromCalculator)) {
   byId('pack-calculator').open = true;
 }
 targetMass.addEventListener('input', updateTotals);
+planGoal.addEventListener('change', renderPlan);
+planPieces.addEventListener('input', renderPlan);
 if (sharedList) restore(currentUrl.searchParams.get('list'));
 else {
   let stored = '';
@@ -366,3 +391,55 @@ else {
   });
 }
 presentCatalog();
+
+byId('undo-order').addEventListener('click', () => {
+  if (!removedItem || order.has(removedItem.id)) return;
+  const {id,qty,index} = removedItem;
+  const entries = Array.from(order);
+  entries.splice(Math.min(index,entries.length),0,[id,qty]);
+  order.clear();
+  entries.forEach(([key,value]) => order.set(key,value));
+  clearUndo();
+  persist();
+  renderOrder();
+  byId('basket-status').textContent = catalog.get(id).name + ' возвращён в список.';
+  document.querySelectorAll('#order-items input')[Array.from(order.keys()).indexOf(id)]?.focus();
+});
+const tableHead = ['Материал','Масса упаковки, г','Цена упаковки, ₽','Количество, уп.','Сумма, ₽'];
+function purchaseRows() {
+  return Array.from(order, ([id, qty]) => {
+    const item = catalog.get(id);
+    return [item.name,item.grams,item.price,qty,item.price*qty];
+  });
+}
+byId('csv-order').addEventListener('click', () => {
+  if (!order.size || invalidQuantities.size) return;
+  const rows = [tableHead,...purchaseRows(),['Итого','','',orderStats().count,orderStats().price]];
+  const csv = rows.map(row => row.map(value => '"' + String(value).replace(/"/g,'""') + '"').join(';')).join('\r\n');
+  downloadText('Mylco-zakupka.csv',csv,'text/csv;charset=utf-8');
+});
+function printSpec() {
+  if (!order.size || invalidQuantities.size) return;
+  const sheet = byId('print-sheet'), stats = orderStats();
+  const element = (tag,value) => {
+    const node = document.createElement(tag);
+    node.textContent = value;
+    return node;
+  };
+  const table = document.createElement('table');
+  const tr = table.createTHead().insertRow();
+  tableHead.forEach(value => tr.append(element('th',value)));
+  const tbody = table.createTBody();
+  for (const data of purchaseRows()) {
+    const row = tbody.insertRow();
+    data.forEach(value => row.append(element('td',value)));
+  }
+  sheet.replaceChildren(element('h1','МылКо · Спецификация материалов'),element('p',new Date().toLocaleDateString('ru-RU') + ' · ' + (stats.isOffer ? 'Запрос КП' : 'Запрос счёта')),table,
+    element('p','Итого: ' + fmt(stats.count) + ' уп., ' + mass(stats.grams) + ', ' + fmt(stats.price) + ' ₽ без доставки.'),
+    ...stats.requirements.map(line => element('p',line)),element('p','Ориентир по каталогу. Наличие и стоимость подтвердит мастерская. Заказы: order@mylco.ru.'));
+  sheet.hidden = false;
+  document.body.classList.add('printing-spec');
+  window.print();
+}
+byId('print-order').addEventListener('click', printSpec);
+window.addEventListener('afterprint', () => { document.body.classList.remove('printing-spec'); byId('print-sheet').hidden = true; });

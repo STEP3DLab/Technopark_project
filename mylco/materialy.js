@@ -70,15 +70,20 @@ function presentCatalog() {
 }
 groupButtons.forEach(button => button.addEventListener('click', () => {
   activeGroup = button.dataset.family;
+  if (catalogLinked && activeGroup !== 'all' && recipes.get(recipeSelect.value)[0].group !== activeGroup) {
+    catalogLinked = false;
+    queryField.value = '';
+  }
   const url = new URL(location.href);
   if (activeGroup === 'all') url.searchParams.delete('group');
   else url.searchParams.set('group', activeGroup);
   history.replaceState(null, '', url);
   presentCatalog();
 }));
-queryField.addEventListener('input', presentCatalog);
+queryField.addEventListener('input', () => { catalogLinked = false; presentCatalog(); });
 sorting.addEventListener('change', presentCatalog);
 byId('reset-skus').addEventListener('click', () => {
+  catalogLinked = false;
   queryField.value = '';
   sorting.value = 'original';
   groupButtons[0].click();
@@ -100,12 +105,85 @@ function orderStats() {
   return {price, grams, count, body};
 }
 const targetMass = byId('target-mass');
-function requiredPacks(item) {
+const recipeSelect = byId('plan-material');
+const recipes = new Map();
+for (const [id, item] of catalog) {
+  item.id = id;
+  const recipe = item.card.dataset.recipe;
+  if (!recipes.has(recipe)) recipes.set(recipe, []);
+  recipes.get(recipe).push(item);
+}
+for (const [id, items] of recipes) recipeSelect.add(new Option(items[0].name, id));
+const linkedRecipe = currentUrl.searchParams.get('material');
+let catalogLinked = recipes.has(linkedRecipe);
+if (catalogLinked) {
+  recipeSelect.value = linkedRecipe;
+  queryField.value = recipes.get(linkedRecipe)[0].name;
+  byId('pack-calculator').open = true;
+}
+function requestedGrams() {
   const raw = targetMass.value.trim().replace(',', '.');
-  if (!raw) return 1;
-  if (!/^\d+(?:\.\d*)?$/.test(raw)) return 0;
-  const g = Math.round(Number(raw) * 1000000) / 1000;
-  const n = Math.ceil(g / item.grams);
+  if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw)) return 0;
+  // Round upwards to whole grams so a displayed combination always covers the request.
+  const grams = Math.ceil(Number((Number(raw) * 1000).toPrecision(14)));
+  return Number.isSafeInteger(grams) && grams > 0 ? grams : 0;
+}
+function currentPlan() {
+  return leastCostPacks(recipes.get(recipeSelect.value) || [], requestedGrams());
+}
+function renderPlan() {
+  byId('plan-share-status').replaceChildren();
+  const desired = requestedGrams();
+  const options = recipes.get(recipeSelect.value);
+  const plan = currentPlan();
+  const output = byId('plan-result');
+  output.hidden = !plan;
+  byId('plan-hint').textContent = plan || !targetMass.value.trim() ? '' :
+    desired ? 'Такой объём превышает лимит списка. Уточните условия оптовой закупки у мастерской.' :
+    'Введите положительную массу, например 6,03.';
+  if (!plan) return;
+  byId('plan-price').textContent = fmt(plan.cost) + ' ₽';
+  byId('plan-combination').textContent = plan.lines.map(([item, qty]) => mass(item.grams) + ' × ' + fmt(qty) + ' уп.').join(' + ');
+  byId('plan-weight').textContent = mass(plan.grams) + (plan.grams === desired ? ' · точно по расчёту' : ' · остаток ' + mass(plan.grams - desired));
+  const singleCosts = options.filter(item => Math.ceil(desired / item.grams) <= 1000000)
+    .map(item => Math.ceil(desired / item.grams) * item.price);
+  const saving = singleCosts.length ? Math.min(...singleCosts) - plan.cost : 0;
+  byId('plan-saving').textContent = saving > 0 ? 'На ' + fmt(saving) + ' ₽ дешевле самого выгодного варианта из упаковок одного размера.' : '';
+  const desiredCounts = new Map(plan.lines.map(([item, qty]) => [item.id, qty]));
+  const applied = options.every(item => (order.get(item.id) || 0) === (desiredCounts.get(item.id) || 0));
+  const alreadyInOrder = options.some(item => order.has(item.id));
+  const button = byId('apply-plan');
+  button.disabled = applied;
+  button.textContent = applied ? 'Набор уже в списке' : alreadyInOrder ? 'Обновить фасовки ' + options[0].name + ' в списке' : 'Добавить набор в список';
+}
+byId('apply-plan').addEventListener('click', () => {
+  const plan = currentPlan();
+  if (!plan) return;
+  for (const item of recipes.get(recipeSelect.value)) order.delete(item.id);
+  for (const [item, qty] of plan.lines) order.set(item.id, qty);
+  persist();
+  renderOrder();
+  byId('basket-status').textContent = 'Список обновлён. ' + recipes.get(recipeSelect.value)[0].name + ' — ' + mass(plan.grams) + '.';
+  record('pack_plan_added', recipeSelect.value);
+});
+recipeSelect.addEventListener('change', () => {
+  if (catalogLinked) {
+    queryField.value = recipes.get(recipeSelect.value)[0].name;
+    activeGroup = 'all';
+    presentCatalog();
+  }
+  renderPlan();
+});
+byId('share-plan').addEventListener('click', () => {
+  if (!currentPlan()) return;
+  const url = new URL(location.href);
+  url.search = new URLSearchParams({material:recipeSelect.value, grams:String(requestedGrams())});
+  url.hash = 'pack-calculator';
+  copyText(url.href, byId('plan-share-status'), 'Ссылка на расчёт скопирована.');
+});
+function requiredPacks(item) {
+  if (!targetMass.value.trim()) return 1;
+  const n = Math.ceil(requestedGrams() / item.grams);
   return n > 0 && n <= 1000000 ? n : 0;
 }
 let basketVisible = false;
@@ -127,6 +205,7 @@ function updateTotals() {
   byId('order-weight').textContent = mass(stats.grams);
   byId('mobile-sum').textContent = fmt(stats.price) + ' ₽';
   showMobileOrder();
+  renderPlan();
   byId('order-mail').href = emailDraft('Запрос счёта на материалы МылКо', stats.body);
   skuCards.forEach(card => {
     const count = order.get(card.dataset.sku) || 0;

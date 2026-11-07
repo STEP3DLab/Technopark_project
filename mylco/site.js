@@ -46,9 +46,10 @@ taskButtons.forEach(button => button.addEventListener('click', () => {
   byId('pick-category').href = shop + topic.url;
   byId('pick-help').dataset.brief = topic.brief;
   const compare = byId('pick-compare');
-  const groups = {form:'silicone', cast:'plastic', clear:'epoxy'};
-  compare.href = selectedTask === 'vacuum' ? 'kamery.html' : 'materialy.html?group=' + groups[selectedTask];
-  compare.textContent = selectedTask === 'vacuum' ? 'Сравнить камеры' : 'Цены и фасовки';
+  const goals = {form:'gypsum', cast:'part'};
+  compare.href = selectedTask === 'vacuum' ? 'kamery.html' : selectedTask === 'clear' ? shop + topic.url : 'podbor.html?task=' + goals[selectedTask] + '#guide-tasks';
+  compare.textContent = selectedTask === 'vacuum' ? 'Сравнить камеры' : selectedTask === 'clear' ? 'Смолы для заливки' : 'Сравнить составы';
+  compare.hidden = selectedTask === 'clear';
   record('task_selected', selectedTask);
 }));
 
@@ -102,6 +103,20 @@ function chooseService(key) {
   byId('request-context').textContent = '';
 }
 chooseService(currentService);
+const consultation = new Map([
+  ['alcorsil-20', 'Alcorsil 20 для гибкой формы'],
+  ['mold-star-15', 'Mold Star 15 Slow для формы со сложным рельефом'],
+  ['vytaflex-60', 'VytaFlex 60 для формы под бетон'],
+  ['caspol-one', 'Caspol ONE для жёсткой отливки'],
+  ['tarbender', 'Tarbender для прозрачного покрытия'],
+  ['epoxacoat-ht', 'EpoxAcoat HT для покрытия оснастки']
+]).get(new URL(location.href).searchParams.get('consult'));
+if (consultation) {
+  chooseService('material');
+  contextLine = 'Прошу помочь с подбором материала. Рассматриваю ' + consultation + '.';
+  project.required = false;
+  byId('request-context').textContent = contextLine;
+}
 service.addEventListener('change', () => chooseService(service.value));
 document.querySelectorAll('[data-brief]').forEach(link => link.addEventListener('click', () => {
   chooseService(link.dataset.brief);

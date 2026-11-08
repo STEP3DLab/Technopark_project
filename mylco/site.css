@@ -192,3 +192,6 @@ dialog {width:min(520px,calc(100% - 28px));max-height:90dvh;overflow:auto;paddin
   .workshop-routes small { margin-top: 4px; font-size: 11px; }
   .workshop-routes .ic { display: none; }
 }
+.hero-art figcaption a { display:inline-flex;align-items:center;min-height:32px;padding:0 4px; }
+.hero-art figcaption:has(a) { padding-block:2px; }
+.hero-art figcaption a:hover { text-decoration:underline;text-underline-offset:3px; }

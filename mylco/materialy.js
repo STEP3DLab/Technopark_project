@@ -107,6 +107,7 @@ function orderStats() {
   const company = byId('quote-company').value.trim();
   const deadline = byId('quote-deadline').value.trim();
   const requirements = [
+    currentUrl.searchParams.get('via') === 'first-mold' ? 'Подборка: первая силиконовая форма для гипса.' : '',
     method === 'pickup' ? 'Получение: самовывоз в Москве.' : '',
     method === 'delivery' ? 'Получение: доставка' + (city ? ' в город ' + city : '') + '.' : '',
     company ? 'Организация: ' + company : '',

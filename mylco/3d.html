@@ -9,7 +9,7 @@
     <p class="eyebrow"><span class="dot"></span> МылКо × STEP 3D</p>
     <h1 id="model-title">3D-модель<br>или <em>копия детали</em></h1>
     <p class="intro-text">Восстановим геометрию по образцу, построим модель по чертежу или напечатаем деталь из вашего файла.</p>
-    <a class="btn orange" href="#tasks">Выбрать задачу <svg class="ic" aria-hidden="true"><use href="#ic-down"/></svg></a>
+    <div class="model-hero-actions"><a class="btn orange" href="#tasks">Выбрать задачу <svg class="ic" aria-hidden="true"><use href="#ic-down"/></svg></a><a class="text-action" href="#portfolio">Посмотреть работы ↓</a></div>
   </div><figure class="model-visual"><img src="assets/part-rebuild.webp" width="1100" height="825" fetchpriority="high" alt="Иллюстрация: повреждённый корпус подшипника и его восстановленная печатная копия"><figcaption>Образец и печатная копия · иллюстрация</figcaption></figure></section>
   <section id="tasks" class="model-tasks" aria-labelledby="task-heading"><h2 id="task-heading">С чего начнём?</h2>
   <div class="route-cards">
@@ -17,6 +17,22 @@
     <article><h3>Есть 3D-файл</h3><p>Оценим печать прототипа, технической детали или мастер-модели для снятия формы.</p><dl><dt>Для оценки</dt><dd>Файл, количество экземпляров и назначение детали.</dd></dl><a class="text-action" href="?job=print#brief" data-job="print">Напечатать по файлу →</a></article>
     <article><h3>Есть чертёж или эскиз</h3><p>Построим цифровую модель с заданными размерами. При необходимости оценим печать.</p><dl><dt>Для оценки</dt><dd>Эскиз с размерами и отметками важных поверхностей.</dd></dl><a class="text-action" href="?job=drawing#brief" data-job="drawing">Заказать модель по эскизу →</a></article>
   </div></section>
+  <section class="casebook" id="portfolio" aria-labelledby="case-heading">
+    <header class="casebook-head"><div><p class="eyebrow"><span class="dot"></span> Портфолио STEP 3D</p><h2 id="case-heading">От образца <em>к модели</em></h2></div>
+    <a class="btn outlined small" href="files/step3d-portfolio.pdf" data-event="portfolio_pdf">Открыть PDF · 2 страницы <svg class="ic" aria-hidden="true"><use href="#ic-file"/></svg></a></header>
+    <div class="reverse-cases">
+      <article class="reverse-case"><figure><img src="assets/step3d/gear.webp" width="650" height="650" loading="lazy" alt="Иллюстрация зубчатого колеса с центральным посадочным отверстием"><figcaption>Иллюстрация типа детали</figcaption></figure><div><h3>Шестерня редуктора</h3><p>Исходником послужила изношенная шестерня. Команда оцифровала образец и восстановила геометрию зубчатого колеса.</p><p class="case-output"><strong>Результат</strong> Цифровая модель для повторного изготовления.</p></div></article>
+      <article class="reverse-case"><figure><img src="assets/step3d/impeller.webp" width="650" height="650" loading="lazy" alt="Иллюстрация крыльчатки с изогнутыми лопатками"><figcaption>Иллюстрация типа детали</figcaption></figure><div><h3>Крыльчатка насоса</h3><p>Когда оригинальную запчасть стало трудно достать, по скану крыльчатки построили параметрическую модель.</p><p class="case-output"><strong>Результат</strong> Модель STEP, контрольная сетка STL и отчёт об отклонениях.</p></div></article>
+    </div>
+    <article class="print-story"><div class="story-text"><p class="eyebrow">3D-сканирование и печать</p><h3>Сценический костюм Анны Плетнёвой</h3><p>Фигуру оцифровали, по скану спроектировали ажурные модули. Напечатанные детали примерили и соединили в костюм.</p><a class="source-link" href="https://t.me/STEP_3D_Lab/344">Публикация команды ↗</a></div>
+      <div class="process-photos" aria-label="Фотографии проекта из архива STEP 3D">
+        <figure><img src="assets/step3d/modules.webp" alt="Отдельные зелёные и белые печатные модули костюма" width="540" height="720" loading="lazy"><figcaption>Печатные модули</figcaption></figure>
+        <figure><img src="assets/step3d/assembly.webp" alt="Шнуровка соединяет ажурные панели на примерке" width="540" height="720" loading="lazy"><figcaption>Соединение деталей</figcaption></figure>
+        <figure><img src="assets/step3d/costume.webp" alt="Собранные панели костюма с зелёными плечевыми элементами на манекене до финишной отделки" width="540" height="720" loading="lazy"><figcaption>Сборка до отделки</figcaption></figure>
+      </div>
+    </article>
+    <div class="casebook-foot"><p><strong>Корпуса для электроники.</strong> Для модулей системы мониторинга STEP 3D изготовили малую серию корпусов из ABS. Крепления спроектировали под сборку электронного модуля.</p><a class="text-action" href="#brief">Обсудить свою задачу →</a></div>
+  </section>
   <section class="model-formats" aria-labelledby="format-title"><div><h2 id="format-title">Что будет на выходе?</h2><a class="source-link" href="https://mylco.ru/reversivnyj-inzhenering/reversivnyj-inzhiniring">Форматы в каталоге ↗</a></div>
   <dl><div><dt>Скан поверхности</dt><dd>STL для передачи формы образца</dd></div><div><dt>Редактируемая модель</dt><dd>STEP или IPT для дальнейшего изменения геометрии</dd></div><div><dt>Чертёж</dt><dd>DWG или PDF для передачи размеров</dd></div><div><dt>Печатная деталь</dt><dd>Физический экземпляр для примерки или мастер-модель для формы</dd></div></dl></section>
 <section class="section enquiry" id="brief"><div><h2 id="brief-title" tabindex="-1"><span id="brief-lead">Обсудим</span><br><em id="brief-accent">вашу задачу?</em></h2><p id="brief-intro">Опишите изделие или оборудование. Составим запрос, к которому можно приложить фото, чертёж или список закупки.</p><a class="brief-phone" href="tel:+74950058314" data-event="call"><svg class="ic" aria-hidden="true"><use href="#ic-phone"/></svg> +7 (495) 005-83-14</a><p class="price-note">Печать — от 1 000 ₽. Итоговую стоимость и срок мастерская уточнит по материалам заявки. <a href="https://mylco.ru/3d-pechat-1/3d-pechat-pod-zakaz">Условия печати ↗</a></p></div><form id="enquiry-form" class="formbox"><select id="service" aria-label="Услуга" hidden><option value="model">3D и мастер-модель</option></select><p id="request-context" aria-live="polite"></p><fieldset id="model-fields" class="model-fields" disabled hidden>

@@ -176,3 +176,14 @@
 .model-extras label span { color:var(--muted);font-weight:400; }
 .model-extras input { display:block;width:100%;min-width:0;margin-top:5px; }
 #model-link { font-weight:400; }
+
+.casting-example { display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1fr);align-items:center;gap:clamp(20px,3vw,48px);margin:0 0 28px;padding:clamp(14px,1.8vw,25px);background:#eeefe7;border-radius:22px; }
+.casting-example figure { position:relative;margin:0; }
+.casting-example img { width:100%;height:auto;max-height:245px;object-fit:cover;border-radius:12px;display:block; }
+.casting-example figcaption { position:absolute;left:8px;bottom:8px;padding:4px 8px;border-radius:9px;font-size:11px;line-height:1.4;color:var(--ink);background:#fffdf6ed; }
+.casting-example .eyebrow { margin:0 0 8px; }
+.casting-example h2 { margin:0;font-size:clamp(25px,2.8vw,40px);line-height:1.1;letter-spacing:-.05em; }
+.casting-example h2+p { max-width:580px;margin:12px 0 16px;font-size:15px;line-height:1.55;color:var(--muted); }
+.casting-actions { display:flex;gap:12px 18px;align-items:center;flex-wrap:wrap; }
+#sku-grid { scroll-margin-top:100px; }
+@media(max-width:650px) { .casting-example { grid-template-columns:1fr;gap:15px; }.casting-example img { max-height:230px; }.casting-example h2+p { font-size:14px; } }

@@ -1,0 +1,28 @@
+.model-page .breadcrumbs { margin-bottom:clamp(20px,3vw,46px); flex-wrap:wrap; }
+.model-hero { display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);align-items:center;gap:clamp(24px,5vw,80px); }
+.model-headline h1 { margin:18px 0; font-size:clamp(48px,5.8vw,88px); line-height:.99; }
+.model-headline .intro-text { max-width:440px; }
+.model-headline .btn { margin-top:23px; }
+.model-visual { position:relative;overflow:hidden;border-radius:24px;background:#eeeae3; }
+.model-visual img { width:100%;height:auto;aspect-ratio:4/3;object-fit:cover; }
+.model-visual figcaption { position:absolute;left:14px;bottom:14px;font-size:11px;line-height:1.4;background:#faf9f6f5;color:var(--ink);border-radius:20px;padding:6px 11px; }
+.model-tasks,.model-formats { margin-top:clamp(40px,6vw,86px); }
+.model-page h2 {font-size:clamp(30px,3.5vw,54px);line-height:1.05;letter-spacing:-.055em; }
+.route-cards { margin-top:23px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px; }
+.route-cards article { display:flex;flex-direction:column;padding:clamp(18px,2vw,30px);border:1px solid var(--line);background:#fff;border-radius:18px; }
+.route-cards h3 {font-size:clamp(21px,1.8vw,29px);line-height:1.12;letter-spacing:-.045em; }
+.route-cards article>p,.route-cards dd,.model-formats dd,.price-note { color:var(--muted);font-size:14px;line-height:1.55; }
+.route-cards article>p {margin:12px 0 0; }
+.route-cards dl { border-top:1px solid var(--line);padding-top:13px;margin:17px 0; }
+.route-cards dt { font-weight:650;font-size:13px;margin-bottom:4px; }
+.route-cards dd,.model-formats dl,.model-formats dd {margin:0; }
+.route-cards .text-action {margin-top:auto;color:var(--blue);line-height:1.35; }
+.model-formats { display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(25px,4vw,66px);background:#efeee8;border-radius:20px;padding:clamp(20px,3vw,43px); }
+.model-formats h2 {margin:0 0 14px; }
+.model-formats dl>div {display:grid;grid-template-columns:1fr 1.4fr;gap:15px;padding:11px 0;border-bottom:1px solid #cacac2; }
+.model-formats dl>div:last-child {border-bottom:0;}
+.model-formats dt {font-weight:630;font-size:14px; }
+.model-page .price-note {max-width:390px;margin-top:22px;}
+.price-note a {text-decoration:underline;text-underline-offset:3px;color:var(--blue);}
+@media(max-width:780px){.model-hero,.model-formats{grid-template-columns:1fr}.model-hero{gap:23px}.model-headline h1{font-size:clamp(44px,9vw,65px)}.model-headline .intro-text{max-width:540px}.model-visual img{max-height:400px}.route-cards{grid-template-columns:1fr;gap:9px}.model-formats{gap:10px}.route-cards article{padding:19px}.route-cards dl{margin:12px 0}.model-formats dl>div{grid-template-columns:1fr 1.3fr}}
+@media(max-width:370px){.model-formats dl>div{grid-template-columns:1fr;gap:3px}.model-visual figcaption{font-size:10px;left:9px;bottom:9px}}

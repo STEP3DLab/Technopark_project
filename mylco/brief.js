@@ -1,0 +1,169 @@
+'use strict';
+
+const serviceInfo = {
+  material: { placeholder:'Что хотите отлить, какого размера образец и сколько копий нужно?', label:'Размеры и тираж', example:'Например, 12 × 8 см, 20 шт.', hint:'Если есть фото образца, приложите его к готовому письму.' },
+  rental: { placeholder:'Что будете дегазировать? Каковы размеры рабочей ёмкости?', label:'Даты аренды', example:'Например, с 12 по 14 ноября', hint:'В письме можно указать удобное время получения камеры.' },
+  custom: { placeholder:'Опишите материал, рабочую ёмкость и как часто планируете пользоваться камерой.', label:'Объём или внутренние размеры', example:'Например, 30 л или Ø 300 × 400 мм', hint:'Чертёж или фото ёмкости можно приложить к письму.' },
+  model: { placeholder:'Например, восстановить крепёжное ушко корпуса и сохранить расстояние между отверстиями.', label:'Габариты и важные размеры', example:'Например, корпус 80 × 45 × 20 мм, между отверстиями 60 мм', hint:'Фотографии и файлы можно приложить в почте перед отправкой.' },
+  b2b: { placeholder:'Перечислите нужные позиции и количества. На кого подготовить предложение?', label:'Город и желаемый срок', example:'Например, Москва, до 25 ноября', hint:'Спецификацию и реквизиты можно приложить к письму.' },
+  weld: { placeholder:'Что нужно сварить? Укажите материал и размеры заготовки.', label:'Размеры и срок', example:'Например, рама 60 × 40 см, к концу месяца', hint:'Фото или чертёж удобно приложить к готовому письму.' }
+};
+
+const service = byId('service'), detail = byId('extra'), project = byId('project');
+const serviceDrafts = new Map();
+let currentService = service.value;
+let contextLine = '';
+const modelSource = byId('model-source');
+const modelResult = byId('model-result'), modelQty = byId('model-qty');
+const physicalResult = () => ['print','both'].includes(modelResult.value);
+const modelJobs = {
+  restore:{source:'sample', result:'both'},
+  print:{source:'file', result:'print'},
+  drawing:{source:'drawing', result:'cad'}
+};
+const modelHints = {
+  sample: 'Для оценки приложите к письму фото с линейкой. Отметьте утраченные элементы и размеры, которые важно сохранить.',
+  file: 'Укажите формат файла, габариты, тираж и назначение детали. Файл или ссылку можно приложить к письму.',
+  drawing: 'Укажите габариты и количество. К готовому письму приложите эскиз или чертёж с основными размерами.'
+};
+function showModelTip() {
+  byId('model-tip').textContent = modelHints[modelSource.value];
+  byId('model-qty-field').hidden = !physicalResult();
+  modelQty.disabled = !physicalResult();
+  modelQty.required = physicalResult();
+}
+modelSource.addEventListener('change', showModelTip);
+modelResult.addEventListener('change', showModelTip);
+showModelTip();
+function chooseService(key) {
+  serviceDrafts.set(currentService, {description:project.value, extra:detail.value, context:contextLine});
+  const previous = serviceDrafts.get(key);
+  currentService = key;
+  service.value = key;
+  byId('model-fields').hidden = key !== 'model';
+  byId('model-fields').disabled = key !== 'model';
+  const info = serviceInfo[key];
+  byId('extra-label').textContent = info.label + ' · необязательно';
+  detail.placeholder = info.example;
+  detail.value = previous?.extra || '';
+  project.value = previous?.description || '';
+  project.placeholder = info.placeholder;
+  byId('service-hint').textContent = info.hint;
+  contextLine = previous?.context || '';
+  project.required = !contextLine;
+  const headings = {model:['Расчёт', '3D-заказа'], b2b:['Запросить', 'КП']};
+  const [lead, accent] = headings[key] || ['Обсудим', 'вашу задачу?'];
+  byId('brief-lead').textContent = lead;
+  byId('brief-accent').textContent = accent;
+  const photo = byId('brief-photo');
+  if (photo) photo.hidden = key !== 'model';
+  byId('brief-intro').textContent = key === 'model'
+    ? 'Укажите, что уже есть и какой результат нужен. По размерам и количеству мастерская сможет оценить работу.'
+    : key === 'b2b' ? 'Укажите позиции и количества. Если спецификация уже готова, приложите её к письму.'
+    : 'Опишите изделие или оборудование. К подготовленному письму можно приложить фото, чертёж или список закупки.';
+  project.setCustomValidity('');
+  byId('request-context').textContent = contextLine;
+}
+function setRequestContext(message) {
+  contextLine = message;
+  project.required = !message;
+  project.setCustomValidity('');
+  byId('request-context').textContent = message;
+}
+const selectedService = new URL(location.href).searchParams.get('service');
+chooseService([...service.options].some(option => option.value === selectedService) ? selectedService : currentService);
+const consultation = new Map([
+  ['alcorsil-20', 'Alcorsil 20 для гибкой формы'],
+  ['mold-star-15', 'Mold Star 15 Slow для формы со сложным рельефом'],
+  ['vytaflex-60', 'VytaFlex 60 для формы под бетон'],
+  ['caspol-one', 'Caspol ONE для жёсткой отливки'],
+  ['tarbender', 'Tarbender для прозрачного покрытия'],
+  ['epoxacoat-ht', 'EpoxAcoat HT для покрытия оснастки']
+]).get(new URL(location.href).searchParams.get('consult'));
+if (consultation && [...service.options].some(option => option.value === 'material')) {
+  chooseService('material');
+  contextLine = 'Прошу помочь с подбором материала. Рассматриваю ' + consultation + '.';
+  project.required = false;
+  byId('request-context').textContent = contextLine;
+}
+const machine = new Map([['mt9','MT 9 без насоса'], ['mt9m','MT9M/2S с насосом ZenSen 2S']]).get(new URL(location.href).searchParams.get('equipment'));
+if (machine && [...service.options].some(option => option.value === 'b2b')) {
+  chooseService('b2b');
+  contextLine = 'Прошу подтвердить наличие и стоимость камеры ' + machine + ' и сообщить условия получения.';
+  project.required = false;
+  byId('request-context').textContent = contextLine;
+}
+service.addEventListener('change', () => chooseService(service.value));
+function applyJob(key) {
+  if (!Object.hasOwn(modelJobs,key)) return;
+  modelSource.value = modelJobs[key].source;
+  modelResult.value = modelJobs[key].result;
+  showModelTip();
+}
+applyJob(new URL(location.href).searchParams.get('job'));
+document.querySelectorAll('[data-job]').forEach(link => link.addEventListener('click', event => {
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  applyJob(link.dataset.job);
+  if (link.href !== location.href) history.pushState(null,'',link.href);
+  byId('brief-title').focus({preventScroll:true});
+  byId('brief').scrollIntoView();
+  record('model_task_selected',link.dataset.job);
+}));
+window.addEventListener('popstate', () => applyJob(new URL(location.href).searchParams.get('job')));
+
+const dialog = byId('draft');
+let lastSubmit = null;
+byId('enquiry-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const description = project.value.trim();
+  if (!contextLine && description.length < 3) {
+    project.setCustomValidity('Напишите несколько слов о задаче.');
+    project.reportValidity();
+    return;
+  }
+  const isModel = service.value === 'model';
+  const modelSubject = physicalResult() ? 'Расчёт 3D-печати' : 'Расчёт цифровой модели или чертежа';
+  const subject = 'МылКо — ' + (isModel ? modelSubject : service.options[service.selectedIndex].text);
+  const recipient = isModel && physicalResult() ? 'mylco@inbox.ru' : 'order@mylco.ru';
+  const modelLines = isModel ? [
+    'Исходный материал: ' + modelSource.selectedOptions[0].text,
+    'Нужный результат: ' + modelResult.selectedOptions[0].text,
+    physicalResult() ? 'Количество экземпляров: ' + modelQty.value + ' шт.' : '',
+    byId('model-link').value.trim() ? 'Исходные материалы: ' + byId('model-link').value.trim() : ''
+  ] : [];
+  const lines = ['Здравствуйте!', '', subject, contextLine, ...modelLines, description, detail.value.trim() ? serviceInfo[service.value].label + ': ' + detail.value.trim() : ''].filter((line, index) => index === 1 || line);
+  const body = lines.join('\n');
+  byId('draft-text').value = body;
+  byId('draft-recipient').textContent = recipient;
+  byId('send-mail').href = 'mailto:' + recipient + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  byId('copy-status').textContent = '';
+  lastSubmit = event.submitter;
+  dialog.showModal();
+  record('brief_prepared', service.value);
+});
+project.addEventListener('input', () => project.setCustomValidity(''));
+byId('close-draft').addEventListener('click', () => dialog.close());
+dialog.addEventListener('click', event => {
+  if (event.target !== dialog) return;
+  const rect = dialog.getBoundingClientRect();
+  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+});
+dialog.addEventListener('close', () => lastSubmit?.focus({preventScroll:true}));
+byId('send-mail').addEventListener('click', () => record('mail_opened', service.value));
+byId('copy-draft').addEventListener('click', async () => {
+  const field = byId('draft-text');
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(field.value);
+    copied = true;
+  } catch {
+    field.focus();
+    field.select();
+    try { copied = document.execCommand('copy'); } catch { /* The text is selected for manual copying. */ }
+  }
+  byId('copy-status').textContent = copied ? 'Текст скопирован. Адрес для отправки — ' + byId('draft-recipient').textContent : 'Текст выделен. Используйте команду «Копировать».';
+  if (copied) record('brief_copied', service.value);
+});
+
+byId('draft-save').addEventListener('click', () => downloadText('Mylco-zapros.txt', byId('draft-text').value));

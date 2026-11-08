@@ -54,3 +54,15 @@
 @media(max-width:1000px) and (min-width:701px) { .reverse-case { grid-template-columns:1fr; }.reverse-case img { max-height:275px;object-fit:cover; } }
 @media(max-width:700px) { .reverse-cases,.print-story { grid-template-columns:1fr; }.casebook-foot { align-items:start;flex-direction:column;gap:12px; }.reverse-case { grid-template-columns:minmax(110px,.6fr) minmax(0,1fr); }.casebook-head { gap:14px; }.model-hero-actions { gap:14px; }.process-photos figcaption { font-size:11px; } }
 @media(max-width:400px) { .reverse-case { grid-template-columns:1fr; }.reverse-case figure { max-width:210px; }.print-story { padding:16px; }.process-photos { gap:5px; } }
+
+.casebook .case-enquiry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--blue);
+}
+.story-text .case-enquiry { display: flex; width: fit-content; }

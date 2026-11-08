@@ -4,7 +4,7 @@ const skuCards = Array.from(document.querySelectorAll('.sku'));
 const catalog = new Map(skuCards.map(card => [card.dataset.sku, {
   card, name:card.dataset.name, grams:Number(card.dataset.grams),
   price:Number(card.dataset.price), group:card.dataset.family,
-  url:card.querySelector('.source-link').href
+  url:card.querySelector('.buy-sku').href
 }]));
 const groupButtons = Array.from(document.querySelectorAll('[data-family][aria-pressed]'));
 const uiNumber = new Intl.NumberFormat('ru-RU', {maximumFractionDigits:3});
@@ -141,7 +141,7 @@ let catalogLinked = recipes.has(linkedRecipe);
 if (catalogLinked) {
   recipeSelect.value = linkedRecipe;
   queryField.value = recipes.get(linkedRecipe)[0].name;
-  byId('pack-calculator').open = true;
+  byId('pack-calculator').open = currentUrl.hash !== '#sku-grid';
   if (activeGroup !== 'all' && recipes.get(linkedRecipe)[0].group !== activeGroup) {
     catalogLinked = false;
     queryField.value = '';

@@ -142,3 +142,53 @@ dialog {width:min(520px,calc(100% - 28px));max-height:90dvh;overflow:auto;paddin
 .brief-photo:not([hidden]){display:block;max-width:260px;width:100%;height:105px;object-fit:cover;object-position:center;border-radius:12px;margin:18px 0 0}
 .bar nav .compact-shop{display:none}
 @media(max-width:350px){.head-cta>.btn.small{display:none}.bar nav.open .compact-shop{display:block}}
+
+.hero-delivery {
+  margin-top: 15px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.hero-delivery a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.workshop-routes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-block: 1px solid var(--line);
+}
+.workshop-routes a {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.35vw, 23px);
+  padding: 16px clamp(8px, 1.5vw, 24px);
+}
+.workshop-routes a + a { border-left: 1px solid var(--line); }
+.workshop-routes a:hover { color: var(--blue); background: #f0efe9; }
+.workshop-routes img {
+  width: clamp(48px, 4.8vw, 75px);
+  height: clamp(48px, 4.8vw, 75px);
+  object-fit: contain;
+  background: #efeee9;
+  border-radius: 13px;
+  mix-blend-mode: multiply;
+}
+.workshop-routes a:last-child img { object-fit: cover; }
+.workshop-routes span { min-width: 0; }
+.workshop-routes strong { display: block; font-size: clamp(16px, 1.45vw, 22px); line-height: 1.15; letter-spacing: -.035em; }
+.workshop-routes small { display: block; margin-top: 5px; font-size: 13px; line-height: 1.35; color: var(--muted); }
+.workshop-routes .ic { margin-left: auto; width: 16px; }
+@media (max-width: 800px) {
+  .workshop-routes a { padding: 13px 9px; gap: 8px; }
+  .workshop-routes img { width: 40px; height: 40px; }
+  .workshop-routes strong { font-size: 15px; }
+  .workshop-routes small { font-size: 12px; }
+}
+@media (max-width: 650px) {
+  .hero-delivery { margin-top: 8px; font-size: 12px; }
+  .workshop-routes a { display: block; padding: 11px 7px 12px; }
+  .workshop-routes a + a { border-top: 0; border-left: 1px solid var(--line); }
+  .workshop-routes img { width: 36px; height: 36px; margin-bottom: 7px; }
+  .workshop-routes span { display: block; }
+  .workshop-routes strong { font-size: 14px; line-height: 1.2; }
+  .workshop-routes small { margin-top: 4px; font-size: 11px; }
+  .workshop-routes .ic { display: none; }
+}

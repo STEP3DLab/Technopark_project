@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1418"><meta name="description" content="Пилотная диспетчерская беспилотного мониторинга дорог Карелии. Съёмка, поиск изменений и заявки дорожной бригаде.">
+  <title>Северный маршрут · Мониторинг дорог</title>
+  <link rel="icon" href="./assets/mark.svg"><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="top"><div class="shell top-inner">
+  <a class="brand" href="#monitor"><img src="./assets/mark.svg" alt="" width="40" height="40"><span>Северный маршрут<small>ТЕХНОПАРК РГСУ</small></span></a>
+  <nav aria-label="Основная навигация"><a href="#monitor" data-nav="monitor">Мониторинг</a><a href="#tickets" data-nav="tickets">Заявки <b id="nav-count">0</b></a><a href="#training" data-nav="training">Практикум</a></nav>
+  <span class="demo"><i></i> Пилотная версия</span>
+</div></header>
+<main class="shell">
+<section id="monitor" class="view">
+  <div class="pagehead"><div><div class="overline"><span class="signal"></span> РЕСПУБЛИКА КАРЕЛИЯ</div><h1>Мониторинг дорог</h1><p>Беспилотная съёмка и автоматический поиск изменений на маршруте</p></div>
+  <button class="primary" id="upload-btn"><span aria-hidden="true">↑</span> Загрузить облёт</button></div>
+  <section class="metrics" aria-label="Сводка мониторинга">
+    <div><span>Точки наблюдения</span><strong id="metric-total">—</strong><small>в журнале</small></div>
+    <div><span>На проверке</span><strong id="metric-pending">—</strong><small class="orange">ожидают решения</small></div>
+    <div><span>Заявки бригаде</span><strong id="metric-tickets">—</strong><small>в работе</small></div>
+    <div><span>Датчик воды <em>ДЕМО</em></span><strong>86<sub>см</sub></strong><small class="mint">порог 80 см</small></div>
+  </section>
+  <div class="workspace">
+    <section class="panel map-panel"><div class="panel-title"><div><div class="eyebrow">МАРШРУТ</div><h2 id="map-heading">Кестеньга — Зашеек</h2></div><span class="tag" id="map-tag">Учебная схема</span></div>
+      <div class="mapbox" id="mapbox">
+        <svg id="map" viewBox="0 0 900 460" role="group" aria-label="Интерактивная карта участков"></svg>
+        <div class="north" aria-hidden="true">N<span>↑</span></div>
+        <div class="map-tools"><button id="zoom-in" aria-label="Приблизить карту">+</button><button id="zoom-out" aria-label="Отдалить карту">−</button><button id="recenter" aria-label="Показать всю карту">⌖</button></div>
+        <span class="map-origin" id="map-origin">УСЛОВНАЯ ГЕОГРАФИЯ</span>
+      </div><div class="legend"><span><i class="route-key"></i> Маршрут</span><span><i class="dot orange-bg"></i> Требует проверки</span><span><i class="dot mint-bg"></i> Контрольная точка</span></div>
+    </section>
+    <section class="panel inspector" id="inspector" aria-label="Выбранное наблюдение"></section>
+  </div>
+  <section class="panel ledger"><div class="panel-title"><div><div class="eyebrow">ОПЕРАТИВНЫЕ ДАННЫЕ</div><h2>Журнал наблюдений</h2></div><label class="filter-label">Статус <select id="filter"><option value="all">Все статусы</option><option value="pending">На проверке</option><option value="ticket">В работе</option><option value="reviewed">Проверено</option><option value="closed">Завершено</option><option value="empty">Нет съёмки</option></select></label></div><div id="records"></div></section>
+</section>
+<section id="tickets" class="view" hidden><div class="pagehead"><div><div class="overline"><span class="signal"></span> ДОРОЖНАЯ СЛУЖБА</div><h1>Заявки бригаде</h1><p>Подтверждённые наблюдения, координаты и задания на выезд</p></div></div><div id="tickets-list"></div></section>
+<section id="training" class="view" hidden><div class="pagehead"><div><div class="overline"><span class="signal"></span> ТЕХНОПАРК РГСУ</div><h1>Практикум оператора</h1><p>Пройдите полный цикл проверки на учебной паре снимков.</p></div></div>
+  <div class="lesson-grid"><div class="panel lesson"><div class="eyebrow">ПОЛЁТНОЕ ЗАДАНИЕ</div><h2>Обследование дороги после паводка</h2><p>На 44-м километре учебного маршрута датчик у трубы показал 86 см при пороге 80 см. Изучите снимки и решите, нужен ли выезд.</p><ol><li><b>Сопоставьте кадры.</b> Передвиньте разделитель и сравните полотно около водопропускной трубы.</li><li><b>Проверьте подсказку алгоритма.</b> Включите контуры изменений и проверьте, какие из них действительно затрагивают дорогу.</li><li><b>Подготовьте заявку.</b> Опишите, что нужно проверить на месте. В журнале заявок скачайте задание для бригады.</li></ol><button class="primary" id="start-lesson">Открыть учебный участок ↗</button></div>
+  <div class="panel lesson"><div class="eyebrow">МАТЕРИАЛ ОПЕРАТОРА</div><h2>Как подготовить свой облёт</h2><p>Для анализа нужны два вертикальных снимка одного места, снятые с близкого ракурса, высоты и ориентации. Сильная смена освещения, снег и разные сезоны могут давать ложные срабатывания.</p><p>Загрузите JPG, PNG или WebP и укажите координаты контрольной точки. Модель машинного обучения (k-means) группирует изменения яркости и цвета. Причину и необходимость выезда определяет диспетчер.</p><p>Снимки обрабатываются на этом устройстве. Для передачи задания другой команде скачайте его из журнала заявок.</p></div></div>
+</section></main>
+<footer class="shell"><span>Проектный центр «Технопарк РГСУ»</span><span>БПЛА · Карелия</span></footer>
+<dialog id="upload-modal"><form id="upload-form"><div class="dialog-head"><div><div class="eyebrow">НОВЫЙ ОБЛЁТ</div><h2>Анализ пары снимков</h2></div><button class="icon-btn" type="button" data-close aria-label="Закрыть">×</button></div>
+<p>Выберите два кадра одного участка с близким ракурсом. Обработка и хранение выполняются в вашем браузере.</p>
+<label>Название участка<input name="title" required maxlength="90" placeholder="Например, мост у посёлка"></label>
+<div class="form-row"><label>Широта<input name="lat" type="number" step="any" min="-90" max="90" required placeholder="65.89"></label><label>Долгота<input name="lon" type="number" step="any" min="-180" max="180" required placeholder="31.83"></label></div>
+<div class="form-row"><label>До события<input name="before" type="file" required accept="image/jpeg,image/png,image/webp"></label><label>После события<input name="after" type="file" required accept="image/jpeg,image/png,image/webp"></label></div>
+<small>JPG, PNG, WebP · до 12 МБ на кадр<br>Скачать учебные кадры: <a href="./assets/flight-before.webp" download>до события</a> и <a href="./assets/flight-after.webp" download>после события</a>.</small><div id="upload-status" role="status"></div>
+<button type="submit" class="primary" id="run">Найти изменения</button></form></dialog>
+<dialog id="ticket-modal"><form id="ticket-form"><div class="dialog-head"><div><div class="eyebrow">РЕШЕНИЕ ДИСПЕТЧЕРА</div><h2>Заявка бригаде</h2></div><button type="button" class="icon-btn" data-close aria-label="Закрыть">×</button></div><p id="ticket-place"></p>
+<label>Вид события<select name="kind"><option>Подтопление</option><option>Размыв</option><option>Снежный занос</option><option>Препятствие на дороге</option><option>Другое</option></select></label>
+<label>Задание<textarea name="note" maxlength="600" required rows="3" placeholder="Что бригада должна проверить или сделать?"></textarea></label><button class="primary" type="submit">Сохранить заявку</button></form></dialog>
+<div class="toast" id="toast" role="status"></div>
+<script type="module" src="./app.js"></script></body></html>

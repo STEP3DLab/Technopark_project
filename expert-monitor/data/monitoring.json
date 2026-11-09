@@ -438,66 +438,81 @@
   "manualSources": 20,
   "automaticSending": false,
   "research": {
-    "date": "2026-11-08",
-    "completedAt": "2026-11-08T05:35:25.564Z",
-    "status": "partial_secondary_candidates_primary_access_limited",
-    "summary": "08.11.2026: 8 федеральных направлений, 12 региональных адресных попыток, 0 первично подтверждённых новых открытых судебных запросов; 7 новых смежных закупочных сигналов, 0 сроков истекли; курсор 72→84.",
+    "date": "2026-11-09",
+    "completedAt": "2026-11-09T05:23:17.676Z",
+    "status": "partial_primary_procurements_court_acts_blocked",
+    "summary": "09.11.2026: 8 направлений, 12 региональных адресных попыток, 0 открытых судебных запросов первично подтверждено; 5 новых смежных сигналов, 7 записей закрыто по сроку; курсор 84→11.",
     "newIds": [
-      "proc-6287074",
-      "proc-393-718",
-      "proc-0373200068626000806",
-      "proc-0160300052626000138",
-      "proc-0173200001326000029",
-      "proc-32616549115",
-      "proc-0318100045226000104"
+      "proc-4669274",
+      "proc-4668366",
+      "proc-121",
+      "proc-0162300033226000071",
+      "proc-144272-ТТ"
     ],
-    "changedIds": [],
-    "excludedIds": [
-      "proc-32616549115",
-      "proc-0318100045226000104"
+    "changedIds": [
+      "proc-32616533182",
+      "proc-0116300000226000208",
+      "proc-0356500001426009547",
+      "proc-0802600001926000046",
+      "proc-0152600003126000107",
+      "proc-0159600017226000063",
+      "proc-0813500000126020649"
+    ],
+    "excludedIds": [],
+    "closedIds": [
+      "proc-32616533182",
+      "proc-0116300000226000208",
+      "proc-0356500001426009547",
+      "proc-0802600001926000046",
+      "proc-0152600003126000107",
+      "proc-0159600017226000063",
+      "proc-0813500000126020649"
     ],
     "errors": [
-      "КАД/Банк решений: не удалось получить актуальные материалы дел и последующие определения.",
-      "ГАС Правосудие и сайты 12 региональных арбитражных судов: 403, timeout, anti-bot; попытки не засчитаны как проверка дел.",
-      "ЕИС/площадки: первичные объявления и последующие протоколы не прочитаны."
+      "КАД и Банк решений: поисковые формы открылись, но актуальные определения и последующие акты из дела не извлечены.",
+      "ГАС «Правосудие»: официальный поиск не вернул текущие целевые дела.",
+      "Все 12 адресных региональных попыток: главные страницы открываются, но актов по приглашению экспертов нет в доступной выдаче; регионы blocked, не successful.",
+      "ЕИС: актуальный первичный статус №0162300033226000071 и ЭТП Металл-ИТ №144272-ТТ не подтверждены."
     ],
     "checkedUrls": [
+      "https://arbitr.ru/materials/as/subj",
       "https://kad.arbitr.ru/",
       "https://ras.arbitr.ru/",
       "https://sudrf.ru/index.php?id=300",
-      "https://arbitr.ru/materials/as/subj",
       "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
-      "https://omsk.arbitr.ru/",
-      "https://tomsk.arbitr.ru/",
-      "https://buryatia.arbitr.ru/",
-      "https://yakutsk.arbitr.ru/",
-      "https://chita.arbitr.ru/",
-      "https://kamchatka.arbitr.ru/",
-      "https://primorsky.arbitr.ru/",
-      "https://khabarovsk.arbitr.ru/",
-      "https://amuras.arbitr.ru/",
-      "https://magadan.arbitr.ru/",
-      "https://sakhalin.arbitr.ru/",
-      "https://eao.arbitr.ru/",
+      "https://chukotka.arbitr.ru/",
       "https://msk.arbitr.ru/",
+      "https://asmo.arbitr.ru/",
+      "https://belgorod.arbitr.ru/",
+      "https://bryansk.arbitr.ru/",
+      "https://vladimir.arbitr.ru/",
+      "https://voronej.arbitr.ru/",
+      "https://ivanovo.arbitr.ru/",
+      "https://kaluga.arbitr.ru/",
+      "https://kostroma.arbitr.ru/",
+      "https://kursk.arbitr.ru/",
+      "https://lipetsk.arbitr.ru/",
       "https://spb.arbitr.ru/",
       "https://krasnodar.arbitr.ru/",
       "https://stavropol.arbitr.ru/",
       "https://samara.arbitr.ru/",
       "https://ekaterinburg.arbitr.ru/",
-      "https://zakupki.kontur.ru/IS87822292",
-      "https://zakupki.kontur.ru/IS87382306",
-      "https://zakupki.kontur.ru/0373200068626000806",
-      "https://zakupki.kontur.ru/0160300052626000138",
-      "https://zakupki.kontur.ru/0173200001326000029",
-      "https://zakupki.kontur.ru/32616549115",
-      "https://zakupki.kontur.ru/0318100045226000104"
+      "https://novosib.arbitr.ru/",
+      "https://khabarovsk.arbitr.ru/",
+      "https://www.b2b-center.ru/app/market-next/smtsb-067385-vypolnenie-rabot-po-obsledovaniiu-stroitelnykh-konstruktsii/tender-4669274/",
+      "https://www.b2b-center.ru/app/market-next/na-pravo-zakliucheniia-dogovora-na-okazanie-uslug-po-kompleksnomu/tender-4668366/",
+      "https://ast.loftinzh.ru/site/view-tender?id=121",
+      "https://zakupki.kontur.ru/0162300033226000071",
+      "https://zakupki.kontur.ru/IS87047499",
+      "https://zakupki.gov.ru/epz/order/notice/ea20/view/common-info.html?regNumber=0162300033226000071",
+      "https://etp.metal-it.ru/trades/641059241/info"
     ],
     "limitations": [
-      "Вторичные карточки не доказывают открытую стадию закупок или актуальный судебный запрос.",
-      "12 региональных официальных ресурсов не подтвердили наличие/отсутствие запросов; остаются в retryRegions.",
-      "НМЦК не гонорар эксперта; МСП/СОНКО, СРО и выезды требуют проверки.",
-      "№ 6287074: известна дата срока, но час не подтверждён, нельзя считать окончанием 23:59."
+      "Открытая стадия двух закупок видна на B2B-Center, но это не судебный запрос и не доказательство допуска АНО.",
+      "Колди ВВ9: объект и часовой пояс не установлены первичной карточкой; МСК указан во вторичной.",
+      "Первичные текущие определения судов и последующие акты не получены; отсутствие подтверждённых судебных запросов не равно отсутствию запросов.",
+      "Закрытие по прошедшему сроку без доказательств продления — календарная операция, старые checkedAt не обновлялись.",
+      "СРО, СМП/СОНКО, удалённые выезды и сложные промышленные объекты требуют проверки по ТЗ."
     ],
     "searchedDistricts": [
       "central",
@@ -510,36 +525,36 @@
       "fareast"
     ],
     "districtsCompleted": [],
-    "rotationStart": 72,
-    "rotationEnd": 84,
+    "rotationStart": 84,
+    "rotationEnd": 11,
     "regionsAttempted": [
-      "Омская область",
-      "Томская область",
-      "Республика Бурятия",
-      "Республика Саха (Якутия)",
-      "Забайкальский край",
-      "Камчатский край",
-      "Приморский край",
-      "Хабаровский край",
-      "Амурская область",
-      "Магаданская область",
-      "Сахалинская область",
-      "Еврейская автономная область"
+      "Чукотский автономный округ",
+      "Москва",
+      "Московская область",
+      "Белгородская область",
+      "Брянская область",
+      "Владимирская область",
+      "Воронежская область",
+      "Ивановская область",
+      "Калужская область",
+      "Костромская область",
+      "Курская область",
+      "Липецкая область"
     ],
     "regionsSuccessful": [],
     "regionsBlocked": [
-      "Омская область",
-      "Томская область",
-      "Республика Бурятия",
-      "Республика Саха (Якутия)",
-      "Забайкальский край",
-      "Камчатский край",
-      "Приморский край",
-      "Хабаровский край",
-      "Амурская область",
-      "Магаданская область",
-      "Сахалинская область",
-      "Еврейская автономная область"
+      "Чукотский автономный округ",
+      "Москва",
+      "Московская область",
+      "Белгородская область",
+      "Брянская область",
+      "Владимирская область",
+      "Воронежская область",
+      "Ивановская область",
+      "Калужская область",
+      "Костромская область",
+      "Курская область",
+      "Липецкая область"
     ],
     "retryRegions": [
       "Москва",
@@ -625,226 +640,227 @@
       "Амурская область",
       "Магаданская область",
       "Сахалинская область",
-      "Еврейская автономная область"
+      "Еврейская автономная область",
+      "Чукотский автономный округ"
     ],
     "sourceQueries": [
       {
         "id": "central",
-        "query": "ЦФО Москва и Московская область ноябрь 2026 запрос суда экспертным организациям строительная экспертиза",
+        "query": "ЦФО Москва Московская область ноябрь 2026 арбитраж запрос эксперту строительно-техническая экспертиза",
         "sourceUrl": "https://msk.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "northwest",
-        "query": "СЗФО Санкт-Петербург и Ленобласть ноябрь 2026 судебно-строительная экспертиза запрос",
+        "query": "СЗФО Петербург Ленинградская область ноябрь 2026 запрос суда землеустроительная экспертиза",
         "sourceUrl": "https://spb.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "south",
-        "query": "ЮФО Краснодар Ростов Крым ноябрь 2026 обследование конструкций экспертиза суд",
+        "query": "ЮФО Краснодар Ростов ноябрь 2026 судебно-строительная экспертиза запрос экспертным организациям",
         "sourceUrl": "https://krasnodar.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "caucasus",
-        "query": "СКФО Ставрополь Дагестан ноябрь 2026 землеустроительная экспертиза суд запрос",
+        "query": "СКФО Ставрополь Дагестан ноябрь 2026 определение строительная экспертиза экспертная организация",
         "sourceUrl": "https://stavropol.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "volga",
-        "query": "ПФО Самара Татарстан Марий Эл ноябрь 2026 строительные дефекты экспертиза",
+        "query": "ПФО Самара Татарстан ноябрь 2026 запрос суда строительные дефекты обследование",
         "sourceUrl": "https://samara.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "ural",
-        "query": "УФО Екатеринбург Тюмень ноябрь 2026 суд строительная экспертиза обследование",
+        "query": "УФО Свердловск Тюмень ноябрь 2026 строительно-техническая экспертиза запрос суда",
         "sourceUrl": "https://ekaterinburg.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "siberia",
-        "query": "СФО Омск Томск Красноярск ноябрь 2026 судебная экспертиза строительство",
-        "sourceUrl": "https://omsk.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "query": "СФО Новосибирск Красноярск ноябрь 2026 судебная строительная экспертиза ходатайство",
+        "sourceUrl": "https://novosib.arbitr.ru/",
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       },
       {
         "id": "fareast",
-        "query": "ДФО Якутск Хабаровск Сахалин ноябрь 2026 запрос судебной экспертизы",
-        "sourceUrl": "https://yakutsk.arbitr.ru/",
-        "result": "Адресный поиск выполнен; текущие официальные определения и открытые запросы проверить не удалось."
+        "query": "ДФО Хабаровск Приморье Якутск ноябрь 2026 судебная экспертиза запрос организаций",
+        "sourceUrl": "https://khabarovsk.arbitr.ru/",
+        "result": "Проведён адресный вторичный поиск; актуальный первичный запрос и последующие акты не извлечены."
       }
     ],
     "regionalResults": [
       {
-        "region": "Омская область",
-        "query": "site:omsk.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://omsk.arbitr.ru/",
+        "region": "Чукотский автономный округ",
+        "query": "site:chukotka.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://chukotka.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "403",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (403). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Томская область",
-        "query": "site:tomsk.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://tomsk.arbitr.ru/",
+        "region": "Москва",
+        "query": "site:msk.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://msk.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "timeout",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (timeout). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Республика Бурятия",
-        "query": "site:buryatia.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://buryatia.arbitr.ru/",
+        "region": "Московская область",
+        "query": "site:asmo.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://asmo.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "403",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (403). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Республика Саха (Якутия)",
-        "query": "site:yakutsk.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://yakutsk.arbitr.ru/",
+        "region": "Белгородская область",
+        "query": "site:belgorod.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://belgorod.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "anti-bot",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (anti-bot). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Забайкальский край",
-        "query": "site:chita.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://chita.arbitr.ru/",
+        "region": "Брянская область",
+        "query": "site:bryansk.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://bryansk.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "timeout",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (timeout). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Камчатский край",
-        "query": "site:kamchatka.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://kamchatka.arbitr.ru/",
+        "region": "Владимирская область",
+        "query": "site:vladimir.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://vladimir.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "timeout",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (timeout). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Приморский край",
-        "query": "site:primorsky.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://primorsky.arbitr.ru/",
+        "region": "Воронежская область",
+        "query": "site:voronej.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://voronej.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "unavailable",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (unavailable). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Хабаровский край",
-        "query": "site:khabarovsk.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://khabarovsk.arbitr.ru/",
+        "region": "Ивановская область",
+        "query": "site:ivanovo.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://ivanovo.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "403",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (403). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Амурская область",
-        "query": "site:amuras.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://amuras.arbitr.ru/",
+        "region": "Калужская область",
+        "query": "site:kaluga.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://kaluga.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "403",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (403). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Магаданская область",
-        "query": "site:magadan.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://magadan.arbitr.ru/",
+        "region": "Костромская область",
+        "query": "site:kostroma.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://kostroma.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "timeout",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (timeout). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Сахалинская область",
-        "query": "site:sakhalin.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://sakhalin.arbitr.ru/",
+        "region": "Курская область",
+        "query": "site:kursk.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://kursk.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "403",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (403). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       },
       {
-        "region": "Еврейская автономная область",
-        "query": "site:eao.arbitr.ru 2026 \"строительно-техническая экспертиза\" \"запрос\" экспертным организациям; вторичный тематический поиск",
-        "sourceUrl": "https://eao.arbitr.ru/",
+        "region": "Липецкая область",
+        "query": "site:lipetsk.arbitr.ru \"строительно-техническая экспертиза\" \"запрос\" 2026 ноябрь экспертным организациям",
+        "sourceUrl": "https://lipetsk.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "officialHomepageStatus": "403",
+        "officialHomepageStatus": "accessible_current_homepage",
         "officialActsStatus": "blocked_no_current_case_act",
         "caseCardsVerified": 0,
         "successful": false,
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Первичные актуальные акты недоступны (403). Адресный вторичный тематический поиск не подтверждает действующее приглашение экспертов. Регион повторить."
+        "notes": "Официальная главная страница доступна, но актуальные определения с запросом экспертным организациям и последующие акты не извлечены; адресный индексный поиск не подтвердил действующий приём. Не засчитывать как проверку дел."
       }
     ],
     "officialCatalogAdditionalRegions": [
@@ -857,12 +873,12 @@
     "sheetSyncStatus": "synced",
     "sheetSyncBlocker": null,
     "sheetVerification": {
-      "newRowsAdded": 7,
-      "closureStatusesUpdated": 0,
+      "newRowsAdded": 5,
       "readbackOK": true,
-      "originalRowsPreserved": 128,
+      "previousRowsPreserved": 135,
       "pricingColumnMPreserved": true,
-      "proposalSheetUntouched": true
+      "proposalSheetUntouched": true,
+      "rows": "141–145"
     }
   },
   "schedule": "Ежедневно в 07:17 МСК"

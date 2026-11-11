@@ -1,4 +1,4 @@
-import {CONFIG} from './config.js?v=1.2.0';
+import {CONFIG} from './config.js?v=1.2.1';
 export class ApiError extends Error {constructor(message,code='NETWORK'){super(message);this.code=code;}}
 export const isConfigured=()=>/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(CONFIG.apiUrl);
 export async function api(action,payload={},timeout=45000){

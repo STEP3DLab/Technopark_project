@@ -1,9 +1,9 @@
-import {CONFIG} from './config.js';
-import {api,isConfigured,encodeAudio} from './api.js';
-import {createSteps} from './questions.js';
-import {drafts,readSettings,writeSettings} from './storage.js';
-import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js';
-import {renderBooking} from './booking.js';
+import {CONFIG} from './config.js?v=1.1.1';
+import {api,isConfigured,encodeAudio} from './api.js?v=1.1.1';
+import {createSteps} from './questions.js?v=1.1.1';
+import {drafts,readSettings,writeSettings} from './storage.js?v=1.1.1';
+import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.1.1';
+import {renderBooking} from './booking.js?v=1.1.1';
 
 const $=id=>document.getElementById(id);
 export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

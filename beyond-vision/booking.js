@@ -1,4 +1,4 @@
-import {api,isConfigured} from './api.js';
+import {api,isConfigured} from './api.js?v=1.1.1';
 
 const months=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
 const dayLabel=date=>new Date(`${date}T12:00:00+03:00`).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',weekday:'long',timeZone:'Europe/Moscow'});

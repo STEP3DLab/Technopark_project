@@ -13,6 +13,6 @@ test('question schedule includes all three panels and accessible rating labels',
   assert.equal(new Set(steps.map(s=>s.id)).size,steps.length);
 });
 test('assets and module imports resolve inside the delivered site',()=>{
-  for(const name of fs.readdirSync(root).filter(n=>n.endsWith('.js'))){const text=fs.readFileSync(path.join(root,name),'utf8');for(const match of text.matchAll(/from\s+['"](\.\/[^'"]+)['"]/g))assert.ok(fs.existsSync(path.resolve(root,match[1])),`${name}: ${match[1]}`)}
+  for(const name of fs.readdirSync(root).filter(n=>n.endsWith('.js'))){const text=fs.readFileSync(path.join(root,name),'utf8');for(const match of text.matchAll(/from\s+['"](\.\/[^'"]+)['"]/g))assert.ok(fs.existsSync(path.resolve(root,match[1].split('?')[0])),`${name}: ${match[1]}`)}
   for(const asset of ['assets/mark.svg','assets/relief.svg','assets/visit-guide.pdf'])assert.ok(fs.existsSync(path.join(root,asset)));
 });

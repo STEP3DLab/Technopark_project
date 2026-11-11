@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f3ec">
+  <meta name="description" content="За пределами зрения — исследование тактильного искусства в Технопарке РГСУ. Слушайте вопросы и рассказывайте о своём восприятии рельефных картин.">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>За пределами зрения · Тактильное искусство</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержанию</a>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="За пределами зрения — главная">
+      <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M33 10a17 17 0 1 0 1 23M15 15a10 10 0 0 0 0 14M22 11v22M29 17v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>за пределами<br><strong>зрения</strong></span>
+    </a>
+    <nav aria-label="Основная навигация"><a href="#about">О проекте</a><a href="#visit">Как нас найти</a></nav>
+    <button class="accessibility-button" id="accessibility-toggle" type="button" aria-expanded="false" aria-controls="accessibility-panel"><span aria-hidden="true">Aa</span><span class="sr-only">Настройки доступности</span></button>
+  </header>
+  <aside id="accessibility-panel" class="accessibility-panel" hidden aria-label="Настройки доступности">
+    <div class="panel-heading"><h2>Удобно вам</h2><button type="button" class="icon-button" id="accessibility-close" aria-label="Закрыть настройки">×</button></div>
+    <label class="switch-row"><span>Крупный текст</span><input type="checkbox" id="large-text"></label>
+    <label class="switch-row"><span>Высокий контраст</span><input type="checkbox" id="high-contrast"></label>
+    <label class="switch-row"><span>Читать вопросы автоматически</span><input type="checkbox" id="auto-speech"></label>
+    <p class="small muted">Озвучивание можно включить для каждого вопроса отдельно. Если вы используете экранный диктор, автоматическое чтение можно оставить выключенным.</p>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+  <footer class="site-footer"><a href="#home">Технопарк РГСУ <span aria-hidden="true">↗</span></a><span>Искусство доступно каждому</span><a href="#privacy">Как хранятся ответы</a></footer>
+  <div class="sr-only" id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+  <noscript><p class="noscript">Для опроса требуется JavaScript. Если вы не можете его включить, обратитесь к организатору: на вопросы можно ответить устно.</p></noscript>
+</body>
+</html>

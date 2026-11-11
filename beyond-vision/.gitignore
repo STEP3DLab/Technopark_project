@@ -1,0 +1,7 @@
+dist/
+.openai/
+node_modules/
+*.log
+.env
+.env.*
+*.xlsx

@@ -6,6 +6,7 @@ if(!/^\d+\.\d+\.\d+$/.test(version||''))throw new Error('Pass a semantic version
 for(const name of (await fs.readdir(root)).filter(n=>n.endsWith('.js'))){
   const file=path.join(root,name);let text=await fs.readFile(file,'utf8');
   text=text.replace(/(from\s+['"]\.\/[^'"?]+\.js)(?:\?v=[^'"]+)?(['"])/g,`$1?v=${version}$2`);
+  text=text.replace(/assets\/visit-guide\.pdf(?:\?v=[0-9.]+)?/g,`assets/visit-guide.pdf?v=${version}`);
   if(name==='config.js')text=text.replace(/version: '[^']+'/,`version: '${version}'`);
   await fs.writeFile(file,text);
 }

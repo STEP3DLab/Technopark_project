@@ -103,7 +103,7 @@ function credentials_(access){
 function createAccess_(bookingId){
   const next=rows_('access').reduce((max,r)=>Math.max(max,Number(String(r.values[0]).replace(/^U/,''))||0),0)+1;
   const pid='U'+('0000'+next).slice(-4),salt=uuid_(),nonce=uuid_(),schedule=schedule_(next);
-  const values=[pid,'rgsu-'+String(next).padStart(4,'0'),salt,'','','active',...schedule,nonce,bookingId,now_()];
+  const values=[pid,'vision-'+String(next).padStart(4,'0'),salt,'','','active',...schedule,nonce,bookingId,now_()];
   const creds=credentials_(values);values[3]=hash_(salt+'|'+creds.password);values[4]=hash_(salt+'|'+creds.code);
   return {row:append_('access',values),values};
 }
@@ -151,8 +151,8 @@ function sendBookingMail_(bookingId){
   try{
     if(MailApp.getRemainingDailyQuota()<1)throw new Error('Дневной лимит отправки писем исчерпан.');
     const c=credentials_(task.access),s=task.slot,site=setting_('Адрес сайта','https://step3dlab.github.io/Technopark_project/beyond-vision/');
-    const body=[`Здравствуйте, ${uncell_(task.booking.values[3])}!`,'','Вы записаны на исследование тактильного искусства «За пределами зрения».',`Дата: ${s.date}. Время: ${s.start}–${s.end}, по Москве.`,`Место: ${s.location}.`,`Номер записи: ${bookingId}.`,'','Ваш доступ к опросу:',`Логин: ${c.login}`,`Пароль: ${c.password}`,`Код участника: ${c.code}`,'Можно войти по коду либо по логину и паролю.',`${site}#access`,'',`Как нас найти: ${site}#visit`,'Если нужна встреча у входа или помощь, ответьте на это письмо.','Названия и содержание панелей до завершения исследования с другими участниками обсуждать не нужно.','','Если вы не оставляли запись, ответьте на это письмо: организатор отменит её.','Технопарк РГСУ'].join('\n');
-    MailApp.sendEmail({to:uncell_(task.booking.values[4]),subject:'Ваша запись и доступ · За пределами зрения · Технопарк РГСУ',body,name:'Технопарк РГСУ · За пределами зрения'});sent=true;
+    const body=[`Здравствуйте, ${uncell_(task.booking.values[3])}!`,'','Вы записаны на исследование тактильного искусства «За пределами зрения».',`Дата: ${s.date}. Время: ${s.start}–${s.end}, по Москве.`,`Место: ${s.location}.`,`Номер записи: ${bookingId}.`,'','Ваш доступ к опросу:',`Логин: ${c.login}`,`Пароль: ${c.password}`,`Код участника: ${c.code}`,'Можно войти по коду либо по логину и паролю.',`${site}#access`,'',`Как нас найти: ${site}#visit`,'Если нужна встреча у входа или помощь, ответьте на это письмо.','Названия и содержание панелей до завершения исследования с другими участниками обсуждать не нужно.','','Если вы не оставляли запись, ответьте на это письмо: организатор отменит её.','Исследовательский проект «За пределами зрения»'].join('\n');
+    MailApp.sendEmail({to:uncell_(task.booking.values[4]),subject:'Ваша запись и доступ · За пределами зрения',body,name:'За пределами зрения'});sent=true;
   }catch(error){message=String(error.message||'Не удалось отправить письмо').slice(0,500);}
   locked_(()=>{const record=rows_('bookings').find(r=>r.values[0]===bookingId);if(record){const v=record.values.slice();v[10]=sent?'sent':'failed';v[12]=message;v[15]=sent?now_():'';writeRow_('bookings',record.row,v)}});
   return sent?'sent':'failed';

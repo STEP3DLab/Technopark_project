@@ -1,12 +1,12 @@
-import { createPracticalController } from './practical.js?v=0.18.1';
-import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.18.1';
-import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.18.1';
+import { createPracticalController } from './practical.js?v=0.19.0';
+import { parseProfile, serializeProfile, mergeProfiles, PROFILE_MAX_BYTES } from './personal-profile.js?v=0.19.0';
+import { HumanAvatar3D as CanvasAvatar } from './avatar-3d.js?v=0.19.0';
 import { createCatalog, matchText, validateMotion } from './catalog.js';
 import { makeSequence, classify, sequenceQuality } from './recognizer.js';
-import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.18.1';
-import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.18.1';
+import { loadVision, detect, resetVision, drawLandmarks } from './vision.js?v=0.19.0';
+import { SessionLedger, frameReadiness, DEMO_SOURCES } from './session.js?v=0.19.0';
 import { TrialProtocol } from './trial-protocol.js';
-import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.18.1';
+import { createCommunicationController, MAX_MESSAGE_LENGTH } from './communication.js?v=0.19.0';
 const $ = id => document.getElementById(id);
 async function fetchJSON(path,timeout=15000){
   const controller=typeof AbortController!=='undefined'?new AbortController():null;
@@ -284,7 +284,7 @@ function showResult(frames,aspect,origin='camera',elapsedMs=0){
 async function ensureTemplates(){
   if(s.templatesReady)return;
   if(!s.catalog.length)throw new Error('Словарь ещё не загружен. Обновите страницу.');
-  const data=await fetchJSON('./assets/recognition-library.json?v=0.18.1');
+  const data=await fetchJSON('./assets/recognition-library.json?v=0.19.0');
   if(data?.schema_version!==1||!Array.isArray(data.entries)||!data.entries.length||
     data.entries.some(x=>!s.catalog.some(c=>c.id===x.id)||x.split!=='train'||!Array.isArray(x.sequence)||x.sequence.length<6)||
     s.catalog.some(c=>!data.entries.some(x=>x.id===c.id)))throw new Error('Некорректная библиотека образцов. Обновите страницу.');
@@ -579,7 +579,7 @@ $('check-device').onclick=()=>{
 $('test-sound').onclick=()=>{if(!window.speechSynthesis){$('sound-status').textContent='Синтез речи недоступен';return;}speak('Проверка звука. Равенство по слуху.');$('sound-heard').hidden=false;$('sound-status').textContent='Подтвердите, слышна ли речь';};
 $('sound-heard').onclick=()=>{$('sound-status').textContent='Звук подтверждён пользователем';$('sound-heard').hidden=true;};
 $('export-session').onclick=()=>{
-  const report={...ledger.exportReport(),applicationVersion:'0.18.1',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  const report={...ledger.exportReport(),applicationVersion:'0.19.0',protocols:protocolRuns.map(p=>p.exportReport())},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=`hearing-equality-session-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('clear-session').onclick=()=>{
@@ -612,7 +612,7 @@ async function loadBenchmark(){
     const report=await fetchJSON('./assets/evaluation-v07.json'),now=report.current.summary,before=report.baseline.summary;
     $('benchmark-correct').textContent=`${now.correct} / ${now.total}`;
     $('benchmark-rejected').textContent=now.rejected;$('benchmark-wrong').textContent=now.wrong;
-    $('benchmark-note').textContent=`${report.holdout.clips} записей · ${report.holdout.signers} других исполнителей · шесть слов. Раньше: ${before.correct} верных, ${before.rejected} отказов, ${before.wrong} ошибочный ответ. Сейчас: ${report.current.templates} образец от ${report.current.signers} исполнителей. Пороги не менялись.`;
+    $('benchmark-note').textContent=`Исторический эксперимент 28.10.2026: ${report.holdout.clips} записей, ${report.holdout.signers} других исполнителей, шесть слов. Версия 0.6: ${before.correct} верных, ${before.rejected} отказов, ${before.wrong} ошибочный ответ. В версии 0.7 использовался ${report.current.templates} образец от ${report.current.signers} исполнителей; пороги были фиксированы. Новая серия 11.11.2026 представлена по ссылке ниже.`;
     $('benchmark-rows').replaceChildren();
     for(const row of report.current.rows){const tr=document.createElement('tr');for(const text of [row.expectedText,row.accepted?row.nearestText:'Отказ',row.correct?'Совпадение':row.accepted?'Ошибка':'Нет уверенного ответа']){const td=document.createElement('td');td.textContent=text;tr.append(td);}$('benchmark-rows').append(tr);}
   }catch{$('benchmark-note').textContent='Не удалось загрузить сохранённый результат проверки. Отчёт доступен в репозитории.';}
@@ -623,11 +623,11 @@ const slides=[
   {kicker:'01 / ЗАДАЧА',title:'Выразить мысль и получить ответ',copy:'Помощник для общения, когда удобнее использовать текст. Составьте сообщение, покажите его крупно, озвучьте или передайте в другое приложение.',cards:[['Ваше сообщение','Общий редактируемый черновик до 2000 символов.'],['Ваш выбор','Крупный текст, озвучивание, копирование или файл.'],['Ответ рядом','Собеседник пишет на том же устройстве.']],action:'Открыть общение',mode:'dialogue'},
   {kicker:'02 / СЦЕНАРИЙ',title:'От первого сообщения к сохранённому диалогу',copy:'Начните с готовой фразы или напишите свой текст. Добавьте сообщение и ответ собеседника в диалог, затем скопируйте его целиком или сохраните файлом.',cards:[['Составить','Текст можно исправить и дополнить до передачи.'],['Передать','Системное меню устройства или копирование в нужный чат.'],['Сохранить','Черновик не пропадает при переходе между разделами.']],action:'Попробовать сценарий',mode:'dialogue'},
   {kicker:'03 / ПРОТОТИП',title:'Жестовый ввод — следующий шаг к общению',copy:'Камера пока предлагает одно из шести слов РЖЯ. Пользователь проверяет результат и сам добавляет его в сообщение. Произвольные высказывания на РЖЯ ещё не распознаются.',cards:[['Камера','Видимость кистей и отдельная карточка результата.'],['Подтверждение','Ни один вариант не заменяет набранный текст.'],['Аватар','Просмотр шести подготовленных жестов с регулировкой скорости.']],action:'Открыть жестовый ввод',mode:'camera'},
-  {kicker:'04 / ПРОВЕРКА',title:'Проверка на 12 отдельных видеозаписях',copy:'Четыре верных ответа, восемь отказов, ноль ошибочных ответов. Все 12 исполнителей отсутствуют в наборе образцов. Это ограниченная проверка по видео; испытание с камеры ещё впереди.',cards:[['Образцы','21 запись от трёх исполнителей.'],['Контрольная серия','12 заданий с заранее фиксированными словами.'],['Отчёт','Ошибки и исправления учитываются отдельно.']],action:'Открыть испытание',mode:'research'},
+  {kicker:'04 / ИСТОРИЯ ПРОВЕРКИ',title:'Историческая проверка 28 октября 2026',copy:'На 12 видеозаписях получены четыре верных ответа, восемь отказов и ноль ошибочно принятых ответов. Это сохранённый результат версии 0.7. Новая серия от 11 ноября 2026 представлена отдельно; проверки камеры и понятности требуют участия людей.',cards:[['Набор 28 октября','21 образец от трёх исполнителей; 12 других исполнителей в проверке.'],['Новый эксперимент','Состав новой серии, результаты и ограничения.','./research.html'],['Полные сообщения','Кабинет записи и проверки 20 смысловых сообщений.','./pilot.html']],action:'Открыть проверки',mode:'research'},
   {kicker:'05 / МИРОВОЙ ОПЫТ',title:'Google переводит ASL. Наша задача — русский жестовый язык',copy:'SL2T уже работает в Gboard и Live Transcribe на Pixel 11: американский жестовый язык → английский текст. В нашем прототипе MediaPipe выделяет координаты, а сравнение с образцами работает на шести словах РЖЯ. Это разные уровни готовности.',cards:[['Google SL2T','Потребительский продукт с августа 2026 года.'],['SignGemma','Публичный релиз и API пока не подтверждены.'],['Наш следующий шаг','Корпус РЖЯ, новые участники и оценка понимания.']],action:'Сравнить технологии',mode:'about'},
-  {kicker:'06 / ПРЕДЛОЖЕНИЕ НТС',title:'Следующий этап — пилот с носителями РЖЯ',copy:'Предлагаем выбрать один сценарий, подготовить 20 полных сообщений и проверить их на новых участниках. Живую камеру и понятность аватара предстоит оценить с участниками; небольшой результат по видео уже опубликован.',cards:[['Материал','Переводчик и носители РЖЯ.'],['Метрики','Ошибки, отказы и время обработки.'],['Результат','Понимание сообщения и завершение диалога.']],action:'Открыть план пилота',mode:'about'}
+  {kicker:'06 / ПИЛОТ ПОЛНЫХ СООБЩЕНИЙ',title:'Пилот «Встреча посетителя»',copy:'Подготовлены 20 смысловых карточек и рабочий кабинет для записей и оценок. Переводчик и носители РЖЯ должны согласовать полные высказывания, затем новые участники проверят их понимание. Эти текстовые карточки пока не являются реализованными переводами РЖЯ.',cards:[['Подготовка материала','Реестр видео и история языковой проверки.','./pilot.html'],['Проверка смысла','Исходный ответ, вопрос и отрицание оцениваются отдельно.'],['Результаты исследования','Ошибки, отказы и состав проверочной серии.','./research.html']],action:'Открыть описание проекта',mode:'about'}
 ];let slideIndex=0;
-function renderSlide(){const slide=slides[slideIndex];$('slide-kicker').textContent=slide.kicker;$('slide-title').textContent=slide.title;$('slide-copy').textContent=slide.copy;$('slide-cards').replaceChildren();for(const [title,copy] of slide.cards){const card=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');b.textContent=title;p.textContent=copy;card.append(b,p);$('slide-cards').append(card);}$('slide-action').textContent=slide.action;$('slide-count').textContent=`${slideIndex+1} / ${slides.length}`;$('prev-slide').disabled=slideIndex===0;$('next-slide').disabled=slideIndex===slides.length-1;}
+function renderSlide(){const slide=slides[slideIndex];$('slide-kicker').textContent=slide.kicker;$('slide-title').textContent=slide.title;$('slide-copy').textContent=slide.copy;$('slide-cards').replaceChildren();for(const [title,copy,href] of slide.cards){const card=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p');b.textContent=title;p.textContent=copy;card.append(b,p);if(href){const link=document.createElement('a');link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Открыть ↗';card.append(link);}$('slide-cards').append(card);}$('slide-action').textContent=slide.action;$('slide-count').textContent=`${slideIndex+1} / ${slides.length}`;$('prev-slide').disabled=slideIndex===0;$('next-slide').disabled=slideIndex===slides.length-1;}
 $('present').onclick=()=>{pauseAvatar();stopCapture();stopDictation();window.speechSynthesis?.cancel();lastFocus=document.activeElement;renderSlide();$('presentation').showModal();};
 $('close-presentation').onclick=()=>$('presentation').close();$('presentation').addEventListener('close',()=>lastFocus?.focus());
 $('prev-slide').onclick=()=>{slideIndex=Math.max(0,slideIndex-1);renderSlide();};$('next-slide').onclick=()=>{slideIndex=Math.min(slides.length-1,slideIndex+1);renderSlide();};
@@ -642,7 +642,7 @@ let catalogJob=null;
 async function initializeCatalog(){
 s.catalogStatus='loading';emitUI('catalog');
 try{
-  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.18.1')).samples);
+  s.catalog=createCatalog((await fetchJSON('./assets/sources/slovo-sources.json?v=0.19.0')).samples);
   if(s.custom.length){s.custom=mergeProfiles([],s.custom,s.catalog);renderPersonalSamples();}
   loadBenchmark();
   for(const id of ['word-chips','reply-chips','video-examples'])$(id).replaceChildren();

@@ -1,0 +1,2014 @@
+{
+  "schema_version": 1,
+  "protocol": "hearing-equality-v019",
+  "date": "2026-11-11",
+  "seed": "hearing-equality-2026-11-11-v019",
+  "selection_uses": "Annotation metadata only; no tracking or model predictions.",
+  "source": {
+    "url": "https://rndml-team-cv.obs.ru-moscow-1.hc.sbercloud.ru/datasets/slovo/slovo.zip",
+    "member": "annotations.csv",
+    "sha256": "8e5595d6431974dd7e93ad21f41dec0401c0e8686bcafbdc093c5edebbdfba49",
+    "rows": 20400,
+    "global_official_train_test_signer_overlap": 92
+  },
+  "known_labels": [
+    {
+      "id": "hello",
+      "text": "Привет!"
+    },
+    {
+      "id": "yes",
+      "text": "да"
+    },
+    {
+      "id": "good",
+      "text": "хорошо"
+    },
+    {
+      "id": "question",
+      "text": "вопрос"
+    },
+    {
+      "id": "friend",
+      "text": "друг"
+    },
+    {
+      "id": "work",
+      "text": "работать"
+    }
+  ],
+  "historical_holdout": {
+    "clips": 12,
+    "signers_excluded": [
+      "0ceb69ca37aa3e44528c7ce03c329479",
+      "2e900e56b0b0d7fe1c3978e6391fbc91",
+      "37d962919364c79138107541f0197f00",
+      "3bb869551201cb9e68e52bec47d6894a",
+      "63db05b188249dbd9ce7cc98fe205e1f",
+      "68f27043789bb049757486b0ed1cbaab",
+      "b56726d7b447d88e526f7da2e9e0e520",
+      "cb53e1b60ed438a7164ddea33f4381b4",
+      "cd2619b64656612f5177970fa8fadd0c",
+      "d2b4042ec6d8505a41b809e64d5adb7c",
+      "d4b56cd94433bc6d7a16a27411ac1a3c",
+      "feea6c22175f962ab28452f7314d1bc0"
+    ],
+    "status": "Previously observed; regression check only, never new test evidence."
+  },
+  "validation_signer": "46dd04a1caa75ed3082b573cb5a3ad26",
+  "split_summary": {
+    "train": {
+      "clips": 76,
+      "signers": 7,
+      "known": 76,
+      "unknown": 0
+    },
+    "validation": {
+      "clips": 43,
+      "signers": 1,
+      "known": 13,
+      "unknown": 30
+    },
+    "test": {
+      "clips": 73,
+      "signers": 46,
+      "known": 13,
+      "unknown": 60
+    }
+  },
+  "known_test_class_counts": {
+    "Привет!": 3,
+    "хорошо": 2,
+    "вопрос": 3,
+    "работать": 3,
+    "да": 2
+  },
+  "limitations": [
+    "No new test signer for friend remains after excluding historic signers.",
+    "Validation has one signer; this is an exploratory engineering experiment.",
+    "Unknown labels are 30 deterministic sampled Slovo classes, not arbitrary movements or connected signing.",
+    "Natural sentences, comprehension of the avatar, and a live browser camera are not measured."
+  ],
+  "entries": [
+    {
+      "clip_id": "02105473-a1d2-4bfe-af7e-f7b38314973a",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/02105473-a1d2-4bfe-af7e-f7b38314973a.mp4"
+    },
+    {
+      "clip_id": "055a4aa1-0eb4-4780-a8c9-d9d4e241b01a",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/055a4aa1-0eb4-4780-a8c9-d9d4e241b01a.mp4"
+    },
+    {
+      "clip_id": "29748c2d-a2ea-472a-b3d1-127e110b6827",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/29748c2d-a2ea-472a-b3d1-127e110b6827.mp4"
+    },
+    {
+      "clip_id": "3db867de-470d-4ec6-9efc-11633faff873",
+      "user_id": "2d84da20c251acaeb3186642fcb04f2e",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/3db867de-470d-4ec6-9efc-11633faff873.mp4"
+    },
+    {
+      "clip_id": "495b7c9e-d060-4629-a5d4-5bdeec0c7ed3",
+      "user_id": "b07a773bcb10b4f14f33d2b0e8ec58ba",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/495b7c9e-d060-4629-a5d4-5bdeec0c7ed3.mp4"
+    },
+    {
+      "clip_id": "4b53bb87-c998-47ed-a580-efe0ae4334ea",
+      "user_id": "95af8e702c909eee7145c6dc1a3d756b",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/4b53bb87-c998-47ed-a580-efe0ae4334ea.mp4"
+    },
+    {
+      "clip_id": "60c85929-fd68-4e03-a8d7-e5f62f813849",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/60c85929-fd68-4e03-a8d7-e5f62f813849.mp4"
+    },
+    {
+      "clip_id": "70c5ffe5-5ee7-4400-aa30-dbc15c281dbb",
+      "user_id": "fc6e5caa3dc328e7558b072e6607e399",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/70c5ffe5-5ee7-4400-aa30-dbc15c281dbb.mp4"
+    },
+    {
+      "clip_id": "8b68e645-74fc-4110-94d6-e50f09841384",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/8b68e645-74fc-4110-94d6-e50f09841384.mp4"
+    },
+    {
+      "clip_id": "a28317c6-d950-44ee-9c72-952f3535445a",
+      "user_id": "95af8e702c909eee7145c6dc1a3d756b",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/a28317c6-d950-44ee-9c72-952f3535445a.mp4"
+    },
+    {
+      "clip_id": "a69e018c-4b6d-42fd-aba6-c538a5b2bc32",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/a69e018c-4b6d-42fd-aba6-c538a5b2bc32.mp4"
+    },
+    {
+      "clip_id": "b40f30e4-d087-440f-a1f6-4d1029fc651d",
+      "user_id": "b07a773bcb10b4f14f33d2b0e8ec58ba",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/b40f30e4-d087-440f-a1f6-4d1029fc651d.mp4"
+    },
+    {
+      "clip_id": "f17a6060-6ced-4bd1-9886-8578cfbb864f",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/f17a6060-6ced-4bd1-9886-8578cfbb864f.mp4"
+    },
+    {
+      "clip_id": "169d72d9-41ba-41c2-b2d1-2be8cbb0b06b",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/169d72d9-41ba-41c2-b2d1-2be8cbb0b06b.mp4"
+    },
+    {
+      "clip_id": "2a949946-981f-4d33-b590-f58c3d09dc14",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/2a949946-981f-4d33-b590-f58c3d09dc14.mp4"
+    },
+    {
+      "clip_id": "41a5e32d-8542-423c-ad10-bf2590c4ad26",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/41a5e32d-8542-423c-ad10-bf2590c4ad26.mp4"
+    },
+    {
+      "clip_id": "52da9e2b-feb0-48d5-a5c4-787c63be93e0",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/52da9e2b-feb0-48d5-a5c4-787c63be93e0.mp4"
+    },
+    {
+      "clip_id": "53be3bf8-31e0-45ba-9b56-2cfdf82b3b70",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/53be3bf8-31e0-45ba-9b56-2cfdf82b3b70.mp4"
+    },
+    {
+      "clip_id": "79d6f7d4-e68d-402d-90da-b6ca853506f3",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/79d6f7d4-e68d-402d-90da-b6ca853506f3.mp4"
+    },
+    {
+      "clip_id": "80299a96-d83d-4faf-af32-5fe440143427",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/80299a96-d83d-4faf-af32-5fe440143427.mp4"
+    },
+    {
+      "clip_id": "83b8a1b6-5f62-4003-93aa-cf121cd0f8e1",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/83b8a1b6-5f62-4003-93aa-cf121cd0f8e1.mp4"
+    },
+    {
+      "clip_id": "88c3832f-f078-4134-ba32-a8bda6bfb0a2",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/88c3832f-f078-4134-ba32-a8bda6bfb0a2.mp4"
+    },
+    {
+      "clip_id": "bcf67404-4b92-4782-9318-268e87fff4ce",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/bcf67404-4b92-4782-9318-268e87fff4ce.mp4"
+    },
+    {
+      "clip_id": "cc59e1b2-5778-47bb-a452-779033da61b0",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/cc59e1b2-5778-47bb-a452-779033da61b0.mp4"
+    },
+    {
+      "clip_id": "efe1d70a-1444-45eb-bc29-55e63a499e66",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "вопрос",
+      "id": "question",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/efe1d70a-1444-45eb-bc29-55e63a499e66.mp4"
+    },
+    {
+      "clip_id": "0ffb6d63-1473-48bd-a0d8-b48e4770fd54",
+      "user_id": "2d84da20c251acaeb3186642fcb04f2e",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/0ffb6d63-1473-48bd-a0d8-b48e4770fd54.mp4"
+    },
+    {
+      "clip_id": "1249c53c-eb10-42d2-96e9-14e507f0bc86",
+      "user_id": "2d84da20c251acaeb3186642fcb04f2e",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/1249c53c-eb10-42d2-96e9-14e507f0bc86.mp4"
+    },
+    {
+      "clip_id": "2b1b2857-02ca-4e0e-86dc-a525e075eb98",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/2b1b2857-02ca-4e0e-86dc-a525e075eb98.mp4"
+    },
+    {
+      "clip_id": "32a06054-aa41-4cc3-a648-9e1c8e3faf62",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/32a06054-aa41-4cc3-a648-9e1c8e3faf62.mp4"
+    },
+    {
+      "clip_id": "339b78d9-dfbe-4439-a8ca-ef959f915d06",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/339b78d9-dfbe-4439-a8ca-ef959f915d06.mp4"
+    },
+    {
+      "clip_id": "34d54421-d709-4b48-b6c7-58e0e3e0710c",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/34d54421-d709-4b48-b6c7-58e0e3e0710c.mp4"
+    },
+    {
+      "clip_id": "394be738-56a1-4a45-a8f5-a24609503ced",
+      "user_id": "b07a773bcb10b4f14f33d2b0e8ec58ba",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/394be738-56a1-4a45-a8f5-a24609503ced.mp4"
+    },
+    {
+      "clip_id": "4c3bfbff-c6ae-45d9-b70d-d1ef28841bd3",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/4c3bfbff-c6ae-45d9-b70d-d1ef28841bd3.mp4"
+    },
+    {
+      "clip_id": "53d1afd1-935a-4f3e-b60a-66674d351d56",
+      "user_id": "95af8e702c909eee7145c6dc1a3d756b",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/53d1afd1-935a-4f3e-b60a-66674d351d56.mp4"
+    },
+    {
+      "clip_id": "8f8056fe-ceb5-4324-a5ca-6d8e95184692",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/8f8056fe-ceb5-4324-a5ca-6d8e95184692.mp4"
+    },
+    {
+      "clip_id": "d3865ed0-3975-449c-89bd-8977e0e33742",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/d3865ed0-3975-449c-89bd-8977e0e33742.mp4"
+    },
+    {
+      "clip_id": "e2ff84c9-676e-42a5-9537-f0de9f703865",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/e2ff84c9-676e-42a5-9537-f0de9f703865.mp4"
+    },
+    {
+      "clip_id": "f9fe8bee-37a1-4ecd-b8f2-4f8a97be08a0",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/f9fe8bee-37a1-4ecd-b8f2-4f8a97be08a0.mp4"
+    },
+    {
+      "clip_id": "fbcfdd09-b129-4145-b0db-bf7ea380bded",
+      "user_id": "b07a773bcb10b4f14f33d2b0e8ec58ba",
+      "text": "да",
+      "id": "yes",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/fbcfdd09-b129-4145-b0db-bf7ea380bded.mp4"
+    },
+    {
+      "clip_id": "1a6aa11c-0b15-42d8-9935-6aa29e4b589b",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/1a6aa11c-0b15-42d8-9935-6aa29e4b589b.mp4"
+    },
+    {
+      "clip_id": "309f24bf-15f3-402c-bdea-6e80d63fe063",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/309f24bf-15f3-402c-bdea-6e80d63fe063.mp4"
+    },
+    {
+      "clip_id": "40af2c54-a282-47de-b505-b93c647f13d2",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/40af2c54-a282-47de-b505-b93c647f13d2.mp4"
+    },
+    {
+      "clip_id": "588d6054-597e-4cfe-8122-7f6fe7e84caa",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/588d6054-597e-4cfe-8122-7f6fe7e84caa.mp4"
+    },
+    {
+      "clip_id": "7d190ebc-5ca7-4550-bb56-136b7cfacc47",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/7d190ebc-5ca7-4550-bb56-136b7cfacc47.mp4"
+    },
+    {
+      "clip_id": "7fcf08ef-cfe9-4ebd-adf0-24b604b27855",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/7fcf08ef-cfe9-4ebd-adf0-24b604b27855.mp4"
+    },
+    {
+      "clip_id": "8835f8cc-9dc7-4f7b-b495-8b0102163c8d",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/8835f8cc-9dc7-4f7b-b495-8b0102163c8d.mp4"
+    },
+    {
+      "clip_id": "b01911f8-b91e-4bea-9b85-03d718e50cf8",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/b01911f8-b91e-4bea-9b85-03d718e50cf8.mp4"
+    },
+    {
+      "clip_id": "b3f968a8-7c07-4d05-bcbd-a66f869714a0",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/b3f968a8-7c07-4d05-bcbd-a66f869714a0.mp4"
+    },
+    {
+      "clip_id": "b9446562-8c70-4821-b083-6f23cfe3a6e1",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/b9446562-8c70-4821-b083-6f23cfe3a6e1.mp4"
+    },
+    {
+      "clip_id": "d44e58eb-81b2-4a68-8957-d601f4b04d2c",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/d44e58eb-81b2-4a68-8957-d601f4b04d2c.mp4"
+    },
+    {
+      "clip_id": "e98ca014-ffd0-4543-9473-d6f9a0a5a3b4",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/e98ca014-ffd0-4543-9473-d6f9a0a5a3b4.mp4"
+    },
+    {
+      "clip_id": "e9b5ad62-459b-46a0-9ae9-ba718fab01df",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "друг",
+      "id": "friend",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/e9b5ad62-459b-46a0-9ae9-ba718fab01df.mp4"
+    },
+    {
+      "clip_id": "1d665cab-8697-44e4-831c-886441786f48",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/1d665cab-8697-44e4-831c-886441786f48.mp4"
+    },
+    {
+      "clip_id": "24c6530e-ec3a-4444-ba16-d3eb0d3c13e9",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/24c6530e-ec3a-4444-ba16-d3eb0d3c13e9.mp4"
+    },
+    {
+      "clip_id": "3a929715-418b-4e20-9f6e-97eb7246f63b",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/3a929715-418b-4e20-9f6e-97eb7246f63b.mp4"
+    },
+    {
+      "clip_id": "3f59dd19-a3c8-4e60-a6e2-91cf00e44bb0",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/3f59dd19-a3c8-4e60-a6e2-91cf00e44bb0.mp4"
+    },
+    {
+      "clip_id": "49f5caa7-ad17-4fbc-a119-5318c0dd96af",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/49f5caa7-ad17-4fbc-a119-5318c0dd96af.mp4"
+    },
+    {
+      "clip_id": "4a5fcbde-f468-4bc9-a246-a74f79a32fb8",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/4a5fcbde-f468-4bc9-a246-a74f79a32fb8.mp4"
+    },
+    {
+      "clip_id": "5a41c4a8-ccbe-48be-a6fd-e42444d1a5e0",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/5a41c4a8-ccbe-48be-a6fd-e42444d1a5e0.mp4"
+    },
+    {
+      "clip_id": "6fb8f67b-e55f-4a54-84ca-4a04a652a39c",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/6fb8f67b-e55f-4a54-84ca-4a04a652a39c.mp4"
+    },
+    {
+      "clip_id": "7bb47d22-7a6c-4fd9-8019-4c491c7e2d9f",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/7bb47d22-7a6c-4fd9-8019-4c491c7e2d9f.mp4"
+    },
+    {
+      "clip_id": "7eebf4e4-e135-4154-a3f9-118773c41fc5",
+      "user_id": "b07a773bcb10b4f14f33d2b0e8ec58ba",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/7eebf4e4-e135-4154-a3f9-118773c41fc5.mp4"
+    },
+    {
+      "clip_id": "a2615799-ed03-4672-8f99-94a2210e352b",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/a2615799-ed03-4672-8f99-94a2210e352b.mp4"
+    },
+    {
+      "clip_id": "ffce2323-7036-46ee-af8a-82f010ce9aff",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "работать",
+      "id": "work",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/ffce2323-7036-46ee-af8a-82f010ce9aff.mp4"
+    },
+    {
+      "clip_id": "0eed301f-bdab-4572-97a0-6a93f25658eb",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/0eed301f-bdab-4572-97a0-6a93f25658eb.mp4"
+    },
+    {
+      "clip_id": "2bc7d1f2-85ba-4bf0-bd04-79ba3aa0c2f2",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/2bc7d1f2-85ba-4bf0-bd04-79ba3aa0c2f2.mp4"
+    },
+    {
+      "clip_id": "43791c91-9bb8-42ed-a5cb-b421506d8550",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/43791c91-9bb8-42ed-a5cb-b421506d8550.mp4"
+    },
+    {
+      "clip_id": "862777fb-c689-4854-ae47-9bcb8412b87f",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/862777fb-c689-4854-ae47-9bcb8412b87f.mp4"
+    },
+    {
+      "clip_id": "abd6c0dc-7b4d-4f42-8485-407acb7f0e56",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/abd6c0dc-7b4d-4f42-8485-407acb7f0e56.mp4"
+    },
+    {
+      "clip_id": "b98ab14d-6d5e-4567-8815-9f8146aba461",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/b98ab14d-6d5e-4567-8815-9f8146aba461.mp4"
+    },
+    {
+      "clip_id": "c11c7f5a-2494-4ccf-992b-eaeba483e313",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/c11c7f5a-2494-4ccf-992b-eaeba483e313.mp4"
+    },
+    {
+      "clip_id": "c78cfeec-6f80-4227-a152-4a6fe4bfeaee",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/c78cfeec-6f80-4227-a152-4a6fe4bfeaee.mp4"
+    },
+    {
+      "clip_id": "cb21efd8-2a94-48dc-b9b3-8425710e014d",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/cb21efd8-2a94-48dc-b9b3-8425710e014d.mp4"
+    },
+    {
+      "clip_id": "cca6d90b-f140-42a7-a335-3c131ff93f0f",
+      "user_id": "0211b488644476dd0fec656ccb9b74fc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/cca6d90b-f140-42a7-a335-3c131ff93f0f.mp4"
+    },
+    {
+      "clip_id": "d25ddfe0-1a64-4e37-a442-735aea194803",
+      "user_id": "db573f94204e56e0cf3fc2ea000e5bdc",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/d25ddfe0-1a64-4e37-a442-735aea194803.mp4"
+    },
+    {
+      "clip_id": "f145d0b3-9cb3-4289-862d-7711a3b8522d",
+      "user_id": "185bd3a81d9d618518d10abebf0d17a8",
+      "text": "хорошо",
+      "id": "good",
+      "split": "train",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/f145d0b3-9cb3-4289-862d-7711a3b8522d.mp4"
+    },
+    {
+      "clip_id": "cc720e36-8afc-4297-9754-5987bbfaf356",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/cc720e36-8afc-4297-9754-5987bbfaf356.mp4"
+    },
+    {
+      "clip_id": "0c6e1bca-81ec-4422-b45d-fa0f8f452f48",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "вопрос",
+      "id": "question",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/0c6e1bca-81ec-4422-b45d-fa0f8f452f48.mp4"
+    },
+    {
+      "clip_id": "58bb2e9c-6e7b-41fd-8125-6dfd0efe5338",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "вопрос",
+      "id": "question",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/58bb2e9c-6e7b-41fd-8125-6dfd0efe5338.mp4"
+    },
+    {
+      "clip_id": "e462dcd5-a15b-4f54-b8ab-5128fdd93708",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "вопрос",
+      "id": "question",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/e462dcd5-a15b-4f54-b8ab-5128fdd93708.mp4"
+    },
+    {
+      "clip_id": "d7103ec6-475f-4c4b-8579-87f455dcdc22",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "да",
+      "id": "yes",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/d7103ec6-475f-4c4b-8579-87f455dcdc22.mp4"
+    },
+    {
+      "clip_id": "27641c42-34b3-4adf-8c38-460549d96ccb",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "друг",
+      "id": "friend",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/27641c42-34b3-4adf-8c38-460549d96ccb.mp4"
+    },
+    {
+      "clip_id": "569a18a1-7606-450b-960e-bd915466df00",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "друг",
+      "id": "friend",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/569a18a1-7606-450b-960e-bd915466df00.mp4"
+    },
+    {
+      "clip_id": "2c2c22eb-d8ef-45f5-8815-6bbdb5ef80c6",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "работать",
+      "id": "work",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/2c2c22eb-d8ef-45f5-8815-6bbdb5ef80c6.mp4"
+    },
+    {
+      "clip_id": "5fd28b57-9261-44fc-9648-e519d00eca14",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "работать",
+      "id": "work",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/5fd28b57-9261-44fc-9648-e519d00eca14.mp4"
+    },
+    {
+      "clip_id": "7a3fb479-cb8c-4f18-a594-2e5383576bb0",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "работать",
+      "id": "work",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/7a3fb479-cb8c-4f18-a594-2e5383576bb0.mp4"
+    },
+    {
+      "clip_id": "2bc56752-df0a-47ae-b705-ba494ef273ec",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "хорошо",
+      "id": "good",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/2bc56752-df0a-47ae-b705-ba494ef273ec.mp4"
+    },
+    {
+      "clip_id": "4196c715-0ed9-4e7a-a0e5-525278d4b414",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "хорошо",
+      "id": "good",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/4196c715-0ed9-4e7a-a0e5-525278d4b414.mp4"
+    },
+    {
+      "clip_id": "894d6954-aa14-4b98-b720-0416890384ba",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "хорошо",
+      "id": "good",
+      "split": "validation",
+      "role": "known",
+      "official_split": "train",
+      "archive_path": "train/894d6954-aa14-4b98-b720-0416890384ba.mp4"
+    },
+    {
+      "clip_id": "b1851818-57ea-43e6-bf6f-7c18677d149d",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "М",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/b1851818-57ea-43e6-bf6f-7c18677d149d.mp4"
+    },
+    {
+      "clip_id": "e8dfb2b9-e2a0-4561-8063-f869da35ee5b",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "Н",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/e8dfb2b9-e2a0-4561-8063-f869da35ee5b.mp4"
+    },
+    {
+      "clip_id": "3beae70c-26f1-4fae-bde6-902b8f96aca8",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "возрадоваться",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/3beae70c-26f1-4fae-bde6-902b8f96aca8.mp4"
+    },
+    {
+      "clip_id": "11073d47-cdee-425f-baa8-e5ff71357fde",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "воротник",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/11073d47-cdee-425f-baa8-e5ff71357fde.mp4"
+    },
+    {
+      "clip_id": "bec37d3c-5387-4c14-a91b-a3862c7e3bb9",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "вред",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/bec37d3c-5387-4c14-a91b-a3862c7e3bb9.mp4"
+    },
+    {
+      "clip_id": "2905b637-61b2-4c54-922d-8fe8896d888a",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "держать",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/2905b637-61b2-4c54-922d-8fe8896d888a.mp4"
+    },
+    {
+      "clip_id": "a945204c-fde5-4103-a5b2-755971d8c654",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "довольство",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/a945204c-fde5-4103-a5b2-755971d8c654.mp4"
+    },
+    {
+      "clip_id": "bd3d5cb4-3dbb-4a24-a00a-c1fcb4c39576",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "задерживать",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/bd3d5cb4-3dbb-4a24-a00a-c1fcb4c39576.mp4"
+    },
+    {
+      "clip_id": "a0519440-ef6c-47a4-877a-6ab6bc4698eb",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "календарь",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/a0519440-ef6c-47a4-877a-6ab6bc4698eb.mp4"
+    },
+    {
+      "clip_id": "18594757-326c-426b-9298-0211dc6435ba",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "кусок; тонкими слоями",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/18594757-326c-426b-9298-0211dc6435ba.mp4"
+    },
+    {
+      "clip_id": "d7b4a2d8-7f83-4144-b22e-97c8a83a1601",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "назад",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/d7b4a2d8-7f83-4144-b22e-97c8a83a1601.mp4"
+    },
+    {
+      "clip_id": "7774186f-ad68-4fd5-bb9f-169ba95a65d5",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "обезьяна",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/7774186f-ad68-4fd5-bb9f-169ba95a65d5.mp4"
+    },
+    {
+      "clip_id": "31b06ae8-d24e-48a2-ac8e-df4f21e20c4f",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "овца",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/31b06ae8-d24e-48a2-ac8e-df4f21e20c4f.mp4"
+    },
+    {
+      "clip_id": "6c8d6dd2-ef16-4f44-8cd1-b2a2f792c67b",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "оживленный",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/6c8d6dd2-ef16-4f44-8cd1-b2a2f792c67b.mp4"
+    },
+    {
+      "clip_id": "4819d317-9114-4911-a626-d7e95120139f",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "олень",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/4819d317-9114-4911-a626-d7e95120139f.mp4"
+    },
+    {
+      "clip_id": "56070797-8237-4102-a23f-334ba4fa2b26",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "остроумие",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/56070797-8237-4102-a23f-334ba4fa2b26.mp4"
+    },
+    {
+      "clip_id": "f11fd8e3-20e5-4066-b283-c02c22d38856",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "пир",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/f11fd8e3-20e5-4066-b283-c02c22d38856.mp4"
+    },
+    {
+      "clip_id": "676c9f23-70a1-44b7-9f7f-83008a3a1c6d",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "прагматичный",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/676c9f23-70a1-44b7-9f7f-83008a3a1c6d.mp4"
+    },
+    {
+      "clip_id": "6becb623-c16d-4dab-9b86-baa7f885c2c8",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "привезти",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/6becb623-c16d-4dab-9b86-baa7f885c2c8.mp4"
+    },
+    {
+      "clip_id": "ebad2cf1-9851-4be6-8ff6-329ebabf9d05",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "принести",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/ebad2cf1-9851-4be6-8ff6-329ebabf9d05.mp4"
+    },
+    {
+      "clip_id": "cef07f47-6321-4af0-b52b-6df27f9eefc3",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "раздражать",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/cef07f47-6321-4af0-b52b-6df27f9eefc3.mp4"
+    },
+    {
+      "clip_id": "661eb49f-01ef-48a4-9bfc-010e17636a93",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "ранний",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/661eb49f-01ef-48a4-9bfc-010e17636a93.mp4"
+    },
+    {
+      "clip_id": "97c8ead0-f544-4bb0-875d-0fa5c94fa4a4",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "ревнивый",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/97c8ead0-f544-4bb0-875d-0fa5c94fa4a4.mp4"
+    },
+    {
+      "clip_id": "e6f6a978-153e-4961-b23f-26e2c4b9cb04",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "сверху",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/e6f6a978-153e-4961-b23f-26e2c4b9cb04.mp4"
+    },
+    {
+      "clip_id": "fe0e3e8a-c72f-438c-a3d7-8cb81dd5b341",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "семья",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/fe0e3e8a-c72f-438c-a3d7-8cb81dd5b341.mp4"
+    },
+    {
+      "clip_id": "6c528377-6bf9-4506-8dea-96aec33f388b",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "скромный",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/6c528377-6bf9-4506-8dea-96aec33f388b.mp4"
+    },
+    {
+      "clip_id": "d7c45d7a-038c-486d-ba8f-6d28798cb0f5",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "скучающий",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/d7c45d7a-038c-486d-ba8f-6d28798cb0f5.mp4"
+    },
+    {
+      "clip_id": "5fb2a100-b0fc-42e0-b733-db1dd4e1c2e0",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "сомнение",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/5fb2a100-b0fc-42e0-b733-db1dd4e1c2e0.mp4"
+    },
+    {
+      "clip_id": "c00715a0-b76f-4d28-8676-23bfb70acbde",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "уверенный",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/c00715a0-b76f-4d28-8676-23bfb70acbde.mp4"
+    },
+    {
+      "clip_id": "fbb41719-97fd-4dca-8ae4-9675f1169933",
+      "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+      "text": "юг",
+      "id": "__unknown__",
+      "split": "validation",
+      "role": "unknown",
+      "official_split": "train",
+      "archive_path": "train/fbb41719-97fd-4dca-8ae4-9675f1169933.mp4"
+    },
+    {
+      "clip_id": "5a954f84-aac2-43c9-b0fb-8ee2c3731229",
+      "user_id": "6a13ce9f94b37d4d71dc07a7ff348ff8",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/5a954f84-aac2-43c9-b0fb-8ee2c3731229.mp4"
+    },
+    {
+      "clip_id": "60a51a38-fb54-4646-affd-a2eac470d724",
+      "user_id": "55ac05bf18204955c640591070dd1118",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/60a51a38-fb54-4646-affd-a2eac470d724.mp4"
+    },
+    {
+      "clip_id": "fb3ec88e-c85c-4915-8d54-8f1afdfe3803",
+      "user_id": "e88c0621a4f9760225fbbff7f1a8b5bb",
+      "text": "Привет!",
+      "id": "hello",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/fb3ec88e-c85c-4915-8d54-8f1afdfe3803.mp4"
+    },
+    {
+      "clip_id": "739f4b42-cb5a-436f-b573-31bfd83e4c1e",
+      "user_id": "c944a2645f4f5ba346538db04df659c6",
+      "text": "вопрос",
+      "id": "question",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/739f4b42-cb5a-436f-b573-31bfd83e4c1e.mp4"
+    },
+    {
+      "clip_id": "8c3f3320-110f-4543-8f7d-37cadcf5baee",
+      "user_id": "eda33efefc1e536a196d6c1ca6b36bba",
+      "text": "вопрос",
+      "id": "question",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/8c3f3320-110f-4543-8f7d-37cadcf5baee.mp4"
+    },
+    {
+      "clip_id": "8fce414e-c173-44e8-afc6-5a0578a1de69",
+      "user_id": "5327426fdce7e6f87680b661e37e24c8",
+      "text": "вопрос",
+      "id": "question",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/8fce414e-c173-44e8-afc6-5a0578a1de69.mp4"
+    },
+    {
+      "clip_id": "6fd72124-6cf6-437f-82e7-8327896fabe0",
+      "user_id": "64df6876c23bf021dbfbccbc64f7406a",
+      "text": "да",
+      "id": "yes",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/6fd72124-6cf6-437f-82e7-8327896fabe0.mp4"
+    },
+    {
+      "clip_id": "d7c749ff-0a81-45b7-9d4d-35ab9abd5df3",
+      "user_id": "df8cbc6337c9d0928d4442d705e98d27",
+      "text": "да",
+      "id": "yes",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/d7c749ff-0a81-45b7-9d4d-35ab9abd5df3.mp4"
+    },
+    {
+      "clip_id": "78b0f239-4f6b-428c-a14a-36dbacd8a00b",
+      "user_id": "1860c7f3605089bf0eff0c4e72c7add4",
+      "text": "работать",
+      "id": "work",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/78b0f239-4f6b-428c-a14a-36dbacd8a00b.mp4"
+    },
+    {
+      "clip_id": "a0e41f14-ba4a-4d95-a081-777e3f5b6460",
+      "user_id": "0a11105fbfa6d452b86187db53b753e2",
+      "text": "работать",
+      "id": "work",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/a0e41f14-ba4a-4d95-a081-777e3f5b6460.mp4"
+    },
+    {
+      "clip_id": "e9ee8f62-c6bf-4ba5-ab28-70d0f78d30c5",
+      "user_id": "bd0fc003c736968ada3652aad29907dc",
+      "text": "работать",
+      "id": "work",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/e9ee8f62-c6bf-4ba5-ab28-70d0f78d30c5.mp4"
+    },
+    {
+      "clip_id": "f6a43edd-da1e-4226-8d5e-92df2052211d",
+      "user_id": "bcf5a67e65444f6c1d3119b5d6c3558b",
+      "text": "хорошо",
+      "id": "good",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/f6a43edd-da1e-4226-8d5e-92df2052211d.mp4"
+    },
+    {
+      "clip_id": "fecaec6d-dbec-4b4a-a6db-436ad56d927a",
+      "user_id": "bcf5a67e65444f6c1d3119b5d6c3558b",
+      "text": "хорошо",
+      "id": "good",
+      "split": "test",
+      "role": "known",
+      "official_split": "test",
+      "archive_path": "test/fecaec6d-dbec-4b4a-a6db-436ad56d927a.mp4"
+    },
+    {
+      "clip_id": "06e5f4f9-9fb1-4483-8854-3880d02ba722",
+      "user_id": "0ab4f8e463cdded2e59d6001f4e1b487",
+      "text": "М",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/06e5f4f9-9fb1-4483-8854-3880d02ba722.mp4"
+    },
+    {
+      "clip_id": "c3ac48e6-979e-4e8d-8f7a-627de0a8d409",
+      "user_id": "12c7911f38c7113ce13c71dbd785ce22",
+      "text": "М",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/c3ac48e6-979e-4e8d-8f7a-627de0a8d409.mp4"
+    },
+    {
+      "clip_id": "45557bda-2f3a-4882-a430-9cfcf5ad149d",
+      "user_id": "7c989fdb633be7453228f7c650097205",
+      "text": "Н",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/45557bda-2f3a-4882-a430-9cfcf5ad149d.mp4"
+    },
+    {
+      "clip_id": "49d3d3c3-7288-4a05-96bf-76da3d012b13",
+      "user_id": "3dd2ce2659aada17b976390004ebe322",
+      "text": "Н",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/49d3d3c3-7288-4a05-96bf-76da3d012b13.mp4"
+    },
+    {
+      "clip_id": "03612e0a-9bb4-4e5c-b5a1-a7b03f6d4ddb",
+      "user_id": "2987f0ebb62c980d913d2d9ad1acab1e",
+      "text": "возрадоваться",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/03612e0a-9bb4-4e5c-b5a1-a7b03f6d4ddb.mp4"
+    },
+    {
+      "clip_id": "f0ae752c-3a1a-4358-bec9-ca9acc3a2a89",
+      "user_id": "e3e1fd4bbf07a0423ee20d5c9baa49cc",
+      "text": "возрадоваться",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/f0ae752c-3a1a-4358-bec9-ca9acc3a2a89.mp4"
+    },
+    {
+      "clip_id": "9e8fc707-931d-4759-9fd0-a24fbdf90c6c",
+      "user_id": "9f9b13d8e63bd774b4ad1bd14f56147d",
+      "text": "вред",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/9e8fc707-931d-4759-9fd0-a24fbdf90c6c.mp4"
+    },
+    {
+      "clip_id": "b91213da-6aff-421d-8740-187f3283fdc0",
+      "user_id": "bd0fc003c736968ada3652aad29907dc",
+      "text": "вред",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/b91213da-6aff-421d-8740-187f3283fdc0.mp4"
+    },
+    {
+      "clip_id": "23683f0b-9d4f-4e24-97f5-d570b8c00fdd",
+      "user_id": "c05c242d2524d1de48c68f1667cd7b6b",
+      "text": "грязный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/23683f0b-9d4f-4e24-97f5-d570b8c00fdd.mp4"
+    },
+    {
+      "clip_id": "2945c1a0-365a-4168-9ac5-d0c97cfd7d31",
+      "user_id": "f2dc6eab563f93d86629c1cfe479f09d",
+      "text": "грязный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/2945c1a0-365a-4168-9ac5-d0c97cfd7d31.mp4"
+    },
+    {
+      "clip_id": "126ac1ca-e2ab-494c-9677-153a5556ad2a",
+      "user_id": "7c989fdb633be7453228f7c650097205",
+      "text": "держать",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/126ac1ca-e2ab-494c-9677-153a5556ad2a.mp4"
+    },
+    {
+      "clip_id": "cf122023-83f0-4fe6-82c0-7000d6b52c78",
+      "user_id": "a2d3f7227726ed3846d9bac38734e85b",
+      "text": "держать",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/cf122023-83f0-4fe6-82c0-7000d6b52c78.mp4"
+    },
+    {
+      "clip_id": "524df664-6a4d-420d-8954-b93215e1f3c8",
+      "user_id": "2987f0ebb62c980d913d2d9ad1acab1e",
+      "text": "довольство",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/524df664-6a4d-420d-8954-b93215e1f3c8.mp4"
+    },
+    {
+      "clip_id": "584efdab-ac7e-47c8-b043-cce1534be2c6",
+      "user_id": "e2a4b39d2c32a290f039aaf98c62eb27",
+      "text": "довольство",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/584efdab-ac7e-47c8-b043-cce1534be2c6.mp4"
+    },
+    {
+      "clip_id": "073a384a-e318-4acc-b7c7-0d0f80eba427",
+      "user_id": "0df9d6e419cb18069e696edaa170ba87",
+      "text": "задерживать",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/073a384a-e318-4acc-b7c7-0d0f80eba427.mp4"
+    },
+    {
+      "clip_id": "b5891955-396d-43cf-be6f-087537855657",
+      "user_id": "e4bd328bca8e6f51bd6f4f019692b666",
+      "text": "задерживать",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/b5891955-396d-43cf-be6f-087537855657.mp4"
+    },
+    {
+      "clip_id": "5b996449-8550-4d2c-b098-c0c364a136a7",
+      "user_id": "fb1007e5ffe149cc08bccaf8eda2ce31",
+      "text": "изучить",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/5b996449-8550-4d2c-b098-c0c364a136a7.mp4"
+    },
+    {
+      "clip_id": "72c4d022-68c1-4e8c-8b07-ddcfab4870d1",
+      "user_id": "324cdee3d2550397efb761d8fff48139",
+      "text": "изучить",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/72c4d022-68c1-4e8c-8b07-ddcfab4870d1.mp4"
+    },
+    {
+      "clip_id": "0816daf1-bae5-4568-b99b-0595e39df6f5",
+      "user_id": "4299b8ccf39ace57287b463fbe4a489b",
+      "text": "календарь",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/0816daf1-bae5-4568-b99b-0595e39df6f5.mp4"
+    },
+    {
+      "clip_id": "a128234c-9b7e-49cc-8c02-f1b6ab782e32",
+      "user_id": "12c7911f38c7113ce13c71dbd785ce22",
+      "text": "календарь",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/a128234c-9b7e-49cc-8c02-f1b6ab782e32.mp4"
+    },
+    {
+      "clip_id": "769e9a60-9824-4acc-b5c3-d422a087d793",
+      "user_id": "4d26ad833542291c50de9ce88fb4f64a",
+      "text": "кусок; тонкими слоями",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/769e9a60-9824-4acc-b5c3-d422a087d793.mp4"
+    },
+    {
+      "clip_id": "d63ac712-8fd4-4b54-9213-ee6918dac611",
+      "user_id": "53c3af7712ee8220b2faed1a55a82eca",
+      "text": "кусок; тонкими слоями",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/d63ac712-8fd4-4b54-9213-ee6918dac611.mp4"
+    },
+    {
+      "clip_id": "20cdfa4d-2fc3-4b34-8625-689bfffd3294",
+      "user_id": "38655613ab774f4181175c682c89a8a9",
+      "text": "лечь",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/20cdfa4d-2fc3-4b34-8625-689bfffd3294.mp4"
+    },
+    {
+      "clip_id": "66fdf481-17ef-47bf-a073-9b934054570d",
+      "user_id": "ab460ff83e8c5b13a705a9e2081023c2",
+      "text": "лечь",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/66fdf481-17ef-47bf-a073-9b934054570d.mp4"
+    },
+    {
+      "clip_id": "6147d56e-a462-40c0-8ead-cd9c55b2903f",
+      "user_id": "14b58133e7dd643c07abda9ef7f51175",
+      "text": "назад",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/6147d56e-a462-40c0-8ead-cd9c55b2903f.mp4"
+    },
+    {
+      "clip_id": "dc74084f-547d-49c3-9eab-4646678031ae",
+      "user_id": "a26bd7c643ebfcdf24eb0b21d49b433a",
+      "text": "назад",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/dc74084f-547d-49c3-9eab-4646678031ae.mp4"
+    },
+    {
+      "clip_id": "1dc4614a-12c6-461d-bc58-850b00f73384",
+      "user_id": "798aa826b6129d33f72f62d4ba60b681",
+      "text": "обезьяна",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/1dc4614a-12c6-461d-bc58-850b00f73384.mp4"
+    },
+    {
+      "clip_id": "d2b6a84f-276d-4db2-aed2-c91fc1cafe95",
+      "user_id": "0a11105fbfa6d452b86187db53b753e2",
+      "text": "обезьяна",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/d2b6a84f-276d-4db2-aed2-c91fc1cafe95.mp4"
+    },
+    {
+      "clip_id": "9927a46a-1358-48b4-8446-7c09cf802299",
+      "user_id": "ca6b767f0cccf093ba737ae2fc4fec3d",
+      "text": "овца",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/9927a46a-1358-48b4-8446-7c09cf802299.mp4"
+    },
+    {
+      "clip_id": "eea079bb-46e3-4d84-b3c7-6a7483b93b83",
+      "user_id": "92c73dfa328525ab086ae872d6614f14",
+      "text": "овца",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/eea079bb-46e3-4d84-b3c7-6a7483b93b83.mp4"
+    },
+    {
+      "clip_id": "108cdb75-e718-4dea-8321-31c77a5ab5df",
+      "user_id": "e2a4b39d2c32a290f039aaf98c62eb27",
+      "text": "оживленный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/108cdb75-e718-4dea-8321-31c77a5ab5df.mp4"
+    },
+    {
+      "clip_id": "8bed9c4e-87e4-4e0d-8721-fc932d110f77",
+      "user_id": "0041ec866777f12c384b64d8cd636277",
+      "text": "оживленный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/8bed9c4e-87e4-4e0d-8721-fc932d110f77.mp4"
+    },
+    {
+      "clip_id": "0a19a9ea-38dd-4a86-9b8c-c0afbe513371",
+      "user_id": "12c7911f38c7113ce13c71dbd785ce22",
+      "text": "олень",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/0a19a9ea-38dd-4a86-9b8c-c0afbe513371.mp4"
+    },
+    {
+      "clip_id": "b589dc5e-9122-4d8f-bf82-9f3e8b18be5c",
+      "user_id": "9f9b13d8e63bd774b4ad1bd14f56147d",
+      "text": "олень",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/b589dc5e-9122-4d8f-bf82-9f3e8b18be5c.mp4"
+    },
+    {
+      "clip_id": "73182591-e7aa-440a-87df-a63d10125ae6",
+      "user_id": "e2a4b39d2c32a290f039aaf98c62eb27",
+      "text": "остроумие",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/73182591-e7aa-440a-87df-a63d10125ae6.mp4"
+    },
+    {
+      "clip_id": "f469591e-4941-48df-8480-b9d084caba87",
+      "user_id": "dbc8429e8eaae0ac020b062e02d00c47",
+      "text": "остроумие",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/f469591e-4941-48df-8480-b9d084caba87.mp4"
+    },
+    {
+      "clip_id": "aacaadf7-8cea-45ca-b7f8-92ec80da6fe4",
+      "user_id": "bcfa0b04671c2a073fe1a90eafa5e718",
+      "text": "пир",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/aacaadf7-8cea-45ca-b7f8-92ec80da6fe4.mp4"
+    },
+    {
+      "clip_id": "edf29021-2c0e-49c5-8a4f-c38c789d3f16",
+      "user_id": "699e0e16008a571b9810c4a1794e0713",
+      "text": "пир",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/edf29021-2c0e-49c5-8a4f-c38c789d3f16.mp4"
+    },
+    {
+      "clip_id": "37cb9d00-5447-4db8-b729-f8e0b9439ca2",
+      "user_id": "92c73dfa328525ab086ae872d6614f14",
+      "text": "прагматичный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/37cb9d00-5447-4db8-b729-f8e0b9439ca2.mp4"
+    },
+    {
+      "clip_id": "ed8d7ee8-824a-488b-ac0c-069eef85aa8f",
+      "user_id": "dbc8429e8eaae0ac020b062e02d00c47",
+      "text": "прагматичный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/ed8d7ee8-824a-488b-ac0c-069eef85aa8f.mp4"
+    },
+    {
+      "clip_id": "420afad4-3c3e-45f6-8f56-104cb9be4702",
+      "user_id": "fb1007e5ffe149cc08bccaf8eda2ce31",
+      "text": "привезти",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/420afad4-3c3e-45f6-8f56-104cb9be4702.mp4"
+    },
+    {
+      "clip_id": "c0f7e022-418f-44bf-9827-6f8d9e5f7136",
+      "user_id": "40ad51b49892dca94b905eca8926568a",
+      "text": "привезти",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/c0f7e022-418f-44bf-9827-6f8d9e5f7136.mp4"
+    },
+    {
+      "clip_id": "7fe80d37-c896-4baf-ade0-edbc7a18da2f",
+      "user_id": "0c51143375644025ccda56fdfbc4ba06",
+      "text": "принести",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/7fe80d37-c896-4baf-ade0-edbc7a18da2f.mp4"
+    },
+    {
+      "clip_id": "9e90b688-6784-4d5f-a424-1d46817dc7c8",
+      "user_id": "232719b160f5951ee2c80613d367dc17",
+      "text": "принести",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/9e90b688-6784-4d5f-a424-1d46817dc7c8.mp4"
+    },
+    {
+      "clip_id": "6a132c0e-1906-4c64-80f7-eb29d4b4818d",
+      "user_id": "13c4baf863bfb1aa4ac638650e508d3b",
+      "text": "ревнивый",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/6a132c0e-1906-4c64-80f7-eb29d4b4818d.mp4"
+    },
+    {
+      "clip_id": "6e528584-a2e8-4b64-989c-af1217511c51",
+      "user_id": "3dd2ce2659aada17b976390004ebe322",
+      "text": "ревнивый",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/6e528584-a2e8-4b64-989c-af1217511c51.mp4"
+    },
+    {
+      "clip_id": "2cdebf1a-924e-49f4-bf26-9ead1a071dfb",
+      "user_id": "bcf5a67e65444f6c1d3119b5d6c3558b",
+      "text": "сверху",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/2cdebf1a-924e-49f4-bf26-9ead1a071dfb.mp4"
+    },
+    {
+      "clip_id": "d2ce48a6-0a10-44bc-93a6-dd5bedf185a9",
+      "user_id": "a2d3f7227726ed3846d9bac38734e85b",
+      "text": "сверху",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/d2ce48a6-0a10-44bc-93a6-dd5bedf185a9.mp4"
+    },
+    {
+      "clip_id": "71bd152c-fec9-4252-9862-5c07cbf73f66",
+      "user_id": "bcf5a67e65444f6c1d3119b5d6c3558b",
+      "text": "семья",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/71bd152c-fec9-4252-9862-5c07cbf73f66.mp4"
+    },
+    {
+      "clip_id": "e6cc21a2-040f-4ec8-a3bf-c3b00fb58d61",
+      "user_id": "7c989fdb633be7453228f7c650097205",
+      "text": "семья",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/e6cc21a2-040f-4ec8-a3bf-c3b00fb58d61.mp4"
+    },
+    {
+      "clip_id": "847cb57b-b23c-4c68-a26b-72d18a0a6f49",
+      "user_id": "c80b4e57f158f28299b2a89694c42329",
+      "text": "скромный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/847cb57b-b23c-4c68-a26b-72d18a0a6f49.mp4"
+    },
+    {
+      "clip_id": "fe3ecae1-3202-4d08-8c25-b21564f2e186",
+      "user_id": "53c3af7712ee8220b2faed1a55a82eca",
+      "text": "скромный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/fe3ecae1-3202-4d08-8c25-b21564f2e186.mp4"
+    },
+    {
+      "clip_id": "5ba66ed7-38be-4ac5-84c7-e70224f0c744",
+      "user_id": "3dd2ce2659aada17b976390004ebe322",
+      "text": "скучающий",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/5ba66ed7-38be-4ac5-84c7-e70224f0c744.mp4"
+    },
+    {
+      "clip_id": "959b6dea-0bd4-4a9b-8b2f-0a783d64d7ee",
+      "user_id": "e3e1fd4bbf07a0423ee20d5c9baa49cc",
+      "text": "скучающий",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/959b6dea-0bd4-4a9b-8b2f-0a783d64d7ee.mp4"
+    },
+    {
+      "clip_id": "70e998c8-1bc9-4685-82a5-359575790da1",
+      "user_id": "92c73dfa328525ab086ae872d6614f14",
+      "text": "уверенный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/70e998c8-1bc9-4685-82a5-359575790da1.mp4"
+    },
+    {
+      "clip_id": "a7f878c3-cab2-4226-b4cd-9af6ab600139",
+      "user_id": "dbc8429e8eaae0ac020b062e02d00c47",
+      "text": "уверенный",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/a7f878c3-cab2-4226-b4cd-9af6ab600139.mp4"
+    },
+    {
+      "clip_id": "37306ca2-e4ad-48c5-b65b-dc6f8bf2dac3",
+      "user_id": "1860c7f3605089bf0eff0c4e72c7add4",
+      "text": "шестьдесят",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/37306ca2-e4ad-48c5-b65b-dc6f8bf2dac3.mp4"
+    },
+    {
+      "clip_id": "759afd5a-38e6-41ab-a7aa-c20927394eab",
+      "user_id": "3dd2ce2659aada17b976390004ebe322",
+      "text": "шестьдесят",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/759afd5a-38e6-41ab-a7aa-c20927394eab.mp4"
+    },
+    {
+      "clip_id": "5662943d-e3c5-4c83-85ac-8c1577a99596",
+      "user_id": "7c989fdb633be7453228f7c650097205",
+      "text": "юг",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/5662943d-e3c5-4c83-85ac-8c1577a99596.mp4"
+    },
+    {
+      "clip_id": "dbca2862-1a13-440f-90ad-26189ac28391",
+      "user_id": "0a11105fbfa6d452b86187db53b753e2",
+      "text": "юг",
+      "id": "__unknown__",
+      "split": "test",
+      "role": "unknown",
+      "official_split": "test",
+      "archive_path": "test/dbca2862-1a13-440f-90ad-26189ac28391.mp4"
+    }
+  ]
+}

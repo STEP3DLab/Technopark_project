@@ -1,0 +1,4475 @@
+{
+  "schema_version": 1,
+  "protocol": "hearing-equality-v019",
+  "stage": "calibration-frozen",
+  "frozen_at": "2026-11-11T12:49:37.582Z",
+  "calibration_splits": [
+    "train",
+    "validation"
+  ],
+  "test_predictions_opened": false,
+  "scope": "Exploratory six-word offline experiment; no live production model update.",
+  "selection_sha256": "1f9e631bdb67a72fb1ba7e16ce0626344c40cf100ab53f7daa525dbc84761b01",
+  "features_sha256": "2f92ab7285588070bc2e407c75c4cf9928efc494ef3f30dd6eabd5c91c97f4f4",
+  "hashes": {
+    "selection": "1f9e631bdb67a72fb1ba7e16ce0626344c40cf100ab53f7daa525dbc84761b01",
+    "features": "2f92ab7285588070bc2e407c75c4cf9928efc494ef3f30dd6eabd5c91c97f4f4",
+    "protocol": "3c76d897dab72f68b1c31c266c34ca228583d7efc7e171909aa544688ce8587f",
+    "recognizer": "0d59870be93a43171bf9ed10b561f39e539e6965a71ccc40a8542f46542b94d8",
+    "production_library": "a8999b3168de512f23a8fe76f9a7542f1ec0d752e21ac3781dd439ae66fe92a7",
+    "historical_fixture": "7b7ea38075a375db2e574225f0202691c6062dcb713ad17e88a13833958b30d9",
+    "evaluator_script": "426d3effc4b5efc90e10a6d75761be167f958dc23730bffec4439abd6afe12a7",
+    "metrics_module": "525aa4a5533076cefa408aef91b32d5b17550a163492c531686ac34e78a189e1"
+  },
+  "audit": {
+    "summary": {
+      "train": {
+        "clips": 76,
+        "signers": 7,
+        "known": 76,
+        "unknown": 0
+      },
+      "validation": {
+        "clips": 43,
+        "signers": 1,
+        "known": 13,
+        "unknown": 30
+      },
+      "test": {
+        "clips": 73,
+        "signers": 46,
+        "known": 13,
+        "unknown": 60
+      }
+    },
+    "signer_overlap": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    },
+    "historical_signer_overlap": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "production_test_signer_overlap": 0,
+    "unknown_validation_test_label_overlap": 0,
+    "duplicate_clips": 0,
+    "historical_clips_used_as_new_evidence": 0
+  },
+  "training": {
+    "selected": 76,
+    "signers": 7,
+    "extraction_failed": 0,
+    "nonempty_sequences": 76,
+    "library_sha256": "4e3ce97b892bac3543c93d71bd839a4414865bbab8c7cf07c0ad14618b9bd06f",
+    "empty_sequences_retained": true
+  },
+  "grid_definition": {
+    "distance": [
+      0.2,
+      0.22,
+      0.24,
+      0.26,
+      0.28,
+      0.3,
+      0.32,
+      0.34,
+      0.36,
+      0.38,
+      0.4,
+      0.42,
+      0.44,
+      0.46,
+      0.48,
+      0.5,
+      0.52,
+      0.54,
+      0.56,
+      0.58,
+      0.6
+    ],
+    "gap": [
+      0.025,
+      0.04,
+      0.055,
+      0.08,
+      0.12,
+      0.16,
+      0.2
+    ]
+  },
+  "selection_rule": "Zero wrong known accepts and zero unknown false accepts; maximize correct known; lower distance; higher gap. Strict distance < threshold and gap > threshold.",
+  "policy": {
+    "enabled": true,
+    "distance": 0.34,
+    "gap": 0.08
+  },
+  "disabled_reason": null,
+  "grid_results": [
+    {
+      "distance": 0.2,
+      "gap": 0.025,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.2,
+      "gap": 0.04,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.2,
+      "gap": 0.055,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.2,
+      "gap": 0.08,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.2,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.2,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.2,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.025,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.04,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.055,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.08,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.22,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.025,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.04,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.055,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.08,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.24,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.025,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.04,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.055,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.08,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.26,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.025,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.04,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.055,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.08,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.28,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.025,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.04,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.055,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.08,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.3,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.025,
+      "correct_known": 3,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.04,
+      "correct_known": 3,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.055,
+      "correct_known": 3,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.08,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.12,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.32,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.025,
+      "correct_known": 5,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.04,
+      "correct_known": 5,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.055,
+      "correct_known": 5,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.34,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 3,
+      "eligible": false
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.36,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 4,
+      "eligible": false
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.38,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 4,
+      "eligible": false
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.4,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 4,
+      "eligible": false
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.42,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 4,
+      "eligible": false
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.44,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 6,
+      "eligible": false
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 4,
+      "eligible": false
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.46,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 7,
+      "eligible": false
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 5,
+      "eligible": false
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.48,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 7,
+      "eligible": false
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 5,
+      "eligible": false
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.5,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 8,
+      "eligible": false
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 5,
+      "eligible": false
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 2,
+      "eligible": false
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.52,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 12,
+      "eligible": false
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 7,
+      "eligible": false
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 3,
+      "eligible": false
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.54,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 13,
+      "eligible": false
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 7,
+      "eligible": false
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 3,
+      "eligible": false
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.56,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 13,
+      "eligible": false
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 7,
+      "eligible": false
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 3,
+      "eligible": false
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.58,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.025,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 15,
+      "eligible": false
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.04,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 8,
+      "eligible": false
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.055,
+      "correct_known": 7,
+      "wrong_known": 0,
+      "unknown_false_accept": 3,
+      "eligible": false
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.08,
+      "correct_known": 2,
+      "wrong_known": 0,
+      "unknown_false_accept": 1,
+      "eligible": false
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.12,
+      "correct_known": 1,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.16,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    },
+    {
+      "distance": 0.6,
+      "gap": 0.2,
+      "correct_known": 0,
+      "wrong_known": 0,
+      "unknown_false_accept": 0,
+      "eligible": true
+    }
+  ],
+  "validation": {
+    "summary": {
+      "known": {
+        "total": 13,
+        "correct": 2,
+        "wrong": 0,
+        "rejected": 11,
+        "accepted": 2,
+        "correct_of_all": {
+          "numerator": 2,
+          "denominator": 13,
+          "value": 0.15384615384615385
+        },
+        "coverage": {
+          "numerator": 2,
+          "denominator": 13,
+          "value": 0.15384615384615385
+        },
+        "selective_error": {
+          "numerator": 0,
+          "denominator": 2,
+          "value": 0
+        },
+        "top1_correct": 8,
+        "top1_of_all": {
+          "numerator": 8,
+          "denominator": 13,
+          "value": 0.6153846153846154
+        },
+        "top1_of_ranked": {
+          "numerator": 8,
+          "denominator": 13,
+          "value": 0.6153846153846154
+        }
+      },
+      "unknown": {
+        "total": 30,
+        "false_accept": 0,
+        "rejected": 30,
+        "false_accept_rate": {
+          "numerator": 0,
+          "denominator": 30,
+          "value": 0
+        },
+        "rejection_rate": {
+          "numerator": 30,
+          "denominator": 30,
+          "value": 1
+        }
+      },
+      "overall": {
+        "total": 43,
+        "accepted": 2,
+        "rejected": 41,
+        "incorrect_accepted": 0,
+        "coverage": {
+          "numerator": 2,
+          "denominator": 43,
+          "value": 0.046511627906976744
+        },
+        "selective_error": {
+          "numerator": 0,
+          "denominator": 2,
+          "value": 0
+        }
+      },
+      "by_known_class": [
+        {
+          "id": "hello",
+          "text": "Привет!",
+          "evaluation_status": "evaluated",
+          "total": 1,
+          "correct": 0,
+          "wrong": 0,
+          "rejected": 1,
+          "accepted": 0,
+          "correct_of_all": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "coverage": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "selective_error": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "top1_correct": 1,
+          "top1_of_all": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          },
+          "top1_of_ranked": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "id": "yes",
+          "text": "да",
+          "evaluation_status": "evaluated",
+          "total": 1,
+          "correct": 0,
+          "wrong": 0,
+          "rejected": 1,
+          "accepted": 0,
+          "correct_of_all": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "coverage": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "selective_error": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "top1_correct": 0,
+          "top1_of_all": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "top1_of_ranked": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          }
+        },
+        {
+          "id": "good",
+          "text": "хорошо",
+          "evaluation_status": "evaluated",
+          "total": 3,
+          "correct": 0,
+          "wrong": 0,
+          "rejected": 3,
+          "accepted": 0,
+          "correct_of_all": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "coverage": {
+            "numerator": 0,
+            "denominator": 3,
+            "value": 0
+          },
+          "selective_error": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "top1_correct": 1,
+          "top1_of_all": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "top1_of_ranked": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          }
+        },
+        {
+          "id": "question",
+          "text": "вопрос",
+          "evaluation_status": "evaluated",
+          "total": 3,
+          "correct": 1,
+          "wrong": 0,
+          "rejected": 2,
+          "accepted": 1,
+          "correct_of_all": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "coverage": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "selective_error": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "top1_correct": 2,
+          "top1_of_all": {
+            "numerator": 2,
+            "denominator": 3,
+            "value": 0.6666666666666666
+          },
+          "top1_of_ranked": {
+            "numerator": 2,
+            "denominator": 3,
+            "value": 0.6666666666666666
+          }
+        },
+        {
+          "id": "friend",
+          "text": "друг",
+          "evaluation_status": "evaluated",
+          "total": 2,
+          "correct": 0,
+          "wrong": 0,
+          "rejected": 2,
+          "accepted": 0,
+          "correct_of_all": {
+            "numerator": 0,
+            "denominator": 2,
+            "value": 0
+          },
+          "coverage": {
+            "numerator": 0,
+            "denominator": 2,
+            "value": 0
+          },
+          "selective_error": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "top1_correct": 1,
+          "top1_of_all": {
+            "numerator": 1,
+            "denominator": 2,
+            "value": 0.5
+          },
+          "top1_of_ranked": {
+            "numerator": 1,
+            "denominator": 2,
+            "value": 0.5
+          }
+        },
+        {
+          "id": "work",
+          "text": "работать",
+          "evaluation_status": "evaluated",
+          "total": 3,
+          "correct": 1,
+          "wrong": 0,
+          "rejected": 2,
+          "accepted": 1,
+          "correct_of_all": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "coverage": {
+            "numerator": 1,
+            "denominator": 3,
+            "value": 0.3333333333333333
+          },
+          "selective_error": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "top1_correct": 3,
+          "top1_of_all": {
+            "numerator": 3,
+            "denominator": 3,
+            "value": 1
+          },
+          "top1_of_ranked": {
+            "numerator": 3,
+            "denominator": 3,
+            "value": 1
+          }
+        }
+      ],
+      "by_unknown_class": [
+        {
+          "text": "М",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "Н",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "возрадоваться",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "воротник",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "вред",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "держать",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "довольство",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "задерживать",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "календарь",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "кусок; тонкими слоями",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "назад",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "обезьяна",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "овца",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "оживленный",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "олень",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "остроумие",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "пир",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "прагматичный",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "привезти",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "принести",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "раздражать",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "ранний",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "ревнивый",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "сверху",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "семья",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "скромный",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "скучающий",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "сомнение",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "уверенный",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        },
+        {
+          "text": "юг",
+          "total": 1,
+          "false_accept": 0,
+          "rejected": 1,
+          "false_accept_rate": {
+            "numerator": 0,
+            "denominator": 1,
+            "value": 0
+          },
+          "rejection_rate": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1
+          }
+        }
+      ],
+      "confusion": {
+        "expected_rows": [
+          "hello",
+          "yes",
+          "good",
+          "question",
+          "friend",
+          "work",
+          "__unknown__"
+        ],
+        "predicted_columns": [
+          "hello",
+          "yes",
+          "good",
+          "question",
+          "friend",
+          "work",
+          "__reject__"
+        ],
+        "counts": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            30
+          ]
+        ]
+      },
+      "rejection_reasons": {
+        "gap": 12,
+        "distance": 29
+      }
+    },
+    "predictions": [
+      {
+        "clip_id": "cc720e36-8afc-4297-9754-5987bbfaf356",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "Привет!",
+        "id": "hello",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/cc720e36-8afc-4297-9754-5987bbfaf356.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.2737224944624643,
+        "gap": 0.07549712656202806,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.2737224944624643
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.3492196210244924
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.35442555800372055
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.3919739146269356
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.4911058012033542
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5266242881754009
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": true
+      },
+      {
+        "clip_id": "0c6e1bca-81ec-4422-b45d-fa0f8f452f48",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "вопрос",
+        "id": "question",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/0c6e1bca-81ec-4422-b45d-fa0f8f452f48.mp4",
+        "extraction_status": "ok",
+        "nearest": "question",
+        "distance": 0.30163583829502716,
+        "gap": 0.057658646477365016,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.30163583829502716
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.3592944847723922
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.4032284128090611
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.42100667393381414
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4527840619313537
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5341302570385603
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": true
+      },
+      {
+        "clip_id": "58bb2e9c-6e7b-41fd-8125-6dfd0efe5338",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "вопрос",
+        "id": "question",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/58bb2e9c-6e7b-41fd-8125-6dfd0efe5338.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.2990263652141642,
+        "gap": 0.0034334587720032395,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.2990263652141642
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.30245982398616744
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.39065098911444857
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4186773447421337
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.431154792737674
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.4543123962683165
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "e462dcd5-a15b-4f54-b8ab-5128fdd93708",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "вопрос",
+        "id": "question",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/e462dcd5-a15b-4f54-b8ab-5128fdd93708.mp4",
+        "extraction_status": "ok",
+        "nearest": "question",
+        "distance": 0.2656712250237584,
+        "gap": 0.09092978152785725,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.2656712250237584
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.35660100655161564
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.4001192885383437
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.40089944978640624
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4151379835460844
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5225442994871264
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": true,
+        "correct": true,
+        "outcome": "correct",
+        "rejection_reason": null,
+        "top1_correct": true
+      },
+      {
+        "clip_id": "d7103ec6-475f-4c4b-8579-87f455dcdc22",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "да",
+        "id": "yes",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/d7103ec6-475f-4c4b-8579-87f455dcdc22.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.3291893777466424,
+        "gap": 0.021534439297583974,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.3291893777466424
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.3507238170442264
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.38504191320979286
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.4285048742342562
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4390496646116133
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4652897850029663
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "27641c42-34b3-4adf-8c38-460549d96ccb",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "друг",
+        "id": "friend",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/27641c42-34b3-4adf-8c38-460549d96ccb.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.3430156101145372,
+        "gap": 0.06783747448969601,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.3430156101145372
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4108530846042332
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.41434612946620114
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.44898773812012244
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.45618074017363736
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.4595218552213899
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": true
+      },
+      {
+        "clip_id": "569a18a1-7606-450b-960e-bd915466df00",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "друг",
+        "id": "friend",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/569a18a1-7606-450b-960e-bd915466df00.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.43232118417763693,
+        "gap": 0.006380066933650674,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.43232118417763693
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.4387012511112876
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.45948052976200826
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.4671783882021864
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5301915258807717
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5439335166899201
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "2c2c22eb-d8ef-45f5-8815-6bbdb5ef80c6",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "работать",
+        "id": "work",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/2c2c22eb-d8ef-45f5-8815-6bbdb5ef80c6.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.34156682315655346,
+        "gap": 0.06752034195561879,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.34156682315655346
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.40908716511217225
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.422539573416252
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4234771357435048
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.48835689554993394
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.4961305855030377
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": true
+      },
+      {
+        "clip_id": "5fd28b57-9261-44fc-9648-e519d00eca14",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "работать",
+        "id": "work",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/5fd28b57-9261-44fc-9648-e519d00eca14.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.28349086059734724,
+        "gap": 0.024031391454564344,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.28349086059734724
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.3075222520519116
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.42635515913996985
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4332990381936157
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5492886813916694
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5798669210494836
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": true
+      },
+      {
+        "clip_id": "7a3fb479-cb8c-4f18-a594-2e5383576bb0",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "работать",
+        "id": "work",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/7a3fb479-cb8c-4f18-a594-2e5383576bb0.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.3230780830342002,
+        "gap": 0.15637039041620898,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.3230780830342002
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4794484734504092
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5297219739423412
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5341325148730223
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5344176512479187
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5437896801842722
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": true,
+        "correct": true,
+        "outcome": "correct",
+        "rejection_reason": null,
+        "top1_correct": true
+      },
+      {
+        "clip_id": "2bc56752-df0a-47ae-b705-ba494ef273ec",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "хорошо",
+        "id": "good",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/2bc56752-df0a-47ae-b705-ba494ef273ec.mp4",
+        "extraction_status": "ok",
+        "nearest": "good",
+        "distance": 0.3324754314865884,
+        "gap": 0.0670516403710435,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.3324754314865884
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.3995270718576319
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.4029860237191989
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.4067070033409156
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.4180038502908755
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4483131032243304
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": true
+      },
+      {
+        "clip_id": "4196c715-0ed9-4e7a-a0e5-525278d4b414",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "хорошо",
+        "id": "good",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/4196c715-0ed9-4e7a-a0e5-525278d4b414.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.3211333955541294,
+        "gap": 0.007890336195983838,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.3211333955541294
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.32902373175011324
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.3408843237684624
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.3578618440483875
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.3666614028747786
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.3997704421222605
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "894d6954-aa14-4b98-b720-0416890384ba",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "хорошо",
+        "id": "good",
+        "split": "validation",
+        "role": "known",
+        "official_split": "train",
+        "archive_path": "train/894d6954-aa14-4b98-b720-0416890384ba.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.446997710025509,
+        "gap": 0.01404693939042101,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.446997710025509
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.46104464941593
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.49906250709202415
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.504789124771136
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5083861133226406
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5517735677707074
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "b1851818-57ea-43e6-bf6f-7c18677d149d",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "М",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/b1851818-57ea-43e6-bf6f-7c18677d149d.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.5390561438650061,
+        "gap": 0.038730681529071664,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5390561438650061
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.5777868253940778
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.600376284150442
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.611738192864277
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.6376224246157732
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.6898316024583573
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "e8dfb2b9-e2a0-4561-8063-f869da35ee5b",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "Н",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/e8dfb2b9-e2a0-4561-8063-f869da35ee5b.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.3654488174251319,
+        "gap": 0.024307987552192767,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.3654488174251319
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.3897568049773247
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4280858846705013
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.46495688424926185
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5026748906780079
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5563829633118685
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "3beae70c-26f1-4fae-bde6-902b8f96aca8",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "возрадоваться",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/3beae70c-26f1-4fae-bde6-902b8f96aca8.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.6116741841940694,
+        "gap": 0.004524039902604082,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6116741841940694
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.6161982240966735
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6455688874748777
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.6522545252075707
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.6724387780443124
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6941222318291181
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "11073d47-cdee-425f-baa8-e5ff71357fde",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "воротник",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/11073d47-cdee-425f-baa8-e5ff71357fde.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.5396193941268204,
+        "gap": 0.01622578844007272,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5396193941268204
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5558451825668931
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.5642656509177597
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5676917237050612
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.6003171831347551
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6152722124380018
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "bec37d3c-5387-4c14-a91b-a3862c7e3bb9",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "вред",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/bec37d3c-5387-4c14-a91b-a3862c7e3bb9.mp4",
+        "extraction_status": "ok",
+        "nearest": "question",
+        "distance": 0.25608046566098136,
+        "gap": 0.06204810779802444,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.25608046566098136
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.3181285734590058
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.33128703887293387
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.33130425544644776
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.3453988519272394
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5125106975977423
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "2905b637-61b2-4c54-922d-8fe8896d888a",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "держать",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/2905b637-61b2-4c54-922d-8fe8896d888a.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.28698443064074114,
+        "gap": 0.011632531301438043,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.28698443064074114
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.2986169619421792
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.3130852908295959
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.3638755792036227
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.36682919931966096
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.3704994637857619
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "a945204c-fde5-4103-a5b2-755971d8c654",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "довольство",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/a945204c-fde5-4103-a5b2-755971d8c654.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.3503935585006802,
+        "gap": 0.03509940815324475,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.3503935585006802
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.38549296665392496
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.41002682625703
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4169938841587813
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5260876118949634
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5533272186198506
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "bd3d5cb4-3dbb-4a24-a00a-c1fcb4c39576",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "задерживать",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/bd3d5cb4-3dbb-4a24-a00a-c1fcb4c39576.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.5566706601778353,
+        "gap": 0.0013070521865417017,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5566706601778353
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.557977712364377
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5635571406809253
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.5844481612270985
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6238440368168556
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6415460357504645
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "a0519440-ef6c-47a4-877a-6ab6bc4698eb",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "календарь",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/a0519440-ef6c-47a4-877a-6ab6bc4698eb.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.5269702179101812,
+        "gap": 0.07073057290674467,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5269702179101812
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5977007908169258
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6911951352930265
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.7083633112381228
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.737142113105298
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.7459318177206365
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "18594757-326c-426b-9298-0211dc6435ba",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "кусок; тонкими слоями",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/18594757-326c-426b-9298-0211dc6435ba.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.5535015904108035,
+        "gap": 0.02563823433261969,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.5535015904108035
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5791398247434232
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.6035729030257702
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.61244043526371
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6213708796834607
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.639293976455422
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "d7b4a2d8-7f83-4144-b22e-97c8a83a1601",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "назад",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/d7b4a2d8-7f83-4144-b22e-97c8a83a1601.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.4672814211475319,
+        "gap": 0.08647000844547847,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4672814211475319
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5537514295930104
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5978566473377926
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6208511305884038
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.6283978268348858
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6566327401032266
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "7774186f-ad68-4fd5-bb9f-169ba95a65d5",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "обезьяна",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/7774186f-ad68-4fd5-bb9f-169ba95a65d5.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.582472201041252,
+        "gap": 0.04982572137620367,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.582472201041252
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.6322979224174556
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6341546488355875
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6404295729294591
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.7289763498610202
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.7408927805269793
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "31b06ae8-d24e-48a2-ac8e-df4f21e20c4f",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "овца",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/31b06ae8-d24e-48a2-ac8e-df4f21e20c4f.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.7489532052720863,
+        "gap": 0.05775256100097048,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.7489532052720863
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.8067057662730568
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.8140681625337607
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.9185846715017748
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.9201485916820991
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.9675233311339408
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "6c8d6dd2-ef16-4f44-8cd1-b2a2f792c67b",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "оживленный",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/6c8d6dd2-ef16-4f44-8cd1-b2a2f792c67b.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.5961508785641344,
+        "gap": 0.033677032895572334,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5961508785641344
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.6298279114597067
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6390382508421916
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.6447537017717198
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6520608293903558
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.6611612928470336
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "4819d317-9114-4911-a626-d7e95120139f",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "олень",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/4819d317-9114-4911-a626-d7e95120139f.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.7385161865162022,
+        "gap": 0.13788435232223006,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.7385161865162022
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.8764005388384323
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.9432612588875505
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 1.0217772780361054
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 1.0269735502791228
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 1.036496317716108
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "56070797-8237-4102-a23f-334ba4fa2b26",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "остроумие",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/56070797-8237-4102-a23f-334ba4fa2b26.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.4406364406314135,
+        "gap": 0.042191106837779824,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4406364406314135
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.4828275474691933
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4843087948191108
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5102381223360963
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5403917839670447
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5543670841794421
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "f11fd8e3-20e5-4066-b283-c02c22d38856",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "пир",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/f11fd8e3-20e5-4066-b283-c02c22d38856.mp4",
+        "extraction_status": "ok",
+        "nearest": "good",
+        "distance": 0.5577764933327047,
+        "gap": 0.010057083925128274,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.5577764933327047
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.567833577257833
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5771414134070365
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5840288120491604
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.590126979350793
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6149626962717903
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "676c9f23-70a1-44b7-9f7f-83008a3a1c6d",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "прагматичный",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/676c9f23-70a1-44b7-9f7f-83008a3a1c6d.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.5258054674323033,
+        "gap": 0.0321341251203503,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5258054674323033
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5579395925526536
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.6081876861810886
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.652610666226732
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6600071371015804
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.7016857567295509
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "6becb623-c16d-4dab-9b86-baa7f885c2c8",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "привезти",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/6becb623-c16d-4dab-9b86-baa7f885c2c8.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.6726233358085171,
+        "gap": 0.009970741167849462,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.6726233358085171
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6825940769763665
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.7085074801249946
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.7118047269961499
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.7310760504192522
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.7371490311019693
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "ebad2cf1-9851-4be6-8ff6-329ebabf9d05",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "принести",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/ebad2cf1-9851-4be6-8ff6-329ebabf9d05.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.5173785211544567,
+        "gap": 0.026290745874829935,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5173785211544567
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5436692670292866
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.571796531459421
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5811248647921332
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5968558299217142
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6528314320750449
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "cef07f47-6321-4af0-b52b-6df27f9eefc3",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "раздражать",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/cef07f47-6321-4af0-b52b-6df27f9eefc3.mp4",
+        "extraction_status": "ok",
+        "nearest": "question",
+        "distance": 0.29492813581943017,
+        "gap": 0.027383112210119298,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.29492813581943017
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.32231124802954947
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.327326992040207
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.34499372772715803
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.3853067775441573
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4029941235564107
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "661eb49f-01ef-48a4-9bfc-010e17636a93",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "ранний",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/661eb49f-01ef-48a4-9bfc-010e17636a93.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.3060540932237716,
+        "gap": 0.0026794276736641365,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.3060540932237716
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.3087335208974357
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.374830762199818
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.3785965055963195
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.4179652580690905
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.41807413085571615
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "97c8ead0-f544-4bb0-875d-0fa5c94fa4a4",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "ревнивый",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/97c8ead0-f544-4bb0-875d-0fa5c94fa4a4.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.5595759031308694,
+        "gap": 0.013823641029920508,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5595759031308694
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5733995441607899
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.5794368728844181
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.6081914672345807
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.616310664838754
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6489507970187299
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "e6f6a978-153e-4961-b23f-26e2c4b9cb04",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "сверху",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/e6f6a978-153e-4961-b23f-26e2c4b9cb04.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.6352696357998052,
+        "gap": 0.001331977499778092,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6352696357998052
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6366016132995833
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.6945437892179633
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.6975816288307023
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.7270109826470348
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.7369524407723901
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "fe0e3e8a-c72f-438c-a3d7-8cb81dd5b341",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "семья",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/fe0e3e8a-c72f-438c-a3d7-8cb81dd5b341.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.5317728799888626,
+        "gap": 0.045429531411865676,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5317728799888626
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5772024114007283
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.6044678685924717
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.6111081266585253
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.6366741994388476
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.673361720372976
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "6c528377-6bf9-4506-8dea-96aec33f388b",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "скромный",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/6c528377-6bf9-4506-8dea-96aec33f388b.mp4",
+        "extraction_status": "ok",
+        "nearest": "friend",
+        "distance": 0.4512487806880728,
+        "gap": 0.04996397789633872,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.4512487806880728
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5012127585844115
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.5111941459802428
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5177613476142973
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5525526361190988
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6036768349153577
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "d7c45d7a-038c-486d-ba8f-6d28798cb0f5",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "скучающий",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/d7c45d7a-038c-486d-ba8f-6d28798cb0f5.mp4",
+        "extraction_status": "ok",
+        "nearest": "good",
+        "distance": 0.4439224502716117,
+        "gap": 0.01874921856563272,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.4439224502716117
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.4626716688372444
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.4686394739867099
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.4797018515604797
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5640444624800904
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5696504065403145
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "5fb2a100-b0fc-42e0-b733-db1dd4e1c2e0",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "сомнение",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/5fb2a100-b0fc-42e0-b733-db1dd4e1c2e0.mp4",
+        "extraction_status": "ok",
+        "nearest": "hello",
+        "distance": 0.3066760674041777,
+        "gap": 0.014828585213531198,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.3066760674041777
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.3215046526177089
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.39213621023616674
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.4015916957539779
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.42200136590852066
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.43146438612183136
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "gap",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "c00715a0-b76f-4d28-8676-23bfb70acbde",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "уверенный",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/c00715a0-b76f-4d28-8676-23bfb70acbde.mp4",
+        "extraction_status": "ok",
+        "nearest": "good",
+        "distance": 0.52477386689396,
+        "gap": 0.012803479082735159,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.52477386689396
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.5375773459766952
+          },
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.5381620208988266
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5471385144382689
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.5773620365417489
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.6163698317743155
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      },
+      {
+        "clip_id": "fbb41719-97fd-4dca-8ae4-9675f1169933",
+        "user_id": "46dd04a1caa75ed3082b573cb5a3ad26",
+        "text": "юг",
+        "id": "__unknown__",
+        "split": "validation",
+        "role": "unknown",
+        "official_split": "train",
+        "archive_path": "train/fbb41719-97fd-4dca-8ae4-9675f1169933.mp4",
+        "extraction_status": "ok",
+        "nearest": "work",
+        "distance": 0.36166263435306906,
+        "gap": 0.0406787746150265,
+        "gap_infinite": false,
+        "rankings": [
+          {
+            "id": "work",
+            "text": "работать",
+            "distance": 0.36166263435306906
+          },
+          {
+            "id": "friend",
+            "text": "друг",
+            "distance": 0.40234140896809556
+          },
+          {
+            "id": "good",
+            "text": "хорошо",
+            "distance": 0.40970247753081235
+          },
+          {
+            "id": "question",
+            "text": "вопрос",
+            "distance": 0.4928434913591432
+          },
+          {
+            "id": "hello",
+            "text": "Привет!",
+            "distance": 0.530564582000074
+          },
+          {
+            "id": "yes",
+            "text": "да",
+            "distance": 0.5440372508967672
+          }
+        ],
+        "ranking_issue": "",
+        "ranking_refusal": null,
+        "accepted": false,
+        "correct": false,
+        "outcome": "rejected",
+        "rejection_reason": "distance",
+        "top1_correct": false
+      }
+    ]
+  },
+  "limitations": [
+    "No new test signer for friend remains after excluding historic signers.",
+    "Validation has one signer; this is an exploratory engineering experiment.",
+    "Unknown labels are 30 deterministic sampled Slovo classes, not arbitrary movements or connected signing.",
+    "Natural sentences, comprehension of the avatar, and a live browser camera are not measured."
+  ],
+  "record_sha256": "b3eb44a9e2b88455a3e79b22669bfd0adc97565b49c35828000023b1f79deb2b"
+}

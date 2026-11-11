@@ -1,4 +1,4 @@
-import {PHRASE_GROUPS,findPhrases} from './phrasebook.js?v=0.18.1';
+import {PHRASE_GROUPS,findPhrases} from './phrasebook.js?v=0.19.0';
 export function createPracticalController({document:doc,insertText,onReply}) {
   const $=id=>doc.getElementById(id);let group='everyday',replyContext=null,addedContext=false,contextDemo=false;
   function renderPhrases(){

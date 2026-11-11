@@ -1,12 +1,13 @@
 {
   "name": "hearing-equality-mvp",
-  "version": "0.18.1",
+  "version": "0.19.0",
   "private": true,
   "type": "module",
   "description": "Равенство по слуху: прототип двусторонней коммуникации: жесты, текст, голос, аватар",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "evaluate": "node scripts/evaluate.mjs",
-    "verify": "node scripts/verify.mjs"
+    "verify": "node scripts/verify.mjs",
+    "research:evaluate": "node scripts/research-evaluate-v019.mjs --evaluate"
   }
 }

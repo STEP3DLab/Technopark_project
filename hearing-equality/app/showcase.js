@@ -1,5 +1,5 @@
-import './platform.js?v=0.18.1';
-import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.18.1';
+import './platform.js?v=0.19.0';
+import { prepareDemoAssets, readDemoCacheStatus } from './demo-cache.js?v=0.19.0';
 
 const api=window.hearingEquality;
 const $=id=>document.getElementById(id);
@@ -66,7 +66,7 @@ function showReadiness({cached=0,total=0,failed=[],offlineReady=false,needsReloa
   $('readiness-progress').value=total?cached/total:0;
   if(loading)$('readiness-copy').textContent='Сохраняем · '+cached+' / '+total;
   else if(offlineReady&&retained)$('readiness-copy').textContent='Ранее подготовленные материалы сохранены и доступны без сети. Обновление не завершилось: повторите при стабильном интернете.';
-  else if(offlineReady)$('readiness-copy').textContent='Готово: аватар и видео доступны без интернета.';
+  else if(offlineReady)$('readiness-copy').textContent='Готово: демонстратор, результаты исследования и кабинет пилота доступны без интернета.';
   else if(needsReload)$('readiness-copy').textContent='Материалы сохранены. Обновите страницу, чтобы включить автономный показ. Текущая история диалога при этом очистится.';
   else $('readiness-copy').textContent='Загружено '+cached+' из '+total+' материалов. '+(failed.length?'Часть загрузок не завершилась. ':'')+'Повторите подготовку при доступном интернете.';
   $('readiness-reload').hidden=!needsReload;

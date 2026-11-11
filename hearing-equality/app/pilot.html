@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153369">
+  <meta name="description" content="Рабочий кабинет пилота «Равенство по слуху»: 20 полных сообщений, реестр материалов и журнал проверки смысла.">
+  <title>Пилот полных сообщений — Равенство по слуху</title>
+  <link rel="stylesheet" href="pilot.css?v=0.19.0">
+</head>
+<body>
+<a class="skip-link" href="#workspace">К рабочей области</a>
+<header class="header">
+  <a class="brand" href="./#text"><img src="assets/brand/rgsu-blue.svg" alt="РГСУ"><span>Равенство по слуху<small>Технопарк РГСУ</small></span></a>
+  <a class="back-link" href="./#text">Открыть демонстратор <span aria-hidden="true">↗</span></a>
+</header>
+<main>
+  <section class="intro" aria-labelledby="page-title">
+    <div><p class="eyebrow">Исследование полных сообщений</p><h1 id="page-title">Встреча посетителя</h1><p class="lead">Подготовка записей РЖЯ и проверка того, как люди понимают сообщение.</p></div>
+    <p class="protocol-note"><strong>20 смыслов для пилота</strong><span>Эти фразы ещё не стали переводами РЖЯ. Здесь вы собираете материалы и фиксируете проверку.</span></p>
+  </section>
+  <div id="loading" class="notice" role="status">Открываем протокол…</div>
+  <noscript><p class="notice error">Для работы кабинета нужен JavaScript. <a href="../docs/PILOT_RECORDING_BRIEF.md">Открыть исходный протокол</a>.</p></noscript>
+  <div id="app-content" hidden>
+    <section class="progress-line" aria-label="Состояние текущего проекта">
+      <div><strong id="metric-messages">0 <span>/ 20</span></strong><span>сообщений с материалами</span></div>
+      <div><strong id="metric-approved">0</strong><span>материалов с языковой проверкой</span></div>
+      <div><strong id="metric-attempts">0</strong><span>зафиксированных попыток</span></div>
+      <p id="progress-caption">Записей и результатов в этом проекте пока нет.</p>
+    </section>
+    <section class="project-bar" aria-label="Файл проекта">
+      <div class="project-actions"><button id="export-json" type="button">Сохранить проект JSON</button><label class="file-button">Открыть проект<input id="import-json" type="file" accept="application/json,.json"></label><button id="new-study" class="quiet" type="button">Новый проект</button></div>
+      <div class="storage-choice"><label><input id="remember" type="checkbox">Сохранять на этом устройстве</label><span id="storage-status">Без сохранения в браузере. Перед закрытием скачайте JSON.</span></div>
+    </section>
+    <div id="restore-banner" class="notice" hidden><span>На устройстве есть сохранённый проект.</span><button id="restore-study" type="button">Восстановить</button><button id="forget-saved" class="quiet" type="button">Удалить сохранённую копию</button></div>
+    <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+    <nav class="tabs" aria-label="Этапы пилота">
+      <button type="button" data-tab="materials" aria-current="page">1. Материалы</button>
+      <button type="button" data-tab="assessment">2. Проверка</button>
+      <button type="button" data-tab="review">3. Оценка смысла</button>
+      <button type="button" data-tab="journal">Журнал и выгрузка</button>
+    </nav>
+    <div id="workspace" tabindex="-1">
+      <section id="tab-materials" class="tab-panel" aria-labelledby="materials-title">
+        <div class="section-heading"><div><p class="eyebrow">Подготовка корпуса</p><h2 id="materials-title">Карточки сообщений</h2></div><a href="../docs/PILOT_RECORDING_BRIEF.md" target="_blank" rel="noopener">Задание на запись ↗</a></div>
+        <p class="section-copy">Русская фраза задаёт смысл. Носитель РЖЯ и переводчик выбирают естественное высказывание, включая мимику, вопрос и отрицание.</p>
+        <div class="materials-layout">
+          <aside class="message-list-wrap"><label for="message-filter">Найти сообщение</label><input id="message-filter" type="search" placeholder="Например, занятие или вопрос" maxlength="100"><div id="message-list" class="message-list" role="group" aria-label="20 смысловых карточек"></div><p id="filter-empty" class="muted" hidden>Сообщений по запросу нет.</p></aside>
+          <section class="work-panel" aria-labelledby="selected-title">
+            <div class="selected-header"><span id="selected-id" class="message-number">M01</span><span id="selected-role" class="muted"></span></div><h3 id="selected-title"></h3><p id="selected-context" class="muted"></p>
+            <p id="selected-status" class="material-status">Материалов пока нет. Языковая проверка не проводилась.</p>
+            <form id="material-form">
+              <div class="form-grid"><label>Код исполнителя исходного жеста<input id="material-participant" placeholder="P01" pattern="[A-Z][A-Z0-9_-]{1,23}" maxlength="24" required autocomplete="off" autocapitalize="characters"></label><label>Раздел данных<select id="material-split"><option value="train">Образцы (train)</option><option value="validation">Настройка (validation)</option><option value="test">Итоговая проверка (test)</option></select></label><label>Дубль<input id="material-take" type="number" min="1" max="99" value="1" required></label><label>Тип материала<select id="material-type"><option value="human_video">Видео носителя РЖЯ</option><option value="avatar_video">Видео движения аватара</option></select></label></div>
+              <p class="field-help">Один код закрепляется за одним разделом. Для аватара укажите код исполнителя исходного движения. Используйте одинаковые коды во всём исследовании.</p>
+              <label class="file-zone" for="material-file"><strong>Выберите видео с устройства</strong><span>До 200 МБ и 10 минут. Файл остаётся на устройстве.</span><input id="material-file" type="file" accept="video/*" required></label>
+              <video id="material-preview" class="preview-video" controls playsinline preload="metadata" hidden></video><p id="material-file-status" class="field-help" role="status"></p>
+              <div class="form-grid"><label>Языковая проверка<select id="material-language"><option value="pending">Ещё не проверено</option><option value="approved">Проверено специалистом</option><option value="changes">Нужны исправления</option></select></label><label>Код проверяющего<input id="material-reviewer" placeholder="R01" pattern="[A-Z][A-Z0-9_-]{1,23}" maxlength="24" autocomplete="off" autocapitalize="characters"></label></div>
+              <label>Вариант перевода и комментарий<textarea id="material-notes" rows="3" maxlength="2000" placeholder="Контекст, региональный вариант, замечания к мимике и движению. Без ФИО."></textarea></label>
+              <label class="check-row"><input id="material-consent" type="checkbox" required><span>Участник согласовал исследовательское использование этой записи. Условия согласия хранятся у организатора отдельно.</span></label>
+              <button id="save-material" class="primary" type="submit">Добавить материал в реестр</button>
+            </form>
+            <div id="selected-materials" class="saved-materials"></div>
+          </section>
+        </div>
+      </section>
+      <section id="tab-assessment" class="tab-panel" hidden aria-labelledby="assessment-title">
+        <div class="section-heading"><div><p class="eyebrow">Одна попытка — одна запись</p><h2 id="assessment-title">Проверка полного сообщения</h2></div></div>
+        <p class="section-copy">Задание фиксируется до ответа. Для распознавания внесите исходный результат вашей системы. Для понятности покажите видео без русской подписи и запишите пересказ участника.</p>
+        <div class="assessment-layout">
+          <form id="assessment-setup" class="work-panel">
+            <fieldset id="attempt-settings"><legend>Участник и задание</legend><div class="form-grid"><label>Что проверяем<select id="attempt-kind"><option value="comprehension">Понятность для человека</option><option value="recognition">Распознавание системой</option></select></label><label id="attempt-participant-label">Код участника проверки<input id="attempt-participant" placeholder="P20" pattern="[A-Z][A-Z0-9_-]{1,23}" maxlength="24" required autocomplete="off" autocapitalize="characters"></label><label>Раздел данных<select id="attempt-split"><option value="test">Итоговая проверка (test)</option><option value="validation">Настройка (validation)</option><option value="train">Образцы (train)</option></select></label><label>Номер попытки<input id="attempt-take" type="number" min="1" max="99" value="1" required></label></div>
+              <label>Ожидаемый смысл<select id="attempt-message"></select></label><label>Тип показа<select id="attempt-medium"><option value="human_video">Видео носителя РЖЯ</option><option value="avatar_video">Видео движения аватара</option><option value="live">Очный показ без файла</option></select></label><label id="attempt-material-label">Материал из реестра<select id="attempt-material"></select></label>
+              <p class="field-help">При проверке распознавания укажите код исполнителя видеозаписи. При проверке понятности — код нового зрителя. Исполнитель и зритель не должны совпадать.</p>
+              <label class="check-row"><input id="attempt-consent" type="checkbox" required><span>Участник согласовал участие в этой исследовательской проверке.</span></label>
+              <button id="begin-attempt" class="primary" type="submit">Зафиксировать задание и начать</button>
+            </fieldset>
+          </form>
+          <section class="work-panel" aria-labelledby="response-title"><h3 id="response-title">Исходный ответ</h3><p id="attempt-state" class="muted">Сначала выберите участника и задание.</p>
+            <div id="attempt-video-area" hidden><video id="attempt-video" class="preview-video" controls playsinline preload="metadata"></video><label class="file-button">Подключить видео с устройства<input id="attach-attempt-video" type="file" accept="video/*"></label><p id="attempt-video-status" class="field-help"></p></div>
+            <button id="blind-view" type="button" disabled>Показать участнику без подписи</button>
+            <form id="response-form"><fieldset id="response-fields" disabled><legend class="sr-only">Зафиксировать исходный ответ</legend><label>Исход попытки<select id="attempt-outcome"><option value="answered">Получен ответ / пересказ</option><option value="refused">Отказ от распознавания / понимания</option><option value="skipped">Задание пропущено</option></select></label><label>Точный исходный ответ<textarea id="attempt-response" rows="4" maxlength="4000" placeholder="Ответ до исправлений. Не заменяйте его ожидаемой фразой."></textarea></label><label>Условия и комментарий<textarea id="attempt-notes" rows="2" maxlength="2000" placeholder="Например, руки вышли за край кадра; ответ получен со второй попытки."></textarea></label><button class="primary" type="submit">Сохранить попытку</button></fieldset></form>
+            <p class="field-help">Здесь нет автоматического перевода 20 сообщений. Это журнал фактически полученных ответов; технические ошибки сохраняются как отказы или пропуски.</p>
+          </section>
+        </div>
+      </section>
+      <section id="tab-review" class="tab-panel" hidden aria-labelledby="review-title">
+        <div class="section-heading"><div><p class="eyebrow">После фиксации ответа</p><h2 id="review-title">Оценка передачи смысла</h2></div></div>
+        <p class="section-copy">Оценки и уточнённый текст сохраняются отдельно. Они не меняют исходную попытку и не становятся результатом автоматического распознавания.</p>
+        <form id="review-form" class="work-panel review-panel"><label>Зафиксированный ответ<select id="review-attempt" required></select></label><div class="comparison"><div><span>Ожидаемый смысл</span><p id="review-expected">—</p></div><div><span>Исходный ответ</span><p id="review-original">Пока нет ответов для оценки.</p></div></div>
+          <div class="form-grid"><label>Код проверяющего<input id="review-code" placeholder="R01" pattern="[A-Z][A-Z0-9_-]{1,23}" maxlength="24" required autocomplete="off" autocapitalize="characters"></label><label>Смысл сообщения<select id="review-meaning" required><option value="">Выберите оценку</option><option value="preserved">Передан полностью</option><option value="partial">Передан частично</option><option value="changed">Искажён</option><option value="uncertain">Недостаточно данных</option></select></label><label>Отрицание / утверждение<select id="review-polarity" required><option value="">Выберите оценку</option><option value="preserved">Сохранено</option><option value="changed">Изменено</option><option value="not_applicable">Неприменимо</option><option value="uncertain">Неясно</option></select></label><label>Вопрос / сообщение<select id="review-question" required><option value="">Выберите оценку</option><option value="preserved">Сохранено</option><option value="changed">Изменено</option><option value="not_applicable">Неприменимо</option><option value="uncertain">Неясно</option></select></label></div>
+          <label class="check-row"><input id="review-independent" type="checkbox"><span>Оценку выполняет отдельный проверяющий, который не давал этот ответ.</span></label><label>Уточнённый текст после проверки<textarea id="review-corrected" rows="3" maxlength="4000" placeholder="При необходимости. Исходный ответ останется в журнале."></textarea></label><label>Пояснение оценки<textarea id="review-notes" rows="3" maxlength="2000" placeholder="Адресат, время, намерение, мимика; причина расхождения."></textarea></label><button id="save-review" class="primary" type="submit">Сохранить отдельную оценку</button>
+        </form>
+      </section>
+      <section id="tab-journal" class="tab-panel" hidden aria-labelledby="journal-title">
+        <div class="section-heading"><div><p class="eyebrow">Данные текущего проекта</p><h2 id="journal-title">Журнал пилота</h2></div><div class="inline-actions"><button id="export-attempts" type="button">Попытки CSV</button><button id="export-materials" type="button">Материалы CSV</button></div></div>
+        <p id="journal-summary" class="section-copy"></p><p class="notice compact">Это внесённые исследователем записи. Общая «точность» не рассчитывается: распознавание, понятность, повторения и разные разделы данных оценивают отдельно.</p>
+        <h3>Разделение участников</h3><div id="participant-groups" class="participant-groups"></div>
+        <h3>Попытки и независимые оценки</h3><div class="table-scroll" tabindex="0" role="region" aria-label="Таблица попыток"><table><thead><tr><th>Участник / раздел</th><th>Сообщение / попытка</th><th>Задача / исход</th><th>Исходный ответ</th><th>Оценки</th></tr></thead><tbody id="journal-body"></tbody></table></div>
+      </section>
+    </div>
+    <details class="method-note"><summary>Как провести пилот без смешения результатов</summary><div><p><strong>Сначала перевод и материал.</strong> Согласуйте естественное полное высказывание с носителями РЖЯ и переводчиком. Запишите лицо, корпус и обе кисти. Проверка лингвистики и понимания — разные этапы.</p><p><strong>Исполнители разделены заранее.</strong> Train используют для образцов, validation — для настройки, test — для итоговой оценки. Новые дубли того же человека остаются в том же разделе. Один браузер не знает о чужих проектах: ведите единый реестр кодов и переносите его в JSON.</p><p><strong>Сначала исходный ответ, затем оценка.</strong> Сохраняйте первый ответ, отказы и пропуски. Повторной попытке назначайте следующий номер. Проверяющий отдельно оценивает смысл, отрицание и вопрос. Уточнённый текст не заменяет исходный.</p><p><strong>Видео и согласия — у организатора.</strong> Экспорт содержит технические данные и условные коды, без видеобайлов. Не вводите ФИО, контакты и медицинские сведения. Условия использования записей согласуют с участниками отдельно.</p></div></details>
+  </div>
+</main>
+<footer><span>Технопарк РГСУ · «Равенство по слуху»</span><a href="../docs/PILOT_WORKBENCH_V019.md" target="_blank" rel="noopener">Описание рабочего кабинета ↗</a></footer>
+<dialog id="blind-dialog" aria-labelledby="blind-title"><div class="blind-content"><h2 id="blind-title">Что вы поняли?</h2><p>Посмотрите видео и передайте смысл своими словами.</p><video id="blind-video" controls playsinline></video><label for="blind-response">Ваш ответ</label><textarea id="blind-response" rows="3" maxlength="4000" placeholder="Напишите, что означает сообщение."></textarea><div class="inline-actions"><button id="blind-submit" class="primary" type="button">Зафиксировать ответ</button><button id="blind-refuse" type="button">Не могу понять</button><button id="blind-skip" class="quiet" type="button">Пропустить</button></div><button id="blind-close" class="quiet" type="button">Вернуться к заданию</button><p id="blind-error" class="field-help error" role="alert"></p></div></dialog>
+<dialog id="language-dialog" aria-labelledby="language-title"><h2 id="language-title">Языковая проверка</h2><p id="language-material-title"></p><form id="language-form"><input id="language-material-id" type="hidden"><label>Код проверяющего<input id="language-reviewer" placeholder="R01" pattern="[A-Z][A-Z0-9_-]{1,23}" maxlength="24" required autocomplete="off" autocapitalize="characters"></label><label>Итог проверки<select id="language-status"><option value="approved">Проверено специалистом</option><option value="changes">Нужны исправления</option></select></label><label>Замечания к переводу<textarea id="language-notes" rows="3" maxlength="2000"></textarea></label><p class="field-help">Запись проверки добавится к истории. Исходное видео и предыдущие записи останутся неизменными.</p><div class="inline-actions"><button class="primary" type="submit">Сохранить проверку</button><button id="language-close" type="button">Отмена</button></div><p id="language-error" class="field-help error" role="alert"></p></form></dialog>
+<script type="module" src="pilot.js?v=0.19.0"></script>
+</body>
+</html>

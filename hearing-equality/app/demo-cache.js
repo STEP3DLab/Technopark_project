@@ -1,6 +1,6 @@
 // Only curated, same-origin demonstration assets are stored. Camera models,
 // microphone audio, uploaded files and conversation content are never cached.
-export const APP_VERSION = '0.18.1';
+export const APP_VERSION = '0.19.0';
 export const APP_BASE = new URL('./', import.meta.url);
 export const CACHE_PREFIX = `hearing-equality-demo:${APP_BASE.pathname}:`;
 export const CACHE_NAME = `${CACHE_PREFIX}${APP_VERSION}`;
@@ -11,6 +11,8 @@ export const MANIFEST_URL = new URL(`.__demo-manifest-${APP_VERSION}.json`, APP_
 export const WORKER_URL = new URL(`sw.js?v=${APP_VERSION}&cache=2`, APP_BASE).href;
 const STATIC_FILES = [
   'index.html',
+  'research.html', 'research.css', 'research.js', 'assets/research-v019-summary.json',
+  'pilot.html', 'pilot.css', 'pilot.js', 'pilot-model.js', 'assets/pilot-messages.json',
   'platform.css', 'dialogue.css', 'rgsu.css', 'showcase.css', 'communication.css', 'practical.css',
   'platform.js', 'canvas-avatar.js', 'vision.js', 'catalog.js', 'recognizer.js',
   'session.js', 'trial-protocol.js', 'avatar-motion.js', 'hand-geometry.js',

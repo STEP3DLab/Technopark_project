@@ -1,7 +1,7 @@
 /** Progressive disclosure over the existing controllers. Nodes are moved, never
  * cloned, so confirmation, draft provenance and media lifecycle stay intact. */
-import './platform.js?v=0.18.1';
-import './showcase.js?v=0.18.1';
+import './platform.js?v=0.19.0';
+import './showcase.js?v=0.19.0';
 const $ = id => document.getElementById(id);
 const paths = {
   expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',compare:'M3 4h18v16H3V4Zm9 0v16',download:'M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4',
@@ -94,7 +94,11 @@ export function installSimpleUI() {
     ['Памятка выступающего',()=>$('open-guide').click()],['Проверка распознавания',()=>api.mode('research')],
   ])advanced.append(button(label,()=>{closePanel();action();},'simple-menu-row'));
   advanced.append(make('a','simple-menu-row','Студия аватара ↗'));advanced.lastElementChild.href='studio.html?outfit=indigo';
-  menu.append(make('p','simple-version','РГСУ · Технопарк · 0.18'));
+  for(const [label,href] of [['Исследование и данные','research.html'],['Пилот 20 сообщений','pilot.html']]) {
+    const link=make('a','simple-menu-row');link.textContent=label+' ↗';link.href=href;link.target='_blank';link.rel='noopener noreferrer';
+    link.addEventListener('click',()=>{stopVoice();stopSpeech();closePanel();});menu.append(link);
+  }
+  menu.append(make('p','simple-version','РГСУ · Технопарк · 0.19'));
   const about=$('view-about'),research=make('details','simple-about-details','<summary>Исследования и источники</summary>');research.append(...about.childNodes);about.append(make('section','simple-about-summary','<h2>Равенство по слуху</h2><p>Покажите жест, напишите сообщение или передайте устройство собеседнику.</p><div class="simple-about-facts"><div><b>Аватар</b><span>6 подготовленных слов РЖЯ</span></div><div><b>Камера</b><span>Экспериментальное распознавание этих слов</span></div><div><b>Общение</b><span>Свободный текст и ответ собеседника</span></div></div><p class="simple-small">Перевод предложений и ASL пока не поддерживается. Понятность жестов аватара ещё проверяется.</p>'),research);
 
   // A single message card with one primary action. Auxiliary actions are

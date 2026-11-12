@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0c0e0d">
+  <title>Дай пять · Интерактивный холст ХВ</title>
+  <link rel="icon" href="data:,">
+  <style>@font-face{font-family:Cormorant;src:url(assets/cormorant.ttf) format('truetype');font-weight:600;font-display:swap}
+:root{color-scheme:dark;background:#0c0e0d;color:#f3e1c8;font-family:Arial,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+button,summary,a{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+button,summary{cursor:pointer}button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid #cbdccc;outline-offset:4px}
+.gallery{position:relative;isolation:isolate;width:100%;height:100%;height:100dvh;overflow:hidden;user-select:none;background:radial-gradient(ellipse at 56% 38%,#191b16,#0c0e0d 76%)}
+.film{position:absolute;height:min(100vh,125.14vw);height:min(100dvh,125.14vw);aspect-ratio:32/15;left:50%;top:50%;transform:translate(-50%,-50%);overflow:hidden}
+.layer{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#motion,#echo{opacity:0}.gallery.has-video #motion{opacity:1}#echo{mix-blend-mode:screen}
+#touch{position:absolute;background:transparent;color:transparent;border:none;padding:0;touch-action:manipulation;cursor:pointer}
+.breath{position:absolute;left:54.49%;top:35.1%;width:3.5%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,rgba(255,217,150,.35),rgba(235,158,75,.12) 54%,transparent);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.20;transform:translate(-50%,-50%) scale(.85)}50%{opacity:.85;transform:translate(-50%,-50%) scale(1.15)}}
+.gallery.is-playing .breath{visibility:hidden}.film:has(#touch:focus-visible) .breath{outline:2px solid #f5e8bd;animation:none}
+.tools{position:absolute;right:max(15px,env(safe-area-inset-right));top:max(15px,env(safe-area-inset-top));display:flex;align-items:flex-start;gap:6px;transition:opacity .45s}
+.tools>button,summary{height:38px;width:38px;display:grid;place-items:center;border:1px solid #d8c5a33b;background:#13150fc9;border-radius:50%;color:#dacaaf;list-style:none}
+.tools>button:hover,summary:hover,.tools>button[aria-pressed=true]{border-color:#d2bc8ea3;color:#ffe2af}
+.tools summary::-webkit-details-marker{display:none}.tools summary span{font-size:23px;line-height:10px;letter-spacing:1px;transform:translateY(-2px)}
+.expand-icon{display:block;width:14px;height:14px;background:linear-gradient(currentColor,currentColor) left top/6px 1.5px,linear-gradient(currentColor,currentColor) left top/1.5px 6px,linear-gradient(currentColor,currentColor) right top/6px 1.5px,linear-gradient(currentColor,currentColor) right top/1.5px 6px,linear-gradient(currentColor,currentColor) left bottom/6px 1.5px,linear-gradient(currentColor,currentColor) left bottom/1.5px 6px,linear-gradient(currentColor,currentColor) right bottom/6px 1.5px,linear-gradient(currentColor,currentColor) right bottom/1.5px 6px;background-repeat:no-repeat}
+.sound-icon{position:relative;font:22px/1 Georgia,serif}.tools button[aria-pressed=false] .sound-icon:after{content:'';position:absolute;left:-3px;top:10px;width:22px;transform:rotate(-48deg);border-top:1px solid}
+.panel{position:absolute;right:0;top:49px;width:min(289px,85vw);padding:19px;background:#191d19f5;border:1px solid #665e4d;border-radius:8px;box-shadow:0 6px 36px #0007;user-select:text;font-size:13px;line-height:1.5;color:#e3dccd}
+.panel strong{font-size:14px}.panel p{margin:8px 0 14px}.panel button,.panel a{background:none;border:0;color:#e5c79a;padding:3px 0;display:block;text-align:left;text-decoration:underline;text-underline-offset:3px}.panel small{display:block;color:#b1ab9e;margin:4px 0 10px}
+.tools[data-quiet=true]:not(:hover):not(:focus-within):not(:has(details[open])){opacity:.12}
+.gallery.is-playing .tools[data-quiet=true]:not(:hover):not(:focus-within){opacity:0}.gallery.hide-tools .tools{visibility:hidden}
+.screen-reader{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+.poem{position:absolute;inset:0;pointer-events:none;opacity:1;transition:opacity .78s ease}
+.stanza{position:absolute;top:49%;margin:0;transform:translateY(-50%);color:#ede2cf;font:600 clamp(16px,1.46vw,37px)/1.5 Cormorant,Georgia,serif;letter-spacing:-.01em;text-shadow:0 1px 8px #090a08}
+.stanza span{display:block;white-space:nowrap}.stanza.first{left:3.5%}.stanza.second{right:3.5%}
+.invitation{position:absolute;margin:0;bottom:max(20px,3.3vh);left:50%;transform:translateX(-50%);color:#e5d8c3;pointer-events:none;font-size:clamp(12px,.9vw,18px);text-shadow:0 1px 6px #000,0 1px 12px #000;white-space:nowrap;transition:opacity .5s ease}
+.gallery.is-playing :is(.poem,.invitation){opacity:0}
+@media(max-aspect-ratio:3/2) and (min-aspect-ratio:1/1){.stanza{font-size:clamp(14px,1.65vw,28px);top:auto;bottom:7%;transform:none}.stanza.first{left:4%}.stanza.second{right:4%}.poem{background:linear-gradient(transparent 60%,#0b0d0be8 100%)}.invitation{bottom:2%}}
+/* In portrait all artwork, type and contact coordinates share one 9:16 plate. */
+.portrait-verse{display:none}
+.gallery.portrait .film{height:min(100vh,177.777778vw);height:min(100dvh,177.777778vw);aspect-ratio:9/16}
+.gallery.portrait .poem{width:1px;height:1px;overflow:hidden;clip-path:inset(50%);background:none}
+.gallery.portrait .portrait-verse{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;fill:#eee2cd;font-family:Cormorant,Georgia,serif;font-weight:600;transition:opacity .7s}
+.gallery.portrait.is-playing .portrait-verse{opacity:0}
+.gallery.portrait .invitation{bottom:max(env(safe-area-inset-bottom),calc((100% - min(100%,177.777778vw))/2 + min(3.1vh,5.51vw)));font-size:clamp(11px,min(2.3vw,1.3vh),26px);letter-spacing:.025em}
+.gallery.portrait .tools{gap:5px;top:max(9px,env(safe-area-inset-top));right:max(9px,env(safe-area-inset-right))}
+.gallery.portrait .tools>button,.gallery.portrait summary{width:clamp(30px,4vw,45px);height:clamp(30px,4vw,45px)}
+@media(max-height:460px) and (min-aspect-ratio:1/1){.stanza{font-size:clamp(12px,1.5vw,17px)}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+  <main class="gallery" id="gallery" aria-label="Интерактивная картина «Дай пять»">
+    <div class="film" id="film">
+      <img id="painting" class="layer" data-landscape="assets/painting-landscape.jpg" data-portrait="assets/painting-portrait.jpg" alt="Девочка касается светящегося охристого отпечатка ладони на тёмном холсте" draggable="false">
+      <video class="layer" id="motion" playsinline muted preload="auto" data-landscape="assets/motion-landscape.mp4" data-portrait="assets/motion-portrait.mp4" aria-hidden="true"></video>
+      <img id="echo" class="layer" data-landscape="assets/echo-landscape.png" data-portrait="assets/echo-portrait.png" alt="" aria-hidden="true" draggable="false">
+      <canvas id="sparks" class="layer" aria-hidden="true"></canvas>
+      <div class="breath" aria-hidden="true"></div>
+      <button id="touch" aria-label="Дать пять — оживить картину" aria-describedby="prompt"></button>
+      <svg class="portrait-verse" viewBox="0 0 1080 1920" aria-hidden="true" focusable="false"></svg>
+    </div>
+    <div class="poem" data-size="46" data-leading="58" aria-label="Стихотворение «Дай пять»">
+      <p class="stanza first" data-x="76" data-baseline="120"><span>Он просто дунул охрой на ладонь,</span>
+        <span>прижатую к шершавой стенке грота.</span>
+        <span>Потом присел и поглядел в огонь.</span>
+        <span>Обычный день. Обычная работа.</span></p>
+      <p class="stanza second" data-x="136" data-baseline="1596"><span>Я вывел этот след на стену зала.</span>
+        <span>Здесь можно трогать. Можно отвечать.</span>
+        <span>Ладонь тебя сквозь время отыскала.</span>
+        <span>Теперь твой ход. Подставь ладонь. Дай пять.</span></p>
+    </div><p class="invitation" id="prompt">Коснитесь ладони на картине</p>
+    <nav class="tools" aria-label="Управление показом">
+      <button id="present" title="Во весь экран" aria-label="Во весь экран" aria-pressed="false"><span class="expand-icon" aria-hidden="true"></span></button>
+      <button id="sound" title="Включить звук" aria-label="Включить звук" aria-pressed="false"><span class="sound-icon" aria-hidden="true">♪</span></button>
+      <details id="options"><summary aria-label="Параметры показа" title="Параметры показа"><span aria-hidden="true">···</span></summary>
+        <div class="panel"><strong>Показ на большом экране</strong><p>Коснитесь любой части ладони или наведите указатель и щёлкните тачпадом. После отклика картина снова готова к касанию.</p><button id="hideTools">Скрыть панель</button><small>Вернуть панель можно клавишей H.</small><a id="downloadPicture" href="#" data-landscape="assets/print-landscape.png" data-portrait="assets/print-portrait.png" download="Дай пять — картина со стихом.png">Скачать картину со стихом</a><a id="otherModes" hidden href="#">Другие режимы</a></div>
+      </details>
+    </nav>
+    <div class="screen-reader" id="announcement" role="status" aria-live="polite"></div>
+  </main>
+  <script>(() => {
+  'use strict';
+  const byId=id=>document.getElementById(id);
+  const gallery=byId('gallery'),film=byId('film'),movie=byId('motion'),touch=byId('touch'),echo=byId('echo');
+  const tools=document.querySelector('.tools'),options=byId('options'),notice=byId('announcement');
+  const surface=byId('sparks'),ctx=surface.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  // This control follows the palm and all five fingers on the registered artwork.
+  const shape=[[247,219],[232,199],[213,185],[195,176],[186,168],[188,160],[195,155],[204,156],[241,175],[237,138],[233,103],[235,92],[242,84],[252,84],[260,94],[264,114],[269,132],[273,100],[275,75],[281,64],[291,63],[300,69],[301,84],[295,132],[311,92],[318,82],[330,81],[339,89],[337,103],[321,141],[341,119],[351,114],[361,117],[367,125],[364,136],[349,155],[330,178],[317,199],[312,218],[297,232],[282,240],[265,243],[253,236]];
+  const portraitQuery=matchMedia('(max-aspect-ratio: 1/1)');
+  const plates={
+    portrait:{width:1080,height:1920,left:0,top:238,artWidth:1080,artHeight:1352},
+    landscape:{width:2304,height:1080,left:720,top:0,artWidth:863,artHeight:1080}
+  };
+  const breath=film.querySelector('.breath'),picture=byId('painting'),download=byId('downloadPicture');
+  let center={x:0,y:0};
+  let active=false,kind='',generation=0,start=0,raf=0,idleTimer=0,wake=null,audio=null,volume=null,sound=false,origin=center;
+
+  function drawPortraitVerse(){
+    const target=film.querySelector('.portrait-verse'),poem=document.querySelector('.poem');
+    const namespace='http://www.w3.org/2000/svg';
+    for(const stanza of poem.querySelectorAll('.stanza')){
+      const x=stanza.dataset.x,firstLine=Number(stanza.dataset.baseline);
+      [...stanza.children].forEach((line,index)=>{
+        const text=document.createElementNS(namespace,'text');
+        text.setAttribute('x',x);
+        text.setAttribute('y',firstLine+index*Number(poem.dataset.leading));
+        text.setAttribute('font-size',poem.dataset.size);
+        text.textContent=line.textContent;
+        target.append(text);
+      });
+    }
+  }
+  function selectPlate(){
+    finish();
+    const format=portraitQuery.matches?'portrait':'landscape',p=plates[format];
+    gallery.classList.toggle('portrait',portraitQuery.matches);
+    for(const asset of [picture,echo,movie])asset.src=asset.dataset[format];
+    download.href=download.dataset[format];
+    const px=x=>(p.left+x/448*p.artWidth)/p.width,py=y=>(p.top+y/561*p.artHeight)/p.height;
+    const x0=186,x1=367,y0=63,y1=243;
+    Object.assign(touch.style,{left:px(x0)*100+'%',top:py(y0)*100+'%',width:(px(x1)-px(x0))*100+'%',height:(py(y1)-py(y0))*100+'%',
+      clipPath:'polygon('+shape.map(([x,y])=>100*(x-x0)/(x1-x0)+'% '+100*(y-y0)/(y1-y0)+'%').join(',')+')'});
+    center={x:px(278),y:py(196)};origin=center;
+    Object.assign(breath.style,{left:center.x*100+'%',top:center.y*100+'%',width:8*p.artWidth/p.width+'%'});
+    resize();
+  }
+  let cssWidth=0,cssHeight=0;
+  function resize(){
+    const box=film.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1,2400/box.width);
+    cssWidth=box.width;cssHeight=box.height;surface.width=Math.max(1,Math.round(box.width*dpr));surface.height=Math.max(1,Math.round(box.height*dpr));
+    ctx.setTransform(surface.width/cssWidth,0,0,surface.height/cssHeight,0,0);
+  }
+  function finish(){
+    if(!active)return;
+    active=false;generation++;cancelAnimationFrame(raf);movie.pause();gallery.classList.remove('is-playing','has-video');
+    echo.style.opacity='0';ctx.clearRect(0,0,cssWidth,cssHeight);notice.textContent='Картина снова готова к касанию.';
+  }
+  function showMovie(){if(active&&kind==='video')gallery.classList.add('has-video');}
+  function fallback(){if(active){kind='fallback';movie.pause();gallery.classList.remove('has-video');}}
+  function voice(time,freq,gain,length){
+    const osc=audio.createOscillator(),amp=audio.createGain();osc.type='sine';osc.frequency.value=freq;
+    amp.gain.setValueAtTime(0,time);amp.gain.linearRampToValueAtTime(gain,time+.065);amp.gain.exponentialRampToValueAtTime(.0001,time+length);
+    osc.connect(amp);amp.connect(volume);osc.start(time);osc.stop(time+length+.04);osc.onended=()=>{osc.disconnect();amp.disconnect();};
+  }
+  function chime(){
+    if(!sound||!audio||audio.state!=='running')return;
+    const t=audio.currentTime+.02;voice(t,196,.13,2.9);voice(t+.22,293.66,.078,3.6);voice(t+.80,440,.047,3.9);voice(t+1.2,587.33,.025,3.8);
+  }
+  function glow(x,y,r,power,color){
+    if(power<=0||r<=1)return;const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba('+color+','+power+')');g.addColorStop(.3,'rgba('+color+','+power*.37+')');g.addColorStop(1,'rgba('+color+',0)');
+    ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);
+  }
+  function envelope(t,a,b,c,d){return Math.max(0,Math.min(1,(t-a)/(b-a),(d-t)/(d-c)));}
+  function animate(now){
+    if(!active)return;
+    const t=(now-start)/1000,x=origin.x*cssWidth,y=origin.y*cssHeight,cx=center.x*cssWidth,cy=center.y*cssHeight;
+    ctx.clearRect(0,0,cssWidth,cssHeight);ctx.globalCompositeOperation='screen';
+    const amp=envelope(t,-.025,.15,.21,.81),u=Math.min(1,t/.65);
+    glow(x+(cx-x)*u,y+(cy-y)*u,cssHeight*(.016+.047*u),amp*.74,'255,210,135');
+    if(kind==='video'){
+      if(movie.currentTime>.04&&movie.readyState>=2)showMovie();
+      if((t>1.5&&movie.currentTime<.04)||t>11)fallback();
+    }
+    if(kind!=='video'){
+      const calm=kind==='calm',duration=calm?2.85:7.6;
+      const strength=envelope(t,0,.4,.85,duration-.15);
+      glow(cx,cy,cssHeight*(calm?.14:.12+.13*Math.min(1,t)),strength*(calm?.43:.72),'255,177,88');
+      echo.style.opacity=String(.84*envelope(t,calm?.25:1.3,calm?.88:3.5,calm?1.6:4.9,duration));
+      if(!calm){
+        const spread=Math.min(1,t/3.75);
+        for(let j=0;j<4&&t<3.75;j++){
+          const r=cssHeight*(.035+spread*.91+j*.009);ctx.beginPath();
+          for(let i=0;i<=120;i++){const a=i*Math.PI/60,d=r*(1+.028*Math.sin(3*a+spread)+.009*Math.cos(7*a+j));const xx=cx+Math.cos(a)*d,yy=cy+Math.sin(a)*d;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);}
+          ctx.strokeStyle='rgba(235,181,102,'+((1-spread)*strength*(.30-j*.05))+')';ctx.lineWidth=1.2;ctx.stroke();
+        }
+      }
+      if(t>=duration){finish();return;}
+    }
+    raf=requestAnimationFrame(animate);
+  }
+  function respond(e){
+    if(active)return;
+    const b=film.getBoundingClientRect();
+    origin=e.detail!==0&&Number.isFinite(e.clientX)?{x:(e.clientX-b.left)/b.width,y:(e.clientY-b.top)/b.height}:center;
+    active=true;const token=++generation;start=performance.now();kind=reduced.matches?'calm':'video';
+    gallery.classList.add('is-playing');options.open=false;tools.dataset.quiet='true';notice.textContent='От ладони расходится свет.';
+    if(kind==='video'){
+      try{movie.currentTime=0;const p=movie.play();if(p)p.catch(()=>{if(token===generation)fallback();});}catch{fallback();}
+    }
+    chime();raf=requestAnimationFrame(animate);
+  }
+  touch.addEventListener('click',respond);movie.addEventListener('playing',showMovie);
+  movie.addEventListener('ended',()=>{if(kind==='video')finish();});movie.addEventListener('error',fallback);
+  function reveal(){tools.dataset.quiet='false';clearTimeout(idleTimer);idleTimer=setTimeout(()=>tools.dataset.quiet='true',3300);}
+  gallery.addEventListener('pointermove',reveal,{passive:true});tools.addEventListener('focusin',reveal);
+  byId('hideTools').onclick=()=>{options.open=false;gallery.classList.add('hide-tools');touch.focus({preventScroll:true});};
+  document.addEventListener('keydown',e=>{if(e.code==='KeyH'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){gallery.classList.toggle('hide-tools');reveal();}
+    if(e.key==='Escape'){options.open=false;gallery.classList.remove('hide-tools');reveal();}});
+  document.addEventListener('click',e=>{if(options.open&&!options.contains(e.target))options.open=false;});
+  function label(el,text,state){el.title=text;el.setAttribute('aria-label',text);el.setAttribute('aria-pressed',String(state));}
+  const fs=byId('present'),tone=byId('sound');
+  function full(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+  async function keepAwake(){
+    if(!full()||document.hidden||wake||!navigator.wakeLock)return;
+    try{const current=await navigator.wakeLock.request('screen');if(!full()||document.hidden){await current.release();return;}wake=current;current.addEventListener('release',()=>{if(wake===current)wake=null;});}catch{}
+  }
+  function screenChange(){label(fs,full()?'Выйти из полного экрана':'Во весь экран',full());if(full())keepAwake();else if(wake)wake.release().catch(()=>{});resize();reveal();}
+  fs.onclick=async()=>{
+    try{
+      if(full()){const exit=document.exitFullscreen||document.webkitExitFullscreen;if(exit)await exit.call(document);}
+      else{const el=document.documentElement,request=el.requestFullscreen||el.webkitRequestFullscreen;if(request)await request.call(el);else throw Error();}
+    }catch{notice.textContent='Полноэкранный режим можно включить клавишей F11.';fs.title=notice.textContent;}
+  };
+  tone.onclick=async()=>{
+    try{
+      if(!audio){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw Error();audio=new AC();volume=audio.createGain();volume.connect(audio.destination);}
+      await audio.resume();sound=!sound;volume.gain.setTargetAtTime(sound?1:0,audio.currentTime,.03);
+      label(tone,sound?'Выключить звук':'Включить звук',sound);if(sound)voice(audio.currentTime+.03,392,.041,.50);
+    }catch{sound=false;label(tone,'Звук недоступен',false);}
+  };
+  document.addEventListener('fullscreenchange',screenChange);document.addEventListener('webkitfullscreenchange',screenChange);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)finish();else keepAwake();});
+  window.addEventListener('pagehide',finish);window.addEventListener('resize',resize);
+  if(location.protocol==='file:')byId('otherModes').hidden=true;
+  drawPortraitVerse();selectPlate();portraitQuery.addEventListener('change',selectPlate);reveal();
+})();
+</script>
+</body>
+</html>

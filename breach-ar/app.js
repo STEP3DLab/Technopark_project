@@ -1,6 +1,7 @@
 import * as THREE from './vendor/three.module.js';
 import { GameEngine, createInvaderMesh } from './engine.js';
 import { SoundEngine } from './audio.js';
+import { CanvasRenderer } from './canvas-renderer.js';
 
 const $ = (id) => document.getElementById(id);
 const clamp = THREE.MathUtils.clamp;
@@ -8,7 +9,7 @@ const store = {
   get(key, fallback) { try { return localStorage.getItem(`breach.${key}`) ?? fallback; } catch { return fallback; } },
   set(key, value) { try { localStorage.setItem(`breach.${key}`, String(value)); } catch {} },
 };
-const state = { mode: 'lobby', stage: 'lobby', busy: false, firing: false, portals: [], muted: store.get('muted', 'false') === 'true', xrSupported: false };
+const state = { mode: 'lobby', stage: 'lobby', busy: false, firing: false, portals: [], muted: store.get('muted', 'false') === 'true', xrSupported: false, software: false };
 const audio = new SoundEngine();
 audio.setMuted(state.muted);
 let renderer, engine, scene, camera, xrAim, hero, environment, placement, markers;
@@ -44,12 +45,18 @@ function soundUI() {
 }
 
 function initScene() {
-  renderer = new THREE.WebGLRenderer({ canvas: $('scene'), alpha: true, antialias: true, powerPreference: 'high-performance' });
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: $('scene'), alpha: true, antialias: true, powerPreference: 'high-performance' });
+  } catch {
+    renderer = new CanvasRenderer({ canvas: $('scene') });
+    state.software = true;
+    document.body.classList.add('software-mode');
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.25;
-  renderer.xr.enabled = true;
+  renderer.xr.enabled = !state.software;
   renderer.xr.setReferenceSpaceType('local');
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.05, 100);
@@ -142,11 +149,11 @@ function resetAim() {
 }
 
 async function capabilityCheck() {
-  try { state.xrSupported = !!navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'); } catch { state.xrSupported = false; }
+  try { state.xrSupported = !state.software && !!navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'); } catch { state.xrSupported = false; }
   $('start-ar').disabled = !state.xrSupported;
   $('start-ar').setAttribute('aria-describedby', 'capability');
   $('start-camera').disabled = !navigator.mediaDevices?.getUserMedia;
-  $('capability').textContent = state.xrSupported ? 'Пространственный AR доступен на этом устройстве' : 'Доступны камера и тренировка. Пространственный AR не поддерживается этим браузером.';
+  $('capability').textContent = state.xrSupported ? 'Пространственный AR доступен на этом устройстве' : state.software ? 'Доступны камера и тренировка. Для пространственного AR нужна аппаратная 3D-графика.' : 'Доступны камера и тренировка. Пространственный AR не поддерживается этим браузером.';
 }
 
 function requestOrientation() {

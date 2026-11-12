@@ -39,3 +39,26 @@ test('sharing an invite for 80 seconds, repeated create, a third player, resumin
   await send('leave',host);
   assert.equal((await send('join',guest)).status,410);
 });
+
+
+test('a shot arriving during play survives slow storage and client clock drift',async t=>{
+  t.mock.timers.enable({apis:['Date'],now:1780000000000});
+  const bucket=memoryBucket(),ctx={waitUntil(){}};
+  const host='a'.repeat(32),guest='c'.repeat(32),code='750321';
+  async function send(action,token,extra={}){
+    const request=new Request('https://example.test/v1',{method:'POST',
+      headers:{origin:'https://step3dlab.github.io'},body:JSON.stringify({action,token,code,...extra})});
+    const response=await worker.fetch(request,{BUCKET:bucket},ctx);
+    assert.equal(response.status,200);
+    return response.json();
+  }
+  await send('create',host,{mode:'quickdraw'});await send('join',guest);
+  for(const role of [host,guest])await send('available',role,{value:true});
+  await send('ready',host,{value:true});const {state}=await send('ready',guest,{value:true});
+  t.mock.timers.tick(state.startAt-Date.now()+300);
+  const at=Date.now(),get=bucket.get.bind(bucket);
+  bucket.get=async key=>{t.mock.timers.tick(2200);return get(key);};
+  const response=await send('shot',guest,{rtt:95,shot:{round:state.round,at:at+400,seq:1,hit:true,confidence:1,targetAgeMs:0}});
+  assert.equal(response.accepted.accepted,true);
+  assert.equal(response.state.winner,'guest');
+});

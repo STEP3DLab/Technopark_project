@@ -21,7 +21,7 @@ function saveEngine(engine) {
   const {state,pending,lastSeq,lastReloadEnd,eventSeq,lagAllowanceMs}=engine;
   return {state,pending,lastSeq,lastReloadEnd,eventSeq,lagAllowanceMs};
 }
-async function handle(bucket, input, ctx) {
+async function handle(bucket, input, ctx, arrival) {
   const {action,token,code} = input;
   if(!/^[a-f0-9]{32}$/.test(token)||! /^(R[A-Z2-9]{5}|[2-8][0-9]{5})$/.test(code))fail(400,'Некорректная комната.');
   const secret = await hash(token), slot=Math.floor(Date.now()/hour);
@@ -73,7 +73,16 @@ async function handle(bucket, input, ctx) {
     if(action==='shot'){
       const latency=Number.isFinite(input.rtt)?Math.min(2400,Math.max(0,input.rtt)):600;
       e.lagAllowanceMs=Math.max(e.lagAllowanceMs,Math.min(1500,latency*.5+230));
-      accepted=e.shoot(role,input.shot,now);
+      // Stamp the shot when the request enters the relay. R2 reads and conditional
+      // write retries may take longer than the network transit allowance.
+      const shot=input.shot;
+      if(shot&&Number.isFinite(shot.at)&&arrival>=e.state.startAt&&arrival<=e.state.endAt){
+        const earliest=Math.max(e.state.startAt,arrival-Math.min(500,latency/2+60));
+        const at=Math.max(earliest,Math.min(arrival,shot.at));
+        accepted=e.shoot(role,{...shot,at},arrival);
+      }else{
+        accepted=e.shoot(role,shot,arrival);
+      }
     }
     e.tick(now);
     switch(action){
@@ -98,17 +107,18 @@ async function handle(bucket, input, ctx) {
   fail(503,'Сеть занята. Повторите действие.');
 }
 export default {async fetch(request,env,ctx) {
+  const arrival=Date.now();
   const origin=request.headers.get('origin');
   const headers={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin'};
   if(allowed.has(origin))headers['Access-Control-Allow-Origin']=origin;
   const res=(value,status=200)=>new Response(JSON.stringify(value),{status,headers});
-  if(request.method==='GET')return res({service:'PULSE DUEL',version:1,ready:Boolean(env.BUCKET)});
+  if(request.method==='GET')return res({service:'PULSE DUEL',version:3,ready:Boolean(env.BUCKET)});
   if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{...headers,'Access-Control-Allow-Methods':'POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type'}});
   if(request.method!=='POST'||!allowed.has(origin)||new URL(request.url).pathname!=='/v1')return res({error:'Недоступно.'},403);
   try {
     const body=await request.text();if(body.length>2500)return res({error:'Слишком большой запрос.'},400);
     let input;try{input=JSON.parse(body);}catch{return res({error:'Неверный запрос.'},400);}
     if(!input||typeof input!=='object')return res({error:'Неверный запрос.'},400);
-    return res(await handle(env.BUCKET,input,ctx));
+    return res(await handle(env.BUCKET,input,ctx,arrival));
   } catch(e){return res({error:e.status?e.message:'Сервис временно недоступен.'},e.status||503);}
 }};

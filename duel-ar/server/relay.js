@@ -1,16 +1,16 @@
-// The deployment build includes duel-engine.js above this module.
+import {DuelEngine} from '../duel-engine.js';
 const allowed = new Set(['https://step3dlab.github.io','http://127.0.0.1:4173','http://localhost:4173']);
 const hour = 3600000;
 const ttl = hour;
-const lease = 13500;
-const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const lobbyLease = 5*60*1000;
+const roundLease = 20000;
 const fail = (status, message) => { throw Object.assign(new Error(message), {status}); };
 const hash = async value => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)))].map(n=>n.toString(16).padStart(2,'0')).join('');
 const keyFor = (slot, code) => 'pulse/'+slot+'/'+code+'.json';
 const put = (bucket,k,data,etag) => bucket.put(k,JSON.stringify(data),{onlyIf:etag?{etagMatches:etag}:{etagDoesNotMatch:'*'}});
 
 function reply(room,role,at,slot) {
-  return {role, slot, serverTime:at, state:room.engine.state, events:room.events};
+  return {role, slot, serverTime:at, state:room.engine.state, sequence:room.engine.lastSeq[role], events:room.events};
 }
 async function purge(bucket, slot) {
   const {objects}=await bucket.list({prefix:'pulse/',limit:24});
@@ -23,7 +23,7 @@ function saveEngine(engine) {
 }
 async function handle(bucket, input, ctx) {
   const {action,token,code} = input;
-  if(!/^[a-f0-9]{32}$/.test(token)||!/^[R][A-Z2-9]{5}$/.test(code))fail(400,'Некорректная комната.');
+  if(!/^[a-f0-9]{32}$/.test(token)||! /^(R[A-Z2-9]{5}|[2-8][0-9]{5})$/.test(code))fail(400,'Некорректная комната.');
   const secret = await hash(token), slot=Math.floor(Date.now()/hour);
   let roomSlot=Number.isInteger(input.slot)?input.slot:slot;
   if(roomSlot<slot-1||roomSlot>slot)fail(404,'Срок действия комнаты истёк.');
@@ -32,7 +32,12 @@ async function handle(bucket, input, ctx) {
     e.setAvailable('host',false);
     const r={host:secret,guest:null,expires:now+ttl,seen:{host:now,guest:0},engine:saveEngine(e),events:[]};
     if(await bucket.head(keyFor(slot-1,code)))fail(409,'Код уже занят.');
-    if(!await put(bucket,keyFor(slot,code),r))fail(409,'Код уже занят.');
+    if(!await put(bucket,keyFor(slot,code),r)){
+      const existing=await bucket.get(keyFor(slot,code));
+      const room=existing&&await existing.json();
+      if(room?.host===secret&&!room.hostLeft)return reply(room,'host',now,slot);
+      fail(409,'Код уже занят.');
+    }
     ctx.waitUntil(purge(bucket,slot).catch(()=>{}));
     return reply(r,'host',now,slot);
   }
@@ -48,12 +53,15 @@ async function handle(bucket, input, ctx) {
     if(now>=r.expires)fail(404,'Время комнаты истекло. Создайте новую.');
     const e=Object.assign(new DuelEngine(),r.engine);
     let dirty=false;
+    const playing=['countdown','active','settling'].includes(e.state.phase);
+    const lease=playing?roundLease:lobbyLease;
     if(now-r.seen.host>lease&&e.state.players.host.connected){e.setPlayer('host',{connected:false});dirty=true;}
-    if(r.guest&&now-r.seen.guest>lease){e.setPlayer('guest',{connected:false});r.guest=null;dirty=true;}
+    if(r.guest&&e.state.players.guest.connected&&now-r.seen.guest>lease){e.setPlayer('guest',{connected:false});dirty=true;}
     let role=secret===r.host?'host':secret===r.guest?'guest':null;
+    if(r.hostLeft&&action!=='leave'&&(!role||role==='host'))fail(410,'Создатель закрыл комнату. Создайте новую.');
     if(action==='join'&&!role) {
       if(!e.state.players.host.connected)fail(404,'Создатель вышел. Создайте новую комнату.');
-      if(r.guest)fail(409,'В комнате уже два игрока.');
+      if(r.guest&&now-r.seen.guest<=lobbyLease)fail(409,'В комнате уже два игрока.');
       r.guest=secret;role='guest';e.setPlayer('guest',{name:input.name,connected:true});e.setAvailable('guest',false);dirty=true;
     }
     if(!role)fail(403,'Вы вышли из комнаты. Войдите снова.');
@@ -76,7 +84,7 @@ async function handle(bucket, input, ctx) {
       case 'dodge':e.dodge(role,input.round,now);break;
       case 'leave':
         e.setPlayer(role,{connected:false});if(role==='guest')r.guest=null;
-        if(role==='host')r.expires=Math.min(r.expires,now+20000);
+        if(role==='host'){r.hostLeft=true;r.expires=Math.min(r.expires,now+20000);}
         break;
     }
     if(dirty||e.state.revision!==before){

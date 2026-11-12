@@ -1,6 +1,7 @@
-import {normalizeRoomCode} from './network.js';
-import {GameRooms} from './rooms.js';
+import {normalizeRoomCode} from './network.js?v=2';
+import {GameRooms} from './rooms.js?v=2';
 import {DuelEngine, RULES, cleanName, otherRole} from './duel-engine.js';
+import {LocalRoom} from './lan.js?v=2';
 import {ShieldView} from './shield.js';
 import {DuelEffects} from './effects.js';
 import {DuelAudio} from './audio.js';
@@ -42,12 +43,19 @@ let busyRoom = false;
 let operation = 0;
 let previousAmmo = null;
 
-const network = new GameRooms({
+let backgroundTimer;
+let networkIssue='';
+let prepared=false;
+let readyBusy=false;
+let lastQr='';
+let localSetup=null;
+const callbacks = {
   onState:handleState,
   onEvent:handleGameEvent,
   onStatus:handleConnectionStatus,
-  onError:error=>{if(error?.type!=='cancelled')toast(error.message,true);},
-});
+  onError:error=>{if(error?.type!=='cancelled'){reportError(error.message);readyBusy=false;renderRoom();}},
+};
+const network=new GameRooms(callbacks);
 
 $('nickname').value = readStorage('pulse-duel-name','');
 updateSoundButtons();
@@ -80,8 +88,7 @@ function showScreen(name){
   window.scrollTo(0,0);
 }
 function openDialog(id){const d=$(id);if(!d.open)d.showModal();}
-function closeDialog(id){$(id).close();}
-function setButton(button,text,busy){button.disabled=busy;button.textContent=text;}
+function closeDialog(id){const d=$(id);if(d.open)d.close();}
 function sound(name,options){audio.play(name,options);}
 function unlockAudio(){audio.unlock().catch(()=>{});}
 function updateSoundButtons(){
@@ -94,153 +101,171 @@ function updateSoundButtons(){
 function toggleSound(){muted=!muted;audio.setMuted(muted);writeStorage('pulse-duel-muted',String(muted));unlockAudio();updateSoundButtons();if(!muted)sound('ui');}
 function vibrate(pattern){if(!muted&&navigator.vibrate)navigator.vibrate(pattern);}
 
+function reportError(message){
+  const node=$(currentScreen==='room'?'roomError':'homeError');
+  node.textContent=message;node.hidden=!message;
+}
+function rememberRoom(){
+  const url=new URL(location.href);url.hash='';url.search='';url.searchParams.set('room',network.roomCode);url.searchParams.set('v','2');
+  history.replaceState({duel:network.ticket()},'',url);
+}
+function validCode(code){return /^(?:[2-9][0-9]{5}|[A-Z2-9]{6})$/.test(code);}
+function readCode(value){
+  const raw=String(value).trim();
+  if(/^https?:/i.test(raw)){try{return normalizeRoomCode(new URL(raw).searchParams.get('room')||'');}catch{return '';}}
+  return normalizeRoomCode(raw);
+}
 async function createRoom(){
   if(busyRoom)return;
-  const op=++operation;busyRoom=true;unlockAudio();sound('ui');
-  $('createButton').disabled=true;$('createButton').querySelector('span').textContent='Создаём комнату…';
+  const op=++operation;busyRoom=true;unlockAudio();sound('ui');resetSession();reportError('');
+  $('createButton').disabled=true;$('createButton').querySelector('span').textContent='Открываем комнату…';
   try{
-    resetSession();
     await network.create({name:playerName(),mode:'duel'});
     if(op!==operation)return;
-    network.setAvailable(false);renderRoom();showScreen('room');
-    const url=new URL(location.href);url.hash='';url.searchParams.set('room',network.roomCode);history.replaceState({},'',url);
-    toast('Комната открыта. Пригласите соперника.');
-  }catch(error){if(error.type!=='cancelled'&&op===operation){toast(error.message,true);showScreen('home');}}
-  finally{if(op===operation){busyRoom=false;$('createButton').disabled=false;$('createButton').querySelector('span').textContent='Создать дуэль';}}
+    network.setAvailable(true);rememberRoom();renderRoom();showScreen('room');
+  }catch(e){if(op===operation&&e.type!=='cancelled'){showScreen('home');reportError(e.message+' Можно выбрать прямую связь по Wi-Fi.');$('homeScreen').querySelector('details').open=true;}}
+  finally{if(op===operation){busyRoom=false;$('createButton').disabled=false;$('createButton').querySelector('span').textContent='Создать комнату';}}
 }
-
-async function joinRoom(code){
+async function joinRoom(input,saved){
   if(busyRoom)return;
-  code=normalizeRoomCode(code);
-  if(!/^[A-Z2-9]{6}$/.test(code)){$('joinError').textContent='Введите шесть символов кода комнаты.';return;}
-  const op=++operation;busyRoom=true;unlockAudio();sound('ui');
-  $('joinError').textContent='';$('joinSubmit').disabled=true;$('joinSubmit').querySelector('span').textContent='Соединяемся…';
+  const code=readCode(input);
+  if(!saved&&history.state?.duel?.code===code)saved=history.state.duel;
+  if(!validCode(code)){$('joinError').textContent='Введите шесть символов с экрана первого игрока.';openDialog('joinDialog');return;}
+  const op=++operation;busyRoom=true;resetSession();reportError('');
+  $('joinCode').value=code;$('joinError').textContent=saved?'Возвращаемся в вашу комнату…':'Подключаемся к комнате…';
+  openDialog('joinDialog');$('joinSubmit').disabled=true;
   try{
-    resetSession();
-    await network.join(code,{name:playerName()});
+    await network.join(code,{name:playerName(),saved});
     if(op!==operation)return;
-    network.setAvailable(false);closeDialog('joinDialog');renderRoom();showScreen('room');
-    const url=new URL(location.href);url.hash='';url.searchParams.set('room',network.roomCode);history.replaceState({},'',url);
-  }catch(error){if(error.type!=='cancelled'&&op===operation){$('joinError').textContent=error.message;showScreen('home');}}
-  finally{if(op===operation){busyRoom=false;$('joinSubmit').disabled=false;$('joinSubmit').querySelector('span').textContent='Войти в дуэль';}}
+    network.setAvailable(true);rememberRoom();closeDialog('joinDialog');
+    if(network.state?.phase==='lobby')showScreen('room');
+    renderRoom();
+  }catch(e){
+    if(op===operation&&e.type!=='cancelled'){
+      showScreen('home');$('joinError').textContent=e.message||'Не удалось подключиться. Повторите вход.';
+      if(saved&&[403,404,410].includes(e.status))history.replaceState({},'',location.href);
+    }
+  }finally{if(op===operation){busyRoom=false;$('joinSubmit').disabled=false;}}
 }
-
 function resetSession(){
+  prepared=readyBusy=false;networkIssue='';lastQr='';$('cameraLine').hidden=true;$('roomError').hidden=true;
   trainingEngine=null;gameState=null;lastPhase=null;series={host:0,guest:0};countedRound=-1;resultRendered='';rematchPending=false;
-  localLastShot=-Infinity;previousAmmo=null;clearTimeout(finalTimer);gameFx?.destroy();gameFx=null;stopCamera(false);
+  localLastShot=-Infinity;previousAmmo=null;clearTimeout(finalTimer);gameFx?.destroy();gameFx=null;stopCamera();
 }
 function leaveRoom(){
   operation++;busyRoom=false;
   closeAllDialogs();network.leave();resetSession();
-  $('createButton').disabled=false;$('createButton').querySelector('span').textContent='Создать дуэль';
-  $('joinSubmit').disabled=false;$('joinSubmit').querySelector('span').textContent='Войти в дуэль';
-  const url=new URL(location.href);url.searchParams.delete('room');url.hash='';history.replaceState({},'',url);
-  showScreen('home');
+  $('createButton').disabled=false;$('createButton').querySelector('span').textContent='Создать комнату';$('joinSubmit').disabled=false;
+  const url=new URL(location.href);url.search='?v=2';url.hash='';history.replaceState({},'',url);
+  showScreen('home');reportError('');
 }
 function closeAllDialogs(){document.querySelectorAll('dialog[open]').forEach(d=>d.close());}
-
 function handleConnectionStatus(status){
-  $('connectionBadge').textContent=status.connected?(status.pingMs==null?'Игроки на связи':`${status.pingMs} мс · на связи`):status.kind==='waiting'?'Ждём второго игрока':status.kind==='disconnected'?'Связь потеряна':'Соединяемся';
-  $('connectionBadge').classList.toggle('connected',Boolean(status.connected));
-  $('arenaConnection').textContent=status.connected?`● ${status.pingMs==null?'LIVE':status.pingMs+' MS'}`:'● НЕТ СВЯЗИ';
+  if(localSetup&&status.connected){localSetup=null;closeDialog('localDialog');showScreen('room');renderRoom();}
+  networkIssue=['recovering','closed'].includes(status.kind)?status.message:'';
+  $('connectionBadge').textContent=networkIssue?'Восстановление связи':status.connected?'Оба в комнате':status.kind==='waiting'?'Комната открыта':status.kind==='disconnected'?'Игрок вышел':'Подключение…';
+  $('connectionBadge').classList.toggle('connected',Boolean(status.connected)&&!networkIssue);
+  $('arenaConnection').textContent=networkIssue?'● ПЕРЕПОДКЛЮЧЕНИЕ':status.connected?'● НА СВЯЗИ':'● ОЖИДАНИЕ';
   if(currentScreen==='room')renderRoom();
-  if(status.kind==='disconnected'&&currentScreen==='result'){
-    $('rematchButton').disabled=true;$('rematchHint').textContent=status.message;
-  }
+  if(status.kind==='closed'){reportError(status.message);$('readyHint').textContent='Выйдите и создайте новую комнату.';}
 }
-
+function qrInto(node,value){
+  if(!window.qrcode){node.hidden=true;return;}
+  try{
+    const qr=window.qrcode(0,'M');qr.addData(value);qr.make();
+    node.innerHTML=qr.createSvgTag({cellSize:3,margin:12,scalable:true});node.hidden=false;
+  }catch{node.replaceChildren();node.hidden=true;}
+}
 function renderRoom(){
-  const s=network.state;if(!s||!network.role)return;
-  const role=network.role,me=s.players[role],rival=s.players[otherRole(role)];
-  $('roomCode').textContent=network.roomCode;
-  $('yourName').textContent=me.name+' · вы';$('rivalName').textContent=rival.connected?rival.name:'Ждём соперника';
-  $('yourStatus').textContent=me.ready?'Готов к дуэли':cameraReady?'Камера готова':'Нужна камера';
-  $('rivalStatus').textContent=!rival.connected?'Отправьте ссылку другу':rival.ready?'Готов к дуэли':rival.available?'Готовится к дуэли':'Включает камеру';
-  document.querySelector('.player-card.you').classList.toggle('ready',me.ready);
+  const s=network.state,role=network.role;if(!s||!role)return;
+  const me=s.players[role],rival=s.players[otherRole(role)],code=network.roomCode;
+  const local=Boolean(network.link?.local);
+  $('roomCode').textContent=code;
+  $('inviteBlock').hidden=role!=='host'||rival.connected||local;
+  $('copyLinkButton').hidden=local;
+  if(rival.connected)closeDialog('qrDialog');
+  if(!$('inviteBlock').hidden&&lastQr!==code){lastQr=code;qrInto($('roomQr'),inviteUrl());}
+  $('roomTitle').textContent=rival.connected?'Оба в комнате':role==='host'?'Пригласите друга':'Ваша комната';
+  $('yourName').textContent=me.name==='Игрок'?'Вы':me.name+' · вы';
+  $('rivalName').textContent=rival.connected?(rival.name==='Игрок'?'Соперник':rival.name):'Второй игрок';
+  $('yourStatus').textContent=me.ready||prepared?'Готов':readyBusy?'Подготовка…':'В комнате';
+  $('rivalStatus').textContent=!rival.connected?'Ждём входа':rival.ready?'Готов':'В комнате';
+  document.querySelector('.player-card.you').classList.toggle('ready',me.ready||prepared);
   document.querySelector('.player-card.rival').classList.toggle('ready',rival.ready);
-  $('readyButton').disabled=!cameraReady||!rival.connected||!network.connected||cameraBusy||s.phase!=='lobby';
-  $('readyButton').querySelector('span').textContent=me.ready?'Готов. Ждём соперника…':'Я готов к дуэли';
-  $('readyHint').textContent=!rival.connected?'Отправьте код или ссылку второму игроку.':!cameraReady?'Включите камеру, чтобы приготовиться.':me.ready?'Ожидаем подтверждения второго игрока.':rival.ready?'Соперник готов. Нажмите кнопку для старта.':'Оба подтверждают готовность — и начинается отсчёт.';
-  for(const b of document.querySelectorAll('[data-mode]')){
-    const selected=b.dataset.mode===s.mode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));b.disabled=role!=='host'||s.phase!=='lobby';
+  $('readyButton').disabled=!!networkIssue||readyBusy||s.phase!=='lobby';
+  $('readyButton').querySelector('span').textContent=me.ready||prepared?'Отменить готовность':readyBusy?'Подготовка…':'Готов с камерой';
+  $('flatReady').hidden=me.ready||prepared;
+  $('flatReady').disabled=!!networkIssue||s.phase!=='lobby';
+  $('readyHint').textContent=networkIssue||(!rival.connected?'Покажите QR-код другу или отправьте ссылку.':me.ready||prepared?'Вы готовы. Ждём подтверждения соперника.':rival.ready?'Соперник готов. Выберите, как будете играть.':'Выберите, как будете играть. Отсчёт начнётся, когда оба готовы.');
+  for(const btn of document.querySelectorAll('[data-mode]')){
+    const selected=btn.dataset.mode===s.mode;btn.classList.toggle('selected',selected);btn.setAttribute('aria-pressed',String(selected));btn.disabled=role!=='host'||s.phase!=='lobby'||me.ready||prepared;
   }
   $('modeOwnerHint').textContent=role==='host'?'Ваш выбор':'Выбирает создатель';
+  if(prepared&&network.connected&&!me.ready&&s.phase==='lobby'&&!readyBusy){prepared=false;network.setReady(true);}
 }
-
 async function enableCamera(){
+  if(cameraReady)return true;
   if(cameraBusy)return false;
-  if(cameraReady&&stream?.getVideoTracks().some(t=>t.readyState==='live'&&!t.muted)){
-    network.setAvailable(true);return true;
-  }
-  if(!navigator.mediaDevices?.getUserMedia){toast('Камера недоступна. Откройте HTTPS-ссылку в Safari или Chrome.',true);return false;}
-  shield.enable();
-  const generation=++cameraGeneration;cameraBusy=true;cameraReady=false;
-  $('cameraButton').disabled=true;$('cameraButton').querySelector('span').textContent='Запускаем камеру…';
-  $('cameraStatus').textContent='Разрешите доступ к камере';$('cameraDetail').textContent='Понадобится только видео, без микрофона.';
-  $('cameraStatusDot').className='status-dot';$('modelProgress').hidden=false;renderRoom();
-  let requestTimer;
+  const gen=++cameraGeneration;cameraBusy=true;$('cameraLine').hidden=false;
+  $('cameraStatus').textContent='Разрешите камеру';$('cameraDetail').textContent='Или нажмите «Готов без камеры».';
+  let timer;
   try{
-    stopTracks();
-    const cameraRequest=navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30,max:30}}});
-    cameraRequest.then(s=>{if(generation!==cameraGeneration)s.getTracks().forEach(t=>t.stop());}).catch(()=>{});
-    const media=await Promise.race([cameraRequest,new Promise((_,reject)=>{requestTimer=setTimeout(()=>reject(new Error('Запрос камеры не подтверждён. Разрешите камеру в настройках сайта и повторите.')),25000);})]);
-    clearTimeout(requestTimer);
-    if(generation!==cameraGeneration){media.getTracks().forEach(t=>t.stop());return false;}
-    stream=media;$('previewVideo').srcObject=stream;
-    await $('previewVideo').play();
-    if(generation!==cameraGeneration)return false;
-    $('cameraPlaceholder').hidden=true;$('previewTag').textContent='CAMERA LIVE';
-    for(const track of stream.getVideoTracks()){
-      track.addEventListener('ended',()=>{if(stream===media)cameraLost('Камера отключена. Включите её ещё раз.');});
-      track.addEventListener('mute',()=>{if(stream===media&&cameraReady)cameraLost('Камера временно недоступна. Вернитесь в комнату и включите её.');});
-    }
-    cameraReady=true;network.setAvailable(true);
-    $('cameraStatus').textContent='Камера готова';$('cameraDetail').textContent='Направьте телефон в сторону игрока. Это будет центр вашей арены.';
-    $('cameraStatusDot').className='status-dot ready';$('cameraButton').querySelector('span').textContent='Перезапустить камеру';
-    $('previewTag').textContent='TRACKING READY';
-    sound('ui');return true;
-  }catch(error){
-    clearTimeout(requestTimer);
-    if(generation!==cameraGeneration)return false;
-    cameraGeneration++;shield.stop();stopTracks();cameraReady=false;network.setAvailable(false);
-    const messages={NotAllowedError:'Нет разрешения на камеру. Разрешите её для этого сайта в настройках браузера.',NotFoundError:'Камера не найдена. Откройте игру на телефоне с камерой.',NotReadableError:'Камера занята другим приложением. Закройте его и повторите.'};
-    const message=messages[error.name]||error.message||'Не удалось включить камеру.';
-    $('cameraStatus').textContent='Не удалось включить камеру';$('cameraDetail').textContent=message;$('cameraStatusDot').className='status-dot error';
-    $('cameraButton').querySelector('span').textContent='Попробовать снова';$('cameraPlaceholder').hidden=false;$('previewTag').textContent='CAMERA OFF';toast(message,true);return false;
-  }finally{
-    if(generation===cameraGeneration||generation+1===cameraGeneration){cameraBusy=false;$('cameraButton').disabled=false;$('modelProgress').hidden=true;renderRoom();}
-  }
+    if(!navigator.mediaDevices?.getUserMedia)throw Error('Камера недоступна в этом браузере.');
+    const request=navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:960},height:{ideal:720}}});
+    request.then(media=>{if(gen!==cameraGeneration)media.getTracks().forEach(t=>t.stop());}).catch(()=>{});
+    const media=await Promise.race([request,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Время ожидания камеры истекло.')),14000);})]);
+    if(gen!==cameraGeneration)return false;
+    stream=media;
+    for(const track of media.getTracks())track.addEventListener('ended',()=>{if(stream===media)cameraLost('Камера отключилась. Игра продолжается на виртуальной арене.');});
+    $('cameraPreviewWrap').hidden=false;$('previewVideo').srcObject=media;
+    // Continue if an embedded browser restricts preview autoplay until the next interaction.
+    $('previewVideo').play().catch(()=>{});
+    cameraReady=true;$('cameraStatus').textContent='Камера включена';$('cameraDetail').textContent='Направьте телефон в сторону соперника.';
+    return true;
+  }catch(e){
+    if(gen!==cameraGeneration)return false;
+    stopCamera();$('cameraLine').hidden=false;$('cameraStatus').textContent='Играем без камеры';
+    $('cameraDetail').textContent='Щит появится на виртуальной арене. Коснитесь его, чтобы выстрелить.';
+    return false;
+  }finally{clearTimeout(timer);if(gen===cameraGeneration)cameraBusy=false;}
 }
 function stopTracks(){
-  const previous=stream;stream=null;
-  previous?.getTracks().forEach(track=>track.stop());
+  const previous=stream;stream=null;previous?.getTracks().forEach(track=>track.stop());
   for(const id of ['previewVideo','arenaVideo']){$(id).pause();$(id).srcObject=null;}
 }
-function stopCamera(notify=true){
+function stopCamera(){
   cameraGeneration++;cameraReady=false;cameraBusy=false;shield.stop();stopTracks();
-  if(notify&&network.role)network.setAvailable(false);
-  $('cameraButton').disabled=false;$('cameraButton').querySelector('span').textContent='Включить камеру';
-  $('cameraPlaceholder').hidden=false;$('cameraStatus').textContent='Включите камеру';$('cameraDetail').textContent='Камера задаёт фон арены. Двигайте прицел телефоном или пальцем.';
-  $('cameraStatusDot').className='status-dot';$('previewTag').textContent='CAMERA OFF';$('modelProgress').hidden=true;
+  $('cameraPreviewWrap').hidden=true;
 }
 function cameraLost(message){
-  if(!cameraReady&&!cameraBusy)return;
-  cameraReady=false;shield.stop();network.setAvailable(false);stopTracks();
-  $('cameraStatus').textContent='Камера остановлена';$('cameraDetail').textContent=message;$('cameraStatusDot').className='status-dot error';
-  $('cameraButton').querySelector('span').textContent='Включить камеру';$('cameraPlaceholder').hidden=false;renderRoom();toast(message,true);
+  stopCamera();$('arenaScreen').classList.add('flat-arena');$('centerButton').hidden=true;
+  $('cameraLine').hidden=false;$('cameraStatus').textContent='Виртуальная арена';$('cameraDetail').textContent=message;
+  if(currentScreen==='arena')toast(message);renderRoom();
 }
-
+async function confirmReady(withCamera){
+  const room=network.link,op=operation;
+  if(!room||room.state?.phase!=='lobby')return;
+  if(prepared||room.state.players[room.role].ready){prepared=false;network.setReady(false);renderRoom();return;}
+  if(readyBusy&&withCamera)return;
+  readyBusy=true;unlockAudio();sound('ui');renderRoom();
+  if(withCamera){shield.enable();await enableCamera();}else{stopCamera();$('cameraLine').hidden=true;}
+  if(op!==operation||network.link!==room||!readyBusy)return;
+  readyBusy=false;shield.center();network.setAvailable(true);
+  if(network.connected)network.setReady(true);else prepared=true;
+  renderRoom();
+}
 function handleState(s){
   if(isTraining()&&s!==trainingEngine.state&&s.version!==1)return;
   const priorPhase=lastPhase;gameState=s;lastPhase=s.phase;
   if(s.phase==='lobby'){
     clearTimeout(finalTimer);resultRendered='';
     if(priorPhase!=='lobby'){
+      if(priorPhase!==null)prepared=false;readyBusy=false;
       showScreen('room');gameFx?.destroy();gameFx=null;
       if(cameraReady&&stream){$('previewVideo').srcObject=stream;$('previewVideo').play().catch(()=>cameraLost('Вернитесь к камере.'));}
     }
     renderRoom();
-    if(rematchPending&&cameraReady){rematchPending=false;queueMicrotask(()=>network.setReady(true));}
+    if(rematchPending){rematchPending=false;queueMicrotask(()=>network.setReady(true));}
   }else if(s.phase==='countdown'||s.phase==='active'||s.phase==='settling'){
     if(currentScreen!=='arena')enterArena();
     renderHUD();
@@ -260,14 +285,15 @@ function enterArena(){
   $('reticle').style.left='50%';$('reticle').style.top='46%';
   $('hitText').classList.remove('show');$('targetFrame').hidden=true;
   gameFx?.destroy();gameFx=new DuelEffects($('gameCanvas'),{mode:isTraining()?'training':'game'});
-  if(!isTraining()){
+  $('arenaScreen').classList.toggle('flat-arena',!isTraining()&&!cameraReady);
+  if(!isTraining()&&stream){
     $('arenaVideo').srcObject=stream;
     $('arenaVideo').play().catch(()=>cameraLost('Не удалось показать камеру. Перезапустите её.'));
   }
-  $('dodgeButton').hidden=isTraining();$('centerButton').hidden=isTraining();
+  $('dodgeButton').hidden=isTraining();$('centerButton').hidden=isTraining()||!cameraReady;
   $('arenaModeLabel').textContent=isTraining()?'ТРЕНИРОВКА':gameState.mode==='quickdraw'?'ПЕРВЫЙ ВЫСТРЕЛ':'ДУЭЛЬ';
   $('arenaConnection').textContent=isTraining()?'● SOLO':`● ${network.pingMs??'LIVE'}${network.pingMs==null?'':' MS'}`;
-  $('arenaBottomNote').textContent=isTraining()?'Перемещайте прицел пальцем или мышью · пробел — выстрел':'Поверните телефон или коснитесь арены, чтобы прицелиться';
+  $('arenaBottomNote').textContent=isTraining()?'Коснитесь дрона для выстрела':'Коснитесь щита для выстрела';
   requestWakeLock();cancelAnimationFrame(frameHandle);frameHandle=requestAnimationFrame(tick);
 }
 
@@ -292,7 +318,6 @@ function targetInView(){
     if(!box)return {visible:false,hit:false,confidence:0,ageMs:0};
     return {...box,box,hit:aim.x>=box.x&&aim.x<=box.x+box.w&&aim.y>=box.y&&aim.y<=box.y+box.h,confidence:1,ageMs:0,reason:'tracked'};
   }
-  if(!cameraReady||!$('arenaVideo').videoWidth)return {visible:false,hit:false};
   const rival=gameState.players[otherRole(myRole())];
   return shield.target({width:w,height:h,aim,seconds:Math.max(0,(now()-gameState.startAt)/1000),
     role:otherRole(myRole()),dodgeAge:rival.dodgeAt==null?-1:now()-rival.dodgeAt,dodgeSide:rival.dodgeSide});
@@ -401,8 +426,9 @@ function renderResult(s){
   $('resultSeries').textContent=isTraining()?'ОДИН ИГРОК · УЧЕБНАЯ АРЕНА':`СЕРИЯ · ВЫ ${series[role]} : ${series[otherRole(role)]} СОПЕРНИК`;
   $('rematchButton').disabled=!isTraining()&&!network.connected;
   $('rematchButton').querySelector('span').textContent=isTraining()?'Ещё тренировка':interrupted?'Вернуться в комнату':'Ещё дуэль';
-  $('rematchHint').textContent=isTraining()?'Для игры вдвоём создайте комнату на главной.':interrupted?'Если связь потеряна, войдите снова по тому же коду.':'Для реванша оба нажимают «Ещё дуэль» и включают камеры.';
-  showScreen('result');gameFx?.destroy();gameFx=null;stopCamera(!isTraining());
+  $('rematchHint').textContent=isTraining()?'Для игры вдвоём создайте комнату на главной.':interrupted?'Если связь потеряна, войдите снова по тому же коду.':'Для реванша оба нажимают «Ещё дуэль».';
+  showScreen('result');gameFx?.destroy();gameFx=null;
+  if(!isTraining()&&stream){$('previewVideo').pause();$('arenaVideo').pause();}
 }
 
 async function rematch(){
@@ -410,13 +436,13 @@ async function rematch(){
   if(isTraining()){startTraining();return;}
   if(!network.connected){toast('Сначала восстановите соединение с соперником.',true);return;}
   if(gameState?.phase==='interrupted'){
-    showScreen('room');await enableCamera();renderRoom();return;
+    prepared=false;showScreen('room');network.setAvailable(true);renderRoom();return;
   }
   $('rematchButton').disabled=true;$('rematchButton').querySelector('span').textContent='Готовим реванш…';
   rematchPending=true;
-  if(!await enableCamera()){rematchPending=false;$('rematchButton').disabled=false;$('rematchButton').querySelector('span').textContent='Ещё дуэль';return;}
+  network.setAvailable(true);
   const ok=network.requestRematch();
-  if(ok){$('rematchButton').querySelector('span').textContent='Вызов отправлен';$('rematchHint').textContent='Ждём подтверждения соперника. Камера включена.';}
+  if(ok){$('rematchButton').querySelector('span').textContent='Вызов отправлен';$('rematchHint').textContent='Ждём подтверждения соперника.';}
   else{rematchPending=false;$('rematchButton').disabled=false;toast('Не удалось начать реванш. Вернитесь в комнату.',true);}
 }
 
@@ -433,16 +459,11 @@ async function requestWakeLock(){
   try{if(navigator.wakeLock&&!document.hidden&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null;});}}catch{}
 }
 function releaseWakeLock(){try{wakeLock?.release();}catch{}wakeLock=null;}
-function inviteUrl(){const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('room',network.roomCode);return url.href;}
-function showInvite(){
-  if(!network.roomCode)return;
-  $('inviteCode').textContent=network.roomCode;const qrBox=$('inviteQr');qrBox.replaceChildren();
-  if(typeof window.qrcode==='function'){
-    const qr=window.qrcode(0,'M');qr.addData(inviteUrl());qr.make();
-    // qrcode-generator emits only SVG geometry from a URL assembled by this app.
-    qrBox.innerHTML=qr.createSvgTag({cellSize:3,margin:4,scalable:true});
-  }else{qrBox.textContent=network.roomCode;}
-  openDialog('inviteDialog');
+function inviteUrl(){const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('room',network.roomCode);url.searchParams.set('v','2');return url.href;}
+async function shareInvite(){
+  const url=inviteUrl();
+  if(navigator.share){try{await navigator.share({title:'PULSE DUEL',text:'Присоединяйся к дуэли',url});return;}catch(e){if(e.name==='AbortError')return;}}
+  await copyText(url,'Ссылка скопирована');
 }
 async function copyText(text,message){
   try{await navigator.clipboard.writeText(text);toast(message);}catch{
@@ -454,23 +475,21 @@ async function copyText(text,message){
 $('createButton').addEventListener('click',createRoom);
 $('joinButton').addEventListener('click',()=>{$('joinError').textContent='';openDialog('joinDialog');$('joinCode').focus();});
 $('joinForm').addEventListener('submit',e=>{e.preventDefault();joinRoom($('joinCode').value);});
-$('joinCode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
+$('joinCode').addEventListener('input',e=>{if(!e.target.value.includes('://'))e.target.value=readCode(e.target.value).replace(/[^A-Z0-9]/g,'').slice(0,6);});
 $('trainingButton').addEventListener('click',startTraining);
 $('nickname').addEventListener('change',()=>{playerName();});
 $('soundButton').addEventListener('click',toggleSound);$('arenaSoundButton').addEventListener('click',toggleSound);
-$('cameraButton').addEventListener('click',()=>{unlockAudio();if(cameraReady)stopCamera();enableCamera();});
-$('readyButton').addEventListener('click',()=>{
-  if(!cameraReady)return;shield.center();unlockAudio();sound('ui');network.setReady(!network.state?.players[network.role]?.ready);
-});
+$('readyButton').addEventListener('click',()=>confirmReady(true));$('flatReady').addEventListener('click',()=>confirmReady(false));
 for(const b of document.querySelectorAll('[data-mode]'))b.addEventListener('click',()=>{sound('ui');network.changeMode(b.dataset.mode);});
 $('leaveRoomButton').addEventListener('click',leaveRoom);
-$('inviteButton').addEventListener('click',showInvite);
+$('inviteButton').addEventListener('click',shareInvite);
+$('roomQr').addEventListener('click',()=>{
+  qrInto($('largeQr'),inviteUrl());
+  $('largeCode').textContent=network.roomCode;
+  openDialog('qrDialog');
+});
 $('copyCodeButton').addEventListener('click',()=>copyText(network.roomCode,'Код комнаты скопирован'));
 $('copyLinkButton').addEventListener('click',()=>copyText(inviteUrl(),'Ссылка на дуэль скопирована'));
-$('shareButton').addEventListener('click',async()=>{
-  if(navigator.share){try{await navigator.share({title:'Вызов на PULSE DUEL',text:'Встречаемся на лазерной дуэли. Код: '+network.roomCode,url:inviteUrl()});return;}catch(e){if(e.name==='AbortError')return;}}
-  await copyText(inviteUrl(),'Ссылка на дуэль скопирована');
-});
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeDialog(b.dataset.close)));
 document.querySelectorAll('[data-help]').forEach(b=>b.addEventListener('click',()=>openDialog('helpDialog')));
 for(const d of document.querySelectorAll('dialog'))d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});
@@ -494,19 +513,94 @@ const updateTrainingAim=e=>{
   const r=$('arenaScreen').getBoundingClientRect();aimPoint={x:Math.max(.01,Math.min(.99,(e.clientX-r.left)/r.width)),y:Math.max(.08,Math.min(.88,(e.clientY-r.top)/r.height))};
   $('reticle').style.left=aimPoint.x*100+'%';$('reticle').style.top=aimPoint.y*100+'%';
 };
-$('arenaScreen').addEventListener('pointerdown',e=>{if(!e.target.closest('button')){trainingDrag=true;updateTrainingAim(e);}});
+$('arenaScreen').addEventListener('pointerdown',e=>{if(!e.target.closest('button')){trainingDrag=true;updateTrainingAim(e);fire();}});
 $('arenaScreen').addEventListener('pointermove',updateTrainingAim);
 window.addEventListener('pointerup',()=>{trainingDrag=false;});
 window.addEventListener('resize',()=>{heroFx?.resize();gameFx?.resize();});
 document.addEventListener('visibilitychange',()=>{
+  clearTimeout(backgroundTimer);
   if(document.hidden){
     releaseWakeLock();
-    if(isTraining()&&['countdown','active','settling'].includes(trainingEngine.state.phase)){trainingEngine.interrupt('unavailable');handleState(trainingEngine.snapshot());}
-    else if(network.role){stopCamera();renderRoom();}
-  }else if(currentScreen==='arena')requestWakeLock();
+    if(!cameraBusy&&cameraReady){stopCamera();$('arenaScreen').classList.add('flat-arena');}
+    if(isTraining()&&['countdown','active','settling'].includes(trainingEngine.state.phase)){
+      trainingEngine.interrupt('unavailable');handleState(trainingEngine.snapshot());
+    }else if(network.role){
+      // Sharing, permission dialogs and app switches briefly hide the page on phones.
+      backgroundTimer=setTimeout(()=>{
+        if(document.hidden&&['active','countdown'].includes(network.state?.phase))network.setAvailable(false);
+      },18000);
+    }
+  }else if(network.role){
+    network.setAvailable(true);renderRoom();if(currentScreen==='arena')requestWakeLock();
+  }
 });
-window.addEventListener('pagehide',()=>{network.leave({silent:true});shield.stop();stopTracks();releaseWakeLock();});
-
-// Invites prefill the join form, retaining a deliberate click before networking.
-const incomingCode=new URL(location.href).searchParams.get('room');
-if(incomingCode){$('joinCode').value=normalizeRoomCode(incomingCode).slice(0,6);openDialog('joinDialog');}
+window.addEventListener('pagehide',()=>{network.suspend();stopCamera();releaseWakeLock();});
+window.addEventListener('pageshow',e=>{if(e.persisted&&new URL(location.href).searchParams.has('room'))location.reload();});
+function startFromUrl(){
+  const url=new URL(location.href),code=readCode(url.searchParams.get('room')||'');
+  if(code){const saved=history.state?.duel;joinRoom(code,saved?.code===code?saved:null);return;}
+  const offer=new URLSearchParams(url.hash.slice(1)).get('wifi');
+  if(offer)localMenu(offer);
+}
+function localMenu(offer=''){
+  if(network.link?.local&&!network.connected)network.leave();
+  closeAllDialogs();
+  localSetup={offer,step:'intro',value:''};
+  $('localTitle').textContent=offer?'Вызов по Wi-Fi':'Прямая связь';
+  $('localHint').textContent=offer?'Оба телефона должны быть в одной Wi-Fi-сети. Подготовьте ответ и передайте его создателю.':'Подключите телефоны к одной Wi-Fi-сети. Второй игрок откроет приглашение, затем передаст ответный код в эту вкладку.';
+  $('localAction').textContent=offer?'Подготовить ответ':'Создать Wi-Fi-приглашение';
+  $('localAction').disabled=false;$('localAction').hidden=false;
+  for(const id of ['localQr','localCopy','localText','localLabel'])$(id).hidden=true;
+  $('localText').value='';$('localError').textContent='';openDialog('localDialog');
+}
+function cancelLocal(){
+  if(localSetup?.room){network.leave();resetSession();showScreen('home');}
+  localSetup=null;closeDialog('localDialog');
+  if(location.hash){const url=new URL(location.href);url.hash='';history.replaceState({},'',url);}
+}
+function exposeLocalData(value){
+  const node=$('localText');
+  node.hidden=false;node.readOnly=true;node.value=value;node.focus();node.select();
+}
+async function copyLocal(){
+  const setup=localSetup;if(!setup?.value)return;
+  try{await navigator.clipboard.writeText(setup.value);$('localError').textContent=setup.offer?'Ответ скопирован. Передайте его первому игроку.':'Приглашение скопировано.';}
+  catch{if(setup.offer)exposeLocalData(setup.value);else window.prompt('Скопируйте приглашение',setup.value);}
+}
+$('localClose').onclick=cancelLocal;
+$('localDialog').addEventListener('cancel',e=>{e.preventDefault();cancelLocal();});
+$('localDialog').addEventListener('close',()=>{if(localSetup?.room&&!network.connected)cancelLocal();});
+$('localCopy').onclick=copyLocal;
+document.querySelectorAll('[data-local]').forEach(b=>b.addEventListener('click',()=>localMenu()));
+$('localAction').onclick=async()=>{
+  const ctx=localSetup;if(!ctx)return;const button=$('localAction');button.disabled=true;$('localError').textContent='';
+  try{
+    if(ctx.step==='intro'){
+      operation++;busyRoom=false;network.leave();resetSession();showScreen('home');
+      const url=new URL(location.href);url.search='?v=2';url.hash='';history.replaceState({},'',url);
+      const local=new LocalRoom(callbacks);ctx.room=local;network.link=local;
+      const data=ctx.offer?await local.answer(ctx.offer,playerName()):await local.offer(playerName());
+      if(localSetup!==ctx)return;
+      $('localCopy').hidden=false;$('localText').readOnly=false;
+      if(ctx.offer){
+        ctx.value=data;ctx.step='reply';$('localTitle').textContent='Передайте ответ';
+        $('localHint').textContent='Отправьте ответ первому игроку в мессенджере. Он вставит его в свою вкладку. Затем вернитесь сюда.';
+        $('localCopy').textContent='Скопировать ответ';button.textContent='Отправить ответ';
+      }else{
+        url.hash=new URLSearchParams({wifi:data}).toString();ctx.value=url.href;ctx.step='apply';
+        $('localTitle').textContent='Приглашение по Wi-Fi';
+        $('localHint').textContent='Друг сканирует QR или открывает ссылку с вашего телефона и отправляет ответ. Вставьте его ниже.';
+        qrInto($('localQr'),ctx.value);$('localCopy').textContent='Скопировать ссылку';
+        $('localLabel').hidden=$('localText').hidden=false;button.textContent='Соединить телефоны';
+      }
+    }else if(ctx.step==='apply'){
+      await ctx.room.complete($('localText').value);$('localHint').textContent='Устанавливаем прямой канал. Оставьте обе вкладки открытыми.';
+      const local=ctx.room;
+      setTimeout(()=>{if(localSetup?.room===local&&!local.connected)$('localError').textContent='Сеть не соединила телефоны. Проверьте, что оба подключены к одной обычной Wi-Fi-сети, затем создайте новое приглашение.';},14000);
+    }else if(ctx.step==='reply'){
+      if(navigator.share){try{await navigator.share({text:ctx.value});}catch(e){if(e.name!=='AbortError')await copyLocal();}}else await copyLocal();
+    }
+  }catch(e){if(localSetup===ctx)$('localError').textContent=e.message||'Не удалось подключиться.';if(ctx.step==='intro'&&ctx.room){network.leave();ctx.room=null;}}
+  finally{if(localSetup===ctx)button.disabled=false;}
+};
+startFromUrl();

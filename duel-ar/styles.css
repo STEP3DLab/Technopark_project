@@ -19,3 +19,28 @@
 .shift-shield:active,.center-shield:active{background:#374c2a}
 @media(max-height:500px) and (orientation:landscape){.center-shield{top:62px}.shift-shield{margin-top:1px}.arena-bottom .weapon-info{min-width:78px}}
 .up-arrow{width:15px;height:15px;vertical-align:middle;transform:rotate(-45deg)}.room-code-row .up-arrow,.help-modal>.button .up-arrow{margin-left:5px}
+/* Keep all joining and ready controls together on a small phone. */
+.action-title,.lobby-card h2{font-family:var(--display);line-height:1.1;font-weight:700;letter-spacing:-.02em}
+.action-title{font-size:34px}.action-intro{font-size:14px;line-height:1.5;color:#aeb5ae;margin:8px 0 22px}
+.extras{margin-top:17px;border-top:1px solid var(--line);padding-top:12px;color:#aeb9b0;font-size:13px}
+.extras summary{cursor:pointer;min-height:32px;line-height:32px}.extras .text-button{display:block;padding:12px 0;min-height:44px;text-align:left}
+.lobby-card{max-width:505px;margin:0 auto;padding:0 0 24px}.lobby-card .section-top{margin-bottom:15px}.lobby-card h2{font-size:clamp(33px,7vw,49px);margin-bottom:19px}
+.inline-invite{padding:15px;display:flex;align-items:center;gap:20px;background:var(--panel);border:1px solid var(--line);border-radius:6px}
+.inline-invite .qr-code{width:112px;height:112px;margin:0;flex-shrink:0;padding:7px}.inline-invite .room-code{font-size:clamp(24px,5.8vw,38px);padding:6px 0;letter-spacing:.08em;line-height:1.2;display:flex;gap:6px;align-items:center}.room-code svg{width:15px;height:15px}
+.inline-share{font-size:13px;text-decoration:underline;text-underline-offset:4px;color:var(--acid);padding:8px 0;min-height:42px;text-align:left}.inline-invite .micro-label{font-size:9px;letter-spacing:.6px}
+.lobby-players{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0}.lobby-players .player-card{margin:0;min-width:0;display:flex;align-items:center;gap:7px;padding:10px 7px;background:transparent;border:0;text-align:left}
+.lobby-players .player-card>div{min-width:0}.lobby-players h3{margin:0 0 3px;text-align:left;font-family:var(--font);font-size:14px}.lobby-players .player-card span:not(.player-dot){font-size:12px;color:#aab4ac}.player-dot{flex-shrink:0;width:8px;height:8px;border-radius:50%;background:#686f69}.ready .player-dot{background:var(--acid)}
+.start-hint{font-size:14px;line-height:1.45;color:#c5d1c6;margin:10px 0 12px}.lobby-card .button{margin:8px 0 0;min-height:48px}
+.lobby-card .camera-preview{height:105px;margin:8px 0}.lobby-card .camera-status{margin:10px 0 0}.local-modal textarea{width:100%;font:14px var(--font);color:var(--text);background:var(--panel);border:1px solid var(--line);padding:10px}
+.local-modal .qr-code{width:min(200px,58vw);height:auto;aspect-ratio:1}.local-modal h2{font-size:35px}.local-modal .modal-note{margin:10px 0 15px}.local-modal label{display:block;margin:12px 0 4px}
+.arena-screen.flat-arena{background:radial-gradient(ellipse at 50% 39%,#29372d,#111b1b 39%,#070b10 80%)}.flat-arena #arenaVideo{visibility:hidden}.flat-arena .arena-shade{background:repeating-linear-gradient(90deg,#bde6bd0a 0 1px,transparent 1px 40px),repeating-linear-gradient(0deg,#bde6bd0a 0 1px,transparent 1px 40px)}
+@media(max-width:680px){
+ .home-screen{display:flex;flex-direction:column;position:relative;padding-top:20px;gap:0}
+ .hero-copy h1{font-size:clamp(48px,14vw,70px);margin:13px 0 7px;line-height:.95}.hero-copy h1 br{display:none}.hero-copy h1 span::before{content:' '}
+ .hero-copy .hero-subtitle{font-size:14px;max-width:260px;line-height:1.4}.hero-visual{order:2;width:100%;height:104px;margin:5px 0 0}.hero-visual canvas{height:115px}.entry-panel{padding:14px 0 0;margin:14px 0 0;width:100%}
+ .entry-panel .action-title{font-size:24px}.action-intro{margin:4px 0 10px;font-size:13px}.entry-panel .button{min-height:47px;margin-top:7px}.entry-panel .training-link{padding:13px 0 5px;min-height:43px}
+ .home-footer{order:3}.room-screen{padding-top:16px}.lobby-card{max-width:450px}.lobby-players{margin:9px 0}.extras{margin-top:9px}.lobby-card h2{margin-bottom:12px}
+}
+@media(max-width:355px){.inline-invite{gap:10px;padding:10px}.inline-invite .qr-code{width:85px;height:85px}.inline-invite .room-code{font-size:23px}}
+
+.inline-invite button.qr-code{border:0;cursor:zoom-in}.qr-modal .qr-code{width:min(270px,100%);height:auto;aspect-ratio:1}.qr-modal p{line-height:1.5;text-align:center}.qr-modal strong{color:var(--lime);white-space:nowrap}

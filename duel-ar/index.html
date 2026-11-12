@@ -11,9 +11,9 @@
   <title>PULSE DUEL — AR-дуэль для двоих</title>
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=2">
   <script src="./vendor/qrcode.js" defer></script>
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=2"></script>
 </head>
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -35,35 +35,47 @@
 
   <main>
     <section id="homeScreen" class="screen home-screen" aria-labelledby="homeTitle">
-      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> ЛАЗЕРНАЯ AR-ДУЭЛЬ ДЛЯ ДВОИХ</p><h1 id="homeTitle">ТВОЙ<br><span>ВЫСТРЕЛ.</span></h1><p class="hero-subtitle">Сбей щит друга поверх живой камеры.<br>И успей увести свой.</p></div>
-      <div class="hero-visual" aria-hidden="true"><canvas id="heroCanvas"></canvas><div class="hero-caption"><span>PLAYER 01</span><span class="versus">VS</span><span>PLAYER 02</span></div></div>
+      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> AR-ДУЭЛЬ ДЛЯ ДВОИХ</p><h1 id="homeTitle">Твой<br><span>выстрел.</span></h1><p class="hero-subtitle">Попади в щит соперника раньше, чем он собьёт твой.</p></div>
+      <div class="hero-visual" aria-hidden="true"><canvas id="heroCanvas"></canvas></div>
       <div class="entry-panel">
-        <div class="entry-heading"><span>ДВА ТЕЛЕФОНА.<br>ОДНА ДУЭЛЬ.</span></div>
-        <label class="name-field" for="nickname"><span>Твой позывной</span><input id="nickname" maxlength="16" autocomplete="nickname" placeholder="Игрок" spellcheck="false"></label>
-        <button id="createButton" class="button primary"><span>Создать дуэль</span><svg><use href="#i-arrow"/></svg></button>
-        <button id="joinButton" class="button secondary"><span>Войти по коду</span><span class="button-meta"><svg aria-hidden="true" class="up-arrow"><use href="#i-arrow"/></svg></span></button>
-        <button id="trainingButton" class="text-button training-link"><svg><use href="#i-target"/></svg>Попробовать одному<span><svg aria-hidden="true" class="up-arrow"><use href="#i-arrow"/></svg></span></button>
-        <p class="entry-note">В браузере · 2 игрока рядом · 45 секунд</p>
+        <h2 class="action-title">Играть вдвоём</h2>
+        <p class="action-intro">Один создаёт комнату, второй сканирует QR-код.</p>
+        <button id="createButton" class="button primary"><span>Создать комнату</span><svg><use href="#i-arrow"/></svg></button>
+        <button id="joinButton" class="button secondary"><span>Ввести код комнаты</span><svg><use href="#i-link"/></svg></button>
+        <p id="homeError" class="inline-error" role="status" hidden></p>
+        <button id="trainingButton" class="text-button training-link"><svg><use href="#i-target"/></svg>Тренировка для одного</button>
+        <details class="extras"><summary>Другие варианты</summary>
+          <label class="name-field" for="nickname"><span>Имя в игре</span><input id="nickname" maxlength="16" autocomplete="nickname" placeholder="Игрок" spellcheck="false"></label>
+          <button class="text-button local-link" data-local>Соединиться напрямую по Wi-Fi</button>
+        </details>
       </div>
-      <footer class="home-footer"><span>PULSE DUEL</span><button class="text-button" data-help>Как играть <span><svg aria-hidden="true" class="up-arrow"><use href="#i-arrow"/></svg></span></button></footer>
+      <footer class="home-footer"><span>1 × 1 · 45 СЕКУНД</span><button class="text-button" data-help>Правила игры</button></footer>
     </section>
 
     <section id="roomScreen" class="screen room-screen" hidden aria-labelledby="roomTitle">
-      <div class="section-top"><button id="leaveRoomButton" class="text-button">← Выйти</button><span id="connectionBadge" class="status-pill">Соединяемся</span></div>
-      <div class="room-layout">
-        <div class="room-main"><p class="eyebrow">ПЕРЕД ПЕРВЫМ ВЫСТРЕЛОМ</p><h2 id="roomTitle">Встреча<br><span>на арене.</span></h2>
-          <div class="room-code-row"><div><span class="micro-label">КОД КОМНАТЫ</span><button id="copyCodeButton" class="room-code" title="Скопировать код"><span id="roomCode">••••••</span><svg><use href="#i-link"/></svg></button></div><button id="inviteButton" class="button small secondary">Пригласить <svg aria-hidden="true" class="up-arrow"><use href="#i-arrow"/></svg></button></div>
-          <div class="players-grid"><article class="player-card you"><span class="player-number">01</span><div class="player-emblem" aria-hidden="true">✳</div><h3 id="yourName">Вы</h3><span id="yourStatus" class="player-status">Подготовка</span></article><span class="players-versus">VS</span><article class="player-card rival"><span class="player-number">02</span><div class="player-emblem" aria-hidden="true">✳</div><h3 id="rivalName">Ждём соперника</h3><span id="rivalStatus" class="player-status">Отправьте ссылку другу</span></article></div>
-          <div class="mode-field"><div class="label-row"><span class="micro-label">ПРАВИЛА ДУЭЛИ</span><span id="modeOwnerHint">Выбирает создатель</span></div><div class="mode-switch" role="group" aria-label="Режим дуэли"><button data-mode="duel" class="selected" aria-pressed="true"><span>Дуэль</span><small>3 попадания</small></button><button data-mode="quickdraw" aria-pressed="false"><span>Первый выстрел</span><small>1 попадание</small></button></div></div>
+      <div class="lobby-card">
+        <div class="section-top"><button id="leaveRoomButton" class="text-button">← Выйти</button><span id="connectionBadge" class="status-pill" role="status">Подключение…</span></div>
+        <h2 id="roomTitle">Ваша комната</h2>
+        <div id="inviteBlock" class="inline-invite">
+          <button type="button" id="roomQr" class="qr-code" aria-label="Увеличить QR-код" title="Увеличить QR-код"></button>
+          <div><span class="micro-label">КОД ДЛЯ ВТОРОГО ИГРОКА</span>
+            <button id="copyCodeButton" class="room-code" title="Скопировать код"><span id="roomCode">······</span><svg><use href="#i-link"/></svg></button>
+            <button id="inviteButton" class="inline-share" type="button">Отправить ссылку</button>
+          </div>
         </div>
-        <div class="prepare-panel"><div id="cameraPreviewWrap" class="camera-preview"><video id="previewVideo" autoplay playsinline muted></video><div class="camera-placeholder" id="cameraPlaceholder"><svg><use href="#i-camera"/></svg><span>Твоя камера — твой прицел</span></div><span class="preview-corner top-left"></span><span class="preview-corner bottom-right"></span><span class="preview-tag" id="previewTag">CAMERA OFF</span></div>
-          <div class="camera-status"><span id="cameraStatusDot" class="status-dot"></span><div><strong id="cameraStatus">Включите камеру</strong><p id="cameraDetail">Изображение с камеры остаётся на вашем телефоне.</p></div></div>
-          <div id="modelProgress" class="progress-track" hidden><div></div></div>
-          <button id="cameraButton" class="button secondary"><svg><use href="#i-camera"/></svg><span>Включить камеру</span></button>
-          <button id="readyButton" class="button primary" disabled><span>Я готов к дуэли</span><svg><use href="#i-check"/></svg></button>
-          <p id="readyHint" class="prepare-hint">Подключите второго игрока и включите камеры.</p>
-          <p class="room-tip"><strong>Встаньте напротив друг друга.</strong> Держите телефон вертикально. Когда нажмёте «Я готов», перед вами появится щит соперника.</p>
-        </div>
+        <div class="lobby-players"><div class="player-card you"><span class="player-dot"></span><div><h3 id="yourName">Вы</h3><span id="yourStatus">В комнате</span></div></div><div class="player-card rival"><span class="player-dot"></span><div><h3 id="rivalName">Второй игрок</h3><span id="rivalStatus">Ждём входа</span></div></div></div>
+        <p id="readyHint" class="start-hint" aria-live="polite">Пригласите второго игрока.</p>
+        <button id="readyButton" class="button primary"><span>Готов с камерой</span><svg><use href="#i-camera"/></svg></button>
+        <button id="flatReady" class="button secondary">Готов без камеры</button>
+        <div id="cameraLine" class="camera-status" hidden><span id="cameraStatusDot" class="status-dot"></span><div><strong id="cameraStatus"></strong><p id="cameraDetail"></p></div></div>
+        <div id="cameraPreviewWrap" class="camera-preview" hidden><video id="previewVideo" autoplay playsinline muted></video></div>
+        <p id="roomError" class="inline-error" aria-live="polite" hidden></p>
+        <details class="extras room-extras"><summary>Режим и подключение</summary>
+          <div class="label-row"><span class="micro-label">ДЛИТЕЛЬНОСТЬ</span><span id="modeOwnerHint">Выбирает создатель</span></div>
+          <div class="mode-switch" role="group" aria-label="Режим дуэли"><button data-mode="duel" class="selected" aria-pressed="true"><span>Дуэль</span><small>3 попадания</small></button><button data-mode="quickdraw" aria-pressed="false"><span>Блиц</span><small>1 попадание</small></button></div>
+          <button id="copyLinkButton" class="text-button">Скопировать приглашение</button>
+          <button class="text-button local-link" data-local>Соединиться напрямую по Wi-Fi</button>
+        </details>
       </div>
     </section>
 
@@ -83,12 +95,15 @@
     <section id="resultScreen" class="screen result-screen" hidden aria-labelledby="resultTitle"><div class="result-symbol" id="resultSymbol" aria-hidden="true">✳</div><p class="eyebrow" id="resultEyebrow">ДУЭЛЬ ЗАВЕРШЕНА</p><h2 id="resultTitle">Твой<br><span>момент.</span></h2><p id="resultMessage" class="result-message"></p><div class="result-stats"><div><strong id="resultHits">0</strong><span>ПОПАДАНИЯ</span></div><div><strong id="resultAccuracy">0%</strong><span>ТОЧНОСТЬ</span></div><div><strong id="resultTime">0с</strong><span>ВРЕМЯ</span></div></div><div id="resultSeries" class="series-score"></div><div class="result-actions"><button id="rematchButton" class="button primary"><span>Ещё дуэль</span><svg><use href="#i-arrow"/></svg></button><button id="resultHomeButton" class="button secondary">На главную</button></div><p class="result-note" id="rematchHint">Реванш начнётся, когда оба будут готовы.</p></section>
   </main>
 
-  <dialog id="joinDialog" class="modal"><form id="joinForm"><div class="modal-top"><span class="micro-label">ПОДКЛЮЧЕНИЕ</span><button type="button" class="icon-button" data-close="joinDialog" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div><h2>Есть<br><span>вызов?</span></h2><label for="joinCode">Введите код с телефона друга</label><input id="joinCode" class="code-input" maxlength="6" minlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234" required pattern="[A-Za-z0-9]{6}"><p id="joinError" class="inline-error" role="alert"></p><button id="joinSubmit" class="button primary" type="submit"><span>Войти в дуэль</span><svg><use href="#i-arrow"/></svg></button><p class="modal-note">Играйте рядом. Оба телефона должны быть в интернете.</p></form></dialog>
+  <dialog id="joinDialog" class="modal"><form id="joinForm"><div class="modal-top"><span class="micro-label">ПОДКЛЮЧЕНИЕ</span><button type="button" class="icon-button" data-close="joinDialog" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div><h2>Войти по коду</h2><label for="joinCode">Введите код с телефона друга</label><input id="joinCode" class="code-input" maxlength="60" minlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="234567" inputmode="numeric" required><p id="joinError" class="inline-error" role="alert"></p><button id="joinSubmit" class="button primary" type="submit"><span>Войти в дуэль</span><svg><use href="#i-arrow"/></svg></button><p class="modal-note">Код показан на экране создателя.</p><button type="button" class="text-button local-link" data-local>Прямая связь по Wi-Fi</button></form></dialog>
 
-  <dialog id="inviteDialog" class="modal invite-modal"><div class="modal-top"><span class="micro-label">ВЫЗОВ НА ДУЭЛЬ</span><button class="icon-button" data-close="inviteDialog" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div><h2>Твой<br><span>соперник?</span></h2><div id="inviteQr" class="qr-code" aria-label="QR-код для входа в комнату"></div><p class="invite-code" id="inviteCode"></p><p class="modal-note">Друг сканирует QR камерой телефона<br>или открывает вашу ссылку.</p><button id="shareButton" class="button primary"><span>Поделиться ссылкой</span><svg><use href="#i-arrow"/></svg></button><button id="copyLinkButton" class="button secondary">Скопировать ссылку</button></dialog>
-
-  <dialog id="helpDialog" class="modal help-modal"><div class="modal-top"><span class="micro-label">БЫСТРЫЙ СТАРТ</span><button class="icon-button" data-close="helpDialog" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div><h2>Право<br><span>на выстрел.</span></h2><ol class="how-steps"><li><span>01</span><div><strong>Позови соперника</strong><p>Создай комнату. Друг входит по ссылке, QR или коду на своём телефоне.</p></div></li><li><span>02</span><div><strong>Включите камеры</strong><p>Встаньте напротив друг друга. Держите телефон вертикально и смотрите через камеру в сторону соперника.</p></div></li><li><span>03</span><div><strong>Оба нажмите «Готов»</strong><p>После отсчёта совместите прицел со светящимся щитом, повернув телефон или коснувшись цели. Нажмите «Огонь». Кнопка «Сдвиг щита» уводит ваш щит в сторону на экране соперника.</p></div></li></ol><div class="rules-strip"><span><b>3</b>попадания</span><span><b>6</b>зарядов</span><span><b>45с</b>на дуэль</span></div><p class="help-detail">После шести выстрелов — автоматическая перезарядка. В режиме «Первый выстрел» достаточно одного попадания. Когда время истечёт, выиграет игрок с большим запасом щита. При равном счёте будет ничья.</p><details><summary>Камера, сеть и совместимость</summary><p>Камера показывает комнату, а датчики телефона удерживают игровой щит в выбранном направлении. Если датчики недоступны, наведите прицел пальцем. Кнопка «Центр» заново задаёт направление. Между телефонами передаются игровые события. Видео остаётся на вашем устройстве.</p><p>Комната синхронизирует позывные, отсчёт и очки через игровой сервис. Если он недоступен при создании, игра пробует прямое соединение через PeerJS. Для прямой связи помогает общий Wi-Fi. При разрыве связи игра останавливает раунд.</p><p>Для игры подойдут мобильные Safari и Chrome с доступом к камере. Откройте ссылку в браузере телефона.</p></details><button class="button primary" data-close="helpDialog">Понятно. К дуэли <svg aria-hidden="true" class="up-arrow"><use href="#i-arrow"/></svg></button></dialog>
-
+  <dialog id="localDialog" class="modal local-modal"><div class="modal-top"><span class="micro-label">ЛОКАЛЬНЫЙ WI-FI</span><button class="icon-button" id="localClose" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div>
+  <h2 id="localTitle">Прямая связь</h2><p id="localHint" class="modal-note"></p><div id="localQr" class="qr-code" hidden></div>
+  <button id="localCopy" class="button secondary" hidden></button><label for="localText" id="localLabel" hidden>Ответ второго телефона</label><textarea id="localText" rows="2" spellcheck="false" placeholder="Вставьте ответ" hidden></textarea>
+  <p id="localError" class="inline-error" role="alert"></p><button id="localAction" class="button primary"></button></dialog>
+  <dialog id="helpDialog" class="modal"><div class="modal-top"><span class="micro-label">ПРАВИЛА</span><button class="icon-button" data-close="helpDialog" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div><h2>Как играть</h2>
+  <ol class="how-steps"><li><span>01</span><div><strong>Войдите вдвоём</strong><p>Первый игрок создаёт комнату. Второй сканирует QR или вводит код.</p></div></li><li><span>02</span><div><strong>Подтвердите готовность</strong><p>Каждый выбирает «Готов с камерой» или «Готов без камеры». После двух подтверждений начнётся общий отсчёт.</p></div></li><li><span>03</span><div><strong>Попадите в щит</strong><p>Касание щита сразу выпускает заряд. С камерой можно также навести центральный прицел и нажать «Огонь». «Сдвиг щита» помогает уклониться.</p></div></li></ol><p class="help-detail">В дуэли нужны три попадания, в блице — одно. Через 45 секунд побеждает игрок, у которого осталось больше щита.</p><button class="button primary" data-close="helpDialog">Понятно</button></dialog>
+  <dialog id="qrDialog" class="modal qr-modal" aria-labelledby="qrTitle"><div class="modal-top"><h3 id="qrTitle">Вход второго игрока</h3><button type="button" class="icon-button" data-close="qrDialog" aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div><div id="largeQr" class="qr-code"></div><p>Откройте камеру второго телефона или введите код <strong id="largeCode"></strong>.</p></dialog>
   <dialog id="exitDialog" class="modal compact-modal"><h3>Покинуть дуэль?</h3><p>Текущий раунд будет остановлен у обоих игроков.</p><button id="confirmExitButton" class="button primary">Выйти</button><button class="button secondary" data-close="exitDialog">Продолжить игру</button></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <noscript><p class="noscript">Для PULSE DUEL нужен JavaScript. Включите его в настройках браузера.</p></noscript>

@@ -119,7 +119,7 @@ export class DuelNetwork {
     if (generation !== this._generation) throw networkError('cancelled', 'Создание комнаты отменено.');
     let lastError;
     for (let attempt = 0; attempt < 3; attempt++) {
-      this.roomCode = randomString(6).replace(/^R/,'P');
+      this.roomCode = '9'+[...crypto.getRandomValues(new Uint8Array(5))].map(n=>n%10).join('');
       try {
         await this._openPeer(Peer, PREFIX + this.roomCode, generation);
         this._session = randomString(16);
@@ -142,7 +142,7 @@ export class DuelNetwork {
 
   async join(code, {name = 'Игрок 2'} = {}) {
     code = normalizeRoomCode(code);
-    if (!/^[A-Z2-9]{6}$/.test(code)) throw networkError('invalid-code', 'Введите код комнаты из шести символов.');
+    if (!/^(?:9[0-9]{5}|[A-Z2-9]{6})$/.test(code)) throw networkError('invalid-code', 'Введите код комнаты из шести символов.');
     this.leave({silent: true});
     const generation = this._generation;
     this.role = 'guest'; this.roomCode = code; this._name = cleanName(name);
@@ -316,7 +316,7 @@ export class DuelNetwork {
   _acceptState(state) {
     if (this.state && state.revision <= this.state.revision) return;
     if (!this.state || state.round !== this.state.round) { this._shotSeq = 0; this._localLastShot = -Infinity; }
-    this.state = structuredClone(state);
+    this.state = JSON.parse(JSON.stringify(state));
     this._call('onState', this.state);
   }
 

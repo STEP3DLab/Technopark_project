@@ -61,3 +61,9 @@ python3 -m http.server 8080
 - Разрешение на датчики ориентации: https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/requestPermission_static
 
 Код и эффекты подготовлены специально для этой игры. Библиотека Three.js распространяется по лицензии MIT.
+
+## Проверенное превью
+
+![Стартовый экран BREACH](./preview.jpg)
+
+Доступность пространственного AR определяется возможностями устройства; снимок сделан в браузере без аппаратного WebGL.

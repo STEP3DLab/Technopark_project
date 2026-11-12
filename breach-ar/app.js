@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js';
-import { GameEngine, createInvaderMesh } from './engine.js';
-import { SoundEngine } from './audio.js';
+import { GameEngine, createInvaderMesh, WAVE_CONFIG, UPGRADE_CATALOG } from './engine.js?v=2.0';
+import { SoundEngine } from './audio.js?v=2.0';
 import { CanvasRenderer } from './canvas-renderer.js?v=1.1';
 
 const $ = (id) => document.getElementById(id);
@@ -9,13 +9,20 @@ const store = {
   get(key, fallback) { try { return localStorage.getItem(`breach.${key}`) ?? fallback; } catch { return fallback; } },
   set(key, value) { try { localStorage.setItem(`breach.${key}`, String(value)); } catch {} },
 };
-const state = { mode: 'lobby', stage: 'lobby', busy: false, firing: false, portals: [], muted: store.get('muted', 'false') === 'true', xrSupported: false, software: false };
+const state = { mode: 'lobby', stage: 'lobby', busy: false, firing: false, portals: [], difficulty: 'normal', muted: store.get('muted', 'false') === 'true', xrSupported: false, software: false };
 const audio = new SoundEngine();
 audio.setMuted(state.muted);
 let renderer, engine, scene, camera, xrAim, hero, environment, placement, markers;
 let session = null, stream = null, hitSource = null, hitPoint = null, wakeLock = null;
-let previousTime = 0, uiTime = 0, toastTimer, bannerTimer, suppressEnd = false, pointer = null, trackingLost = false;
+let previousTime = 0, uiTime = 0, toastTimer, bannerTimer, feedbackTimer, introTimer, suppressEnd = false, pointer = null, trackingLost = false;
 let lastMode = 'demo', lastResult = null, launchEpoch = 0;
+let lastUIPhase = '', lastCountdown = -1, lastWarningAt = -10000;
+const transientTimers = new Map();
+const ENEMY_LABELS = { scout: 'РАЗВЕДЧИК', drone: 'ПЕРЕХВАТЧИК', flanker: 'ФЛАНКЕР', charger: 'ТАРАН', tank: 'БРОНЕНОСЕЦ', boss: 'ЯДРО ВТОРЖЕНИЯ', projectile: 'ЗАРЯД' };
+const ENEMY_TIPS = { scout: 'Держи цель в центре и стреляй короткими очередями.', flanker: 'Меняет направление. Сопровождай цель и держи её в центре.', charger: 'Вспышка перед рывком — перехвати его или используй импульс.', tank: 'Удержи прицел на ядре: критический выстрел пробивает броню.', boss: 'Сбивай красные заряды. Атакуй ядро, когда защита открыта.', projectile: 'Сбей заряд одним выстрелом или очисти сектор импульсом.' };
+const DIFFICULTY_LABELS = { easy: 'РАЗВЕДКА', normal: 'ВТОРЖЕНИЕ', hard: 'ХАОС' };
+const MODE_LABELS = { demo: 'ТРЕНИРОВКА', camera: 'КАМЕРА', ar: 'AR' };
+const UPGRADE_ICONS = { cooling: 'i-expand', capacitor: 'i-pulse', focus: 'i-crosshair', damage: 'i-crosshair', shield: 'i-shield', pulse: 'i-pulse', cadence: 'i-arrow' };
 const vector = new THREE.Vector3(), quaternion = new THREE.Quaternion();
 const orientation = { enabled: false, received: false, raw: new THREE.Quaternion(), zero: null, yaw: 0, pitch: 0, timer: null };
 const touchAim = { yaw: 0, pitch: 0, targetYaw: 0, targetPitch: 0 };
@@ -82,7 +89,7 @@ function initScene() {
 
 function makeHero() {
   const group = new THREE.Group();
-  const invader = createInvaderMesh('scout'); invader.name = 'specimen';
+  const invader = createInvaderMesh('boss'); invader.name = 'specimen';
   group.add(invader);
   const box = new THREE.Box3().setFromObject(invader), size = box.getSize(new THREE.Vector3());
   invader.scale.setScalar(2.3 / Math.max(size.x, 0.01));
@@ -129,10 +136,11 @@ function setView(mode, stage) {
   state.mode = mode; state.stage = stage;
   document.body.classList.remove('lobby-view', 'playing', 'camera-mode', 'ar-mode', 'demo-mode', 'setup-mode');
   document.body.classList.add(mode === 'lobby' ? 'lobby-view' : `${mode}-mode`);
-  if (stage === 'playing' || stage === 'paused') document.body.classList.add('playing');
+  if (['playing', 'paused', 'upgrade'].includes(stage)) document.body.classList.add('playing');
   if (stage === 'setup') document.body.classList.add('setup-mode');
-  $('lobby').hidden = stage !== 'lobby'; $('hud').hidden = !['playing', 'paused'].includes(stage);
+  $('lobby').hidden = stage !== 'lobby'; $('hud').hidden = !['playing', 'paused', 'upgrade'].includes(stage);
   $('setup').hidden = stage !== 'setup'; $('results').hidden = stage !== 'results';
+  $('upgrade-dialog').hidden = stage !== 'upgrade';
   hero.visible = mode === 'lobby'; environment.visible = mode === 'demo';
   placement.visible = stage === 'setup'; markers.visible = stage === 'setup';
   scene.fog = mode === 'demo' ? new THREE.FogExp2(0x060b10, .025) : null;
@@ -140,7 +148,7 @@ function setView(mode, stage) {
   $('camera-feed').hidden = mode !== 'camera';
   const modeText = mode === 'ar' ? 'ПРОСТРАНСТВЕННЫЙ AR' : mode === 'camera' ? 'КАМЕРА · 360°' : 'ТРЕНИРОВКА';
   $('mode-label').textContent = modeText;
-  if ($('control-hint')) $('control-hint').textContent = mode === 'demo' ? 'Свайп или мышь — прицел · удерживайте огонь' : 'Поворачивайте телефон · удерживайте огонь';
+  if ($('control-hint')) $('control-hint').textContent = mode === 'demo' ? 'МЫШЬ / СВАЙП — ПРИЦЕЛ · ПРОБЕЛ — ОГОНЬ · E — ИМПУЛЬС' : 'ПОВОРАЧИВАЙ ТЕЛЕФОН · ДЕРЖИ ПРИЦЕЛ ДЛЯ КРИТИЧЕСКОГО УДАРА';
   resize();
 }
 
@@ -295,56 +303,197 @@ function autoPortals() {
 function beginMission() {
   if (state.mode === 'ar' && trackingLost) { toast('Дождитесь, пока камера определит положение телефона'); return; }
   if (state.mode === 'camera' && orientation.enabled && !orientation.received) { toast('Калибруем поворот телефона…'); return; }
-  state.firing = false; lastResult = null;
+  state.firing = false; lastResult = null; lastUIPhase = ''; lastCountdown = -1; lastWarningAt = -10000;
+  clearCombatMessages();
   setView(state.mode, 'playing');
   const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value || 'normal';
+  state.difficulty = difficulty;
   engine.start({ mode: state.mode, difficulty, portals: state.portals.length ? state.portals : autoPortals() });
-  const message = state.mode === 'demo' ? 'Прицел — мышью или свайпом. Огонь — кнопкой или пробелом.' : 'Наведите прицел и удерживайте огонь';
-  toast(message, 4200);
+  const message = state.mode === 'demo' ? 'Мышь / свайп — прицел. Пробел — огонь. Держи прицел на ядре для критического удара.' : 'Держи прицел на ядре для критического удара. Огонь — короткими очередями.';
+  toast(message, 4800);
 }
 
 function onStats(stats) {
-  if (performance.now() - uiTime < 70 && stats.shield > 0) return;
+  if (performance.now() - uiTime < 70 && stats.shield > 0 && lastUIPhase === stats.phase) return;
   uiTime = performance.now();
+  lastUIPhase = stats.phase;
+  const total = stats.totalWaves || WAVE_CONFIG.length || 5;
+  const canFire = stats.phase === 'playing' && state.stage === 'playing';
   $('score').textContent = String(stats.score).padStart(5, '0');
-  $('wave').textContent = `${Math.min(stats.wave || 1, 5)} / 5`;
+  $('wave').textContent = `${String(Math.min(stats.wave || 1, total)).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+  $('wave-name').textContent = stats.waveName || 'ПЕРВЫЙ КОНТАКТ';
+  $('wave-progress').style.width = `${clamp(stats.waveProgress || 0, 0, 1) * 100}%`;
+  $('wave-progress-label').textContent = stats.phase === 'intermission' ? 'СЛЕДУЮЩАЯ ВОЛНА' : stats.phase === 'upgrade' ? 'СЕКТОР ЗАЧИЩЕН' : stats.boss ? 'УНИЧТОЖЬ ЯДРО' : `ОСТАЛОСЬ ЦЕЛЕЙ: ${stats.remaining ?? stats.incoming ?? 0}`;
   $('shield-value').textContent = `${Math.max(0, Math.ceil(stats.shield))}%`;
-  $('shield-bar').style.width = `${stats.shield}%`;
+  $('shield-bar').style.width = `${clamp(stats.shield / (stats.maxShield || 100), 0, 1) * 100}%`;
+  $('shield-bar').parentElement.classList.toggle('critical', stats.shield <= 30);
   $('heat-bar').style.width = `${stats.heat}%`;
   $('heat-bar').parentElement.classList.toggle('hot', stats.heat > 75);
   $('heat-label').textContent = stats.heat >= 98 || stats.overheated ? 'ОХЛАЖДЕНИЕ' : 'ГОТОВ';
-  $('combo').textContent = stats.combo > 1 ? `×${stats.combo}` : '';
+  $('combo').textContent = stats.combo > 1 ? `СЕРИЯ ×${stats.combo}` : '';
   $('combo').classList.toggle('active', stats.combo > 1);
-  $('incoming').textContent = stats.incoming ? `ЦЕЛЕЙ В СЕКТОРЕ / ${String(stats.incoming).padStart(2, '0')}` : '';
+  $('incoming').textContent = stats.incoming && !stats.boss ? `В СЕКТОРЕ / ${String(stats.incoming).padStart(2, '0')}` : '';
   $('reticle').classList.toggle('locked', !!stats.targeted);
-  const kinds = { scout: 'РАЗВЕДЧИК', drone: 'ПЕРЕХВАТЧИК', tank: 'БРОНЕНОСЕЦ' };
-  $('target-label').textContent = stats.targeted ? `${kinds[stats.targetKind] || 'ЦЕЛЬ'} · ${stats.targetHealth || 1}` : 'ПОИСК ЦЕЛИ';
-  const pulse = $('pulse-button'); pulse.disabled = stats.pulseCharge < 100;
+  $('reticle').classList.toggle('critical-ready', !!stats.criticalReady);
+  $('reticle').classList.toggle('shielded', !!stats.targetShielded);
+  $('reticle').style.setProperty('--focus', clamp(stats.focus || 0, 0, 1));
+  $('focus-bar').style.width = `${clamp(stats.focus || 0, 0, 1) * 100}%`;
+  $('focus-label').textContent = stats.criticalReady ? 'КРИТИЧЕСКИЙ УДАР ГОТОВ' : stats.targetKind === 'projectile' ? 'ПЕРЕХВАТИ ЗАРЯД' : stats.targeted ? 'УДЕРЖИ ПРИЦЕЛ' : 'ФОКУС';
+  $('target-label').textContent = stats.targeted ? ENEMY_LABELS[stats.targetKind] || 'ЦЕЛЬ' : 'ПОИСК ЦЕЛИ';
+  $('target-hp-bar').style.width = `${stats.targeted ? clamp(stats.targetHp / Math.max(1, stats.targetMaxHp), 0, 1) * 100 : 0}%`;
+  $('target-health').textContent = stats.targeted ? `${Math.max(0, Math.ceil(stats.targetHp ?? 1))} / ${stats.targetMaxHp || 1}${stats.targetShielded ? ' · БРОНЯ' : ''}` : '';
+  $('target-hint').textContent = stats.targeted ? stats.targetHint || (stats.targetShielded ? 'Фокус пробивает защиту' : '') : '';
+  const boss = stats.boss;
+  $('boss-hud').hidden = !boss;
+  if (boss) {
+    $('boss-name').textContent = 'ЯДРО ВТОРЖЕНИЯ';
+    $('boss-phase').textContent = `ФАЗА ${boss.phase} / 3 · ${boss.label || 'КОНТАКТ'}`;
+    $('boss-health').style.width = `${clamp(boss.hp / boss.maxHp, 0, 1) * 100}%`;
+    $('boss-health-value').textContent = `${Math.ceil(boss.hp)} / ${boss.maxHp}`;
+    $('boss-warning').textContent = boss.exposed ? 'ЯДРО ОТКРЫТО — АТАКУЙ' : boss.attackCharge > .68 ? 'ЗАЛП — СБИВАЙ КРАСНЫЕ ЗАРЯДЫ' : 'СБИВАЙ ЗАРЯДЫ · КОПИ ФОКУС';
+    $('boss-hud').classList.toggle('exposed', !!boss.exposed);
+    $('boss-hud').classList.toggle('charging', boss.attackCharge > .68 && !boss.exposed);
+  }
+  $('fire-button').disabled = !canFire;
+  $('fire-button').classList.toggle('overheated', !!stats.overheated);
+  const pulse = $('pulse-button'); pulse.disabled = stats.pulseCharge < 100 || !canFire;
   pulse.style.setProperty('--charge', `${stats.pulseCharge}%`);
   const label = pulse.querySelector('[data-pulse-charge]'); if (label) label.textContent = stats.pulseCharge >= 100 ? 'ГОТОВ' : `${Math.floor(stats.pulseCharge)}%`;
-  pulse.setAttribute('aria-label', stats.pulseCharge >= 100 ? 'ЭМИ-импульс готов: уничтожить ближайших захватчиков' : `Импульс заряжается: ${Math.floor(stats.pulseCharge)} процентов`);
+  pulse.setAttribute('aria-label', stats.pulseCharge >= 100 ? 'Импульс готов: повредить и оглушить врагов, сбить заряды' : `Импульс заряжается: ${Math.floor(stats.pulseCharge)} процентов`);
+  if (stats.phase === 'intermission') {
+    const count = Math.max(1, Math.ceil(stats.intermission));
+    if (count !== lastCountdown) {
+      lastCountdown = count;
+      clearTimeout(bannerTimer);
+      $('wave-banner').textContent = `СЛЕДУЮЩАЯ ВОЛНА ЧЕРЕЗ ${count}`;
+      $('wave-banner').hidden = false; $('wave-banner').classList.add('visible');
+    }
+  }
+  drawThreats(stats);
   drawRadar(stats);
 }
 function onEvent(event) {
   switch (event.type) {
     case 'shot': audio.shot(); $('fire-button').classList.add('firing'); setTimeout(() => $('fire-button').classList.remove('firing'), 80); break;
-    case 'hit': audio.hit(); flash('hit-marker', 100); break;
-    case 'kill': audio.explosion(); flash('hit-marker', 130); vibrate(10); break;
+    case 'hit': audio.hit(); flash('hit-marker', 100); if (event.blocked) combatFeedback('БРОНЯ · УДЕРЖИ ПРИЦЕЛ', 'blocked', 650); break;
+    case 'blocked': combatFeedback('БРОНЯ · УДЕРЖИ ПРИЦЕЛ', 'blocked', 650); break;
+    case 'kill': audio.explosion(); flash('hit-marker', 130); if (event.points) combatFeedback(`${event.cause === 'critical' ? 'КРИТ  /  ' : ''}+${event.points}${event.combo > 1 ? `  /  СЕРИЯ ×${event.combo}` : ''}`, event.cause === 'critical' ? 'critical' : ''); vibrate(10); break;
+    case 'projectileclear': if (event.cause === 'laser') { audio.hit(); combatFeedback(`ПЕРЕХВАТ +${event.points || 30}`, '', 650); } break;
+    case 'critical': audio.critical(); combatFeedback('КРИТИЧЕСКИЙ УДАР', 'critical', 800); flash('hit-marker', 160); vibrate(18); break;
+    case 'focus': audio.focus(); break;
     case 'damage': audio.damage(); flash('damage-flash', 350); vibrate([30, 35, 45]); break;
-    case 'pulse': audio.pulse(); toast('ЭМИ-импульс'); vibrate(40); break;
+    case 'pulse': audio.pulse(); combatFeedback('ИМПУЛЬС · СЕКТОР ПОДАВЛЕН', 'critical', 950); vibrate(40); break;
     case 'overheat': toast('Перегрев. Отпустите огонь для охлаждения', 1900); break;
     case 'wave': {
-      audio.wave(); clearTimeout(bannerTimer);
+      audio.wave(); clearTimeout(bannerTimer); lastCountdown = -1;
       const number = event.wave || engine.getState().wave;
-      $('wave-banner').textContent = `ВОЛНА ${String(number).padStart(2, '0')}`;
+      const name = event.name || event.waveName || engine.getState().waveName || '';
+      $('wave-banner').textContent = `${String(number).padStart(2, '0')} / ${name || 'КОНТАКТ'}`;
       $('wave-banner').hidden = false; $('wave-banner').classList.add('visible');
-      bannerTimer = setTimeout(() => { $('wave-banner').classList.remove('visible'); $('wave-banner').hidden = true; }, 1800);
+      bannerTimer = setTimeout(() => { $('wave-banner').classList.remove('visible'); $('wave-banner').hidden = true; }, 2200);
       break;
     }
+    case 'warning':
+      if (performance.now() - lastWarningAt > 2100) { lastWarningAt = performance.now(); audio.warning(); toast(event.message || 'Угроза рядом. Проверь указатель направления.', 1700); }
+      break;
+    case 'enemyintro': {
+      clearTimeout(introTimer);
+      $('enemy-intro-name').textContent = event.name || ENEMY_LABELS[event.kind] || 'НОВАЯ УГРОЗА';
+      $('enemy-intro-tip').textContent = event.tip || ENEMY_TIPS[event.kind] || '';
+      $('enemy-intro').hidden = false;
+      introTimer = setTimeout(() => { $('enemy-intro').hidden = true; }, 5200);
+      break;
+    }
+    case 'bossphase': audio.boss(); combatFeedback(`ЯДРО / ФАЗА ${event.phase || engine.getState().boss?.phase || 1}`, 'critical', 1700); break;
+    case 'upgrade': showUpgrades(event); break;
+    case 'upgradechosen': audio.upgrade(); break;
+    case 'perfectwave': combatFeedback('ЧИСТАЯ ВОЛНА', 'critical', 1000); break;
     case 'gameover': finishGame(event.victory, event.state || engine.getState()); break;
   }
 }
-function flash(id, duration) { const element = $(id); element.hidden = false; element.classList.add('active'); setTimeout(() => { element.classList.remove('active'); element.hidden = true; }, duration); }
+function flash(id, duration) { const element = $(id); clearTimeout(transientTimers.get(id)); element.hidden = false; element.classList.add('active'); transientTimers.set(id, setTimeout(() => { element.classList.remove('active'); element.hidden = true; }, duration)); }
+function combatFeedback(message, type = '', duration = 620) {
+  const element = $('combat-feedback'); clearTimeout(feedbackTimer);
+  element.textContent = message; element.classList.remove('critical', 'blocked');
+  if (type) element.classList.add(type);
+  element.hidden = false; element.classList.add('visible');
+  feedbackTimer = setTimeout(() => { element.classList.remove('visible'); element.hidden = true; }, duration);
+}
+function clearCombatMessages() {
+  clearTimeout(bannerTimer); clearTimeout(feedbackTimer); clearTimeout(introTimer); clearTimeout(toastTimer);
+  transientTimers.forEach(clearTimeout); transientTimers.clear();
+  for (const id of ['wave-banner', 'combat-feedback', 'enemy-intro', 'hit-marker', 'damage-flash', 'toast']) {
+    const element = $(id); if (!element) continue; element.hidden = true; element.classList.remove('visible', 'active');
+  }
+  $('fire-button').classList.remove('firing');
+}
+function renderLoadout(id, upgrades) {
+  const container = $(id); container.replaceChildren();
+  if (!upgrades?.length) { container.textContent = 'БАЗОВЫЙ БЛАСТЕР'; return; }
+  for (const upgrade of upgrades) {
+    const chip = document.createElement('span'); chip.className = 'loadout-chip';
+    chip.textContent = `${upgrade.title || upgrade.id} ${upgrade.level > 1 ? 'II' : 'I'}`;
+    chip.title = upgrade.stat || ''; container.append(chip);
+  }
+}
+function showUpgrades(event) {
+  state.firing = false; pointer = null; clearCombatMessages();
+  const stats = engine.getState(), summary = event.summary || {};
+  const offers = event.offers || stats.upgradeOffers || [];
+  setView(state.mode, 'upgrade');
+  $('upgrade-wave').textContent = `ВОЛНА ${String(summary.wave || stats.wave).padStart(2, '0')} / ${summary.waveName || stats.waveName || 'СЕКТОР ЗАЧИЩЕН'}`;
+  const parts = [`${summary.waveKills || 0} целей`, `точность ${Math.round(summary.accuracy || 0)}%`];
+  if (summary.perfect) parts.unshift('БЕЗ ПОВРЕЖДЕНИЙ');
+  if (summary.bonus) parts.push(`+${summary.bonus} очков`);
+  if (summary.repaired) parts.push(`щит +${Math.round(summary.repaired)}`);
+  $('upgrade-summary').textContent = parts.join(' · ');
+  const container = $('upgrade-options'); container.replaceChildren();
+  for (const [index, offer] of offers.entries()) {
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'upgrade-option'; button.dataset.upgrade = offer.id;
+    button.setAttribute('aria-label', `${offer.title}. ${offer.description}. ${offer.stat}. Выбрать улучшение.`);
+    const icon = document.createElement('span'); icon.className = 'upgrade-icon'; icon.setAttribute('aria-hidden', 'true');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', `#${UPGRADE_ICONS[offer.id] || 'i-pulse'}`); svg.append(use); icon.append(svg); button.append(icon);
+    for (const [className, value] of [['upgrade-level', `УРОВЕНЬ ${offer.level || 1} / 2`], ['upgrade-title', offer.title], ['upgrade-description', offer.description], ['upgrade-stat', offer.stat], ['upgrade-key', `${index + 1}`]]) {
+      const span = document.createElement('span'); span.className = className; span.textContent = value || ''; button.append(span);
+    }
+    container.append(button);
+  }
+  renderLoadout('upgrade-loadout', stats.upgrades);
+  container.querySelector('button')?.focus({ preventScroll: true });
+}
+function chooseUpgrade(id) {
+  if (state.stage !== 'upgrade' || !engine.chooseUpgrade(id)) return;
+  state.firing = false; setView(state.mode, 'playing'); previousTime = performance.now(); lastUIPhase = '';
+  $('pause-button').focus({ preventScroll: true });
+  const catalog = Array.isArray(UPGRADE_CATALOG) ? UPGRADE_CATALOG.find(item => item.id === id) : UPGRADE_CATALOG[id];
+  toast(`${catalog?.title || 'Улучшение'} установлено`, 2000); requestWakeLock();
+}
+function drawThreats(stats) {
+  const container = $('threat-indicators');
+  if (!container.children.length) for (let i = 0; i < 3; i++) {
+    const marker = document.createElement('div'); marker.className = 'threat-arrow'; marker.hidden = true;
+    const arrow = document.createElement('span'); arrow.className = 'threat-chevron'; arrow.setAttribute('aria-hidden', 'true');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 24 24');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', '#i-arrow'); svg.append(use); arrow.append(svg);
+    const label = document.createElement('small'); marker.append(arrow, label); container.append(marker);
+  }
+  const fovY = THREE.MathUtils.degToRad(camera.fov / 2), fovX = Math.atan(Math.tan(fovY) * camera.aspect);
+  const threats = (stats.threats || []).filter(t => t.behind || Math.abs(t.angle) > fovX * .9 || Math.abs(t.elevation) > fovY * .9)
+    .sort((a, b) => (b.urgency || 0) - (a.urgency || 0) || a.distance - b.distance).slice(0, 3);
+  [...container.children].forEach((marker, index) => {
+    const threat = threats[index]; marker.hidden = !threat || stats.phase !== 'playing'; if (!threat) return;
+    const right = threat.angle >= 0;
+    const vertical = !threat.behind && Math.abs(threat.elevation) > Math.abs(threat.angle) && Math.abs(threat.angle) < fovX;
+    const x = vertical ? 50 : right ? 94 : 6;
+    const y = vertical ? threat.elevation > 0 ? 29 : 67 : clamp(47 - threat.elevation * 20 + index * 8, 30, 65);
+    marker.style.left = `${x}%`; marker.style.top = `${y}%`; marker.style.transform = 'translate(-50%, -50%)';
+    const rotation = vertical ? threat.elevation > 0 ? -90 : 90 : right ? 0 : 180;
+    marker.firstElementChild.style.transform = `rotate(${rotation}deg)`;
+    marker.classList.toggle('urgent', threat.distance < 2.3 || threat.urgency > .7);
+    marker.lastElementChild.textContent = threat.kind === 'projectile' ? 'ЗАРЯД' : threat.behind ? 'СЗАДИ' : `${threat.distance.toFixed(1)} м`;
+  });
+}
 function vibrate(pattern) { if (!state.muted && navigator.vibrate) navigator.vibrate(pattern); }
 function drawRadar(stats) {
   const canvas = $('radar'), ctx = canvas?.getContext('2d'); if (!ctx) return;
@@ -359,8 +508,8 @@ function drawRadar(stats) {
     const mesh = enemy.mesh || enemy.group; if (!mesh) continue;
     const p = mesh.getWorldPosition(new THREE.Vector3()).sub(origin).applyQuaternion(inv);
     const dist = Math.sqrt(p.x * p.x + p.z * p.z), scale = Math.min(dist / 7, 1) * r / Math.max(dist, .01);
-    ctx.fillStyle = enemy.kind === 'tank' ? '#ff7a63' : '#9ef8de'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 5;
-    ctx.beginPath(); ctx.arc(cx + p.x * scale, cy + p.z * scale, enemy.kind === 'tank' ? 3.1 : 2.3, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = enemy.kind === 'projectile' || enemy.kind === 'charger' ? '#ff6853' : enemy.kind === 'boss' || enemy.kind === 'tank' ? '#ffbf81' : enemy.kind === 'flanker' ? '#a6a5ff' : '#9ef8de'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 5;
+    ctx.beginPath(); ctx.arc(cx + p.x * scale, cy + p.z * scale, enemy.kind === 'boss' ? 4.5 : enemy.kind === 'tank' ? 3.1 : 2.3, 0, Math.PI * 2); ctx.fill();
   }
   ctx.shadowBlur = 0; ctx.fillStyle = '#e8fff7'; ctx.beginPath(); ctx.moveTo(cx, cy - 4); ctx.lineTo(cx - 3, cy + 3); ctx.lineTo(cx + 3, cy + 3); ctx.closePath(); ctx.fill();
 }
@@ -374,12 +523,24 @@ function resumeGame() {
   audio.unlock(); engine.resume(); state.stage = 'playing'; previousTime = performance.now(); dialogClose('pause-dialog'); requestWakeLock();
 }
 function finishGame(victory, stats) {
-  state.firing = false; lastResult = { victory: !!victory, stats: { ...stats } };
-  const best = Math.max(Number(store.get('best', 0)), stats.score); store.set('best', best);
+  state.firing = false; pointer = null; clearCombatMessages(); lastResult = { victory: !!victory, stats: { ...stats } };
+  const recordKey = `best.v2.${state.mode}.${state.difficulty}`;
+  const oldBest = Number(store.get(recordKey, 0)) || 0, best = Math.max(oldBest, stats.score); store.set(recordKey, best);
   $('result-title').textContent = victory ? 'КОМНАТА ПОД КОНТРОЛЕМ.' : 'ОНИ ПРОРВАЛИСЬ.';
   $('result-score').textContent = String(stats.score).padStart(5, '0');
   $('result-kills').textContent = stats.kills; $('result-accuracy').textContent = `${Math.round(stats.accuracy)}%`;
-  $('result-wave').textContent = `${Math.min(stats.wave, 5)} / 5`; $('result-best').textContent = String(best).padStart(5, '0');
+  $('result-wave').textContent = `${Math.min(stats.wave, stats.totalWaves || 5)} / ${stats.totalWaves || 5}`; $('result-best').textContent = String(best).padStart(5, '0');
+  $('result-grade').textContent = stats.grade || (victory ? 'A' : 'C');
+  $('result-grade-label').textContent = victory ? 'ОПЕРАЦИЯ УСПЕШНА' : 'ЕСТЬ ЧТО УЛУЧШИТЬ';
+  $('result-combo').textContent = `×${stats.bestCombo || 0}`;
+  $('result-criticals').textContent = stats.criticals || 0;
+  $('result-perfect').textContent = `${stats.perfectWaves || 0} / ${stats.totalWaves || 5}`;
+  const seconds = Math.max(0, Math.floor(stats.elapsed));
+  $('result-time').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+  $('result-record-label').textContent = `${stats.score > oldBest ? 'НОВЫЙ РЕКОРД · ' : ''}${MODE_LABELS[state.mode]} / ${DIFFICULTY_LABELS[state.difficulty]}`;
+  $('result-record-label').classList.toggle('new-record', stats.score > oldBest);
+  renderLoadout('result-loadout', stats.upgrades);
+  dialogClose('pause-dialog');
   setView(state.mode, 'results');
   // Give camera access back immediately after a completed run. Spatial results remain usable in the DOM overlay.
   if (state.mode === 'camera') stopCamera();
@@ -407,10 +568,10 @@ function onSessionEnd(event) {
   if (!suppressEnd) { engine?.stop(); restoreLobby(); toast('AR-сессия завершена'); }
 }
 function restoreLobby() {
-  state.firing = false; stopCamera(); engine?.stop();
+  state.firing = false; pointer = null; clearCombatMessages(); stopCamera(); engine?.stop();
   clearMarkers(); placement.visible = false; state.portals = [];
   resetAim(); engine?.setCamera(camera);
-  for (const id of ['pause-dialog', 'help-dialog']) dialogClose(id);
+  for (const id of ['pause-dialog', 'help-dialog', 'upgrade-dialog', 'error-dialog']) dialogClose(id);
   setView('lobby', 'lobby'); resize(); capabilityCheck();
   if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
 }
@@ -439,7 +600,7 @@ function updateCamera(dt) {
 function frame(time, xrFrame) {
   const dt = previousTime ? Math.min((time - previousTime) / 1000, .05) : .016; previousTime = time;
   const seconds = time / 1000;
-  let tracked = true;
+  let tracked = state.mode !== 'ar';
   if (state.mode === 'ar' && xrFrame) {
     const ref = renderer.xr.getReferenceSpace();
     const pose = ref && xrFrame.getViewerPose(ref);
@@ -485,7 +646,7 @@ function frame(time, xrFrame) {
   if (state.stage === 'playing' && tracked) {
     if (state.firing) engine.fire();
     engine.update(dt, seconds);
-  } else if (state.stage === 'results') engine.update(dt, seconds);
+  } else if (state.stage === 'results' || state.stage === 'upgrade') engine.update(dt, seconds);
   renderer.render(scene, camera);
 }
 function animateHero(seconds) {
@@ -514,10 +675,12 @@ function bindInput() {
   $('place-portal').addEventListener('click', placePortal); $('begin-mission').addEventListener('click', beginMission); $('setup-cancel').addEventListener('click', home);
   $('pause-button').addEventListener('click', pauseGame); $('resume-button').addEventListener('click', resumeGame); $('quit-button').addEventListener('click', home);
   $('retry-button').addEventListener('click', retry); $('home-button').addEventListener('click', home);
+  $('upgrade-options').addEventListener('click', event => { const button = event.target.closest('button[data-upgrade]'); if (button) chooseUpgrade(button.dataset.upgrade); });
+  $('upgrade-quit').addEventListener('click', home);
   $('help-open').addEventListener('click', () => dialogOpen('help-dialog')); $('help-close').addEventListener('click', () => dialogClose('help-dialog'));
   $('error-close').addEventListener('click', () => dialogClose('error-dialog')); $('error-demo').addEventListener('click', startDemo);
   $('sound-toggle').addEventListener('click', () => { state.muted = !state.muted; store.set('muted', state.muted); audio.unlock(); audio.setMuted(state.muted); soundUI(); });
-  $('pulse-button').addEventListener('click', () => { if (state.stage === 'playing') engine.pulse(); });
+  $('pulse-button').addEventListener('click', () => { if (state.stage === 'playing' && !trackingLost) engine.pulse(); });
   $('recenter-button').addEventListener('click', () => {
     if (state.mode === 'ar') { toast('В AR положение отслеживается камерой. Для новых точек начните заново.'); return; }
     if (orientation.received) { orientation.zero = null; orientation.yaw = 0; }
@@ -551,7 +714,7 @@ function bindInput() {
   surface.addEventListener('pointerup', () => { if (pointer && !pointer.moved && state.stage === 'playing') engine.fire(); pointer = null; });
   surface.addEventListener('pointercancel', () => { pointer = null; state.firing = false; });
   document.addEventListener('keydown', event => {
-    const modal = ['help-dialog', 'error-dialog', 'pause-dialog'].map($).find(d => !d.hidden);
+    const modal = ['help-dialog', 'error-dialog', 'pause-dialog', 'upgrade-dialog'].map($).find(d => !d.hidden);
     if (event.code === 'Tab' && modal) {
       const items = [...modal.querySelectorAll('button:not([disabled]),a[href],input')];
       if (items.length && event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items.at(-1).focus(); }
@@ -563,9 +726,15 @@ function bindInput() {
       else { dialogClose('help-dialog'); dialogClose('error-dialog'); }
       return;
     }
+    if (state.stage === 'upgrade' && /^Digit[123]$/.test(event.code) && !event.repeat) {
+      event.preventDefault();
+      const button = $('upgrade-options').querySelectorAll('button')[Number(event.code.at(-1)) - 1];
+      if (button) chooseUpgrade(button.dataset.upgrade);
+      return;
+    }
     if (state.stage !== 'playing') return;
-    if (event.code === 'Space') { event.preventDefault(); state.firing = true; }
-    if (event.code === 'KeyE' && !event.repeat) engine.pulse();
+    if (event.code === 'Space') { event.preventDefault(); state.firing = true; audio.unlock(); }
+    if (event.code === 'KeyE' && !event.repeat && !trackingLost) engine.pulse();
     if (event.code === 'KeyP' && !event.repeat) pauseGame();
     if (event.code === 'ArrowLeft') { event.preventDefault(); touchAim.targetYaw += .06; }
     if (event.code === 'ArrowRight') { event.preventDefault(); touchAim.targetYaw -= .06; }

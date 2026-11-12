@@ -119,6 +119,32 @@ export class SoundEngine {
     this._noise(0.72, 0.55, 4300, 80, 0.12);
   }
 
+  focus() {
+    this._tone(720, 1080, 0.13, 0.1, 'sine');
+    this._tone(1440, 1440, 0.1, 0.06, 'sine', 0.08);
+  }
+
+  critical() {
+    this._tone(2300, 420, 0.16, 0.2, 'triangle');
+    this._tone(180, 45, 0.2, 0.34, 'sine');
+    this._noise(0.12, 0.24, 4200, 800);
+  }
+
+  warning() {
+    this._tone(480, 480, 0.095, 0.12, 'sine');
+    this._tone(480, 480, 0.095, 0.1, 'sine', 0.18);
+  }
+
+  upgrade() {
+    [440, 554, 660, 880].forEach((frequency, index) => this._tone(frequency, frequency, 0.25, 0.14, 'sine', index * 0.065));
+  }
+
+  boss() {
+    this._tone(72, 48, 0.75, 0.38, 'sine');
+    this._tone(144, 96, 0.6, 0.14, 'triangle');
+    this._noise(0.5, 0.2, 1200, 110);
+  }
+
   stop() {
     for (const node of this.nodes) {
       try { node.stop(); } catch { /* An already ended voice needs no work. */ }

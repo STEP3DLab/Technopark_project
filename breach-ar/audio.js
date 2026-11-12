@@ -145,6 +145,31 @@ export class SoundEngine {
     this._noise(0.5, 0.2, 1200, 110);
   }
 
+  capture() {
+    [392, 523, 784, 1046].forEach((frequency, index) => this._tone(frequency, frequency * 1.01, 0.26, 0.13, 'sine', index * 0.065));
+    this._tone(140, 280, 0.32, 0.16, 'triangle');
+  }
+
+  portalShot() {
+    this._tone(860, 240, 0.13, 0.13, 'sine');
+  }
+
+  rift() {
+    this._tone(320, 42, 0.65, 0.38, 'sine');
+    this._tone(640, 180, 0.8, 0.13, 'triangle');
+    this._noise(0.62, 0.22, 2500, 120);
+  }
+
+  shard() {
+    this._tone(1100, 1450, 0.18, 0.14, 'sine');
+    this._tone(2200, 2500, 0.13, 0.06, 'triangle', 0.025);
+  }
+
+  riftSaved() {
+    [330, 440, 660, 880].forEach((frequency, index) => this._tone(frequency, frequency, 0.32, 0.16, 'sine', index * 0.08));
+    this._tone(65, 140, 0.5, 0.25, 'sine');
+  }
+
   stop() {
     for (const node of this.nodes) {
       try { node.stop(); } catch { /* An already ended voice needs no work. */ }

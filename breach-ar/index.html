@@ -11,7 +11,7 @@
   <title>BREACH — Вторжение в твою реальность</title>
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css?v=2.0">
+  <link rel="stylesheet" href="./styles.css?v=3.0">
 </head>
 <body class="lobby-view">
   <svg class="svg-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -24,6 +24,8 @@
     <symbol id="i-pulse" viewBox="0 0 24 24"><path d="m13 2-8 12h6l-1 8 9-13h-7z"/></symbol>
     <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/><path d="M9 12h6m-3-3v6"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 8 3v6c0 5-8 11-8 11S4 16 4 11V5z"/></symbol>
+    <symbol id="i-portal" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="5" ry="9"/><path d="M4 7 2 9l2 2m16 2 2 2-2 2M8 12h8m-4-4v8"/></symbol>
+    <symbol id="i-rift" viewBox="0 0 24 24"><path d="m13 2-5 8 5 2-3 10 8-12-5-1 3-7M4 5l2 2m12 11 2 2M3 17l2-2m15-9 2-2"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8z"/></symbol>
   </svg>
 
@@ -35,7 +37,7 @@
 
   <main id="lobby" class="lobby">
     <header class="site-header">
-      <a class="wordmark" href="./" aria-label="BREACH — главная"><span class="brand-glyph" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>BREACH<span class="brand-edition">AR / 02</span></a>
+      <a class="wordmark" href="./" aria-label="BREACH — главная"><span class="brand-glyph" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>BREACH<span class="brand-edition">AR / 03</span></a>
       <div class="header-tools">
         <button id="sound-toggle" class="icon-button sound-button" type="button" aria-label="Включить или выключить звук" aria-pressed="false"><svg><use href="#i-sound"/></svg><span id="sound-label" data-sound-label>ЗВУК</span></button>
         <button id="help-open" class="text-button help-button" type="button">Как играть <svg class="link-arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
@@ -74,6 +76,7 @@
             <label><input type="radio" name="difficulty" value="hard"><span>Хаос</span></label>
           </fieldset>
         </div>
+        <div class="new-mechanics" aria-label="Новые возможности игры"><span><svg aria-hidden="true"><use href="#i-portal"/></svg>ПЕРЕХВАТ ПОРТАЛОВ</span><span><svg aria-hidden="true"><use href="#i-rift"/></svg>ХРОНОРАЗЛОМ</span></div>
       </section>
     </div>
 
@@ -94,6 +97,8 @@
       <button id="pause-button" class="icon-button hud-pause" type="button" aria-label="Пауза"><svg><use href="#i-pause"/></svg></button>
     </header>
     <div class="shield-status"><div><svg><use href="#i-shield"/></svg><span>ЩИТ</span><strong id="shield-value">100</strong></div><div class="meter-track"><span id="shield-bar"></span></div></div>
+    <span id="portal-budget" class="portal-budget">ПЕРЕХВАТ / 1</span>
+    <section id="portal-status" class="portal-status" aria-label="Перехват портала" hidden><div class="portal-status-heading"><svg aria-hidden="true"><use href="#i-portal"/></svg><span id="portal-status-title">ПЕРЕХВАТ ПОРТАЛА</span></div><div class="portal-progress-track"><span id="portal-progress"></span></div><span id="portal-status-detail">Удерживай огонь по пустому порталу</span></section>
     <div class="wave-progress-module"><span id="wave-name">ПЕРВЫЙ КОНТАКТ</span><div class="meter-track"><span id="wave-progress"></span></div><span id="wave-progress-label">ЗАЩИТИ ПРОСТРАНСТВО</span></div>
     <div id="incoming" class="incoming" aria-live="off"></div>
     <div id="combo" class="combo"></div>
@@ -106,6 +111,11 @@
     <div id="threat-indicators" class="threat-indicators" aria-hidden="true"></div>
     <div id="combat-feedback" class="combat-feedback" aria-live="off"></div>
     <section id="boss-hud" class="boss-hud" aria-label="Состояние ядра" hidden><div class="boss-heading"><span id="boss-name">ЯДРО ВТОРЖЕНИЯ</span><span id="boss-phase">ФАЗА 1 / 3</span></div><div class="boss-health-track"><span id="boss-health"></span></div><div class="boss-meta"><span id="boss-warning">ПЕРЕХВАТЫВАЙ СНАРЯДЫ</span><span id="boss-health-value">100%</span></div></section>
+    <section id="rift-hud" class="rift-hud" aria-label="Хроноразлом: последний шанс" hidden>
+      <div class="rift-copy"><span class="rift-kicker">ПОСЛЕДНИЙ ШАНС</span><h3>ХРОНОРАЗЛОМ</h3><p>Сбей 3 осколка. Верни щит.</p><div class="rift-collection"><div id="rift-pips" class="rift-pips" aria-hidden="true"><i></i><i></i><i></i></div><span id="rift-count">0 / 3</span></div></div>
+      <div class="rift-clock"><strong id="rift-timer">5.0</strong><span>СЕКУНД</span></div>
+      <div class="rift-progress-track"><span id="rift-progress"></span></div>
+    </section>
     <aside id="enemy-intro" class="enemy-intro" role="status" hidden><span class="intro-kicker">НОВЫЙ КОНТАКТ</span><strong id="enemy-intro-name"></strong><span id="enemy-intro-tip"></span></aside>
     <div id="hit-marker" class="hit-marker" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <div id="wave-banner" class="wave-banner" role="status"></div>
@@ -135,6 +145,7 @@
       <div class="result-primary"><div class="result-score-block"><span class="field-label">ТВОЙ СЧЁТ</span><strong id="result-score">0</strong></div><div class="result-rank"><span class="field-label">РАНГ</span><b id="result-grade">C</b><span id="result-grade-label">ЗАЩИТНИК</span></div></div>
       <div class="result-stats"><div><span>ЦЕЛЕЙ</span><strong id="result-kills">0</strong></div><div><span>ТОЧНОСТЬ</span><strong id="result-accuracy">0%</strong></div><div><span>КОМБО</span><strong id="result-combo">0</strong></div><div><span>КРИТЫ</span><strong id="result-criticals">0</strong></div><div><span>ВОЛНА</span><strong id="result-wave">1 / 5</strong></div><div><span>БЕЗ УРОНА</span><strong id="result-perfect">0</strong></div><div><span>ВРЕМЯ</span><strong id="result-time">0:00</strong></div><div><span>РЕКОРД</span><strong id="result-best">0</strong></div></div>
       <p id="result-record-label" class="result-record-label">ТРЕНИРОВКА · ВТОРЖЕНИЕ</p>
+      <div class="result-special-stats" aria-label="Особые действия за забег"><div><span>ПЕРЕХВАТЫ</span><strong id="result-captures">0</strong></div><div><span>ЦЕЛИ ТУРЕЛИ</span><strong id="result-portal-kills">0</strong></div><div><span>ХРОНОРАЗЛОМ</span><strong id="result-rift">НЕ ИСПОЛЬЗОВАН</strong></div></div>
       <div class="result-loadout-module"><span class="field-label">ТВОЯ СБОРКА</span><div id="result-loadout" class="loadout-list">Стандартный бластер</div></div>
       <div class="result-actions"><button id="retry-button" class="button button-primary" type="button">Ещё одно вторжение <svg><use href="#i-arrow"/></svg></button><button id="home-button" class="text-button" type="button">В главное меню</button></div>
     </div>
@@ -155,7 +166,24 @@
 
   <div id="pause-dialog" class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden><div class="modal-card"><div class="eyebrow">СИГНАЛ ПРИОСТАНОВЛЕН</div><h2 id="pause-title">Передышка.</h2><p>Вторжение подождёт.<br>Вернись, когда будешь готов.</p><div class="modal-actions"><button id="resume-button" class="button button-primary" type="button">Продолжить <svg><use href="#i-play"/></svg></button><button id="quit-button" class="button button-secondary" type="button">В главное меню</button></div></div></div>
 
-  <div id="help-dialog" class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden><div class="modal-card help-card"><button id="help-close" class="icon-button modal-close" type="button" aria-label="Закрыть инструкцию"><svg><use href="#i-close"/></svg></button><div class="eyebrow">ПРОТОКОЛ ЗАЩИТЫ</div><h2 id="help-title">Твой телефон —<br>твой бластер.</h2><ol class="help-steps"><li><span>01</span><div><b>Открой точки вторжения</b><p>Запусти AR или камеру и установи порталы у свободных углов. В тренировке наводись мышью или пальцем.</p></div></li><li><span>02</span><div><b>Поймай фокус. Пробей защиту.</b><p>Держи прицел на цели около 0,6 секунды: заполнившаяся шкала даёт критический выстрел. Удерживай «Огонь», делай паузы для охлаждения.</p></div></li><li><span>03</span><div><b>Управляй угрозой</b><p>Рывок врага предваряет вспышка. Броню пробивает фокус. Импульс наносит урон, задерживает врагов и убирает снаряды. Пробел — огонь, E — импульс, P — пауза.</p></div></li><li><span>04</span><div><b>Собери бластер. Разрушь ядро.</b><p>После первых четырёх волн выбери по одному улучшению. В финале сбивай красные снаряды и атакуй ядро, когда его защита открыта.</p></div></li></ol><div class="help-modes"><p><b>Пространственный AR</b> привязывает порталы к точкам в комнате на совместимых устройствах. Появление настраивается вручную: настоящие стены и мебель не скрывают врагов.</p><p><b>Режим с камерой</b> накладывает игру на видео и учитывает направление телефона. Стены автоматически не распознаются.</p><p><b>Тренировка</b> работает без камеры. На сенсорном экране веди прицел пальцем.</p></div><p class="help-privacy">Видео не записывается и никуда не отправляется.</p></div></div>
+  <div id="help-dialog" class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+    <div class="modal-card help-card">
+      <button id="help-close" class="icon-button modal-close" type="button" aria-label="Закрыть инструкцию"><svg><use href="#i-close"/></svg></button>
+      <div class="help-body">
+        <div class="eyebrow">ПРОТОКОЛ ЗАЩИТЫ</div><h2 id="help-title">Твой телефон —<br>твой бластер.</h2>
+        <ol class="help-steps">
+          <li><span>01</span><div><b>Открой точки вторжения</b><p>Запусти AR или камеру и установи порталы у свободных углов. В тренировке наводись мышью или пальцем.</p></div></li>
+          <li><span>02</span><div><b>Поймай фокус. Пробей защиту.</b><p>Держи прицел на цели около 0,6 секунды: полная шкала даёт критический выстрел. Удерживай «Огонь», делай паузы для охлаждения.</p></div></li>
+          <li><span>03</span><div><b>Управляй угрозой</b><p>Рывок врага предваряет вспышка. Броню пробивает фокус. Импульс наносит урон, задерживает врагов и убирает снаряды. Пробел — огонь, E — импульс, P — пауза.</p></div></li>
+          <li><span>04</span><div><b>Собери бластер. Разрушь ядро.</b><p>После первых четырёх волн выбери по одному улучшению. В финале сбивай красные снаряды и атакуй ядро, когда его защита открыта.</p></div></li>
+          <li class="help-portal"><span>05</span><div><b>Перехвати портал</b><p>Наведи лазер на пустой портал и удерживай огонь: 6 попаданий превратят его в союзную турель на 10 секунд. Доступен один перехват за волну.</p></div></li>
+          <li class="help-rift"><span>06</span><div><b>Вернись через разлом</b><p>Первый смертельный удар замедлит мир на 5 секунд. Сбей 3 светящихся осколка перед собой, чтобы вернуть 35 единиц щита. Этот шанс даётся один раз за забег.</p></div></li>
+        </ol>
+        <div class="help-modes"><p><b>Пространственный AR</b> привязывает порталы к точкам в комнате на совместимых устройствах. Появление настраивается вручную: настоящие стены и мебель не скрывают врагов.</p><p><b>Режим с камерой</b> накладывает игру на видео и учитывает направление телефона. Стены автоматически не распознаются.</p><p><b>Тренировка</b> работает без камеры. На сенсорном экране веди прицел пальцем.</p></div>
+        <p class="help-privacy">Видео не записывается и никуда не отправляется.</p>
+      </div>
+    </div>
+  </div>
 
   <div id="error-dialog" class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="error-title" hidden><div class="modal-card"><div class="eyebrow error-eyebrow">СИГНАЛ НЕДОСТУПЕН</div><h2 id="error-title">Не удалось<br>подключиться.</h2><p id="error-text">Проверь разрешение на использование камеры в настройках браузера.</p><div class="modal-actions"><button id="error-close" class="button button-primary" type="button">Понятно <svg><use href="#i-arrow"/></svg></button><button id="error-demo" class="button button-secondary" type="button">Перейти в тренировку</button></div></div></div>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>

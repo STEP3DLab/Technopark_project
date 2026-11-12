@@ -1,7 +1,8 @@
 import * as THREE from './vendor/three.module.js';
-import { GameEngine, createInvaderMesh, WAVE_CONFIG, UPGRADE_CATALOG } from './engine.js?v=2.0';
-import { SoundEngine } from './audio.js?v=2.0';
+import { GameEngine, createInvaderMesh, WAVE_CONFIG, UPGRADE_CATALOG } from './engine.js?v=3.0';
+import { SoundEngine } from './audio.js?v=3.0';
 import { CanvasRenderer } from './canvas-renderer.js?v=2.1';
+import { FrameClock } from './runtime-clock.js?v=3.0';
 
 const $ = (id) => document.getElementById(id);
 const clamp = THREE.MathUtils.clamp;
@@ -14,11 +15,14 @@ const audio = new SoundEngine();
 audio.setMuted(state.muted);
 let renderer, engine, scene, camera, xrAim, hero, environment, placement, markers;
 let session = null, stream = null, hitSource = null, hitPoint = null, wakeLock = null;
-let previousTime = 0, uiTime = 0, toastTimer, bannerTimer, feedbackTimer, introTimer, suppressEnd = false, pointer = null, trackingLost = false;
-let lastMode = 'demo', lastResult = null, launchEpoch = 0;
+let uiTime = 0, toastTimer, bannerTimer, feedbackTimer, introTimer, pointer = null, trackingLost = false, graphicsLost = false;
+let lastMode = 'demo', lastResult = null, launchEpoch = 0, capabilityEpoch = 0, wakeEpoch = 0, wakeRequest = null;
 let lastUIPhase = '', lastCountdown = -1, lastWarningAt = -10000;
+const frameClock = new FrameClock();
+const firePointers = new Set();
+let combatSpaceHeld = false, spaceFiring = false;
 const transientTimers = new Map();
-const ENEMY_LABELS = { scout: 'РАЗВЕДЧИК', drone: 'ПЕРЕХВАТЧИК', flanker: 'ФЛАНКЕР', charger: 'ТАРАН', tank: 'БРОНЕНОСЕЦ', boss: 'ЯДРО ВТОРЖЕНИЯ', projectile: 'ЗАРЯД' };
+const ENEMY_LABELS = { scout: 'РАЗВЕДЧИК', drone: 'ПЕРЕХВАТЧИК', flanker: 'ФЛАНКЕР', charger: 'ТАРАН', tank: 'БРОНЕНОСЕЦ', boss: 'ЯДРО ВТОРЖЕНИЯ', projectile: 'ЗАРЯД', portal: 'ПОРТАЛ', shard: 'ОСКОЛОК ВРЕМЕНИ' };
 const ENEMY_TIPS = { scout: 'Держи цель в центре и стреляй короткими очередями.', flanker: 'Меняет направление. Сопровождай цель и держи её в центре.', charger: 'Вспышка перед рывком — перехвати его или используй импульс.', tank: 'Удержи прицел на ядре: критический выстрел пробивает броню.', boss: 'Сбивай красные заряды. Атакуй ядро, когда защита открыта.', projectile: 'Сбей заряд одним выстрелом или очисти сектор импульсом.' };
 const DIFFICULTY_LABELS = { easy: 'РАЗВЕДКА', normal: 'ВТОРЖЕНИЕ', hard: 'ХАОС' };
 const MODE_LABELS = { demo: 'ТРЕНИРОВКА', camera: 'КАМЕРА', ar: 'AR' };
@@ -37,10 +41,17 @@ function toast(message, duration = 2800) {
 }
 function dialogOpen(id) { const d = $(id); if (d?.showModal && !d.open) d.showModal(); else if (d) d.hidden = false; d?.querySelector('button')?.focus(); }
 function dialogClose(id) { const d = $(id); if (d?.close) d.close(); else if (d) d.hidden = true; }
-function error(title, message) { $('error-title').textContent = title; $('error-text').textContent = message; dialogOpen('error-dialog'); }
+function error(title, message, reason = '') {
+  $('error-title').textContent = title; $('error-text').textContent = message;
+  $('error-dialog').dataset.reason = reason; $('error-demo').disabled = graphicsLost;
+  dialogOpen('error-dialog');
+}
+function graphicsError() {
+  error('Графика приостановлена', 'Браузер освободил графическую память. Дождись восстановления графики или обнови страницу, чтобы вернуться в игру.', 'graphics');
+}
 function setBusy(busy, label = '') {
   state.busy = busy;
-  for (const id of ['start-ar', 'start-camera', 'start-demo']) $(id).disabled = busy || (id === 'start-ar' && !state.xrSupported);
+  for (const id of ['start-ar', 'start-camera', 'start-demo']) $(id).disabled = busy || graphicsLost || (id === 'start-ar' && !state.xrSupported) || (id === 'start-camera' && !navigator.mediaDevices?.getUserMedia);
   $('start-demo').hidden = busy;
   if ($('cancel-launch')) $('cancel-launch').hidden = !busy;
   if (label) $('capability').textContent = label;
@@ -142,6 +153,10 @@ function setView(mode, stage) {
   $('lobby').hidden = stage !== 'lobby'; $('hud').hidden = !['playing', 'paused', 'upgrade'].includes(stage);
   $('setup').hidden = stage !== 'setup'; $('results').hidden = stage !== 'results';
   $('upgrade-dialog').hidden = stage !== 'upgrade';
+  if (stage !== 'playing') {
+    document.body.classList.remove('rift-active');
+    $('rift-hud').hidden = true; $('portal-status').hidden = true;
+  }
   hero.visible = mode === 'lobby'; environment.visible = mode === 'demo';
   placement.visible = stage === 'setup'; markers.visible = stage === 'setup';
   scene.fog = mode === 'demo' ? new THREE.FogExp2(0x060b10, .025) : null;
@@ -160,10 +175,15 @@ function resetAim() {
 }
 
 async function capabilityCheck() {
-  try { state.xrSupported = !state.software && !!navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'); } catch { state.xrSupported = false; }
-  $('start-ar').disabled = !state.xrSupported;
+  const check = ++capabilityEpoch;
+  let supported = false;
+  try { supported = !state.software && !!navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'); } catch {}
+  if (check !== capabilityEpoch) return;
+  state.xrSupported = supported;
+  $('start-ar').disabled = state.busy || graphicsLost || !state.xrSupported;
   $('start-ar').setAttribute('aria-describedby', 'capability');
-  $('start-camera').disabled = !navigator.mediaDevices?.getUserMedia;
+  $('start-camera').disabled = state.busy || graphicsLost || !navigator.mediaDevices?.getUserMedia;
+  if (state.busy) return;
   $('capability').textContent = state.xrSupported ? 'Пространственный AR доступен на этом устройстве' : state.software ? 'Доступны камера и тренировка. Для пространственного AR нужна аппаратная 3D-графика.' : 'Доступны камера и тренировка. Пространственный AR не поддерживается этим браузером.';
 }
 
@@ -189,24 +209,27 @@ function onOrientation(event) {
 }
 
 async function startCamera() {
-  if (state.busy || !renderer) return;
+  if (state.busy || !renderer || graphicsLost) return;
   const epoch = ++launchEpoch;
   audio.unlock();
   const permission = requestOrientation(); // Must originate in the same user gesture as the launch button.
   setBusy(true, 'Разрешите доступ к камере…');
+  let acquired = null;
   try {
     if (!navigator.mediaDevices?.getUserMedia) throw Object.assign(new Error('Camera unavailable'), { name: 'NotSupportedError' });
-    const acquired = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
-    if (epoch !== launchEpoch) { acquired.getTracks().forEach(track => track.stop()); return; }
+    acquired = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    if (epoch !== launchEpoch) { releaseCameraStream(acquired); return; }
     stream = acquired;
-    $('camera-feed').srcObject = stream;
+    $('camera-feed').srcObject = acquired;
     await $('camera-feed').play();
-    orientation.enabled = await permission; orientation.received = false;
-    if (epoch !== launchEpoch) { stopCamera(); return; }
+    if (epoch !== launchEpoch || stream !== acquired) { releaseCameraStream(acquired); return; }
+    const permitted = await permission;
+    if (epoch !== launchEpoch || stream !== acquired) { releaseCameraStream(acquired); return; }
+    orientation.enabled = permitted; orientation.received = false;
     resetAim(); window.addEventListener('deviceorientation', onOrientation);
     lastMode = 'camera'; prepareSetup('camera');
     orientation.timer = setTimeout(() => {
-      if (!orientation.received && state.mode === 'camera') {
+      if (epoch === launchEpoch && stream === acquired && !orientation.received && state.mode === 'camera') {
         orientation.enabled = false;
         $('mode-label').textContent = 'КАМЕРА · РУЧНОЙ ПРИЦЕЛ';
         toast('Датчик поворота недоступен. Двигайте прицел свайпом.', 5000);
@@ -214,45 +237,61 @@ async function startCamera() {
     }, 2300);
     requestWakeLock();
   } catch (cause) {
-    stopCamera();
+    releaseCameraStream(acquired);
     if (epoch !== launchEpoch) return;
+    stopCamera();
     const message = cause.name === 'NotAllowedError' ? 'Разрешите камеру в настройках браузера для этого сайта и попробуйте ещё раз. Игра также доступна в тренировке без камеры.' : cause.name === 'NotFoundError' ? 'Камера не найдена. Подключите её или запустите тренировку.' : cause.name === 'NotReadableError' ? 'Камера занята другим приложением. Закройте его и попробуйте ещё раз.' : 'Не удалось запустить камеру. Откройте ссылку напрямую в Chrome или Safari по HTTPS. Можно начать с тренировки.';
     error('Камера пока недоступна', message);
   } finally { if (epoch === launchEpoch) { setBusy(false); capabilityCheck(); } }
 }
 
 async function startAR() {
-  if (state.busy || !renderer || !navigator.xr) return;
+  if (state.busy || !renderer || !navigator.xr || graphicsLost) return;
   const epoch = ++launchEpoch;
   // Keep requestSession before all awaits: browsers require transient activation.
-  const request = navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['dom-overlay'], optionalFeatures: ['hit-test', 'local-floor'], domOverlay: { root: $('overlay') } });
-  audio.unlock(); setBusy(true, 'Запускаем пространственный AR…');
+  let acquired = null;
   try {
-    const acquired = await request;
+    const request = navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['dom-overlay'], optionalFeatures: ['hit-test', 'local-floor'], domOverlay: { root: $('overlay') } });
+    audio.unlock(); setBusy(true, 'Запускаем пространственный AR…');
+    acquired = await request;
     if (epoch !== launchEpoch) { try { await acquired.end(); } catch {} return; }
     session = acquired;
     session.addEventListener('end', onSessionEnd, { once: true });
-    session.addEventListener('visibilitychange', () => { if (session?.visibilityState !== 'visible') pauseGame(); });
+    session.addEventListener('visibilitychange', () => { if (session === acquired && acquired.visibilityState !== 'visible') pauseGame(); });
     resetAim();
     await renderer.xr.setSession(session);
-    if (epoch !== launchEpoch) { try { await acquired.end(); } catch {} return; }
+    if (epoch !== launchEpoch || session !== acquired) { try { await acquired.end(); } catch {} return; }
     engine.setCamera(xrAim);
     lastMode = 'ar'; trackingLost = true; prepareSetup('ar');
     try {
-      const viewerSpace = await session.requestReferenceSpace('viewer');
-      hitSource = await session.requestHitTestSource({ space: viewerSpace });
-    } catch { hitSource = null; }
+      const viewerSpace = await acquired.requestReferenceSpace('viewer');
+      if (epoch !== launchEpoch || session !== acquired) return;
+      const acquiredSource = await acquired.requestHitTestSource({ space: viewerSpace });
+      if (epoch !== launchEpoch || session !== acquired) { try { acquiredSource.cancel(); } catch {} return; }
+      try { hitSource?.cancel(); } catch {}
+      hitSource = acquiredSource;
+    } catch { if (epoch === launchEpoch && session === acquired) hitSource = null; }
+    if (epoch !== launchEpoch || session !== acquired) return;
     requestWakeLock();
   } catch (cause) {
     if (epoch !== launchEpoch) return;
-    if (session) { suppressEnd = true; try { await session.end(); } catch {} session = null; suppressEnd = false; }
+    if (acquired && session === acquired) { session = null; try { await acquired.end(); } catch {} }
+    if (epoch !== launchEpoch) return;
     restoreLobby();
     error('AR не запустился', cause.name === 'NotAllowedError' ? 'Браузер не получил разрешение на AR. Разрешите доступ при следующем запуске или выберите «Играть с камерой».' : 'Для пространственного AR нужны совместимые телефон и браузер с экранными элементами управления. Попробуйте Chrome на Android с сервисами Google Play для AR или режим «Играть с камерой».');
   } finally { if (epoch === launchEpoch) { setBusy(false); capabilityCheck(); } }
 }
 
-function startDemo() {
-  if (state.busy || !renderer) return;
+async function startDemo() {
+  if (state.busy || !renderer || graphicsLost) return;
+  audio.unlock();
+  if (session) {
+    const endingEpoch = launchEpoch + 1;
+    await home();
+    if (launchEpoch !== endingEpoch) return;
+  }
+  // End a launch generation before starting a different mode.
+  launchEpoch++; stopCamera();
   dialogClose('error-dialog'); audio.unlock(); resetAim(); engine.setCamera(camera);
   lastMode = 'demo'; state.portals = [];
   setView('demo', 'playing'); beginMission(); requestWakeLock();
@@ -302,9 +341,10 @@ function autoPortals() {
   return [-.48, 0, .48].map(angle => origin.clone().add(front.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), angle).multiplyScalar(state.mode === 'demo' ? 7 : 3.8)));
 }
 function beginMission() {
+  if (graphicsLost) { graphicsError(); return; }
   if (state.mode === 'ar' && trackingLost) { toast('Дождитесь, пока камера определит положение телефона'); return; }
   if (state.mode === 'camera' && orientation.enabled && !orientation.received) { toast('Калибруем поворот телефона…'); return; }
-  state.firing = false; lastResult = null; lastUIPhase = ''; lastCountdown = -1; lastWarningAt = -10000;
+  clearCombatInput(); frameClock.reset(); lastResult = null; lastUIPhase = ''; lastCountdown = -1; lastWarningAt = -10000;
   clearCombatMessages();
   setView(state.mode, 'playing');
   const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value || 'normal';
@@ -319,7 +359,9 @@ function onStats(stats) {
   uiTime = performance.now();
   lastUIPhase = stats.phase;
   const total = stats.totalWaves || WAVE_CONFIG.length || 5;
-  const canFire = stats.phase === 'playing' && state.stage === 'playing';
+  const canFire = ['playing', 'lastchance'].includes(stats.phase) && state.stage === 'playing' && !trackingLost;
+  const portalTarget = stats.targetKind === 'portal' ? stats.portalTarget : null;
+  const riftActive = !!stats.lastChance?.active && state.stage === 'playing';
   $('score').textContent = String(stats.score).padStart(5, '0');
   $('wave').textContent = `${String(Math.min(stats.wave || 1, total)).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
   $('wave-name').textContent = stats.waveName || 'ПЕРВЫЙ КОНТАКТ';
@@ -337,15 +379,16 @@ function onStats(stats) {
   $('reticle').classList.toggle('locked', !!stats.targeted);
   $('reticle').classList.toggle('critical-ready', !!stats.criticalReady);
   $('reticle').classList.toggle('shielded', !!stats.targetShielded);
+  $('reticle').classList.toggle('portal-lock', !!portalTarget);
   $('reticle').style.setProperty('--focus', clamp(stats.focus || 0, 0, 1));
-  $('focus-bar').style.width = `${clamp(stats.focus || 0, 0, 1) * 100}%`;
-  $('focus-label').textContent = stats.criticalReady ? 'КРИТИЧЕСКИЙ УДАР ГОТОВ' : stats.targetKind === 'projectile' ? 'ПЕРЕХВАТИ ЗАРЯД' : stats.targeted ? 'УДЕРЖИ ПРИЦЕЛ' : 'ФОКУС';
-  $('target-label').textContent = stats.targeted ? ENEMY_LABELS[stats.targetKind] || 'ЦЕЛЬ' : 'ПОИСК ЦЕЛИ';
+  $('focus-bar').style.width = `${clamp(portalTarget ? portalTarget.progress : stats.focus || 0, 0, 1) * 100}%`;
+  $('focus-label').textContent = riftActive ? 'СБЕЙ ОСКОЛКИ' : portalTarget ? portalTarget.allied ? 'СОЮЗНАЯ ТУРЕЛЬ' : portalTarget.capturable ? 'УДЕРЖИВАЙ ОГОНЬ' : 'ПЕРЕХВАТ ИСПОЛЬЗОВАН' : stats.criticalReady ? 'КРИТИЧЕСКИЙ УДАР ГОТОВ' : stats.targetKind === 'projectile' ? 'ПЕРЕХВАТИ ЗАРЯД' : stats.targeted ? 'УДЕРЖИ ПРИЦЕЛ' : 'ФОКУС';
+  $('target-label').textContent = portalTarget?.allied ? 'ПОРТАЛ ПОД КОНТРОЛЕМ' : stats.targeted ? ENEMY_LABELS[stats.targetKind] || 'ЦЕЛЬ' : riftActive ? 'НАЙДИ ОСКОЛОК' : 'ПОИСК ЦЕЛИ';
   $('target-hp-bar').style.width = `${stats.targeted ? clamp(stats.targetHp / Math.max(1, stats.targetMaxHp), 0, 1) * 100 : 0}%`;
-  $('target-health').textContent = stats.targeted ? `${Math.max(0, Math.ceil(stats.targetHp ?? 1))} / ${stats.targetMaxHp || 1}${stats.targetShielded ? ' · БРОНЯ' : ''}` : '';
+  $('target-health').textContent = portalTarget ? portalTarget.capturable ? `${Math.round(portalTarget.progress * 6)} / 6` : '' : stats.targeted ? `${Math.max(0, Math.ceil(stats.targetHp ?? 1))} / ${stats.targetMaxHp || 1}${stats.targetShielded ? ' · БРОНЯ' : ''}` : '';
   $('target-hint').textContent = stats.targeted ? stats.targetHint || (stats.targetShielded ? 'Фокус пробивает защиту' : '') : '';
   const boss = stats.boss;
-  $('boss-hud').hidden = !boss;
+  $('boss-hud').hidden = !boss || riftActive;
   if (boss) {
     $('boss-name').textContent = 'ЯДРО ВТОРЖЕНИЯ';
     $('boss-phase').textContent = `ФАЗА ${boss.phase} / 3 · ${boss.label || 'КОНТАКТ'}`;
@@ -357,10 +400,11 @@ function onStats(stats) {
   }
   $('fire-button').disabled = !canFire;
   $('fire-button').classList.toggle('overheated', !!stats.overheated);
-  const pulse = $('pulse-button'); pulse.disabled = stats.pulseCharge < 100 || !canFire;
+  const pulse = $('pulse-button'); pulse.disabled = stats.pulseCharge < 100 || !canFire || riftActive;
   pulse.style.setProperty('--charge', `${stats.pulseCharge}%`);
-  const label = pulse.querySelector('[data-pulse-charge]'); if (label) label.textContent = stats.pulseCharge >= 100 ? 'ГОТОВ' : `${Math.floor(stats.pulseCharge)}%`;
-  pulse.setAttribute('aria-label', stats.pulseCharge >= 100 ? 'Импульс готов: повредить и оглушить врагов, сбить заряды' : `Импульс заряжается: ${Math.floor(stats.pulseCharge)} процентов`);
+  const label = pulse.querySelector('[data-pulse-charge]'); if (label) label.textContent = riftActive ? 'ОГОНЬ' : stats.pulseCharge >= 100 ? 'ГОТОВ' : `${Math.floor(stats.pulseCharge)}%`;
+  pulse.setAttribute('aria-label', riftActive ? 'В хроноразломе доступен только лазер' : stats.pulseCharge >= 100 ? 'Импульс готов: повредить и оглушить врагов, сбить заряды' : `Импульс заряжается: ${Math.floor(stats.pulseCharge)} процентов`);
+  renderSpecialMechanics(stats, riftActive);
   if (stats.phase === 'intermission') {
     const count = Math.max(1, Math.ceil(stats.intermission));
     if (count !== lastCountdown) {
@@ -373,17 +417,50 @@ function onStats(stats) {
   drawThreats(stats);
   drawRadar(stats);
 }
+function renderSpecialMechanics(stats, riftActive) {
+  const combat = stats.phase === 'playing' && state.stage === 'playing';
+  const portal = stats.portalTarget, allied = stats.capturedPortal;
+  const showCapture = combat && portal?.capturable && stats.targetKind === 'portal';
+  const budget = $('portal-budget');
+  budget.hidden = !combat;
+  budget.textContent = stats.portalCaptureReady ? 'ПЕРЕХВАТ / 1' : 'ПЕРЕХВАТ / ИСПОЛЬЗОВАН';
+  budget.classList.toggle('used', !stats.portalCaptureReady);
+  const status = $('portal-status');
+  status.hidden = !combat || (!allied && !showCapture);
+  status.classList.toggle('active', !!allied);
+  if (combat && (allied || showCapture)) {
+    $('portal-status-title').textContent = allied ? 'ПОРТАЛ-СОЮЗНИК' : 'ПЕРЕХВАТ ПОРТАЛА';
+    $('portal-status-detail').textContent = allied ? `${Math.ceil(allied.remaining)} с · прикрывает сектор` : `${Math.round((portal.progress || 0) * 6)} / 6 · удерживай огонь по кольцу`;
+    $('portal-progress').style.width = `${clamp(allied ? allied.remaining / (allied.duration || 10) : portal.progress || 0, 0, 1) * 100}%`;
+  }
+  document.body.classList.toggle('rift-active', riftActive);
+  $('rift-hud').hidden = !riftActive;
+  if (riftActive) {
+    const rift = stats.lastChance;
+    $('rift-timer').textContent = Math.max(0, rift.remaining).toFixed(1).replace('.', ',');
+    $('rift-progress').style.width = `${clamp(rift.remaining / (rift.duration || 5), 0, 1) * 100}%`;
+    $('rift-count').textContent = `${rift.collected} / ${rift.total}`;
+    [...$('rift-pips').children].forEach((pip, index) => pip.classList.toggle('active', index < rift.collected));
+  }
+}
 function onEvent(event) {
   switch (event.type) {
-    case 'shot': audio.shot(); $('fire-button').classList.add('firing'); setTimeout(() => $('fire-button').classList.remove('firing'), 80); break;
+    case 'shot': audio.shot(); $('fire-button').classList.add('firing'); clearTimeout(transientTimers.get('fire-button')); transientTimers.set('fire-button', setTimeout(() => $('fire-button').classList.remove('firing'), 80)); break;
     case 'hit': audio.hit(); flash('hit-marker', 100); if (event.blocked) combatFeedback('БРОНЯ · УДЕРЖИ ПРИЦЕЛ', 'blocked', 650); break;
     case 'blocked': combatFeedback('БРОНЯ · УДЕРЖИ ПРИЦЕЛ', 'blocked', 650); break;
-    case 'kill': audio.explosion(); flash('hit-marker', 130); if (event.points) combatFeedback(`${event.cause === 'critical' ? 'КРИТ  /  ' : ''}+${event.points}${event.combo > 1 ? `  /  СЕРИЯ ×${event.combo}` : ''}`, event.cause === 'critical' ? 'critical' : ''); vibrate(10); break;
+    case 'kill': audio.explosion(); flash('hit-marker', 130); if (event.points) combatFeedback(`${event.cause === 'critical' ? 'КРИТ  /  ' : event.cause === 'portal' ? 'ТУРЕЛЬ  /  ' : ''}+${event.points}${event.combo > 1 ? `  /  СЕРИЯ ×${event.combo}` : ''}`, event.cause === 'critical' ? 'critical' : ''); vibrate(10); break;
     case 'projectileclear': if (event.cause === 'laser') { audio.hit(); combatFeedback(`ПЕРЕХВАТ +${event.points || 30}`, '', 650); } break;
     case 'critical': audio.critical(); combatFeedback('КРИТИЧЕСКИЙ УДАР', 'critical', 800); flash('hit-marker', 160); vibrate(18); break;
     case 'focus': audio.focus(); break;
     case 'damage': audio.damage(); flash('damage-flash', 350); vibrate([30, 35, 45]); break;
     case 'pulse': audio.pulse(); combatFeedback('ИМПУЛЬС · СЕКТОР ПОДАВЛЕН', 'critical', 950); vibrate(40); break;
+    case 'portalcaptured': audio.capture(); combatFeedback('ПОРТАЛ ПОД КОНТРОЛЕМ · 10 С', 'critical', 1300); vibrate([15, 30, 15]); break;
+    case 'portalshot': audio.portalShot(); break;
+    case 'portalexpired': toast('Перехват завершён. Новый — в следующей волне.', 2400); break;
+    case 'lastchance': clearCombatMessages(); audio.rift(); vibrate([20, 40, 20]); break;
+    case 'shardcollected': audio.shard(); flash('hit-marker', 130); break;
+    case 'lastchancesaved': audio.riftSaved(); combatFeedback('ЩИТ ВОССТАНОВЛЕН · 35%', 'critical', 1700); vibrate(25); break;
+    case 'lastchancefailed': clearCombatMessages(); break;
     case 'overheat': toast('Перегрев. Отпустите огонь для охлаждения', 1900); break;
     case 'wave': {
       audio.wave(); clearTimeout(bannerTimer); lastCountdown = -1;
@@ -438,7 +515,7 @@ function renderLoadout(id, upgrades) {
   }
 }
 function showUpgrades(event) {
-  state.firing = false; pointer = null; clearCombatMessages();
+  clearCombatInput(); clearCombatMessages();
   const stats = engine.getState(), summary = event.summary || {};
   const offers = event.offers || stats.upgradeOffers || [];
   setView(state.mode, 'upgrade');
@@ -465,7 +542,7 @@ function showUpgrades(event) {
 }
 function chooseUpgrade(id) {
   if (state.stage !== 'upgrade' || !engine.chooseUpgrade(id)) return;
-  state.firing = false; setView(state.mode, 'playing'); previousTime = performance.now(); lastUIPhase = '';
+  clearCombatInput(); setView(state.mode, 'playing'); frameClock.reset(); lastUIPhase = '';
   $('pause-button').focus({ preventScroll: true });
   const catalog = Array.isArray(UPGRADE_CATALOG) ? UPGRADE_CATALOG.find(item => item.id === id) : UPGRADE_CATALOG[id];
   toast(`Установлено: ${catalog?.title || 'улучшение'}`, 2000); requestWakeLock();
@@ -479,14 +556,16 @@ function drawThreats(stats) {
     const use = document.createElementNS('http://www.w3.org/2000/svg', 'use'); use.setAttribute('href', '#i-arrow'); svg.append(use); arrow.append(svg);
     const label = document.createElement('small'); marker.append(arrow, label); container.append(marker);
   }
-  const fovY = THREE.MathUtils.degToRad(camera.fov / 2), fovX = Math.atan(Math.tan(fovY) * camera.aspect);
+  const projection = activeCamera().projectionMatrix.elements;
+  const fovY = Math.atan(1 / Math.abs(projection[5])), fovX = Math.atan(1 / Math.abs(projection[0]));
   const threats = (stats.threats || []).filter(t => t.behind || Math.abs(t.angle) > fovX * .9 || Math.abs(t.elevation) > fovY * .9)
     .sort((a, b) => (b.urgency || 0) - (a.urgency || 0) || a.distance - b.distance).slice(0, 3);
   [...container.children].forEach((marker, index) => {
     const threat = threats[index]; marker.hidden = !threat || stats.phase !== 'playing'; if (!threat) return;
     const right = threat.angle >= 0;
     const vertical = !threat.behind && Math.abs(threat.elevation) > Math.abs(threat.angle) && Math.abs(threat.angle) < fovX;
-    const x = vertical ? 50 : right ? 94 : 6;
+    const edge = Math.max(6, 44 / innerWidth * 100);
+    const x = vertical ? 50 : right ? 100 - edge : edge;
     const y = vertical ? threat.elevation > 0 ? 29 : 67 : clamp(47 - threat.elevation * 20 + index * 8, 30, 65);
     marker.style.left = `${x}%`; marker.style.top = `${y}%`; marker.style.transform = 'translate(-50%, -50%)';
     const rotation = vertical ? threat.elevation > 0 ? -90 : 90 : right ? 0 : 180;
@@ -505,11 +584,18 @@ function drawRadar(stats) {
   ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();
   ctx.fillStyle = 'rgba(157,245,226,.07)'; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, -Math.PI / 2 - .5, -Math.PI / 2 + .5); ctx.closePath(); ctx.fill();
   const cam = activeCamera(), inv = cam.getWorldQuaternion(new THREE.Quaternion()).invert(), origin = cam.getWorldPosition(new THREE.Vector3());
+  for (const portal of engine?.getPortals() || []) {
+    if (!portal.group) continue;
+    const p = portal.group.getWorldPosition(new THREE.Vector3()).sub(origin).applyQuaternion(inv);
+    const dist = Math.hypot(p.x, p.z), scale = Math.min(dist / 7, 1) * r / Math.max(dist, .01);
+    ctx.strokeStyle = portal.alliedRemaining > 0 ? '#b0f48a' : 'rgba(151,202,187,.4)';
+    ctx.beginPath(); ctx.arc(cx + p.x * scale, cy + p.z * scale, 3.4, 0, Math.PI * 2); ctx.stroke();
+  }
   for (const enemy of engine?.getEnemies() || []) {
     const mesh = enemy.mesh || enemy.group; if (!mesh) continue;
     const p = mesh.getWorldPosition(new THREE.Vector3()).sub(origin).applyQuaternion(inv);
     const dist = Math.sqrt(p.x * p.x + p.z * p.z), scale = Math.min(dist / 7, 1) * r / Math.max(dist, .01);
-    ctx.fillStyle = enemy.kind === 'projectile' || enemy.kind === 'charger' ? '#ff6853' : enemy.kind === 'boss' || enemy.kind === 'tank' ? '#ffbf81' : enemy.kind === 'flanker' ? '#a6a5ff' : '#9ef8de'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 5;
+    ctx.fillStyle = enemy.kind === 'shard' ? '#d4b9ff' : enemy.kind === 'projectile' || enemy.kind === 'charger' ? '#ff6853' : enemy.kind === 'boss' || enemy.kind === 'tank' ? '#ffbf81' : enemy.kind === 'flanker' ? '#a6a5ff' : '#9ef8de'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 5;
     ctx.beginPath(); ctx.arc(cx + p.x * scale, cy + p.z * scale, enemy.kind === 'boss' ? 4.5 : enemy.kind === 'tank' ? 3.1 : 2.3, 0, Math.PI * 2); ctx.fill();
   }
   ctx.shadowBlur = 0; ctx.fillStyle = '#e8fff7'; ctx.beginPath(); ctx.moveTo(cx, cy - 4); ctx.lineTo(cx - 3, cy + 3); ctx.lineTo(cx + 3, cy + 3); ctx.closePath(); ctx.fill();
@@ -517,15 +603,16 @@ function drawRadar(stats) {
 
 function pauseGame() {
   if (state.stage !== 'playing') return;
-  state.firing = false; state.stage = 'paused'; engine.pause(); dialogOpen('pause-dialog');
+  clearCombatInput(); state.stage = 'paused'; engine.pause(); releaseWakeLock(); dialogOpen('pause-dialog');
 }
 function resumeGame() {
   if (state.stage !== 'paused') return;
-  audio.unlock(); state.stage = 'playing'; engine.resume(); previousTime = performance.now(); dialogClose('pause-dialog'); requestWakeLock();
+  if (graphicsLost) { graphicsError(); return; }
+  audio.unlock(); state.stage = 'playing'; frameClock.reset(); engine.resume(); dialogClose('pause-dialog'); requestWakeLock();
 }
 function finishGame(victory, stats) {
-  state.firing = false; pointer = null; clearCombatMessages(); lastResult = { victory: !!victory, stats: { ...stats } };
-  const recordKey = `best.v2.${state.mode}.${state.difficulty}`;
+  clearCombatInput(); clearCombatMessages(); lastResult = { victory: !!victory, stats: { ...stats } };
+  const recordKey = `best.v3.${state.mode}.${state.difficulty}`;
   const oldBest = Number(store.get(recordKey, 0)) || 0, best = Math.max(oldBest, stats.score); store.set(recordKey, best);
   $('result-title').textContent = victory ? 'КОМНАТА ПОД КОНТРОЛЕМ.' : 'ОНИ ПРОРВАЛИСЬ.';
   $('result-score').textContent = String(stats.score).padStart(5, '0');
@@ -536,6 +623,9 @@ function finishGame(victory, stats) {
   $('result-combo').textContent = `×${stats.bestCombo || 0}`;
   $('result-criticals').textContent = stats.criticals || 0;
   $('result-perfect').textContent = `${stats.perfectWaves || 0} / ${stats.totalWaves || 5}`;
+  $('result-captures').textContent = stats.portalCaptures || 0;
+  $('result-portal-kills').textContent = stats.portalKills || 0;
+  $('result-rift').textContent = stats.riftSaves > 0 ? 'СПАСЁН' : stats.lastChance?.used ? 'ИСТЁК' : 'НЕ ИСПОЛЬЗОВАН';
   const seconds = Math.max(0, Math.floor(stats.elapsed));
   $('result-time').textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   $('result-record-label').textContent = `${stats.score > oldBest ? 'НОВЫЙ РЕКОРД · ' : ''}${MODE_LABELS[state.mode]} / ${DIFFICULTY_LABELS[state.difficulty]}`;
@@ -545,7 +635,7 @@ function finishGame(victory, stats) {
   setView(state.mode, 'results');
   // Give camera access back immediately after a completed run. Spatial results remain usable in the DOM overlay.
   if (state.mode === 'camera') stopCamera();
-  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  releaseWakeLock();
   $('retry-button').focus();
 }
 async function retry() {
@@ -556,34 +646,67 @@ async function retry() {
   else startDemo();
 }
 
+function releaseCameraStream(acquired) {
+  if (!acquired) return;
+  acquired.getTracks().forEach(track => track.stop());
+  // An obsolete launch may finish after a new video stream has been attached.
+  if ($('camera-feed').srcObject === acquired) $('camera-feed').srcObject = null;
+  if (stream === acquired) stream = null;
+}
 function stopCamera() {
   clearTimeout(orientation.timer);
   window.removeEventListener('deviceorientation', onOrientation);
   orientation.enabled = false; orientation.received = false;
-  stream?.getTracks().forEach(track => track.stop()); stream = null;
+  releaseCameraStream(stream);
   $('camera-feed').srcObject = null; $('camera-feed').hidden = true;
 }
 function onSessionEnd(event) {
-  if (session && event?.target && event.target !== session) return;
-  try { hitSource?.cancel(); } catch {} hitSource = null; hitPoint = null; session = null; trackingLost = false;
-  if (!suppressEnd) { engine?.stop(); restoreLobby(); toast('AR-сессия завершена'); }
+  if (event?.target && event.target !== session) return;
+  launchEpoch++; session = null; releaseHitSource(); trackingLost = false;
+  setBusy(false); restoreLobby(); toast('AR-сессия завершена');
+}
+function releaseHitSource() {
+  try { hitSource?.cancel(); } catch {}
+  hitSource = null; hitPoint = null;
 }
 function restoreLobby() {
-  state.firing = false; pointer = null; clearCombatMessages(); stopCamera(); engine?.stop();
+  clearCombatInput(); clearCombatMessages(); stopCamera(); engine?.stop(); frameClock.reset();
+  if (!session) { releaseHitSource(); trackingLost = false; }
   clearMarkers(); placement.visible = false; state.portals = [];
   resetAim(); engine?.setCamera(camera);
   for (const id of ['pause-dialog', 'help-dialog', 'upgrade-dialog', 'error-dialog']) dialogClose(id);
   setView('lobby', 'lobby'); resize(); capabilityCheck();
-  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  releaseWakeLock();
 }
 async function home() {
-  launchEpoch++; setBusy(false);
-  if (session) { suppressEnd = true; try { await session.end(); } catch {} suppressEnd = false; session = null; }
-  restoreLobby();
+  const epoch = ++launchEpoch;
+  const ending = session; session = null;
+  restoreLobby(); setBusy(!!ending, ending ? 'Завершаем AR…' : '');
+  if (ending) try { await ending.end(); } catch {}
+  if (epoch === launchEpoch) { setBusy(false); capabilityCheck(); }
+}
+function wantsWakeLock() {
+  return document.visibilityState === 'visible' && ['setup', 'playing', 'upgrade'].includes(state.stage);
+}
+function releaseWakeLock() {
+  wakeEpoch++;
+  const acquired = wakeLock; wakeLock = null;
+  if (acquired) acquired.release().catch(() => {});
 }
 async function requestWakeLock() {
-  if (navigator.wakeLock && !wakeLock && document.visibilityState === 'visible') {
-    try { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } catch {}
+  if (!navigator.wakeLock || wakeLock || wakeRequest || !wantsWakeLock()) return;
+  const epoch = wakeEpoch, request = {};
+  wakeRequest = request;
+  try {
+    const acquired = await navigator.wakeLock.request('screen');
+    if (epoch !== wakeEpoch || !wantsWakeLock()) { acquired.release().catch(() => {}); return; }
+    wakeLock = acquired;
+    acquired.addEventListener('release', () => { if (wakeLock === acquired) wakeLock = null; });
+  } catch {} finally {
+    if (wakeRequest === request) {
+      wakeRequest = null;
+      if (epoch !== wakeEpoch && wantsWakeLock()) requestWakeLock();
+    }
   }
 }
 
@@ -599,12 +722,13 @@ function updateCamera(dt) {
   camera.updateMatrixWorld();
 }
 function frame(time, xrFrame) {
-  // Keep combat time consistent on slower devices. Small simulation steps
-  // retain collision/firing accuracy while one scene is drawn per RAF.
-  // A bounded catch-up avoids damage bursts after a suspended browser tab.
-  const frameDelta = previousTime ? clamp((time - previousTime) / 1000, 0, .25) : .016; previousTime = time;
+  const { delta: frameDelta, suspended } = frameClock.tick(time);
   const dt = Math.min(frameDelta, .05);
   const seconds = time / 1000;
+  if (suspended && state.stage === 'playing') {
+    pauseGame();
+    toast('Игра на паузе после задержки браузера. Нажми «Продолжить».', 4800);
+  }
   let tracked = state.mode !== 'ar';
   if (state.mode === 'ar' && xrFrame) {
     const ref = renderer.xr.getReferenceSpace();
@@ -614,6 +738,10 @@ function frame(time, xrFrame) {
       const t = pose.transform;
       xrAim.position.set(t.position.x, t.position.y, t.position.z);
       xrAim.quaternion.set(t.orientation.x, t.orientation.y, t.orientation.z, t.orientation.w);
+      if (pose.views?.[0]?.projectionMatrix) {
+        xrAim.projectionMatrix.fromArray(pose.views[0].projectionMatrix);
+        xrAim.projectionMatrixInverse.copy(xrAim.projectionMatrix).invert();
+      }
       xrAim.updateMatrixWorld();
       if (trackingLost) toast('Отслеживание восстановлено');
       trackingLost = false;
@@ -640,7 +768,12 @@ function frame(time, xrFrame) {
         }
       }
     } else if (!trackingLost) { trackingLost = true; toast('Медленно наведите камеру на освещённую поверхность', 4000); }
+  } else if (state.mode === 'ar') {
+    trackingLost = true;
   } else updateCamera(frameDelta);
+  if (state.mode === 'ar' && !tracked) {
+    $('fire-button').disabled = true; $('pulse-button').disabled = true;
+  }
   if (state.mode === 'lobby') animateHero(seconds);
   if (state.stage === 'setup' && tracked) {
     placement.position.copy(placementPosition()); placement.lookAt(activeCamera().position);
@@ -658,6 +791,15 @@ function frame(time, xrFrame) {
     }
   } else if (state.stage === 'results' || state.stage === 'upgrade') engine.update(Math.min(frameDelta, .07), seconds);
   renderer.render(scene, camera);
+}
+function clearCombatInput(released = false) {
+  state.firing = false; pointer = null; firePointers.clear(); spaceFiring = false;
+  // Keep a consumed Space held across modal transitions until its keyup.
+  // Otherwise native keyup activation can accept the newly focused upgrade.
+  if (released) combatSpaceHeld = false;
+}
+function updateFiring() {
+  state.firing = state.stage === 'playing' && !trackingLost && (spaceFiring || firePointers.size > 0);
 }
 function animateHero(seconds) {
   const slot = $('hero-slot');
@@ -698,21 +840,27 @@ function bindInput() {
     toast('Прицел откалиброван');
   });
   const fire = $('fire-button');
-  fire.addEventListener('pointerdown', event => { if (state.stage !== 'playing' || (state.mode === 'ar' && trackingLost)) return; event.preventDefault(); state.firing = true; audio.unlock(); fire.setPointerCapture?.(event.pointerId); engine.fire(); });
-  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) fire.addEventListener(name, () => { state.firing = false; });
+  fire.addEventListener('pointerdown', event => {
+    if (state.stage !== 'playing' || trackingLost || event.button > 0) return;
+    event.preventDefault(); firePointers.add(event.pointerId); updateFiring(); audio.unlock();
+    fire.setPointerCapture?.(event.pointerId); engine.fire();
+  });
+  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) fire.addEventListener(name, event => { firePointers.delete(event.pointerId); updateFiring(); });
   // A keyboard-activated button emits click without a pointer event.
   fire.addEventListener('click', event => { if (event.detail === 0 && state.stage === 'playing' && !trackingLost) engine.fire(); });
   const surface = $('scene');
   surface.addEventListener('pointerdown', event => {
-    if (!['playing', 'setup'].includes(state.stage) || state.mode === 'ar') return;
-    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false, type: event.pointerType };
+    if (!['playing', 'setup'].includes(state.stage) || state.mode === 'ar' || pointer || event.button > 0) return;
+    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, travel: 0, moved: false, type: event.pointerType };
     surface.setPointerCapture?.(event.pointerId);
   });
   surface.addEventListener('pointermove', event => {
     if (state.mode === 'ar' || !['playing', 'setup'].includes(state.stage)) return;
     if (pointer) {
+      if (event.pointerId !== pointer.id) return;
       const dx = event.clientX - pointer.x, dy = event.clientY - pointer.y;
-      if (Math.abs(dx) + Math.abs(dy) > 2) pointer.moved = true;
+      pointer.travel += Math.abs(dx) + Math.abs(dy);
+      if (pointer.travel > 6) pointer.moved = true;
       if (orientation.enabled && orientation.received) orientation.yaw += dx * .004;
       else { touchAim.targetYaw += dx * .004; touchAim.targetPitch = clamp(touchAim.targetPitch + dy * .0035, -1.15, 1.15); }
       pointer.x = event.clientX; pointer.y = event.clientY;
@@ -721,19 +869,26 @@ function bindInput() {
       touchAim.targetPitch = (.5 - event.clientY / innerHeight) * 1.2;
     }
   });
-  surface.addEventListener('pointerup', () => { if (pointer && !pointer.moved && state.stage === 'playing') engine.fire(); pointer = null; });
-  surface.addEventListener('pointercancel', () => { pointer = null; state.firing = false; });
+  surface.addEventListener('pointerup', event => {
+    if (pointer?.id !== event.pointerId) return;
+    if (!pointer.moved && state.stage === 'playing') engine.fire();
+    pointer = null;
+  });
+  for (const name of ['pointercancel', 'lostpointercapture']) surface.addEventListener(name, event => { if (pointer?.id === event.pointerId) pointer = null; });
   document.addEventListener('keydown', event => {
-    const modal = ['help-dialog', 'error-dialog', 'pause-dialog', 'upgrade-dialog'].map($).find(d => !d.hidden);
+    if (event.code === 'Space' && combatSpaceHeld) { event.preventDefault(); return; }
+    const modal = ['error-dialog', 'help-dialog', 'pause-dialog', 'upgrade-dialog'].map($).find(d => !d.hidden);
     if (event.code === 'Tab' && modal) {
       const items = [...modal.querySelectorAll('button:not([disabled]),a[href],input')];
       if (items.length && event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items.at(-1).focus(); }
       else if (items.length && !event.shiftKey && document.activeElement === items.at(-1)) { event.preventDefault(); items[0].focus(); }
     }
     if (event.code === 'Escape') {
-      if (state.stage === 'playing') pauseGame();
+      event.preventDefault();
+      if (!$('error-dialog').hidden) dialogClose('error-dialog');
+      else if (!$('help-dialog').hidden) dialogClose('help-dialog');
+      else if (state.stage === 'playing') pauseGame();
       else if (state.stage === 'paused') resumeGame();
-      else { dialogClose('help-dialog'); dialogClose('error-dialog'); }
       return;
     }
     if (state.stage === 'upgrade' && /^Digit[123]$/.test(event.code) && !event.repeat) {
@@ -743,7 +898,10 @@ function bindInput() {
       return;
     }
     if (state.stage !== 'playing') return;
-    if (event.code === 'Space') { event.preventDefault(); state.firing = true; audio.unlock(); }
+    if (event.code === 'Space') {
+      event.preventDefault(); combatSpaceHeld = true; spaceFiring = !event.repeat;
+      updateFiring(); audio.unlock();
+    }
     if (event.code === 'KeyE' && !event.repeat && !trackingLost) engine.pulse();
     if (event.code === 'KeyP' && !event.repeat) pauseGame();
     if (event.code === 'ArrowLeft') { event.preventDefault(); touchAim.targetYaw += .06; }
@@ -751,15 +909,30 @@ function bindInput() {
     if (event.code === 'ArrowUp') { event.preventDefault(); touchAim.targetPitch = clamp(touchAim.targetPitch + .06, -1.15, 1.15); }
     if (event.code === 'ArrowDown') { event.preventDefault(); touchAim.targetPitch = clamp(touchAim.targetPitch - .06, -1.15, 1.15); }
   });
-  document.addEventListener('keyup', event => { if (event.code === 'Space') state.firing = false; });
+  document.addEventListener('keyup', event => {
+    if (event.code === 'Space') {
+      if (combatSpaceHeld) event.preventDefault();
+      combatSpaceHeld = false; spaceFiring = false; updateFiring();
+    }
+  });
   $('pause-dialog').addEventListener('cancel', event => { event.preventDefault(); resumeGame(); });
   $('overlay').addEventListener('beforexrselect', event => event.preventDefault());
   window.addEventListener('resize', resize);
-  window.addEventListener('blur', () => { state.firing = false; pauseGame(); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { state.firing = false; pauseGame(); } });
-  window.addEventListener('pagehide', () => { launchEpoch++; setBusy(false); stopCamera(); state.firing = false; session?.end().catch(() => {}); audio.stop(); });
+  window.addEventListener('blur', () => { clearCombatInput(true); pauseGame(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { clearCombatInput(true); pauseGame(); releaseWakeLock(); } else requestWakeLock(); });
+  window.addEventListener('pagehide', () => {
+    launchEpoch++; setBusy(false); stopCamera(); clearCombatInput(true); releaseWakeLock();
+    session?.end().catch(() => {}); audio.stop();
+  });
   window.addEventListener('pageshow', () => { if (state.mode === 'camera' && !stream && state.stage !== 'results') { setBusy(false); restoreLobby(); toast('Запустите камеру снова, чтобы продолжить'); } });
-  $('scene').addEventListener('webglcontextlost', event => { event.preventDefault(); pauseGame(); error('Графика приостановлена', 'Браузер освободил графическую память. Обновите страницу, чтобы вернуться в игру.'); });
+  $('scene').addEventListener('webglcontextlost', event => {
+    event.preventDefault(); graphicsLost = true; clearCombatInput(); pauseGame(); setBusy(state.busy); graphicsError();
+  });
+  $('scene').addEventListener('webglcontextrestored', () => {
+    graphicsLost = false; setBusy(state.busy); capabilityCheck(); $('error-demo').disabled = false;
+    if ($('error-dialog').dataset.reason === 'graphics') dialogClose('error-dialog');
+    toast('Графика восстановлена. Можно продолжить игру.', 3500);
+  });
 }
 
 try {

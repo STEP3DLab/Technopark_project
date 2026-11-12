@@ -224,9 +224,10 @@ export class GameEngine {
     this.scene.add(this.group);
     this.enemyGroup = new THREE.Group();
     this.projectileGroup = new THREE.Group();
+    this.shardGroup = new THREE.Group();
     this.portalGroup = new THREE.Group();
     this.effectGroup = new THREE.Group();
-    this.group.add(this.portalGroup, this.enemyGroup, this.projectileGroup, this.effectGroup);
+    this.group.add(this.portalGroup, this.enemyGroup, this.projectileGroup, this.shardGroup, this.effectGroup);
     this.box = new THREE.BoxGeometry(1, 1, 1);
     this.beamGeometry = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true);
     this.ringGeometry = new THREE.RingGeometry(0.91, 1, 64);
@@ -234,6 +235,7 @@ export class GameEngine {
     this.portalDisk = new THREE.CircleGeometry(0.49, 48);
     this.projectileGeometry = new THREE.OctahedronGeometry(0.12, 0);
     this.coreGeometry = new THREE.SphereGeometry(0.11, 8, 6);
+    this.shardGeometry = new THREE.OctahedronGeometry(0.16, 0);
     this.texture = glowTexture();
     this.particleMaterial = additiveMaterial(0xffffff, 0.95);
     this.particleMesh = new THREE.InstancedMesh(this.box, this.particleMaterial, MAX_PARTICLES);
@@ -243,6 +245,7 @@ export class GameEngine {
     this.effectGroup.add(this.particleMesh);
     this.enemies = [];
     this.projectiles = [];
+    this.shards = [];
     this.portals = [];
     this.effects = [];
     this.particles = [];
@@ -313,6 +316,17 @@ export class GameEngine {
     this.bossDefeated = false;
     this.introduced = new Set();
     this.lastWarningTime = -100;
+    this.portalAim = null;
+    this.portalCaptureUsed = false;
+    this.portalCaptures = 0;
+    this.portalKills = 0;
+    this.portalShots = 0;
+    this.portalAllyShots = 0;
+    this.portalInterceptions = 0;
+    this.lastChanceUsed = false;
+    this.lastChanceRemaining = 0;
+    this.lastChanceCollected = 0;
+    this.riftSaves = 0;
     this._applyUpgradeStats();
   }
 
@@ -388,6 +402,9 @@ export class GameEngine {
       const ring = new THREE.Mesh(this.portalTorus, ringMaterial);
       const glow = new THREE.Sprite(glowMaterial);
       glow.scale.setScalar(1.55);
+      const coreMaterial = new THREE.MeshBasicMaterial({ color: 0x7af7d7, toneMapped: false });
+      const core = new THREE.Mesh(this.coreGeometry, coreMaterial);
+      core.name = 'portal-core'; core.position.z = 0.035; core.scale.setScalar(0.67);
       const vertices = [];
       for (let segment = 0; segment < 16; segment++) {
         const a = segment / 16 * TAU;
@@ -400,9 +417,9 @@ export class GameEngine {
       const detailGeometry = new THREE.BufferGeometry();
       detailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
       const detail = new THREE.LineSegments(detailGeometry, detailMaterial);
-      group.add(disk, glow, ring, detail);
+      group.add(disk, glow, ring, detail, core);
       this.portalGroup.add(group);
-      this.portals.push({ group, position, ring, detail, glow, glowMaterial, ringMaterial, detailMaterial, detailGeometry, materials: [ringMaterial, detailMaterial, diskMaterial, glowMaterial], flash: 0, seed: i * 1.7 });
+      this.portals.push({ id: `portal-${i + 1}`, group, position, ring, detail, glow, core, coreMaterial, glowMaterial, ringMaterial, detailMaterial, detailGeometry, materials: [ringMaterial, detailMaterial, diskMaterial, glowMaterial, coreMaterial], flash: 0, seed: i * 1.7, captureProgress: 0, lostAimFor: 0, alliedRemaining: 0, fireTimer: 0 });
     }
   }
 
@@ -424,6 +441,13 @@ export class GameEngine {
     this.focus = 0;
     this.focusTarget = null;
     this.upgradeOffers = [];
+    this.portalCaptureUsed = false;
+    this.portalAim = null;
+    for (const portal of this.portals) {
+      if (portal.alliedRemaining > 0) this._expirePortal(portal, 'newwave');
+      portal.captureProgress = 0;
+      portal.lostAimFor = 0;
+    }
     this.onEvent({ type: 'wave', wave, total: 5, enemies: this.spawnRemaining, name: this.config.name, description: this.config.description });
   }
 
@@ -454,6 +478,10 @@ export class GameEngine {
         return !best || dot > best.dot ? { item, dot } : best;
       }, null).item;
     } else portal = this.portals[(this.spawnIndex + this.wave - 1) % this.portals.length];
+    if (portal.alliedRemaining > 0) {
+      const alternatives = this.portals.filter(item => item.alliedRemaining <= 0);
+      if (alternatives.length) portal = alternatives[this.spawnIndex % alternatives.length];
+    }
     const spec = MODELS[kind];
     const mesh = buildInvader(kind, this.box);
     this._addArmor(mesh, kind);
@@ -482,6 +510,7 @@ export class GameEngine {
       warnedClose: false, offscreen,
     };
     this.enemies.push(enemy);
+    if (portal.alliedRemaining > 0) { enemy.stun = 1.2; enemy.exposed = 1.2; }
     this.spawnRemaining--;
     this.spawnIndex++;
     portal.flash = 1;
@@ -503,19 +532,116 @@ export class GameEngine {
   }
 
   _warn(enemy, message, urgency = 0.7, force = false) {
+    if (this.phase !== 'playing') return;
     if (!force && this.totalTime - this.lastWarningTime < 1.6) return;
     this.lastWarningTime = this.totalTime;
     const offset = enemy.mesh.position.clone().sub(this.cameraPosition).applyQuaternion(this.cameraQuaternion.clone().invert());
     this.onEvent({ type: 'warning', id: enemy.id, kind: enemy.kind, message, urgency, angle: Math.atan2(offset.x, -offset.z) });
   }
 
+  _findPortalTarget(hostileTarget = this.target) {
+    if (this.phase !== 'playing' || hostileTarget) return null;
+    let closest = null, bestDistance = Infinity;
+    for (const portal of this.portals) {
+      const offset = portal.position.clone().sub(this.cameraPosition);
+      const distance = offset.length();
+      const forward = offset.dot(this.cameraDirection);
+      if (forward <= 0.2 || distance >= bestDistance) continue;
+      const perpendicular = Math.sqrt(Math.max(0, offset.lengthSq() - forward * forward));
+      if (perpendicular <= Math.min(0.42, 0.22 + distance * 0.016)) { closest = portal; bestDistance = distance; }
+    }
+    return closest;
+  }
+
+  _hitPortal(portal) {
+    this.portalShots++;
+    this.focus = 0;
+    this.focusTarget = null;
+    this.focusAnnounced = false;
+    const position = portal.core.getWorldPosition(new THREE.Vector3());
+    this._laser(position, true);
+    this.onEvent({ type: 'shot', hit: true, portal: true, targetKind: 'portal', position: position.clone() });
+    if (!this.portalCaptureUsed && portal.alliedRemaining <= 0) {
+      portal.captureProgress = Math.min(6, portal.captureProgress + 1);
+      portal.lostAimFor = 0;
+      portal.flash = 0.8;
+      this._sparks(position, 0xc0ff86, 5, 0.45, true);
+      this.onEvent({ type: 'portalprogress', id: portal.id, progress: portal.captureProgress / 6 });
+      if (portal.captureProgress >= 6) this._capturePortal(portal);
+    }
+  }
+
+  _capturePortal(portal) {
+    if (this.phase !== 'playing' || this.portalCaptureUsed) return;
+    this.portalCaptureUsed = true;
+    this.portalCaptures++;
+    for (const item of this.portals) if (item !== portal) item.captureProgress = 0;
+    portal.captureProgress = 6;
+    portal.alliedRemaining = 10;
+    portal.fireTimer = 0.35;
+    portal.flash = 1.5;
+    this._shockwave(portal.position, 0xc3ff79, 1.2, 0.65, 0.8, true);
+    this.onEvent({ type: 'portalcaptured', id: portal.id, duration: 10 });
+  }
+
+  _expirePortal(portal, reason = 'timeout') {
+    portal.alliedRemaining = 0;
+    portal.captureProgress = 0;
+    portal.fireTimer = 0;
+    portal.flash = 0.6;
+    this.onEvent({ type: 'portalexpired', id: portal.id, reason });
+  }
+
+  _updatePortalCombat(dt) {
+    if (this.phase !== 'playing') return;
+    this.portalAim = this._findPortalTarget(this.target);
+    for (const portal of this.portals) {
+      if (portal !== this.portalAim) portal.lostAimFor += dt;
+      else portal.lostAimFor = 0;
+      if (portal.alliedRemaining <= 0) {
+        if (portal.lostAimFor > 1) portal.captureProgress = Math.max(0, portal.captureProgress - dt * 2.4);
+        continue;
+      }
+      portal.alliedRemaining = Math.max(0, portal.alliedRemaining - dt);
+      if (portal.alliedRemaining <= 0) { this._expirePortal(portal); continue; }
+      portal.fireTimer = Math.max(0, portal.fireTimer - dt);
+      if (portal.fireTimer > 0) continue;
+      let target = null, bestPriority = Infinity;
+      for (const enemy of [...this.enemies, ...this.projectiles]) {
+        if (enemy.age < 0.4 || enemy.hp <= 0) continue;
+        const distance = enemy.mesh.position.distanceTo(portal.position);
+        if (distance > 12) continue;
+        const priority = enemy.distance + distance * 0.12 - (enemy.kind === 'projectile' ? 100 : 0);
+        if (priority < bestPriority) { target = enemy; bestPriority = priority; }
+      }
+      if (!target) continue;
+      portal.fireTimer = 0.75;
+      portal.flash = 1;
+      const start = portal.core.getWorldPosition(new THREE.Vector3());
+      const end = target.mesh.userData.core ? target.mesh.userData.core.getWorldPosition(new THREE.Vector3()) : target.mesh.position.clone();
+      const damage = target.kind === 'boss' ? 0.45 : 0.9;
+      this._worldBeam(start, end, 0xc3ff79);
+      this.portalAllyShots++;
+      this.onEvent({ type: 'portalshot', id: portal.id, targetId: target.id, kind: target.kind, damage });
+      target.hp = Math.max(0, target.hp - damage);
+      target.hitFlash = 0.7;
+      this._sparks(end, 0xc3ff79, 4, 0.6);
+      if (target.kind === 'projectile') {
+        if (target.hp <= 0) { this.portalInterceptions++; this._destroyProjectile(this.projectiles.indexOf(target), 'portal'); }
+      } else if (target.hp <= 0) this._killEnemy(target, 'portal');
+      else this._updateBossPhase(target);
+      if (this.phase !== 'playing') break;
+    }
+  }
+
   update(dt, time) {
     if (this.disposed || this.phase === 'idle' || this.phase === 'paused') return;
     dt = Math.min(Math.max(Number.isFinite(dt) ? dt : 0, 0), 0.07);
-    this.time += dt;
+    const worldDt = this.phase === 'lastchance' ? dt * 0.12 : dt;
+    this.time += worldDt;
     this._readCamera();
-    this._updateEffects(dt);
-    this._updatePortals(dt);
+    this._updateEffects(dt, worldDt);
+    this._updatePortals(worldDt);
     if (['upgrade', 'victory', 'gameover'].includes(this.phase)) return;
     this.totalTime += dt;
     this.cooldown = Math.max(0, this.cooldown - dt);
@@ -529,6 +655,16 @@ export class GameEngine {
     if (this.phase === 'intermission') {
       this.intermission = Math.max(0, this.intermission - dt);
       if (this.intermission <= 0) this._beginWave(this.wave + 1);
+    } else if (this.phase === 'lastchance') {
+      this.lastChanceRemaining = Math.max(0, this.lastChanceRemaining - dt);
+      if (this.lastChanceRemaining <= 0) this._failLastChance();
+      else {
+        this._updateEnemies(worldDt);
+        this._updateProjectiles(worldDt);
+        this._updateShards(dt);
+        this.target = this._findTarget();
+        this.portalAim = null;
+      }
     } else if (this.phase === 'playing') {
       this.spawnDelay -= dt;
       if (this.spawnRemaining > 0 && this.spawnDelay <= 0 && this.enemies.length < this.config.maxActive) {
@@ -537,8 +673,9 @@ export class GameEngine {
       }
       this._updateEnemies(dt);
       if (this.phase === 'playing') this._updateProjectiles(dt);
-      this.target = this.phase === 'playing' ? this._findTarget() : null;
+      this.target = this.phase === 'playing' || this.phase === 'lastchance' ? this._findTarget() : null;
       this._updateFocus(dt);
+      if (this.phase === 'playing') this._updatePortalCombat(dt);
       if (!this.enemies.length && !this.projectiles.length && !this.spawnRemaining && this.phase === 'playing') this._completeWave();
     }
     this.publishDelay -= dt;
@@ -610,12 +747,12 @@ export class GameEngine {
         enemy.warnedClose = true;
         this._warn(enemy, 'Угроза рядом — разверните прицел к отметке радара', 1, true);
       }
-      if (enemy.kind !== 'boss' && enemy.position.distanceTo(this.cameraPosition) < 0.62 && enemy.age >= enemy.minResponse && enemy.stun <= 0) {
+      if (this.phase === 'playing' && enemy.kind !== 'boss' && enemy.position.distanceTo(this.cameraPosition) < 0.62 && enemy.age >= enemy.minResponse && enemy.stun <= 0) {
         this.waveEscapes++;
         this._explode(enemy, 0xff5c79, 20);
         this._removeEnemy(i);
         this._damagePlayer(MODELS[enemy.kind].damage, enemy.kind);
-        if (this.phase === 'gameover') break;
+        if (this.phase !== 'playing') break;
       }
     }
   }
@@ -625,6 +762,11 @@ export class GameEngine {
     if (distance > 8.4) enemy.position.addScaledVector(direction, dt * 0.45);
     if (enemy.stun > 0 || enemy.age < 1.4) return;
     enemy.actionTimer -= dt;
+    if (this.phase === 'lastchance' && enemy.actionTimer <= 0) {
+      enemy.actionTimer = 0;
+      enemy.attackCharge = enemy.actionPhase === 'windup' ? 1 : 0;
+      return;
+    }
     if (enemy.actionPhase === 'windup') {
       enemy.attackCharge = Math.min(1, 1 - Math.max(0, enemy.actionTimer) / enemy.windupDuration);
       if (enemy.actionTimer <= 0) {
@@ -689,10 +831,10 @@ export class GameEngine {
       projectile.mesh.children[0].rotation.y += dt * 3;
       projectile.mesh.children[1].rotation.z += dt * 2;
       projectile.distance = projectile.position.distanceTo(this.cameraPosition);
-      if (projectile.distance < 0.45 && projectile.age > 1.8) {
+      if (this.phase === 'playing' && projectile.distance < 0.45 && projectile.age > 1.8) {
         this._destroyProjectile(i, 'impact');
         this._damagePlayer(projectile.damage, 'projectile');
-        if (this.phase === 'gameover') break;
+        if (this.phase !== 'playing') break;
       } else if (projectile.age > 22) this._destroyProjectile(i, 'expired');
     }
   }
@@ -714,6 +856,7 @@ export class GameEngine {
   }
 
   _damagePlayer(rawDamage, kind) {
+    if (this.phase !== 'playing') return;
     const damage = Math.min(this.shield, Math.max(1, Math.round(rawDamage * this.difficulty.damage * this.weapon.damageMultiplier)));
     this.shield = Math.max(0, this.shield - damage);
     this.waveDamage += damage;
@@ -721,18 +864,133 @@ export class GameEngine {
     this.combo = 0;
     this.focus = 0;
     this.onEvent({ type: 'damage', damage, kind, shield: this.shield });
-    if (this.shield <= 0) this._finish(false);
+    if (this.shield <= 0) {
+      if (!this.lastChanceUsed) this._activateLastChance();
+      else this._finish(false);
+    }
+  }
+
+  _activateLastChance() {
+    if (this.lastChanceUsed || this.terminalEmitted || this.phase !== 'playing') return;
+    this._readCamera();
+    this.lastChanceUsed = true;
+    this.lastChanceRemaining = 5;
+    this.lastChanceCollected = 0;
+    this.phase = 'lastchance';
+    this.shield = 0;
+    this.heat = 0;
+    this.overheated = false;
+    this.cooldown = 0;
+    this.focus = 0;
+    this.focusTarget = null;
+    this.focusAnnounced = false;
+    this.target = null;
+    this.portalAim = null;
+    this.combo = 0;
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.cameraQuaternion);
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(this.cameraQuaternion);
+    const origin = this.cameraPosition.clone().addScaledVector(this.cameraDirection, 2.3);
+    for (let i = 0; i < 3; i++) {
+      const position = origin.clone().addScaledVector(right, (i - 1) * 0.38).addScaledVector(up, i === 1 ? 0.2 : -0.12);
+      const mesh = new THREE.Group();
+      const color = i === 1 ? 0xc0a0ff : 0x94fff0;
+      const material = new THREE.MeshBasicMaterial({ color, toneMapped: false });
+      const ringMaterial = additiveMaterial(color, 0.8);
+      const glowMaterial = new THREE.SpriteMaterial({ map: this.texture, color, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+      const body = new THREE.Mesh(this.shardGeometry, material);
+      const ring = new THREE.Mesh(this.ringGeometry, ringMaterial); ring.scale.setScalar(0.225);
+      const glow = new THREE.Sprite(glowMaterial); glow.scale.setScalar(0.6);
+      mesh.add(body, ring, glow);
+      mesh.position.copy(position);
+      mesh.lookAt(this.cameraPosition);
+      mesh.userData.materials = [material, ringMaterial, glowMaterial];
+      this.shardGroup.add(mesh);
+      this.shards.push({ id: this.nextId++, mesh, kind: 'shard', hp: 1, maxHp: 1, position, radius: 0.22, age: 0, distance: position.distanceTo(this.cameraPosition), actionPhase: 'rift', index: i });
+    }
+    this._shockwave(origin, 0xad9aff, 1.8, 0.65, 0.6, true);
+    this.onEvent({ type: 'lastchance', duration: 5, total: 3 });
+    this._publish();
+  }
+
+  _updateShards(dt) {
+    for (const shard of this.shards) {
+      shard.age += dt;
+      shard.distance = shard.mesh.position.distanceTo(this.cameraPosition);
+      shard.mesh.lookAt(this.cameraPosition);
+      shard.mesh.children[0].rotation.y += dt * 1.4;
+      shard.mesh.children[0].rotation.z += dt * 0.5;
+      shard.mesh.children[1].rotation.z -= dt * 0.7;
+      shard.mesh.scale.setScalar(1 + Math.sin(shard.age * 4 + shard.index) * 0.045);
+    }
+  }
+
+  _collectShard(shard) {
+    if (this.phase !== 'lastchance') return;
+    const index = this.shards.indexOf(shard);
+    if (index < 0) return;
+    this._sparks(shard.mesh.position, shard.index === 1 ? 0xc0a0ff : 0x94fff0, 16, 0.9, true);
+    this._shockwave(shard.mesh.position, 0xb5fff5, 0.55, 0.35, 0.8, true);
+    shard.mesh.removeFromParent();
+    shard.mesh.userData.materials.forEach(material => material.dispose());
+    this.shards.splice(index, 1);
+    if (this.target === shard) this.target = null;
+    this.lastChanceCollected++;
+    this.onEvent({ type: 'shardcollected', collected: this.lastChanceCollected, total: 3 });
+    if (this.lastChanceCollected >= 3) this._saveLastChance();
+  }
+
+  _clearShards() {
+    for (const shard of this.shards) {
+      shard.mesh.removeFromParent();
+      shard.mesh.userData.materials.forEach(material => material.dispose());
+    }
+    this.shards.length = 0;
+  }
+
+  _saveLastChance() {
+    if (this.phase !== 'lastchance' || this.lastChanceCollected < 3) return;
+    this.phase = 'playing';
+    this.lastChanceRemaining = 0;
+    this.shield = 35;
+    this.heat = 0;
+    this.overheated = false;
+    this.cooldown = 0;
+    this.target = null;
+    this.focus = 0;
+    this.focusTarget = null;
+    this.riftSaves++;
+    this._clearShards();
+    while (this.projectiles.length) this._destroyProjectile(this.projectiles.length - 1, 'rift');
+    for (const enemy of this.enemies) {
+      enemy.stun = Math.max(enemy.stun, 2);
+      enemy.exposed = Math.max(enemy.exposed, 2);
+      enemy.actionPhase = 'recover';
+      enemy.actionTimer = Math.max(enemy.actionTimer, 2.5);
+      enemy.attackCharge = 0;
+    }
+    this._shockwave(this.cameraPosition.clone().addScaledVector(this.cameraDirection, 2), 0xa5fff1, 3.5, 0.7, 0.8, true);
+    this.onEvent({ type: 'lastchancesaved', shield: 35 });
+    this._publish();
+  }
+
+  _failLastChance() {
+    if (this.phase !== 'lastchance') return;
+    this.lastChanceRemaining = 0;
+    this._clearShards();
+    this.onEvent({ type: 'lastchancefailed' });
+    this._finish(false);
   }
 
   _findTarget() {
     let target = null, bestDistance = Infinity, precise = false;
-    for (const enemy of [...this.enemies, ...this.projectiles]) {
-      if (enemy.age < (enemy.kind === 'projectile' ? 0.05 : 0.18)) continue;
+    const candidates = this.phase === 'lastchance' ? this.shards : [...this.enemies, ...this.projectiles];
+    for (const enemy of candidates) {
+      if (enemy.age < (enemy.kind === 'shard' ? 0 : enemy.kind === 'projectile' ? 0.05 : 0.18)) continue;
       const offset = enemy.mesh.position.clone().sub(this.cameraPosition);
       const distance = offset.length();
       const forwardDistance = offset.dot(this.cameraDirection);
       if (forwardDistance <= 0) continue;
-      const radius = enemy.radius * Math.min(1, enemy.age / 0.6);
+      const radius = enemy.radius * (enemy.kind === 'shard' ? 1 : Math.min(1, enemy.age / 0.6));
       const perpendicular = Math.sqrt(Math.max(0, distance * distance - forwardDistance * forwardDistance));
       if (perpendicular > radius + distance * this.difficulty.assist || distance >= bestDistance) continue;
       target = enemy;
@@ -768,14 +1026,22 @@ export class GameEngine {
   _shielded(enemy) { return (enemy.kind === 'tank' || enemy.kind === 'boss') && enemy.exposed <= 0 && enemy.stun <= 0; }
 
   fire() {
-    if (this.phase !== 'playing' || this.cooldown > 0 || this.overheated) return false;
+    if ((this.phase !== 'playing' && this.phase !== 'lastchance') || this.cooldown > 0 || this.overheated) return false;
     this._readCamera();
     this.cooldown = this.weapon.cooldown;
-    this.shots++;
     this.heat = Math.min(100, this.heat + this.weapon.heatPerShot);
     const target = this._findTarget();
+    this.portalAim = this._findPortalTarget(target);
+    if (this.portalAim) {
+      this._hitPortal(this.portalAim);
+      if (this.heat >= 99.5) { this.overheated = true; this.onEvent({ type: 'overheat' }); }
+      this.target = null;
+      this._publish();
+      return true;
+    }
+    this.shots++;
     const weakpoint = Boolean(target && this.preciseAim);
-    const critical = Boolean(target && target.kind !== 'projectile' && weakpoint && this.focusTarget === target.id && this.focus >= 0.999);
+    const critical = Boolean(this.phase === 'playing' && target && target.kind !== 'projectile' && target.kind !== 'shard' && weakpoint && this.focusTarget === target.id && this.focus >= 0.999);
     const end = target ? (weakpoint && target.mesh.userData.core ? target.mesh.userData.core.getWorldPosition(new THREE.Vector3()) : target.mesh.position.clone()) : this.cameraDirection.clone().multiplyScalar(16).add(this.cameraPosition);
     this._laser(end, Boolean(target), critical);
     this.onEvent({ type: 'shot', hit: Boolean(target), critical, position: end.clone() });
@@ -785,7 +1051,7 @@ export class GameEngine {
       const blocked = this._shielded(target) && !weakpoint;
       if (blocked) { damage *= 0.14; this.shotsBlocked++; }
       else if (this._shielded(target) && !critical) damage *= target.kind === 'boss' ? 0.55 : 0.95;
-      if (target.kind === 'projectile') damage = 1;
+      if (target.kind === 'projectile' || target.kind === 'shard') damage = 1;
       target.hp = Math.max(0, target.hp - damage);
       target.hitFlash = 1;
       if (critical) {
@@ -796,14 +1062,15 @@ export class GameEngine {
         this._shockwave(end, 0xf5ffe8, 0.75, 0.32, 0.8);
         this.onEvent({ type: 'critical', id: target.id, kind: target.kind, damage });
       }
-      this._sparks(end, target.kind === 'projectile' ? 0xffb47c : MODELS[target.kind].color, critical ? 12 : 6, 0.75);
+      this._sparks(end, target.kind === 'shard' ? 0xb2fff0 : target.kind === 'projectile' ? 0xffb47c : MODELS[target.kind].color, critical ? 12 : 6, 0.75, target.kind === 'shard');
       this.onEvent({ type: 'hit', id: target.id, kind: target.kind, hp: target.hp, maxHp: target.maxHp, damage, critical, weakpoint, blocked });
-      if (target.kind === 'projectile') this._destroyProjectile(this.projectiles.indexOf(target), 'laser');
+      if (target.kind === 'shard') this._collectShard(target);
+      else if (target.kind === 'projectile') this._destroyProjectile(this.projectiles.indexOf(target), 'laser');
       else if (target.hp <= 0) this._killEnemy(target, critical ? 'critical' : 'laser');
       else this._updateBossPhase(target);
     } else { this.focus = Math.max(0, this.focus - 0.3); this.combo = Math.max(0, this.combo - 1); }
-    if (this.phase === 'playing' && this.heat >= 99.5) { this.overheated = true; this.focus = 0; this.onEvent({ type: 'overheat' }); }
-    this.target = this.phase === 'playing' ? this._findTarget() : null;
+    if ((this.phase === 'playing' || this.phase === 'lastchance') && this.heat >= 99.5) { this.overheated = true; this.focus = 0; this.onEvent({ type: 'overheat' }); }
+    this.target = this.phase === 'playing' || this.phase === 'lastchance' ? this._findTarget() : null;
     this._publish();
     return true;
   }
@@ -839,18 +1106,21 @@ export class GameEngine {
   _killEnemy(enemy, cause) {
     const index = this.enemies.indexOf(enemy);
     if (index < 0) return;
-    this.combo = this.totalTime - this.lastKillTime <= 4 ? this.combo + 1 : 1;
-    this.bestCombo = Math.max(this.bestCombo, this.combo);
-    this.lastKillTime = this.totalTime;
-    const multiplier = 1 + Math.min(4, Math.floor((this.combo - 1) / 3)) * 0.25;
+    if (cause !== 'portal') {
+      this.combo = this.totalTime - this.lastKillTime <= 4 ? this.combo + 1 : 1;
+      this.bestCombo = Math.max(this.bestCombo, this.combo);
+      this.lastKillTime = this.totalTime;
+    }
+    const multiplier = cause === 'portal' ? 1 : 1 + Math.min(4, Math.floor((this.combo - 1) / 3)) * 0.25;
     const points = Math.round(MODELS[enemy.kind].points * multiplier * (cause === 'critical' ? 1.15 : 1));
     this.score += points;
     this.kills++;
-    if (cause !== 'pulse') this.pulseCharge = Math.min(100, this.pulseCharge + (enemy.kind === 'tank' ? 10 : 6));
+    if (cause === 'portal') this.portalKills++;
+    if (cause !== 'pulse' && cause !== 'portal') this.pulseCharge = Math.min(100, this.pulseCharge + (enemy.kind === 'tank' ? 10 : 6));
     this._explode(enemy, MODELS[enemy.kind].color, enemy.kind === 'boss' ? 95 : enemy.kind === 'tank' ? 44 : 32);
     this._shockwave(enemy.mesh.position, MODELS[enemy.kind].color, enemy.kind === 'boss' ? 3.2 : enemy.kind === 'tank' ? 1.5 : 1.1, enemy.kind === 'boss' ? 1.1 : 0.52, 0.7);
     this.onEvent({ type: 'kill', id: enemy.id, kind: enemy.kind, points, combo: this.combo, cause, position: enemy.mesh.position.clone() });
-    if (this.combo >= 3 && this.combo % 3 === 0) this.onEvent({ type: 'combo', combo: this.combo, multiplier });
+    if (cause !== 'portal' && this.combo >= 3 && this.combo % 3 === 0) this.onEvent({ type: 'combo', combo: this.combo, multiplier });
     this._removeEnemy(index);
     if (enemy.kind === 'boss') { this.bossDefeated = true; this._finish(true); }
   }
@@ -975,30 +1245,48 @@ export class GameEngine {
     this.effects.push({ group, materials, life: 0.105, age: 0, kind: 'laser', initialOpacity: materials.map(material => material.opacity) });
   }
 
-  _shockwave(position, color, radius, life, opacity) {
+  _worldBeam(start, end, color) {
+    const group = new THREE.Group();
+    const direction = end.clone().sub(start);
+    const length = direction.length();
+    if (length < 0.01) return;
+    const midpoint = start.clone().addScaledVector(direction, 0.5);
+    const rotation = new THREE.Quaternion().setFromUnitVectors(UP, direction.normalize());
+    const materials = [additiveMaterial(color, 0.48), additiveMaterial(0xf6ffe8, 0.95)];
+    for (let i = 0; i < 2; i++) {
+      const beam = new THREE.Mesh(this.beamGeometry, materials[i]);
+      beam.position.copy(midpoint); beam.quaternion.copy(rotation);
+      beam.scale.set(i ? 0.0045 : 0.017, length, i ? 0.0045 : 0.017);
+      group.add(beam);
+    }
+    this.effectGroup.add(group);
+    this.effects.push({ group, materials, life: 0.15, age: 0, kind: 'laser', worldTime: true, initialOpacity: materials.map(material => material.opacity) });
+  }
+
+  _shockwave(position, color, radius, life, opacity, playerTime = false) {
     const material = additiveMaterial(color, opacity);
     const mesh = new THREE.Mesh(this.ringGeometry, material);
     mesh.position.copy(position);
     mesh.quaternion.copy(this.cameraQuaternion);
     mesh.scale.setScalar(0.04);
     this.effectGroup.add(mesh);
-    this.effects.push({ group: mesh, materials: [material], life, age: 0, kind: 'ring', radius, initialOpacity: [opacity] });
+    this.effects.push({ group: mesh, materials: [material], life, age: 0, kind: 'ring', radius, playerTime, initialOpacity: [opacity] });
   }
 
-  _addParticle(position, velocity, color, size, life) {
+  _addParticle(position, velocity, color, size, life, playerTime = false) {
     if (this.particles.length >= MAX_PARTICLES) this.particles.shift();
     this.particles.push({
       position: position.clone(), velocity: velocity.clone(), color: new THREE.Color(color),
       rotation: new THREE.Euler(this._fx() * TAU, this._fx() * TAU, this._fx() * TAU),
       spin: new THREE.Vector3(this._fx() * 7 - 3.5, this._fx() * 7 - 3.5, this._fx() * 7 - 3.5),
-      size, life, age: 0,
+      size, life, age: 0, playerTime,
     });
   }
 
-  _sparks(position, color, count, speed = 1) {
+  _sparks(position, color, count, speed = 1, playerTime = false) {
     for (let i = 0; i < count; i++) {
       const velocity = new THREE.Vector3(this._fx() - 0.5, this._fx() - 0.35, this._fx() - 0.5).normalize().multiplyScalar((0.4 + this._fx()) * speed);
-      this._addParticle(position, velocity, i % 4 === 0 ? 0xffffff : color, 0.022 + this._fx() * 0.023, 0.24 + this._fx() * 0.27);
+      this._addParticle(position, velocity, i % 4 === 0 ? 0xffffff : color, 0.022 + this._fx() * 0.023, 0.24 + this._fx() * 0.27, playerTime);
     }
   }
 
@@ -1015,10 +1303,10 @@ export class GameEngine {
     }
   }
 
-  _updateEffects(dt) {
+  _updateEffects(dt, worldDt = dt) {
     for (let i = this.effects.length - 1; i >= 0; i--) {
       const effect = this.effects[i];
-      effect.age += dt;
+      effect.age += effect.playerTime || (effect.kind === 'laser' && !effect.worldTime) ? dt : worldDt;
       const progress = effect.age / effect.life;
       if (progress >= 1) {
         effect.group.removeFromParent();
@@ -1031,18 +1319,19 @@ export class GameEngine {
     }
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const particle = this.particles[i];
-      particle.age += dt;
+      const particleDt = particle.playerTime ? dt : worldDt;
+      particle.age += particleDt;
       if (particle.age >= particle.life) {
         this.particles[i] = this.particles[this.particles.length - 1];
         this.particles.pop();
         continue;
       }
-      particle.velocity.y -= dt * 0.75;
-      particle.velocity.multiplyScalar(Math.max(0, 1 - dt * 0.45));
-      particle.position.addScaledVector(particle.velocity, dt);
-      particle.rotation.x += particle.spin.x * dt;
-      particle.rotation.y += particle.spin.y * dt;
-      particle.rotation.z += particle.spin.z * dt;
+      particle.velocity.y -= particleDt * 0.75;
+      particle.velocity.multiplyScalar(Math.max(0, 1 - particleDt * 0.45));
+      particle.position.addScaledVector(particle.velocity, particleDt);
+      particle.rotation.x += particle.spin.x * particleDt;
+      particle.rotation.y += particle.spin.y * particleDt;
+      particle.rotation.z += particle.spin.z * particleDt;
     }
     for (let i = 0; i < this.particles.length; i++) {
       const particle = this.particles[i];
@@ -1062,18 +1351,26 @@ export class GameEngine {
 
   _updatePortals(dt) {
     for (const portal of this.portals) {
+      const allied = portal.alliedRemaining > 0;
+      const progress = portal.captureProgress / 6;
+      const color = allied ? 0xc3ff79 : progress > 0 ? 0xa9ffcf : CYAN;
       portal.flash = Math.max(0, portal.flash - dt * 1.4);
-      portal.detail.rotation.z += dt * (0.16 + portal.flash);
+      portal.detail.rotation.z += dt * (allied ? 1.2 : 0.16 + portal.flash + progress * 0.7);
       portal.ring.rotation.z -= dt * 0.15;
       const pulse = Math.sin(this.time * 1.8 + portal.seed) * 0.08;
-      portal.ringMaterial.opacity = 0.38 + pulse + portal.flash * 0.6;
-      portal.detailMaterial.opacity = 0.28 + portal.flash * 0.6;
-      portal.glowMaterial.opacity = 0.1 + pulse * 0.4 + portal.flash * 0.25;
+      portal.ringMaterial.color.setHex(color);
+      portal.detailMaterial.color.setHex(color);
+      portal.glowMaterial.color.setHex(color);
+      portal.coreMaterial.color.setHex(allied ? 0xe7ffb0 : progress > 0 ? 0xb7ffdf : 0x7af7d7);
+      portal.core.scale.setScalar(allied ? 0.88 : 0.67 + progress * 0.2);
+      portal.ringMaterial.opacity = (allied ? 0.8 : 0.38) + pulse + portal.flash * 0.6 + progress * 0.12;
+      portal.detailMaterial.opacity = (allied ? 0.64 : 0.28) + portal.flash * 0.6;
+      portal.glowMaterial.opacity = (allied ? 0.24 : 0.1) + pulse * 0.4 + portal.flash * 0.25;
     }
   }
 
   pause() {
-    if (this.phase !== 'playing' && this.phase !== 'intermission') return;
+    if (this.phase !== 'playing' && this.phase !== 'intermission' && this.phase !== 'lastchance') return;
     this.beforePause = this.phase;
     this.phase = 'paused';
     this._publish();
@@ -1086,7 +1383,7 @@ export class GameEngine {
   }
 
   _finish(victory) {
-    if (this.terminalEmitted) return;
+    if (this.terminalEmitted || (victory && this.phase === 'lastchance')) return;
     this.terminalEmitted = true;
     if (victory) {
       this._rewardWave();
@@ -1096,6 +1393,10 @@ export class GameEngine {
     }
     this.phase = victory ? 'victory' : 'gameover';
     this.target = null;
+    this.portalAim = null;
+    this.lastChanceRemaining = 0;
+    this._clearShards();
+    for (const portal of this.portals) { portal.alliedRemaining = 0; portal.captureProgress = 0; }
     this.focus = 0;
     this._publish();
     this.onEvent({ type: 'gameover', victory, state: this.getState() });
@@ -1108,9 +1409,9 @@ export class GameEngine {
   }
 
   getState() {
-    const threats = [...this.enemies, ...this.projectiles].map(enemy => {
+    const threats = [...this.enemies, ...this.projectiles, ...this.shards].map(enemy => {
       const relative = enemy.mesh.position.clone().sub(this.cameraPosition).applyQuaternion(this.cameraQuaternion.clone().invert());
-      const urgency = Math.max(enemy.kind === 'projectile' ? 0.6 : enemy.actionPhase === 'windup' || enemy.actionPhase === 'dash' ? 0.8 : 0, Math.max(0, Math.min(1, 1 - (enemy.distance - 0.6) / 5)));
+      const urgency = enemy.kind === 'shard' ? 0 : Math.max(enemy.kind === 'projectile' ? 0.6 : enemy.actionPhase === 'windup' || enemy.actionPhase === 'dash' ? 0.8 : 0, Math.max(0, Math.min(1, 1 - (enemy.distance - 0.6) / 5)));
       return { id: enemy.id, kind: enemy.kind, angle: Math.atan2(relative.x, -relative.z), elevation: Math.atan2(relative.y, Math.hypot(relative.x, relative.z)), distance: enemy.distance, hp: enemy.hp, maxHp: enemy.maxHp, behind: relative.z > 0, urgency, actionPhase: enemy.actionPhase, attackCharge: enemy.attackCharge || 0, stunned: enemy.stun > 0 };
     });
     const bossEnemy = this.enemies.find(enemy => enemy.kind === 'boss');
@@ -1119,14 +1420,22 @@ export class GameEngine {
     const completed = config ? config.count - this.spawnRemaining - this.enemies.length : 0;
     const waveProgress = this.waveResolved || this.phase === 'victory' ? 1 : boss ? 1 - boss.hp / boss.maxHp : config ? Math.max(0, Math.min(1, completed / config.count)) : 0;
     const targetShielded = Boolean(this.target && this._shielded(this.target));
-    const criticalReady = Boolean(this.target && this.focusTarget === this.target.id && this.focus >= 0.999 && this.preciseAim && !this.overheated);
+    const criticalReady = Boolean(this.phase === 'playing' && this.target && this.focusTarget === this.target.id && this.focus >= 0.999 && this.preciseAim && !this.overheated);
+    const portal = this.phase === 'playing' ? this.portalAim : null;
+    const portalTarget = portal ? { id: portal.id, progress: portal.alliedRemaining > 0 ? 1 : portal.captureProgress / 6, capturable: !this.portalCaptureUsed && portal.alliedRemaining <= 0, allied: portal.alliedRemaining > 0, remaining: portal.alliedRemaining } : null;
+    const alliedPortal = this.portals.find(item => item.alliedRemaining > 0);
+    const riftActive = this.phase === 'lastchance' || (this.phase === 'paused' && this.beforePause === 'lastchance');
     let targetHint = '';
-    if (this.target?.kind === 'projectile') targetHint = 'Сбейте заряд одним выстрелом';
+    if (this.target?.kind === 'shard') targetHint = 'Соберите осколок одним выстрелом';
+    else if (this.target?.kind === 'projectile') targetHint = 'Сбейте заряд одним выстрелом';
     else if (criticalReady) targetHint = 'Фокус готов · критический выстрел';
     else if (targetShielded) targetHint = this.preciseAim ? 'Ядро в прицеле · удерживайте фокус' : 'Броня · наведитесь на светящееся ядро';
     else if (this.target?.kind === 'boss') targetHint = 'Ядро открыто · полный урон';
     else if (this.target?.actionPhase === 'windup') targetHint = 'Рывок скоро · огонь или ЭМИ';
     else if (this.target) targetHint = this.preciseAim ? 'Точная наводка заряжает фокус' : 'Наведите центр прицела на цель';
+    else if (portalTarget?.allied) targetHint = `Союзная турель · ${Math.ceil(portalTarget.remaining)} с`;
+    else if (portalTarget?.capturable) targetHint = `Удерживайте огонь · захват ${Math.floor(portal.captureProgress)} / 6`;
+    else if (portalTarget) targetHint = 'Захват использован · снова в следующей волне';
     return {
       score: this.score, kills: this.kills, wave: this.wave, totalWaves: 5,
       waveName: config?.name || '', waveDescription: config?.description || '', waveProgress,
@@ -1135,9 +1444,9 @@ export class GameEngine {
       shots: this.shots, hits: this.hits, shotsBlocked: this.shotsBlocked, criticals: this.criticals, pulseCharge: this.pulseCharge,
       elapsed: this.totalTime, remaining: this.spawnRemaining + this.enemies.length,
       incoming: this.enemies.length + this.projectiles.length, enemies: this.enemies.length, projectiles: this.projectiles.length, projectilesDestroyed: this.projectilesDestroyed, phase: this.phase,
-      targeted: Boolean(this.target), targetKind: this.target?.kind || null,
-      targetHealth: this.target ? this.target.hp / this.target.maxHp : 0,
-      targetHp: this.target?.hp || 0, targetMaxHp: this.target?.maxHp || 0, targetShielded, targetHint,
+      targeted: Boolean(this.target || portalTarget), targetKind: this.target?.kind || (portalTarget ? 'portal' : null),
+      targetHealth: this.target ? this.target.hp / this.target.maxHp : portalTarget?.progress || 0,
+      targetHp: this.target?.hp || (portalTarget ? Math.floor(portal.captureProgress) : 0), targetMaxHp: this.target?.maxHp || (portalTarget ? 6 : 0), targetShielded, targetHint,
       focus: this.focus, focusTarget: this.focusTarget, criticalReady, preciseAim: this.preciseAim,
       nearestDistance: threats.length ? Math.min(...threats.map(threat => threat.distance)) : null,
       intermission: Math.max(0, this.intermission), threats, boss,
@@ -1146,16 +1455,25 @@ export class GameEngine {
       modifiers: { ...this.weapon }, perfectWaves: this.perfectWaves, grade: this._grade(),
       damageTaken: this.totalDamageTaken, seed: this.seed, difficulty: this.difficultyName || 'normal',
       waveSummary: this.waveSummary ? { ...this.waveSummary } : null,
+      portalTarget, portalCaptureReady: this.phase === 'playing' && !this.portalCaptureUsed,
+      capturedPortal: alliedPortal ? { id: alliedPortal.id, remaining: alliedPortal.alliedRemaining, duration: 10 } : null,
+      portalCaptures: this.portalCaptures, portalKills: this.portalKills, portalShots: this.portalShots, portalAllyShots: this.portalAllyShots, portalInterceptions: this.portalInterceptions,
+      lastChance: { active: riftActive, used: this.lastChanceUsed, remaining: this.lastChanceRemaining, duration: 5, collected: this.lastChanceCollected, total: 3 },
+      timeScale: this.phase === 'lastchance' ? 0.12 : ['paused', 'upgrade', 'idle', 'victory', 'gameover'].includes(this.phase) ? 0 : 1,
+      riftSaves: this.riftSaves,
     };
   }
 
-  getEnemies() { return [...this.enemies, ...this.projectiles]; }
+  getEnemies() { return [...this.enemies, ...this.projectiles, ...this.shards]; }
+  getPortals() { return this.portals; }
 
   _publish() { this.onUpdate(this.getState()); }
 
   stop() {
     this.phase = 'idle';
     this.target = null;
+    this.portalAim = null;
+    this._clearShards();
     while (this.enemies.length) this._removeEnemy(this.enemies.length - 1);
     for (const projectile of this.projectiles) {
       projectile.mesh.removeFromParent();
@@ -1180,6 +1498,7 @@ export class GameEngine {
     this.upgradeOffers = [];
     this.focus = 0;
     this.focusTarget = null;
+    this.lastChanceRemaining = 0;
     this.group.visible = false;
   }
 
@@ -1195,6 +1514,7 @@ export class GameEngine {
     this.portalDisk.dispose();
     this.projectileGeometry.dispose();
     this.coreGeometry.dispose();
+    this.shardGeometry.dispose();
     this.texture.dispose();
     this.particleMaterial.dispose();
     this.particleMesh.dispose();

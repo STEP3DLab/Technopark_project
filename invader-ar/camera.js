@@ -54,6 +54,7 @@ function updateTargets(hits,t){
       if(hit.corners)item.corners=hit.corners.map((p,i)=>({x:item.corners[i].x+(p.x-item.corners[i].x)*k,y:item.corners[i].y+(p.y-item.corners[i].y)*k}));
       else{
         for(const key of ['x','y','width'])item[key]+=(hit[key]-item[key])*k;
+        item.score=hit.score;
         item.angle+=Math.atan2(Math.sin(hit.angle-item.angle),Math.cos(hit.angle-item.angle))*k;
       }
       item.seen=t;
@@ -135,6 +136,26 @@ function render(ms){
           cone.addColorStop(0,'rgba('+light+',0)');cone.addColorStop(.7,'rgba('+light+',.12)');cone.addColorStop(1,'rgba('+light+',.26)');
           ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(p.x-size*.34,p.y-rise);ctx.lineTo(p.x+size*.34,p.y-rise);ctx.lineTo(p.x+size*.07,p.y);ctx.lineTo(p.x-size*.07,p.y);ctx.closePath();ctx.fill();
         }
+        const ux=p.x,uy=p.y-rise;
+        // Telemetry follows the acquired drawing, in the same camera coordinate system.
+        const pixel=w/Math.max(1,overlay.clientWidth);
+        const side=ux<w*.59?1:-1;
+        const labelX=clamp(ux+side*size*.68,68*pixel,w-68*pixel);
+        const labelY=clamp(uy-size*.26,83*pixel,h-96*pixel);
+        ctx.save();ctx.globalAlpha=.82*reveal;ctx.strokeStyle='rgba(235,221,255,.78)';ctx.lineWidth=pixel;
+        ctx.beginPath();ctx.moveTo(ux+side*size*.39,uy-size*.12);ctx.lineTo(labelX-side*7*pixel,labelY);ctx.lineTo(labelX+side*36*pixel,labelY);ctx.stroke();
+        ctx.font='600 '+10*pixel+'px monospace';ctx.textBaseline='bottom';ctx.textAlign=side>0?'left':'right';ctx.shadowColor='#080410';ctx.shadowBlur=3*pixel;
+        ctx.fillStyle='#fff5ff';ctx.fillText('INV·01',labelX,labelY-2*pixel);
+        ctx.font=9*pixel+'px monospace';ctx.textBaseline='top';ctx.fillStyle='#dcffed';ctx.fillText(Math.round(item.score*100)+'%',labelX,labelY+3*pixel);
+        ctx.restore();
+        if(energy>0){
+          ctx.save();const u=1-energy;
+          ctx.strokeStyle='rgba(210,176,255,'+energy*.84+')';ctx.lineWidth=Math.max(1,size*.013*energy);
+          ctx.beginPath();ctx.ellipse(ux,uy,size*(.21+u*.90),size*(.12+u*.67),-.16,0,Math.PI*2);ctx.stroke();
+          ctx.fillStyle='rgba(235,212,255,'+energy+')';
+          for(let i=0;i<26;i++){const a=i*2.4,rad=size*(.25+u*(.48+(i%5)*.11));const d=(3-i%3)*pixel;ctx.fillRect(ux+Math.cos(a)*rad,uy+Math.sin(a)*rad*.80,d,d);}
+          ctx.restore();
+        }
         matrix=compose(projection,translate(x,y,-depth),rz(-item.angle*(1-.78*reveal)),rx(.16),ry(-.24+.27*Math.sin(t*1.15)),scale(1.04));
       }
       graphics.draw(matrix,t,{reveal,color,pulse:energy});
@@ -154,4 +175,5 @@ function saveShot(source,sw,sh,w,h){
   out.toBlob(blob=>{if(!blob)return;const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;link.download='invader-lab-'+Date.now()+'.jpg';link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);},'image/jpeg',.93);
 }
 $('snap').onclick=()=>{snapshot=true;options.chime('snap');};
-$('livePulse').onclick=()=>{pulseAt=now();options.chime('pulse');};
+function triggerPulse(){if(!targets.size)return;pulseAt=now();options.chime('pulse');}
+$('livePulse').onclick=triggerPulse;overlay.onclick=triggerPulse;

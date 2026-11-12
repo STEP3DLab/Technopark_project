@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0b0c12">
+<title>Invader Lab — AR-захватчик</title>
+<meta name="description" content="Оживите пиксельного захватчика на татуировке и разместите голограммы в своей комнате.">
+<link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+<symbol id="scan" viewBox="0 0 24 24"><path d="M3 8V4h5m8 0h5v4M3 16v4h5m8 0h5v-4M3 12h18"/></symbol>
+<symbol id="help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 0 1 5 .2c0 2-2.6 2.2-2.6 4m0 2.3v.2"/></symbol>
+<symbol id="sound" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zm12-1a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+<symbol id="mute" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zm13 1 5 5m0-5-5 5"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="diag" viewBox="0 0 24 24"><path d="M6 18 18 6M7 6h11v11"/></symbol>
+<symbol id="rotate" viewBox="0 0 24 24"><path d="M7 7a7 7 0 1 1-2.1 7.7M4 4.5v5h5"/></symbol>
+<symbol id="volume" viewBox="0 0 24 24"><path d="m12 2 8.5 5v10L12 22l-8.5-5V7zM3.7 7.1l8.3 5 8.3-5M12 12v10"/></symbol>
+<symbol id="tag" viewBox="0 0 24 24"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm12 0h3v3h3m-6 0v4h6"/></symbol>
+<symbol id="close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+<symbol id="photo" viewBox="0 0 24 24"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="pulse" viewBox="0 0 24 24"><path d="M2 12h5l3-8 4 16 3-8h5"/></symbol>
+<symbol id="move" viewBox="0 0 24 24"><path d="M2 12h20M6 8l-4 4 4 4m12-8 4 4-4 4"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><path d="M5 10h14v11H5zM8 10V7a4 4 0 1 1 8 0v3"/></symbol>
+<symbol id="layer" viewBox="0 0 24 24"><path d="m2 8 10-5 10 5-10 5zm0 5 10 5 10-5M2 18l10 5 10-5"/></symbol>
+</defs></svg>
+<header class="head"><div class="frame nav"><a class="brand" href="./" aria-label="Invader Lab, главная"><img src="icon.svg" alt=""><span>INVADER<span class="brand-lab">LAB</span></span></a><div class="nav-tools"><button id="helpButton" class="bare help"><svg><use href="#help"/></svg><span>Как это работает</span></button><i></i><button class="iconbtn" id="soundButton" aria-label="Включить звук" aria-pressed="false"><svg><use href="#mute"/></svg></button></div></div></header>
+<main class="frame">
+<section class="hero">
+<div class="intro"><p class="eyebrow"><span class="signal"><b></b><b></b><b></b><b></b></span>Дополненная реальность</p><h1>Разбуди<br><em>захватчика<span>.</span></em></h1><p class="lede">Наведи камеру на татуировку — и пиксельный пришелец соберётся над рукой. Затем выпусти его в комнату.</p><button class="primary" id="startScan"><svg><use href="#scan"/></svg>Запустить сканер<svg class="end"><use href="#arrow"/></svg></button><p class="micro"><span class="dot"></span>Камера обрабатывается на устройстве</p></div>
+<section class="viewer" aria-label="Интерактивная 3D-модель захватчика">
+<div class="viewer-meta"><span class="chip"><span class="dot"></span>ГОЛОПРОЕКТОР</span><span class="spec">INV–01</span></div>
+<canvas id="sky" aria-hidden="true"></canvas><canvas id="model" tabindex="0" aria-label="3D-захватчик. Поверните перетаскиванием или клавишами со стрелками."></canvas>
+<div class="viewer-tools"><span class="drag"><svg><use href="#move"/></svg>Вращай модель</span><div id="colors" class="colors" aria-label="Цвет проекции"><button data-color="violet" aria-label="Аметист" title="Аметист" aria-pressed="true"></button><button data-color="cyan" aria-label="Лёд" title="Лёд" aria-pressed="false"></button><button data-color="amber" aria-label="Янтарь" title="Янтарь" aria-pressed="false"></button></div><button class="viewer-reset" id="resetView" title="Вернуть исходный вид" aria-label="Вернуть исходный вид"><svg><use href="#rotate"/></svg></button></div>
+</section></section>
+<section class="modes"><div class="section-label"><h2>Пространственные режимы</h2><span></span></div><div class="cards">
+<button class="mode-card" id="roomButton"><span class="mode-art art-room" aria-hidden="true"><svg viewBox="0 0 80 76"><path class="gridline" d="m1 54 38-19 40 19-38 19zM13 60l39-19M27 67l39-19M15 47l39 20M29 40l39 20"/><path class="base" d="m25 48 15-8 15 8-15 8z"/><path class="cubeL" d="m24 22 16 8v18l-16-8z"/><path class="cubeR" d="m40 30 16-8v18l-16 8z"/><path class="cubeT" d="m24 22 16-8 16 8-16 8z"/><path class="minor" d="M13 26v-9l10-5m35 0 10 5v9m-54 8v7l7 4m46-11v7l-7 4"/></svg></span><span class="card-content"><strong>AR-комната</strong><small>Размещай захватчиков на полу и на столе.</small></span><svg class="card-arrow"><use href="#diag"/></svg></button>
+<button class="mode-card" id="beaconButton"><span class="mode-art art-tags" aria-hidden="true"><svg viewBox="0 0 80 76"><g transform="translate(14 9) rotate(-10 24 25)"><path class="back-card" d="M2 2h38v45H2z"/></g><g transform="translate(27 14) rotate(9 22 25)"><path class="front-card" d="M0 0h36v46H0z"/><path class="tagbits" d="M7 7h9v9H7zm14 0h9v9h-9zM7 21h9v9H7zm14 0h4v4h-4zm6 5h4v5h-4zM7 35h22v2H7z"/></g></svg></span><span class="card-content"><strong>Станции с метками</strong><small>Оставь метки в комнате и возвращайся к ним.</small></span><svg class="card-arrow"><use href="#diag"/></svg></button></div></section>
+</main>
+<footer class="frame foot"><span>INVADER LAB</span><span>Лаборатория пространственных экспериментов</span></footer>
+<dialog id="info"><div class="dialog-bar"><span class="mono" id="dialogKicker"></span><button class="iconbtn" id="dialogClose" aria-label="Закрыть"><svg><use href="#close"/></svg></button></div><div id="dialogBody"></div></dialog>
+<section id="live" hidden aria-label="Камера дополненной реальности"><video id="feed" playsinline autoplay muted></video><canvas id="aura" aria-hidden="true"></canvas><canvas id="overlay"></canvas><div class="live-top"><span class="live-name"><span class="dot"></span><span id="liveTitle">СКАНЕР</span></span><button class="hud-btn" id="liveClose" aria-label="Закрыть камеру"><svg><use href="#close"/></svg></button></div><div id="reticle" class="reticle"><i></i><i></i><i></i><i></i></div><div class="live-bottom"><div id="liveState" class="status" aria-live="polite"></div><div class="live-actions"><button class="hud-btn" id="livePulse" title="Энергетический импульс" aria-label="Энергетический импульс"><svg><use href="#pulse"/></svg></button><button class="hud-btn" id="snap" title="Сохранить снимок" aria-label="Сохранить снимок"><svg><use href="#photo"/></svg></button><button class="hud-btn wide" id="transfer"><svg><use href="#volume"/></svg>В комнату</button></div></div></section>
+<section id="xrHud" hidden aria-label="Расстановка в комнате"><div class="live-top"><span class="live-name"><span class="dot"></span>AR-КОМНАТА</span><button class="hud-btn" id="xrExit" aria-label="Завершить сеанс"><svg><use href="#close"/></svg></button></div><div class="live-bottom"><div class="status" id="xrState" aria-live="polite"></div><div class="live-actions"><button class="hud-btn wide" id="xrUndo">Убрать последнего</button><button class="hud-btn wide highlight" id="xrPlace">+ Разместить</button></div></div></section>
+<input hidden id="choosePhoto" type="file" accept="image/*"><div id="toast" class="toast" role="status" hidden></div>
+<script type="module" src="app.js"></script>
+</body></html>

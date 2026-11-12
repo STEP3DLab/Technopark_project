@@ -6,14 +6,21 @@ const $=id=>document.getElementById(id);
 const feed=$('feed'),overlay=$('overlay'),aura=$('aura'),surface=$('live'),sample=document.createElement('canvas');
 const read=sample.getContext('2d',{willReadFrequently:true});
 let graphics,frame=0,stream,still,serial=0,mode=null,targets=new Map(),sampleTime=-Infinity,pulseAt=-10,lastStatus='',snapshot=false;
-let options;
+let options,shotUrl;
+const shotDialog=document.createElement('dialog');
+shotDialog.setAttribute('aria-label','Снимок голограммы');
+shotDialog.innerHTML='<div class="dialog-bar"><span class="mono">Снимок голограммы</span><button class="iconbtn" aria-label="Закрыть снимок">×</button></div><img alt="Сохранённый кадр с захватчиком" style="display:block;max-width:100%;max-height:56dvh;margin:auto;object-fit:contain;border-radius:7px"><a class="secondary" download>Скачать JPEG</a>';
+document.body.append(shotDialog);
+shotDialog.querySelector('button').onclick=()=>shotDialog.close();
+shotDialog.addEventListener('close',()=>{if(shotUrl){URL.revokeObjectURL(shotUrl);shotUrl=null;}});
+
 const now=()=>performance.now()/1000;
 const beaconColors=['violet','cyan','amber','violet'];
 function status(message){
   if(message!==lastStatus){lastStatus=message;$('liveState').textContent=message;}
 }
 export function stopCamera(){
-  serial++;cancelAnimationFrame(frame);
+  serial++;cancelAnimationFrame(frame);if(shotDialog.open)shotDialog.close();
   if(stream)stream.getTracks().forEach(t=>{t.onended=null;t.stop();});
   stream=null;feed.pause();feed.srcObject=null;feed.style.visibility='';surface.style.backgroundImage='';
   still=null;mode=null;surface.hidden=true;targets.clear();document.body.classList.remove('no-scroll');
@@ -124,7 +131,11 @@ function render(ms){
         if(!pose)continue;
         const midpoint=pts.reduce((p,a)=>({x:p.x+a.x/4,y:p.y+a.y/4}),{x:0,y:0}),side=Math.hypot(pts[1].x-pts[0].x,pts[1].y-pts[0].y);
         rings(ctx,midpoint.x,midpoint.y,side,Math.atan2(pts[1].y-pts[0].y,pts[1].x-pts[0].x),t,color,energy);
-        matrix=compose(projection,pose,translate(0,.07,.29+.04*Math.sin(t*1.8+id)),ry(.20*Math.sin(t+id)),scale(.88));
+        // The emitter follows the physical plane; its pilot turns toward the observer.
+        const lift=.12+.018*Math.sin(t*1.8+id);
+        const position=translate(pose[12]+pose[8]*lift,pose[13]+pose[9]*lift+.18,pose[14]+pose[10]*lift);
+        const apparent=side*Math.abs(pose[14])/focal;
+        matrix=compose(projection,position,rx(.13+pose[9]*.11),ry(-.25+pose[8]*.22+.17*Math.sin(t+id)),scale(apparent*.88));
       }else{
         const p=screen(item),size=item.width*cover;
         const rise=(.83+.035*Math.sin(t*2))*size*Math.min(age*1.65,1);
@@ -172,7 +183,14 @@ function saveShot(source,sw,sh,w,h){
   const out=document.createElement('canvas');out.width=w;out.height=h;const ctx=out.getContext('2d'),c=Math.max(w/sw,h/sh);
   ctx.drawImage(source,(w-sw*c)/2,(h-sh*c)/2,sw*c,sh*c);ctx.drawImage(aura,0,0);ctx.drawImage(overlay,0,0);
   ctx.font='600 '+Math.max(12,Math.round(w*.019))+'px monospace';ctx.fillStyle='white';ctx.shadowColor='black';ctx.shadowBlur=3;ctx.fillText('INVADER LAB',w*.035,h*.96);
-  out.toBlob(blob=>{if(!blob)return;const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;link.download='invader-lab-'+Date.now()+'.jpg';link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);},'image/jpeg',.93);
+  const ticket=serial;
+  out.toBlob(blob=>{
+    if(!blob||ticket!==serial||shotDialog.open)return;
+    shotUrl=URL.createObjectURL(blob);
+    const link=shotDialog.querySelector('a');
+    link.href=shotUrl;link.download='invader-lab-'+Date.now()+'.jpg';shotDialog.querySelector('img').src=shotUrl;
+    shotDialog.showModal();
+  },'image/jpeg',.93);
 }
 $('snap').onclick=()=>{snapshot=true;options.chime('snap');};
 function triggerPulse(){if(!targets.size)return;pulseAt=now();options.chime('pulse');}

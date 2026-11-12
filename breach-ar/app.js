@@ -33,6 +33,8 @@ function error(title, message) { $('error-title').textContent = title; $('error-
 function setBusy(busy, label = '') {
   state.busy = busy;
   for (const id of ['start-ar', 'start-camera', 'start-demo']) $(id).disabled = busy || (id === 'start-ar' && !state.xrSupported);
+  $('start-demo').hidden = busy;
+  if ($('cancel-launch')) $('cancel-launch').hidden = !busy;
   if (label) $('capability').textContent = label;
 }
 function soundUI() {
@@ -508,6 +510,7 @@ function resize() {
 
 function bindInput() {
   $('start-demo').addEventListener('click', startDemo); $('start-camera').addEventListener('click', startCamera); $('start-ar').addEventListener('click', startAR);
+  $('cancel-launch')?.addEventListener('click', home);
   $('place-portal').addEventListener('click', placePortal); $('begin-mission').addEventListener('click', beginMission); $('setup-cancel').addEventListener('click', home);
   $('pause-button').addEventListener('click', pauseGame); $('resume-button').addEventListener('click', resumeGame); $('quit-button').addEventListener('click', home);
   $('retry-button').addEventListener('click', retry); $('home-button').addEventListener('click', home);
@@ -575,7 +578,7 @@ function bindInput() {
   window.addEventListener('resize', resize);
   window.addEventListener('blur', () => { state.firing = false; pauseGame(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { state.firing = false; pauseGame(); } });
-  window.addEventListener('pagehide', () => { launchEpoch++; stopCamera(); state.firing = false; session?.end().catch(() => {}); audio.stop(); });
+  window.addEventListener('pagehide', () => { launchEpoch++; setBusy(false); stopCamera(); state.firing = false; session?.end().catch(() => {}); audio.stop(); });
   window.addEventListener('pageshow', () => { if (state.mode === 'camera' && !stream && state.stage !== 'results') { setBusy(false); restoreLobby(); toast('Запустите камеру снова, чтобы продолжить'); } });
   $('scene').addEventListener('webglcontextlost', event => { event.preventDefault(); pauseGame(); error('Графика приостановлена', 'Браузер освободил графическую память. Обновите страницу, чтобы вернуться в игру.'); });
 }

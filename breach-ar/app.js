@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
 import { GameEngine, createInvaderMesh, WAVE_CONFIG, UPGRADE_CATALOG } from './engine.js?v=2.0';
 import { SoundEngine } from './audio.js?v=2.0';
-import { CanvasRenderer } from './canvas-renderer.js?v=1.1';
+import { CanvasRenderer } from './canvas-renderer.js?v=2.1';
 
 const $ = (id) => document.getElementById(id);
 const clamp = THREE.MathUtils.clamp;
@@ -26,6 +26,7 @@ const UPGRADE_ICONS = { cooling: 'i-expand', capacitor: 'i-pulse', focus: 'i-cro
 const vector = new THREE.Vector3(), quaternion = new THREE.Quaternion();
 const orientation = { enabled: false, received: false, raw: new THREE.Quaternion(), zero: null, yaw: 0, pitch: 0, timer: null };
 const touchAim = { yaw: 0, pitch: 0, targetYaw: 0, targetPitch: 0 };
+const touchLayout = () => innerWidth < 700 || window.matchMedia('(pointer: coarse)').matches;
 
 function toast(message, duration = 2800) {
   clearTimeout(toastTimer);
@@ -110,14 +111,14 @@ function makeHero() {
 
 function makeArena() {
   const group = new THREE.Group();
-  const grid = new THREE.GridHelper(70, 70, 0x28645c, 0x142b30); grid.position.set(0, -1.6, -14);
+  const grid = new THREE.GridHelper(70, state.software ? 28 : 70, 0x28645c, 0x142b30); grid.position.set(0, -1.6, -14);
   grid.material.transparent = true; grid.material.opacity = .55; group.add(grid);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x080f15, roughness: .9, metalness: .15 }));
   floor.rotation.x = -Math.PI / 2; floor.position.set(0, -1.62, -14); group.add(floor);
   const pillarGeo = new THREE.BoxGeometry(1.2, 4.6, 1.2);
   const pillarMat = new THREE.MeshStandardMaterial({ color: 0x0b1b22, metalness: .55, roughness: .35 });
   const edgeMat = new THREE.LineBasicMaterial({ color: 0x2e6a68, transparent: true, opacity: .55 });
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < (state.software ? 4 : 6); i++) {
     for (const sign of [-1, 1]) {
       const pillar = new THREE.Mesh(pillarGeo, pillarMat); pillar.position.set(sign * (4.4 + i * .4), .6, -4 - i * 5.5);
       pillar.add(new THREE.LineSegments(new THREE.EdgesGeometry(pillarGeo), edgeMat)); group.add(pillar);
@@ -126,7 +127,7 @@ function makeArena() {
     }
   }
   const geo = new THREE.BufferGeometry(), points = [];
-  for (let i = 0; i < 220; i++) points.push(Math.sin(i * 128.1) * 25, Math.cos(i * 93.7) * 10 + 3, -Math.abs(Math.sin(i * 17.3)) * 40 - 3);
+  for (let i = 0; i < (state.software ? 75 : 220); i++) points.push(Math.sin(i * 128.1) * 25, Math.cos(i * 93.7) * 10 + 3, -Math.abs(Math.sin(i * 17.3)) * 40 - 3);
   geo.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
   group.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x85a9aa, size: .025, transparent: true, opacity: .5 })));
   return group;
@@ -148,7 +149,7 @@ function setView(mode, stage) {
   $('camera-feed').hidden = mode !== 'camera';
   const modeText = mode === 'ar' ? 'ПРОСТРАНСТВЕННЫЙ AR' : mode === 'camera' ? 'КАМЕРА · 360°' : 'ТРЕНИРОВКА';
   $('mode-label').textContent = modeText;
-  if ($('control-hint')) $('control-hint').textContent = mode === 'demo' ? 'МЫШЬ / СВАЙП — ПРИЦЕЛ · ПРОБЕЛ — ОГОНЬ · E — ИМПУЛЬС' : 'ПОВОРАЧИВАЙ ТЕЛЕФОН · ДЕРЖИ ПРИЦЕЛ ДЛЯ КРИТИЧЕСКОГО УДАРА';
+  if ($('control-hint')) $('control-hint').textContent = mode === 'demo' ? touchLayout() ? 'ВЕДИ ПРИЦЕЛ ПАЛЬЦЕМ · УДЕРЖИВАЙ ОГОНЬ' : 'МЫШЬ — ПРИЦЕЛ · ПРОБЕЛ — ОГОНЬ · E — ИМПУЛЬС' : 'ПОВОРАЧИВАЙ ТЕЛЕФОН · ДЕРЖИ ПРИЦЕЛ ДЛЯ КРИТИЧЕСКОГО УДАРА';
   resize();
 }
 
@@ -309,7 +310,7 @@ function beginMission() {
   const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value || 'normal';
   state.difficulty = difficulty;
   engine.start({ mode: state.mode, difficulty, portals: state.portals.length ? state.portals : autoPortals() });
-  const message = state.mode === 'demo' ? 'Мышь / свайп — прицел. Пробел — огонь. Держи прицел на ядре для критического удара.' : 'Держи прицел на ядре для критического удара. Огонь — короткими очередями.';
+  const message = state.mode === 'demo' ? touchLayout() ? 'Прицел — свайпом. Огонь — кнопкой. Держи прицел на ядре для критического удара.' : 'Мышь — прицел. Пробел — огонь. Держи прицел на ядре для критического удара.' : 'Держи прицел на ядре для критического удара. Огонь — короткими очередями.';
   toast(message, 4800);
 }
 
@@ -467,7 +468,7 @@ function chooseUpgrade(id) {
   state.firing = false; setView(state.mode, 'playing'); previousTime = performance.now(); lastUIPhase = '';
   $('pause-button').focus({ preventScroll: true });
   const catalog = Array.isArray(UPGRADE_CATALOG) ? UPGRADE_CATALOG.find(item => item.id === id) : UPGRADE_CATALOG[id];
-  toast(`${catalog?.title || 'Улучшение'} установлено`, 2000); requestWakeLock();
+  toast(`Установлено: ${catalog?.title || 'улучшение'}`, 2000); requestWakeLock();
 }
 function drawThreats(stats) {
   const container = $('threat-indicators');
@@ -516,11 +517,11 @@ function drawRadar(stats) {
 
 function pauseGame() {
   if (state.stage !== 'playing') return;
-  state.firing = false; engine.pause(); state.stage = 'paused'; dialogOpen('pause-dialog');
+  state.firing = false; state.stage = 'paused'; engine.pause(); dialogOpen('pause-dialog');
 }
 function resumeGame() {
   if (state.stage !== 'paused') return;
-  audio.unlock(); engine.resume(); state.stage = 'playing'; previousTime = performance.now(); dialogClose('pause-dialog'); requestWakeLock();
+  audio.unlock(); state.stage = 'playing'; engine.resume(); previousTime = performance.now(); dialogClose('pause-dialog'); requestWakeLock();
 }
 function finishGame(victory, stats) {
   state.firing = false; pointer = null; clearCombatMessages(); lastResult = { victory: !!victory, stats: { ...stats } };
@@ -598,7 +599,11 @@ function updateCamera(dt) {
   camera.updateMatrixWorld();
 }
 function frame(time, xrFrame) {
-  const dt = previousTime ? Math.min((time - previousTime) / 1000, .05) : .016; previousTime = time;
+  // Keep combat time consistent on slower devices. Small simulation steps
+  // retain collision/firing accuracy while one scene is drawn per RAF.
+  // A bounded catch-up avoids damage bursts after a suspended browser tab.
+  const frameDelta = previousTime ? clamp((time - previousTime) / 1000, 0, .25) : .016; previousTime = time;
+  const dt = Math.min(frameDelta, .05);
   const seconds = time / 1000;
   let tracked = state.mode !== 'ar';
   if (state.mode === 'ar' && xrFrame) {
@@ -635,7 +640,7 @@ function frame(time, xrFrame) {
         }
       }
     } else if (!trackingLost) { trackingLost = true; toast('Медленно наведите камеру на освещённую поверхность', 4000); }
-  } else updateCamera(dt);
+  } else updateCamera(frameDelta);
   if (state.mode === 'lobby') animateHero(seconds);
   if (state.stage === 'setup' && tracked) {
     placement.position.copy(placementPosition()); placement.lookAt(activeCamera().position);
@@ -644,9 +649,14 @@ function frame(time, xrFrame) {
     for (const marker of markers.children) marker.children[1].rotation.z += dt * .35;
   }
   if (state.stage === 'playing' && tracked) {
-    if (state.firing) engine.fire();
-    engine.update(dt, seconds);
-  } else if (state.stage === 'results' || state.stage === 'upgrade') engine.update(dt, seconds);
+    let remaining = frameDelta;
+    while (remaining > .00001 && state.stage === 'playing') {
+      const step = Math.min(remaining, .05);
+      if (state.firing) engine.fire();
+      engine.update(step, seconds);
+      remaining -= step;
+    }
+  } else if (state.stage === 'results' || state.stage === 'upgrade') engine.update(Math.min(frameDelta, .07), seconds);
   renderer.render(scene, camera);
 }
 function animateHero(seconds) {

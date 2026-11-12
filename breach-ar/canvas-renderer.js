@@ -4,7 +4,13 @@ import * as THREE from './vendor/three.module.js';
 // world-space scene/camera used by aiming and gameplay; it does not emulate XR.
 const MAX_COMMANDS = 14000;
 const WHITE = new THREE.Color(0xffffff);
-const linearToByte = value => Math.round(Math.min(1, Math.max(0, value <= 0.0031308 ? value * 12.92 : 1.055 * Math.pow(value, 1 / 2.4) - 0.055)) * 255);
+// Flat shading reuses a compact transfer-function table instead of running
+// three gamma powers for every voxel face on every frame.
+const SRGB_TABLE = Uint8Array.from({ length: 4097 }, (_, index) => {
+  const value = index / 4096;
+  return Math.round((value <= 0.0031308 ? value * 12.92 : 1.055 * Math.pow(value, 1 / 2.4) - 0.055) * 255);
+});
+const linearToByte = value => SRGB_TABLE[Math.min(4096, Math.max(0, Math.round(value * 4096)))];
 const matrixScale = m => Math.max(Math.hypot(m[0], m[1], m[2]), Math.hypot(m[4], m[5], m[6]), Math.hypot(m[8], m[9], m[10]));
 
 export class CanvasRenderer {
@@ -37,7 +43,7 @@ export class CanvasRenderer {
     this.disposed = false;
   }
 
-  setPixelRatio(ratio) { this.pixelRatio = Math.min(1.5, Math.max(0.5, ratio || 1)); }
+  setPixelRatio(ratio) { this.pixelRatio = Math.min(1, Math.max(0.5, ratio || 1)); }
 
   setSize(width, height, updateStyle = true) {
     this.width = Math.max(1, width);
@@ -147,13 +153,18 @@ export class CanvasRenderer {
     const parameters = geometry.parameters;
     if (geometry.type === 'TorusGeometry' && parameters.tube / parameters.radius < 0.08) {
       const segments = Math.min(96, parameters.tubularSegments || 64);
-      let previous = null;
+      let arc = [];
       const scale = matrixScale(modelView.elements);
       for (let i = 0; i <= segments; i++) {
         const angle = (parameters.arc || Math.PI * 2) * i / segments;
         const point = this._viewPoint(Math.cos(angle) * parameters.radius, Math.sin(angle) * parameters.radius, 0, modelView.elements);
-        if (previous) this._lineSegment(previous, point, material, Math.max(0.7, parameters.tube * 2 * scale * this.height * this.projection[5] / (2 * Math.max(this.near, -(point[2] + previous[2]) / 2))), instanceColor);
-        previous = point;
+        arc.push(point);
+        if (arc.length === 5 || i === segments) {
+          const depth = -arc.reduce((sum, item) => sum + item[2], 0) / arc.length;
+          const width = Math.max(0.7, parameters.tube * 2 * scale * this.height * this.projection[5] / (2 * Math.max(this.near, depth)));
+          this._polyline(arc, material, width, instanceColor);
+          arc = [point];
+        }
       }
       return;
     }
@@ -197,6 +208,20 @@ export class CanvasRenderer {
     if (points.every(point => point[0] < 0) || points.every(point => point[0] > this.width) || points.every(point => point[1] < 0) || points.every(point => point[1] > this.height)) return;
     const depth = -(a[2] + b[2]) / 2;
     this.commands.push({ kind: 'line', points, depth: depth - 0.001, color: this._style(material, 1, depth, instanceColor, vertexColor), alpha: material.opacity ?? 1, width: Math.min(20, width), additive: material.blending === THREE.AdditiveBlending });
+  }
+
+  _polyline(viewPoints, material, width = 1, instanceColor = WHITE) {
+    if (viewPoints.length < 2 || this.commands.length >= MAX_COMMANDS) return;
+    // Keep every projected centerline vertex. Short arcs batch four connected
+    // edges into one paint call while remaining independently depth-sorted.
+    if (viewPoints.some(point => point[2] > -this.near)) {
+      for (let i = 1; i < viewPoints.length; i++) this._lineSegment(viewPoints[i - 1], viewPoints[i], material, width, instanceColor);
+      return;
+    }
+    const points = viewPoints.map(point => this._project(point));
+    if (points.every(point => point[0] < 0) || points.every(point => point[0] > this.width) || points.every(point => point[1] < 0) || points.every(point => point[1] > this.height)) return;
+    const depth = -viewPoints.reduce((sum, point) => sum + point[2], 0) / viewPoints.length;
+    this.commands.push({ kind: 'line', points, depth: depth - 0.001, color: this._style(material, 1, depth, instanceColor), alpha: material.opacity ?? 1, width: Math.min(20, width), additive: material.blending === THREE.AdditiveBlending });
   }
 
   _lines(object, modelView) {
@@ -285,19 +310,29 @@ export class CanvasRenderer {
     }
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
+    let currentAlpha = clearAlpha > 0 ? clearAlpha : 1;
+    let currentComposite = 'source-over';
+    let currentFill = null, currentStroke = null, currentWidth = null;
     for (const command of this.commands) {
-      ctx.globalAlpha = Math.min(1, Math.max(0, command.alpha));
-      ctx.globalCompositeOperation = command.additive ? 'lighter' : 'source-over';
-      ctx.fillStyle = command.color;
-      ctx.strokeStyle = command.color;
+      const alpha = Math.min(1, Math.max(0, command.alpha));
+      const composite = command.additive ? 'lighter' : 'source-over';
+      if (alpha !== currentAlpha) { ctx.globalAlpha = alpha; currentAlpha = alpha; }
+      if (composite !== currentComposite) { ctx.globalCompositeOperation = composite; currentComposite = composite; }
+      if (command.kind === 'line') {
+        if (currentStroke !== command.color) { ctx.strokeStyle = command.color; currentStroke = command.color; }
+      } else if (command.kind !== 'glow' && currentFill !== command.color) { ctx.fillStyle = command.color; currentFill = command.color; }
       if (command.kind === 'face' || command.kind === 'line') {
         ctx.beginPath();
         ctx.moveTo(...command.points[0]);
         for (let i = 1; i < command.points.length; i++) ctx.lineTo(...command.points[i]);
         if (command.kind === 'face') { ctx.closePath(); ctx.fill(); }
-        else { ctx.lineWidth = command.width; ctx.stroke(); }
+        else {
+          if (currentWidth !== command.width) { ctx.lineWidth = command.width; currentWidth = command.width; }
+          ctx.stroke();
+        }
       } else if (command.kind === 'point') {
-        ctx.beginPath(); ctx.arc(...command.point, command.radius, 0, Math.PI * 2); ctx.fill();
+        if (command.radius <= 1.5) ctx.fillRect(command.point[0] - command.radius, command.point[1] - command.radius, command.radius * 2, command.radius * 2);
+        else { ctx.beginPath(); ctx.arc(...command.point, command.radius, 0, Math.PI * 2); ctx.fill(); }
       } else if (command.kind === 'glow') {
         const [x, y] = command.point;
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, command.radius);
@@ -306,6 +341,7 @@ export class CanvasRenderer {
         gradient.addColorStop(0.45, command.color.replace('rgb(', 'rgba(').replace(')', ',0.15)'));
         gradient.addColorStop(1, command.color.replace('rgb(', 'rgba(').replace(')', ',0)'));
         ctx.fillStyle = gradient;
+        currentFill = null;
         ctx.fillRect(x - command.radius, y - command.radius, command.radius * 2, command.radius * 2);
       }
     }

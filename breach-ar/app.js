@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
-import { GameEngine, createInvaderMesh, WAVE_CONFIG, UPGRADE_CATALOG } from './engine.js?v=3.0';
+import { GameEngine, createInvaderMesh, WAVE_CONFIG, UPGRADE_CATALOG } from './engine.js?v=3.1';
 import { SoundEngine } from './audio.js?v=3.0';
-import { CanvasRenderer } from './canvas-renderer.js?v=2.1';
+import { CanvasRenderer } from './canvas-renderer.js?v=3.1';
 import { FrameClock } from './runtime-clock.js?v=3.0';
 
 const $ = (id) => document.getElementById(id);
@@ -402,7 +402,7 @@ function onStats(stats) {
   $('fire-button').classList.toggle('overheated', !!stats.overheated);
   const pulse = $('pulse-button'); pulse.disabled = stats.pulseCharge < 100 || !canFire || riftActive;
   pulse.style.setProperty('--charge', `${stats.pulseCharge}%`);
-  const label = pulse.querySelector('[data-pulse-charge]'); if (label) label.textContent = riftActive ? 'ОГОНЬ' : stats.pulseCharge >= 100 ? 'ГОТОВ' : `${Math.floor(stats.pulseCharge)}%`;
+  const label = pulse.querySelector('[data-pulse-charge]'); if (label) label.textContent = riftActive ? '—' : stats.pulseCharge >= 100 ? 'ГОТОВ' : `${Math.floor(stats.pulseCharge)}%`;
   pulse.setAttribute('aria-label', riftActive ? 'В хроноразломе доступен только лазер' : stats.pulseCharge >= 100 ? 'Импульс готов: повредить и оглушить врагов, сбить заряды' : `Импульс заряжается: ${Math.floor(stats.pulseCharge)} процентов`);
   renderSpecialMechanics(stats, riftActive);
   if (stats.phase === 'intermission') {

@@ -278,6 +278,7 @@ export class CanvasRenderer {
     scene.traverseVisible(object => {
       if (this.commands.length >= MAX_COMMANDS) return;
       if (object.layers && !object.layers.test(camera.layers)) return;
+      const firstCommand = this.commands.length;
       this.modelView.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
       if (object.isInstancedMesh) {
         const material = Array.isArray(object.material) ? object.material[0] : object.material;
@@ -294,8 +295,11 @@ export class CanvasRenderer {
       } else if (object.isLine) this._lines(object, this.modelView);
       else if (object.isPoints) this._points(object, this.modelView);
       else if (object.isSprite) this._sprite(object, this.modelView);
+      // Explicit holographic layers (temporal shards) must remain legible
+      // above near enemies, matching the WebGL materials' render order.
+      for (let i = firstCommand; i < this.commands.length; i++) this.commands[i].order = object.renderOrder || 0;
     });
-    this.commands.sort((a, b) => b.depth - a.depth);
+    this.commands.sort((a, b) => a.order - b.order || b.depth - a.depth);
     const ctx = this.context;
     ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
     ctx.globalAlpha = 1;

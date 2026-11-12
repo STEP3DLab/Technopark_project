@@ -82,7 +82,7 @@ test('Unfinished portal capture decays after looking away and remains frozen on 
 
 test('Allied portal damages enemies, redirects spawning, expires and renews capture allowance next wave',()=>{
   const f=fixture({seed:'portal-turret',difficulty:'easy',radius:7});f.start();const portal=openPortal(f);portalBurst(f,portal);
-  const capturedAt=f.clock,spawnCount=f.events.filter(e=>e.type==='spawn').length;
+  const spawnCount=f.events.filter(e=>e.type==='spawn').length;
   f.engine.pause();const held=f.engine.getState().capturedPortal.remaining;f.advance(2);assert.equal(f.engine.getState().capturedPortal.remaining,held);f.engine.resume();
   f.advance(9.8);let s=f.engine.getState();assert.ok(s.capturedPortal&&s.capturedPortal.remaining>0);
   assert.ok(s.portalKills>0,'the turret must inflict real lethal damage');assert.ok(f.events.some(e=>e.type==='portalshot'));
@@ -109,7 +109,14 @@ test('First lethal impact starts one last chance with three portrait-visible sha
   const shards=f.engine.getEnemies().filter(e=>e.kind==='shard');assert.equal(shards.length,3);
   const projected=shards.map(e=>e.mesh.position.clone().project(f.camera));
   assert.ok(shards.every(e=>e.hp===1));assert.ok(projected.every(p=>p.z>=-1&&p.z<=1&&Math.abs(p.x)<.92&&Math.abs(p.y)<.92),'all shards must fit a portrait camera, including rolled aim');
-  f.dispose();return{shards:shards.length,projected:projected.map(p=>p.toArray()),remaining:s.lastChance.remaining};
+  for(const shard of shards){
+    const layers=['rift-backplate','rift-body','rift-ring','rift-glow'].map(name=>shard.mesh.getObjectByName(name));
+    assert.ok(layers.every(Boolean),'each shard needs a contrast backplate and complete holographic layers');
+    for(const layer of layers){assert.ok(layer.renderOrder>=100);assert.equal(layer.material.transparent,true);assert.equal(layer.material.depthTest,false);assert.equal(layer.material.depthWrite,false);assert.equal(layer.material.fog,false);}
+    assert.ok(layers[0].renderOrder<layers[1].renderOrder,'the body must draw above its dark backplate');
+    assert.ok(layers[0].material.opacity>=.9,'the backplate must provide contrast against close enemies');
+  }
+  f.dispose();return{shards:shards.length,projected:projected.map(p=>p.toArray()),remaining:s.lastChance.remaining,holographicLayersPerShard:4};
 });
 
 test('Last chance advances real countdown, slows the world, freezes on pause, and rescues with three full-speed shots',()=>{

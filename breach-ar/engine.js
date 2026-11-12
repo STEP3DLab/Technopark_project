@@ -236,6 +236,7 @@ export class GameEngine {
     this.projectileGeometry = new THREE.OctahedronGeometry(0.12, 0);
     this.coreGeometry = new THREE.SphereGeometry(0.11, 8, 6);
     this.shardGeometry = new THREE.OctahedronGeometry(0.16, 0);
+    this.shardBackplateGeometry = new THREE.CircleGeometry(0.25, 32);
     this.texture = glowTexture();
     this.particleMaterial = additiveMaterial(0xffffff, 0.95);
     this.particleMesh = new THREE.InstancedMesh(this.box, this.particleMaterial, MAX_PARTICLES);
@@ -893,17 +894,28 @@ export class GameEngine {
     for (let i = 0; i < 3; i++) {
       const position = origin.clone().addScaledVector(right, (i - 1) * 0.38).addScaledVector(up, i === 1 ? 0.2 : -0.12);
       const mesh = new THREE.Group();
-      const color = i === 1 ? 0xc0a0ff : 0x94fff0;
-      const material = new THREE.MeshBasicMaterial({ color, toneMapped: false });
-      const ringMaterial = additiveMaterial(color, 0.8);
-      const glowMaterial = new THREE.SpriteMaterial({ map: this.texture, color, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+      mesh.renderOrder = 100;
+      const color = i === 1 ? 0xf1fbff : 0xdcc4ff;
+      const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1, depthTest: false, depthWrite: false, toneMapped: false, fog: false });
+      const backplateMaterial = new THREE.MeshBasicMaterial({ color: 0x100922, transparent: true, opacity: 0.94, depthTest: false, depthWrite: false, toneMapped: false, fog: false, side: THREE.DoubleSide });
+      const ringMaterial = additiveMaterial(0xc3a4ff, 0.95);
+      ringMaterial.depthTest = false;
+      ringMaterial.fog = false;
+      const glowMaterial = new THREE.SpriteMaterial({ map: this.texture, color: 0xbb98ff, transparent: true, opacity: 0.28, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, toneMapped: false, fog: false });
+      const backplate = new THREE.Mesh(this.shardBackplateGeometry, backplateMaterial);
+      backplate.name = 'rift-backplate'; backplate.renderOrder = 100; backplate.position.z = -0.03;
       const body = new THREE.Mesh(this.shardGeometry, material);
+      body.name = 'rift-body'; body.renderOrder = 101;
       const ring = new THREE.Mesh(this.ringGeometry, ringMaterial); ring.scale.setScalar(0.225);
+      ring.name = 'rift-ring'; ring.renderOrder = 102;
       const glow = new THREE.Sprite(glowMaterial); glow.scale.setScalar(0.6);
-      mesh.add(body, ring, glow);
+      glow.name = 'rift-glow'; glow.renderOrder = 103;
+      mesh.add(backplate, body, ring, glow);
       mesh.position.copy(position);
       mesh.lookAt(this.cameraPosition);
-      mesh.userData.materials = [material, ringMaterial, glowMaterial];
+      mesh.userData.materials = [backplateMaterial, material, ringMaterial, glowMaterial];
+      mesh.userData.shardBody = body;
+      mesh.userData.shardRing = ring;
       this.shardGroup.add(mesh);
       this.shards.push({ id: this.nextId++, mesh, kind: 'shard', hp: 1, maxHp: 1, position, radius: 0.22, age: 0, distance: position.distanceTo(this.cameraPosition), actionPhase: 'rift', index: i });
     }
@@ -917,9 +929,9 @@ export class GameEngine {
       shard.age += dt;
       shard.distance = shard.mesh.position.distanceTo(this.cameraPosition);
       shard.mesh.lookAt(this.cameraPosition);
-      shard.mesh.children[0].rotation.y += dt * 1.4;
-      shard.mesh.children[0].rotation.z += dt * 0.5;
-      shard.mesh.children[1].rotation.z -= dt * 0.7;
+      shard.mesh.userData.shardBody.rotation.y += dt * 1.4;
+      shard.mesh.userData.shardBody.rotation.z += dt * 0.5;
+      shard.mesh.userData.shardRing.rotation.z -= dt * 0.7;
       shard.mesh.scale.setScalar(1 + Math.sin(shard.age * 4 + shard.index) * 0.045);
     }
   }
@@ -928,7 +940,7 @@ export class GameEngine {
     if (this.phase !== 'lastchance') return;
     const index = this.shards.indexOf(shard);
     if (index < 0) return;
-    this._sparks(shard.mesh.position, shard.index === 1 ? 0xc0a0ff : 0x94fff0, 16, 0.9, true);
+    this._sparks(shard.mesh.position, shard.index === 1 ? 0xf1fbff : 0xdcc4ff, 16, 0.9, true);
     this._shockwave(shard.mesh.position, 0xb5fff5, 0.55, 0.35, 0.8, true);
     shard.mesh.removeFromParent();
     shard.mesh.userData.materials.forEach(material => material.dispose());
@@ -1515,6 +1527,7 @@ export class GameEngine {
     this.projectileGeometry.dispose();
     this.coreGeometry.dispose();
     this.shardGeometry.dispose();
+    this.shardBackplateGeometry.dispose();
     this.texture.dispose();
     this.particleMaterial.dispose();
     this.particleMesh.dispose();

@@ -179,7 +179,10 @@ export class CanvasRenderer {
       const screen = points.map(point => this._project(point));
       if (screen.every(point => point[0] < -2) || screen.every(point => point[0] > this.width + 2) || screen.every(point => point[1] < -2) || screen.every(point => point[1] > this.height + 2)) continue;
       const depth = -points.reduce((sum, point) => sum + point[2], 0) / points.length;
-      this.commands.push({ kind: 'face', points: screen, depth, color: this._style(material, shade, depth, instanceColor), alpha: material.opacity ?? 1, additive: material.blending === THREE.AdditiveBlending });
+      // The arena's single large floor spans the near and far planes. Drawing
+      // it first avoids painter-order overdraw of the far grid and pillars.
+      const sortDepth = geometry.type === 'PlaneGeometry' && parameters.width >= 25 && parameters.height >= 25 ? this.far + depth : depth;
+      this.commands.push({ kind: 'face', points: screen, depth: sortDepth, color: this._style(material, shade, depth, instanceColor), alpha: material.opacity ?? 1, additive: material.blending === THREE.AdditiveBlending });
     }
   }
 

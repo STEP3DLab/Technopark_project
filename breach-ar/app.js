@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
 import { GameEngine, createInvaderMesh } from './engine.js';
 import { SoundEngine } from './audio.js';
-import { CanvasRenderer } from './canvas-renderer.js';
+import { CanvasRenderer } from './canvas-renderer.js?v=1.1';
 
 const $ = (id) => document.getElementById(id);
 const clamp = THREE.MathUtils.clamp;

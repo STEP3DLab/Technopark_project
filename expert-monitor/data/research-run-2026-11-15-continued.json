@@ -1,0 +1,301 @@
+{
+  "date": "2026-11-15",
+  "at": "2026-11-15T12:51:07.627+03:00",
+  "scope": "Российская Федерация",
+  "rotationStart": 83,
+  "rotationEnd": 10,
+  "regionsAttempted": [
+    "Еврейская автономная область",
+    "Чукотский автономный округ",
+    "Москва",
+    "Московская область",
+    "Белгородская область",
+    "Брянская область",
+    "Владимирская область",
+    "Воронежская область",
+    "Ивановская область",
+    "Калужская область",
+    "Костромская область",
+    "Курская область"
+  ],
+  "regionalResults": [
+    {
+      "region": "Еврейская автономная область",
+      "sourceUrl": "https://eao.arbitr.ru/",
+      "officialDirectoryUrl": "https://usd--brb.sudrf.ru/modules.php?name=sud",
+      "query": "site:eao.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_502",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Чукотский автономный округ",
+      "sourceUrl": "https://chukotka.arbitr.ru/",
+      "officialDirectoryUrl": "https://anadyr--chao.sudrf.ru/modules.php?name=sud",
+      "query": "site:chukotka.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Москва",
+      "sourceUrl": "https://msk.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:msk.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "homepage_reachable_no_act",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Московская область",
+      "sourceUrl": "https://asmo.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:asmo.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Белгородская область",
+      "sourceUrl": "https://belgorod.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:belgorod.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Брянская область",
+      "sourceUrl": "https://bryansk.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:bryansk.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Владимирская область",
+      "sourceUrl": "https://vladimir.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:vladimir.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Воронежская область",
+      "sourceUrl": "https://voronej.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:voronej.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Ивановская область",
+      "sourceUrl": "https://ivanovo.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:ivanovo.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Калужская область",
+      "sourceUrl": "https://kaluga.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:kaluga.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Костромская область",
+      "sourceUrl": "https://kostroma.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:kostroma.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    },
+    {
+      "region": "Курская область",
+      "sourceUrl": "https://kursk.arbitr.ru/",
+      "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+      "query": "site:kursk.arbitr.ru \"строительно-технической экспертизы\" \"экспертным организациям\" 2026 ноябрь",
+      "officialHomepageStatus": "http_403",
+      "officialActsStatus": "blocked_case_search",
+      "caseCardsVerified": 0,
+      "successful": false,
+      "retryNeeded": true,
+      "secondarySearchAttempted": true,
+      "notes": "Проверены официальный каталог/региональный адрес и тематический вторичный поиск, но ни одно актуальное определение и последующий акт по делу не получены; недоступность не означает отсутствия заказов."
+    }
+  ],
+  "sourceQueries": [
+    {
+      "id": "central",
+      "query": "15.11.2026 ЦФО Москва МО Смоленск суд запрос экспертным организациям стройтехническая экспертиза; закупки мониторинг зданий реновации",
+      "sourceUrl": "https://zakupki.kontur.ru/0173200001326000031",
+      "result": "Новая крупная смежная закупка мониторинга МКД Москвы, судебных приглашений нет"
+    },
+    {
+      "id": "northwest",
+      "query": "15.11.2026 СЗФО Санкт-Петербург Республика Коми обследование строительных конструкций экспертиза 223-ФЗ ЭПБ",
+      "sourceUrl": "https://zakupki.kontur.ru/32616577020",
+      "result": "Новая закупка ЭПБ/обследования ТЭЦ-2 Воркута; не суд"
+    },
+    {
+      "id": "south",
+      "query": "15.11.2026 ЮФО Краснодар Ростов Крым судебная строительная экспертиза представить кандидатуры 2026",
+      "sourceUrl": "https://rostov.arbitr.ru/",
+      "result": "Нет первичного актуального судебного акта; вторичный адресный поиск"
+    },
+    {
+      "id": "caucasus",
+      "query": "15.11.2026 СКФО Дагестан Ставрополь строительная землеустроительная экспертиза суд предложить кандидатуры 2026",
+      "sourceUrl": "https://sudrf.ru/index.php?id=300",
+      "result": "ГАС Правосудие не дал проверенных свежих определений"
+    },
+    {
+      "id": "volga",
+      "query": "15.11.2026 ПФО Самара Тольятти обследование здания школа ДК закупка 2026",
+      "sourceUrl": "https://zakupki.kontur.ru/0342300000126001348",
+      "result": "Два новых обследования общественных зданий Самарской области, не судебные запросы"
+    },
+    {
+      "id": "ural",
+      "query": "15.11.2026 УФО Свердловская область Россети Урал западные электрические сети обследование конструкций тендер",
+      "sourceUrl": "https://zakupki.kontur.ru/32616576644",
+      "result": "Новая смежная закупка электросетевого филиала"
+    },
+    {
+      "id": "siberia",
+      "query": "15.11.2026 СФО Красноярский край гидроузел Канзыба обследование ГТС закупка 2026",
+      "sourceUrl": "https://zakupki.kontur.ru/32616570653",
+      "result": "Обследование гидроузла, специальные компетенции; не судебный запрос"
+    },
+    {
+      "id": "fareast",
+      "query": "15.11.2026 ДФО ЕАО Чукотка Якутия суд запрос эксперта строительная экспертиза; обследование сетей тендер",
+      "sourceUrl": "https://eao.arbitr.ru/",
+      "result": "Адресные суды ЕАО и Чукотки заблокированы для чтения актов; иных первично подтвержденных сигналов нет"
+    }
+  ],
+  "newIds": [
+    "proc-0173200001326000031",
+    "proc-32616576644",
+    "proc-32616570653",
+    "proc-0342300000126001348",
+    "proc-2097586",
+    "proc-0163200000326005767",
+    "proc-32616577020",
+    "proc-32616575934"
+  ],
+  "changedIds": [
+    "proc-027300000012602465",
+    "proc-32616563521"
+  ],
+  "excludedIds": [
+    "proc-027300000012602465"
+  ],
+  "checkedUrls": [
+    "https://kad.arbitr.ru/",
+    "https://ras.arbitr.ru/",
+    "https://sudrf.ru/index.php?id=300",
+    "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+    "https://arbitr.ru/materials/as/subj",
+    "https://eao.arbitr.ru/",
+    "https://chukotka.arbitr.ru/",
+    "https://msk.arbitr.ru/",
+    "https://asmo.arbitr.ru/",
+    "https://belgorod.arbitr.ru/",
+    "https://bryansk.arbitr.ru/",
+    "https://vladimir.arbitr.ru/",
+    "https://voronej.arbitr.ru/",
+    "https://ivanovo.arbitr.ru/",
+    "https://kaluga.arbitr.ru/",
+    "https://kostroma.arbitr.ru/",
+    "https://kursk.arbitr.ru/",
+    "https://usd--brb.sudrf.ru/modules.php?name=sud",
+    "https://anadyr--chao.sudrf.ru/modules.php?name=sud",
+    "https://zakupki.kontur.ru/0173200001326000031",
+    "https://tendem.ru/tenders/17340510",
+    "https://zakupki.kontur.ru/32616576644",
+    "https://tendik.ru/tender/eis223/32616576644",
+    "https://zakupki.kontur.ru/32616570653",
+    "https://zakupki.kontur.ru/0342300000126001348",
+    "https://zakupki.kontur.ru/IS88849982",
+    "https://zakupki.kontur.ru/0163200000326005767",
+    "https://zakupki.kontur.ru/32616577020",
+    "https://www.b2b-center.ru/market/pravo-zakliucheniia-dogovora-na-okazanie-uslug-po-ekspertize/tender-4680364/",
+    "https://energybase.ru/tender/01a1d8ac-14f9-73b6-b41b-15ea03be3688",
+    "https://sprosradar.ru/zakupki/223/32616575934",
+    "https://zakupki.kontur.ru/027300000012602465",
+    "https://zakupki.kontur.ru/32616563521",
+    "https://rostov.arbitr.ru/"
+  ],
+  "limitations": [
+    "Региональный цикл не является проверкой всех судов: 12 адресных попыток, 0 актуальных актов/запросов первоисточника, все 12 — в повтор.",
+    "8 новых записей — закупки, а не судебные приглашения, их первичные изменения и протоколы ЕИС/ЭТП не подтверждены.",
+    "Отмена №027300000012602465 установлена по вторичной карточке от 06.11; первичный акт отмены в ЕИС не извлечён.",
+    "№32616563521: сохранён ранний срок 16.11 09:30 МСК, встречается 18.11 в другой карточке, продление не подтверждено.",
+    "Сложные промышленные закупки, допуски СРО/ЭПБ/СОНКО и выезды требуют проверки до решения об участии."
+  ],
+  "errors": [
+    "КАД/Банк решений: результаты современных определений не извлечены из индексируемых поисковых форм.",
+    "ГАС Правосудие/региональные суды: ограничения HTTP 403/502, невозможно проверить открытые судебные запросы по актам.",
+    "ЕИС: текущие первичные извещения и протоколы не открылись; вторичные карточки имеют needs_review.",
+    "По №32616563521 два вторичных срока, продление первоисточником не подтверждено."
+  ],
+  "newCourts": [
+    "as_eao",
+    "as_chukotka"
+  ],
+  "sheetSyncStatus": "pending",
+  "noApplicationsOrMessages": true
+}

@@ -468,5 +468,117 @@
     "extractLinks": false,
     "region": "Ростовская область",
     "scope": "Федеральный адресный обход; карточки дел не верифицированы."
+  },
+  {
+    "id": "as-eao-monitor",
+    "name": "Арбитражный суд — Еврейская автономная область",
+    "url": "https://eao.arbitr.ru/",
+    "type": "court_official",
+    "status": "blocked",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Еврейская автономная область",
+    "scope": "Адресная региональная проверка",
+    "notes": "2026-11-15: http_502, свежие определения и открытые запросы не прочитаны, остается retry"
+  },
+  {
+    "id": "as-chukotka-monitor",
+    "name": "Арбитражный суд — Чукотский автономный округ",
+    "url": "https://chukotka.arbitr.ru/",
+    "type": "court_official",
+    "status": "blocked",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Чукотский автономный округ",
+    "scope": "Адресная региональная проверка",
+    "notes": "2026-11-15: http_403, свежие определения и открытые запросы не прочитаны, остается retry"
+  },
+  {
+    "id": "research-proc-0173200001326000031",
+    "name": "Исследовательская закупка №0173200001326000031",
+    "url": "https://zakupki.kontur.ru/0173200001326000031",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Москва",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-32616576644",
+    "name": "Исследовательская закупка №32616576644",
+    "url": "https://zakupki.kontur.ru/32616576644",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Свердловская область",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-32616570653",
+    "name": "Исследовательская закупка №32616570653",
+    "url": "https://zakupki.kontur.ru/32616570653",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Красноярский край",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-0342300000126001348",
+    "name": "Исследовательская закупка №0342300000126001348",
+    "url": "https://zakupki.kontur.ru/0342300000126001348",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Самарская область",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-2097586",
+    "name": "Исследовательская закупка №2097586",
+    "url": "https://zakupki.kontur.ru/IS88849982",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Самарская область",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-0163200000326005767",
+    "name": "Исследовательская закупка №0163200000326005767",
+    "url": "https://zakupki.kontur.ru/0163200000326005767",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Смоленская область",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-32616577020",
+    "name": "Исследовательская закупка №32616577020",
+    "url": "https://zakupki.kontur.ru/32616577020",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Республика Коми",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-32616575934",
+    "name": "Исследовательская закупка №32616575934",
+    "url": "https://energybase.ru/tender/01a1d8ac-14f9-73b6-b41b-15ea03be3688",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Санкт-Петербург",
+    "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
   }
 ]

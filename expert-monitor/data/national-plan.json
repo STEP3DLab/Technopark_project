@@ -581,7 +581,36 @@
       "primaryCaseStatusesVerified": 0,
       "newCandidatesChecked": 0
     },
-    "sheetSyncStatus": "pending"
+    "sheetSyncStatus": "synced",
+    "sheetVerification": {
+      "newRowsAdded": 8,
+      "newCourtRowsAdded": 2,
+      "existingRowsUpdated": 2,
+      "originalOpportunityRowsPreserved": 170,
+      "originalCourtRowsPreserved": 87,
+      "ownPricesColumnMPreserved": true,
+      "proposalSheetPreserved": true,
+      "existingNotesAndUserNarrativesPreserved": true,
+      "idReadbackOK": true,
+      "updatedIds": [
+        "proc-027300000012602465",
+        "proc-32616563521"
+      ],
+      "addedIds": [
+        "proc-0173200001326000031",
+        "proc-32616576644",
+        "proc-32616570653",
+        "proc-0342300000126001348",
+        "proc-2097586",
+        "proc-0163200000326005767",
+        "proc-32616577020",
+        "proc-32616575934"
+      ],
+      "addedCourtIds": [
+        "as_eao",
+        "as_chukotka"
+      ]
+    }
   },
   "history": [
     {
@@ -7124,7 +7153,36 @@
         "primaryCaseStatusesVerified": 0,
         "newCandidatesChecked": 0
       },
-      "sheetSyncStatus": "pending"
+      "sheetSyncStatus": "synced",
+      "sheetVerification": {
+        "newRowsAdded": 8,
+        "newCourtRowsAdded": 2,
+        "existingRowsUpdated": 2,
+        "originalOpportunityRowsPreserved": 170,
+        "originalCourtRowsPreserved": 87,
+        "ownPricesColumnMPreserved": true,
+        "proposalSheetPreserved": true,
+        "existingNotesAndUserNarrativesPreserved": true,
+        "idReadbackOK": true,
+        "updatedIds": [
+          "proc-027300000012602465",
+          "proc-32616563521"
+        ],
+        "addedIds": [
+          "proc-0173200001326000031",
+          "proc-32616576644",
+          "proc-32616570653",
+          "proc-0342300000126001348",
+          "proc-2097586",
+          "proc-0163200000326005767",
+          "proc-32616577020",
+          "proc-32616575934"
+        ],
+        "addedCourtIds": [
+          "as_eao",
+          "as_chukotka"
+        ]
+      }
     }
   ]
 }

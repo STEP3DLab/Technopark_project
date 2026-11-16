@@ -580,5 +580,38 @@
     "extractLinks": false,
     "region": "Санкт-Петербург",
     "notes": "2026-11-15: тематическая вторичная карточка, проверить официальные извещения и ограничения."
+  },
+  {
+    "id": "research-proc-395-569",
+    "name": "Bidzaar 395-569: георадар склада Дмитров",
+    "url": "https://bidzaar.com/app/process/light/01a1c9ab-ba52-759b-8339-21d1e2a5475a",
+    "type": "procurement_primary",
+    "status": "primary_public_stage",
+    "region": "Московская область",
+    "notes": "16.11.2026: публичный приём отображён, время в первоисточнике без TZ, 11:13 МСК по вторичному Контур; конфликт с устаревшей датой в свободном описании.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "research-proc-GP635028",
+    "name": "ГП635028: цех №13 Криогенмаш",
+    "url": "https://zakupki.kontur.ru/GP635028",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "region": "Московская область",
+    "notes": "16.11.2026: первичная ЭТП ГПБ не прочитана; ориентир 18.11 10:00 МСК.",
+    "autoFetch": false,
+    "extractLinks": false
+  },
+  {
+    "id": "research-proc-0169300000126001543",
+    "name": "Челябинск 0169300000126001543: обследование МКД",
+    "url": "https://zakupki.kontur.ru/0169300000126001543",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "region": "Челябинская область",
+    "notes": "16.11.2026: ограничение для МСП/СМП по вторичной карточке, не рекомендовать прямую заявку АНО без проверки.",
+    "autoFetch": false,
+    "extractLinks": false
   }
 ]

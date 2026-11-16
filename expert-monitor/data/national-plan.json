@@ -627,15 +627,19 @@
         "kind": "directory"
       }
     ],
-    "sheetSyncStatus": "pending_update_by_id",
+    "sheetSyncStatus": "synced",
     "sheetVerification": {
-      "status": "pending",
-      "existingRowsMustPreserve": [
+      "status": "synced",
+      "rowsAdded": 3,
+      "rowsUpdated": 4,
+      "verifiedById": true,
+      "columnsPreserved": [
         "M Наша цена, ₽",
         "КП",
-        "заметки, формулы и пользовательские правки"
+        "старые заметки и формулы"
       ],
-      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1ZyorxcS0C8UeLz2lNYO_YOHBySGTN9i1GGJ-gL6TB2E/edit"
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1ZyorxcS0C8UeLz2lNYO_YOHBySGTN9i1GGJ-gL6TB2E/edit",
+      "verifiedOnDate": "2026-11-16"
     }
   },
   "history": [
@@ -7678,15 +7682,19 @@
           "kind": "directory"
         }
       ],
-      "sheetSyncStatus": "pending_update_by_id",
+      "sheetSyncStatus": "synced",
       "sheetVerification": {
-        "status": "pending",
-        "existingRowsMustPreserve": [
+        "status": "synced",
+        "rowsAdded": 3,
+        "rowsUpdated": 4,
+        "verifiedById": true,
+        "columnsPreserved": [
           "M Наша цена, ₽",
           "КП",
-          "заметки, формулы и пользовательские правки"
+          "старые заметки и формулы"
         ],
-        "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1ZyorxcS0C8UeLz2lNYO_YOHBySGTN9i1GGJ-gL6TB2E/edit"
+        "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1ZyorxcS0C8UeLz2lNYO_YOHBySGTN9i1GGJ-gL6TB2E/edit",
+        "verifiedOnDate": "2026-11-16"
       }
     }
   ]

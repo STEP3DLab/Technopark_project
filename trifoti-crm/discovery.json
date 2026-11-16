@@ -1,8 +1,21 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-15T21:52:22.427731+00:00",
+  "generated_at": "2026-11-16T13:44:31.807391+00:00",
   "disclaimer": "Discovery candidates only. Verify the official notice, deadline, status and technical specification manually.",
   "sources_attempted": 6,
   "errors": [],
-  "items": []
+  "items": [
+    {
+      "id": "2e728947453a16056574",
+      "title": "Госзакупки и тендеры: какую роль в победе играет репутация компании - Московская газета",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPMXZ5a0lpLW5ZaGJQRVJEbW5namlGYTdZamU2OVZZYWlONzRsRjVadFRhNEZ2bGpPeU9raFA5Tl82QkV6TnFWLVYyM19pOXZXZV8zLU5MdTFOMVNHV2pPc1E4Z3prQmFHa2RWSXc1QXVlb0wxUFNFV3FRTEJDeDB5ekM1N3EydFdreW1JdmZOeFhWZ1RmQlpfZThGZWk2eHRLY1lRZzNFeHFSSkFRdzlIZg?oc=5",
+      "source": "Google News RSS — discovery, not primary procurement source",
+      "query": "тендер малые архитектурные формы Московская область",
+      "published": "Mon, 16 Nov 2026 11:18:17 GMT",
+      "status": "unverified",
+      "budget": null,
+      "deadline": null,
+      "first_seen": "2026-11-16T13:44:31.807367+00:00"
+    }
+  ]
 }

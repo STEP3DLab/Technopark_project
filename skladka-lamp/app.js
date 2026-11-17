@@ -485,11 +485,11 @@ function exportPNG(){
   if(!gl){notify('Не удалось получить снимок: WebGL недоступен');return;}
   try{
     // preserveDrawingBuffer позволяет снимать именно текущий ракурс, без панели управления.
-    canvas.toBlob(blob=>{
+    requestAnimationFrame(()=>canvas.toBlob(blob=>{
       if(!blob){notify('Не удалось создать PNG');return;}
       download(blob,`skladka-${state.finish}-${state.pleats}folds.png`);
       notify('PNG текущего ракурса сохранён');
-    },'image/png');
+    },'image/png'));
   }catch(e){console.error(e);notify('Ошибка экспорта PNG');}
 }
 

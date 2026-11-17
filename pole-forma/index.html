@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f0ea">
+  <meta name="description" content="ПОЛЕ / ФОРМА — демонстрационный сайт вымышленной выставки кинетического искусства. Шесть объектов, три дня движения.">
+  <title>ПОЛЕ / ФОРМА — выставка кинетического искусства · Демо</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23ff4b00%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2225%22%20fill%3D%22none%22%20stroke%3D%22%231a1a19%22%20stroke-width%3D%223%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2212%22%20fill%3D%22%231a1a19%22/%3E%3Cpath%20d%3D%22M0%2032h64%22%20stroke%3D%22%23fff%22%20stroke-width%3D%223%22/%3E%3C/svg%3E%0A" type="image/svg+xml">
+  <style>
+:root{--paper:#f2f0ea;--paper2:#e9e7df;--ink:#171716;--inksoft:#585851;--orange:#ff4b00;--line:rgba(23,23,22,.2);--white:#fffdf8;--pad:clamp(22px,4vw,76px);--condensed:'Roboto Condensed','Arial Narrow','Arial',sans-serif;--body:'Inter','Arial',sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+body.overlay-open{overflow:hidden}
+button,a{-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--orange);outline-offset:5px}
+::selection{background:var(--orange);color:#fff}
+[hidden]{display:none!important}
+.sr-only{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.skip-link{position:fixed;top:8px;left:8px;transform:translateY(-140%);padding:12px 20px;background:var(--orange);color:#fff;z-index:1000}
+.skip-link:focus{transform:none}
+.micro{font:600 11px/1.45 var(--body);letter-spacing:.075em;text-transform:uppercase}
+.site-header{height:86px;display:flex;align-items:center;justify-content:space-between;gap:28px;border-bottom:1px solid var(--line);padding:0 var(--pad);position:relative;z-index:8;background:var(--paper)}
+.brand{display:flex;align-items:center;gap:12px;font:bold 24px/1 var(--condensed);letter-spacing:-.08em;white-space:nowrap}.brand-symbol{color:var(--orange);transition:transform .6s cubic-bezier(.2,.8,.2,1)}.brand:hover .brand-symbol{transform:rotate(60deg)}
+.main-nav{display:flex;align-items:center;gap:clamp(14px,2.6vw,40px);margin-left:auto}.main-nav a{font-size:13px;font-weight:600;position:relative;white-space:nowrap}.main-nav a:after{content:'';position:absolute;left:0;bottom:-7px;right:100%;height:2px;background:var(--orange);transition:right .25s}.main-nav a:hover:after{right:0}
+.button-quiet{display:inline-flex;align-items:center;justify-content:center;gap:12px;border:1px solid var(--ink);padding:13px 16px;background:transparent;font-size:12px;font-weight:700;white-space:nowrap;transition:background .2s,color .2s}.button-quiet:hover{background:var(--ink);color:var(--paper)}.poster-launch-dot{width:8px;height:8px;background:var(--orange);border-radius:50%}
+.hero{min-height:min(850px,calc(100svh - 86px));padding:0 var(--pad);display:flex;flex-direction:column;position:relative;overflow:hidden}.hero-topline{display:flex;justify-content:space-between;align-items:center;padding-top:22px;position:relative;z-index:2}.hero-topline>span:first-child{display:flex;align-items:center;gap:10px}.tiny-square{display:inline-block;background:var(--orange);width:7px;height:7px}
+.hero-body{position:relative;flex:1;min-height:560px;display:flex;align-items:center}.hero-type{z-index:2;position:relative;width:100%;padding:22px 0 38px;pointer-events:none}.hero-pretitle{margin:0 0 20px 7px;font-weight:700;letter-spacing:.16em}.hero h1{margin:0;font:900 clamp(110px,16.1vw,310px)/.72 var(--condensed);letter-spacing:-.094em;transform:scaleX(.9);transform-origin:left center;max-width:104%;color:var(--ink);text-transform:uppercase}.hero h1 span{display:block}.hero-title-one{white-space:nowrap}.hero-title-two{margin-left:-.015em;white-space:nowrap}.hero h1 .hero-slash{color:var(--orange);height:.3em;position:relative;z-index:3;line-height:.57;transform:translate(.67em,-.11em);font-size:.67em}.hero-orange-star{display:inline!important;color:var(--orange);font-size:.22em;vertical-align:top;position:relative;top:.37em;left:.2em;letter-spacing:0}
+.hero-copy-wrap{display:flex;align-items:start;gap:68px;margin:43px 0 0 8px}.hero-no{font:bold 12px/1 var(--body);letter-spacing:.06em}.hero-copy{font-size:clamp(15px,1.32vw,20px);line-height:1.45;font-weight:500;margin:-3px 0 0}
+.hero-art{position:absolute;right:-4vw;top:-2%;bottom:-2%;width:min(68%,940px);pointer-events:none;z-index:1}.hero-art canvas{width:100%;height:100%;display:block}.hero-art-index{position:absolute;top:9%;right:12%;font:11px/1.6 monospace;letter-spacing:.1em;color:#737168}.hero-art-cross{position:absolute;bottom:13%;right:19%;font:300 35px/1 var(--body);color:var(--orange)}
+.hero-bottom{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:15px;min-height:95px;border-top:1px solid var(--line);padding:22px 0 30px;position:relative;z-index:2}.hero-bottom-note{color:var(--inksoft);max-width:300px}.text-link{font:bold 17px/1.3 var(--body);display:inline-flex;align-items:center;gap:30px;white-space:nowrap}.text-link .link-arrow{color:var(--orange);font:35px/.7 var(--body);display:inline-block;transition:transform .25s}.text-link:hover .link-arrow{transform:translate(5px,5px)}.hero-scroll{justify-self:end;color:var(--inksoft)}
+.section-pad{padding:100px var(--pad) 110px}.section-label{display:grid;grid-template-columns:92px 1fr auto;gap:15px;padding:13px 0 14px;border-top:1px solid var(--ink);font:700 11px/1.5 var(--body);letter-spacing:.1em}.label-number{color:var(--orange)}.section-label-tail{justify-self:end}
+.intro{padding-top:115px;padding-bottom:130px}.intro-main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:5%;padding-top:54px;align-items:center}.intro h2,.section-heading-row h2,.program h2,.visit h2{font:900 clamp(66px,7.2vw,124px)/.91 var(--condensed);letter-spacing:-.078em;text-transform:uppercase;margin:0}.intro h2 em,.program h2 em,.visit h2 em{font-style:normal;color:var(--orange)}.intro-subcopy{display:grid;grid-template-columns:1fr 1fr;gap:30px;max-width:780px;margin-top:56px}.intro-subcopy p{font-size:clamp(15px,1.15vw,18px);line-height:1.58;margin:0;max-width:340px}.intro-subcopy p:nth-child(2){color:var(--inksoft)}.intro-diagram{position:relative;align-self:stretch;display:flex;flex-direction:column;justify-content:center}.intro-diagram svg{display:block;width:100%;max-width:470px;margin:auto}.diagram-caption{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px;max-width:470px;width:100%;margin:0 auto}
+.reveal{opacity:1;transform:none}.js-motion .reveal{opacity:.93;transform:translateY(12px);transition:opacity .7s ease,transform .85s cubic-bezier(.2,.7,.2,1)}.js-motion .reveal.is-visible{opacity:1;transform:none}
+.works{background:var(--paper2);padding-bottom:95px}.section-heading-row{display:flex;justify-content:space-between;gap:40px;align-items:end;padding:38px 0 56px}.section-heading-row h2{font-size:clamp(64px,7.5vw,128px)}.outlined-word{-webkit-text-stroke:1.8px var(--ink);color:transparent}.section-heading-row p{max-width:260px;font-size:15px;line-height:1.6;margin:0 0 5px;color:var(--inksoft)}.works-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:58px 22px}.work-card{min-width:0}.work-art{width:100%;aspect-ratio:1.06;overflow:hidden;display:block;background:#171716;position:relative}.work-art svg{display:block;width:100%;height:100%;transition:transform .85s cubic-bezier(.2,.8,.2,1)}.work-card:hover .work-art svg,.work-card:focus-within .work-art svg{transform:scale(1.075) rotate(-1deg)}.work-art::after{content:'↗';position:absolute;right:14px;bottom:12px;color:var(--white);background:var(--ink);width:40px;height:40px;display:grid;place-items:center;font:22px var(--body);opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s}.work-card:hover .work-art:after,.work-card:focus-within .work-art:after{opacity:1;transform:none}.work-card-head{border-top:1px solid var(--ink);padding-top:14px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:8px}.work-index{font:700 11px var(--body);letter-spacing:.1em;color:var(--orange)}.work-medium{font:600 11px var(--body);letter-spacing:.05em;color:var(--inksoft);text-transform:uppercase}.work-card h3{font:900 clamp(25px,2.1vw,39px)/.98 var(--condensed);text-transform:uppercase;letter-spacing:-.045em;margin:17px 0 10px}.work-card p{font-size:14px;line-height:1.55;color:var(--inksoft);margin:0;max-width:350px;min-height:42px}.work-open{margin-top:20px;padding:0 0 5px;display:inline-flex;align-items:center;gap:23px;border:0;border-bottom:1px solid var(--ink);background:none;font-size:13px;font-weight:700;transition:color .2s,border-color .2s}.work-open:hover{color:var(--orange);border-color:var(--orange)}.work-open .work-arrow{font-size:21px;line-height:1;color:var(--orange)}.works-footnote{margin:65px 0 0;color:var(--inksoft)}
+.manifesto{background:var(--orange);color:var(--ink);overflow:hidden;position:relative;min-height:710px;display:flex;align-items:center;padding:75px var(--pad)}.manifesto-inner{position:relative;z-index:2;width:100%}.manifesto-inner>p{font:900 clamp(68px,9.9vw,170px)/.86 var(--condensed);letter-spacing:-.078em;text-transform:uppercase;margin:32px 0 60px}.manifesto-inner>p span{color:var(--white)}.manifesto-bottom{border-top:1px solid rgba(23,23,22,.5);padding-top:22px;display:block;width:58%}.manifesto-field{position:absolute;width:min(72vw,1100px);height:min(72vw,1100px);right:-17%;top:50%;transform:translateY(-50%);opacity:.74}.manifesto-orbit{position:absolute;border:2px solid var(--ink);border-radius:50%;inset:8%;transition:transform .15s linear}.manifesto-orbit.orbit-b{inset:20%;border-width:3px}.manifesto-orbit.orbit-c{inset:32%;border-width:2px}.manifesto-core{position:absolute;inset:45%;background:var(--ink);border-radius:50%}
+.program{padding-top:100px;padding-bottom:125px}.program-header{display:flex;justify-content:space-between;gap:40px;align-items:end;padding:44px 0 65px}.program-header p{font-size:16px;line-height:1.65;max-width:280px;margin:0 0 6px;color:var(--inksoft)}.program-layout{display:grid;grid-template-columns:28% minmax(0,1fr);gap:30px}.program-side{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;justify-content:space-between;min-height:405px}.program-star{font:300 clamp(160px,21vw,335px)/1 var(--body);color:var(--orange);display:block;transform-origin:center;animation:star-slow 45s linear infinite;width:fit-content}.program-side p{color:var(--inksoft)}@keyframes star-slow{to{transform:rotate(360deg)}}
+.day-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}.day-tab{border:0;border-right:1px solid var(--line);padding:20px 15px 17px;background:transparent;color:var(--ink);text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:8px;transition:background .2s,color .2s}.day-tab:last-child{border-right:0}.day-tab span{font:700 11px var(--body);letter-spacing:.1em}.day-tab strong{font:900 clamp(32px,4vw,61px)/1 var(--condensed);letter-spacing:-.07em}.day-tab:hover{background:#e4e0d7}.day-tab[aria-selected=true]{background:var(--orange);color:var(--ink)}
+.event-panel{min-height:300px}.events-list{display:flex;flex-direction:column}.event-row{width:100%;border:none;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);display:grid;grid-template-columns:80px minmax(0,1fr) 112px 27px;gap:15px;align-items:center;text-align:left;padding:25px 15px;transition:background .2s}.event-row:hover{background:#e9e6de}.event-row[aria-pressed=true]{background:#dedbd3}.event-time{font:700 17px/1 var(--condensed)}.event-name{font:800 clamp(17px,1.7vw,25px)/1.1 var(--condensed);text-transform:uppercase;letter-spacing:-.02em}.event-kind{font:700 10px/1.4 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--inksoft)}.event-radio{width:19px;height:19px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center}.event-row[aria-pressed=true] .event-radio{background:var(--orange);border-color:var(--orange)}.event-row[aria-pressed=true] .event-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink)}.program-foot{display:flex;gap:10px;padding-top:18px;color:var(--inksoft);font-size:12px;line-height:1.5}.program-foot>span:first-child{color:var(--orange);font-weight:900;font-size:18px}
+.visit{background:var(--ink);color:var(--paper);padding:95px var(--pad) 85px;overflow:hidden}.section-label-invert{border-color:var(--paper)}.visit-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.65fr);gap:40px;min-height:560px;padding-top:75px}.visit-left{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between}.visit-caption{display:flex;align-items:center;gap:11px}.circle-flash{width:10px;height:10px;background:var(--orange);border-radius:50%}.visit h2{font-size:clamp(67px,7.6vw,131px);margin:30px 0 60px}.visit h2 em{font-style:normal}.visit-info{display:grid;grid-template-columns:1fr 1fr;gap:65px;max-width:530px;width:100%;padding-bottom:12px}.info-label{color:#94938b;display:block;margin-bottom:12px}.visit-info strong{font-size:16px}.visit-info p{font-size:13px;color:#9d9c93;margin:9px 0 0;line-height:1.5}.visit-right{min-width:0;display:flex;flex-direction:column;justify-content:end;align-items:stretch;position:relative}.visit-orbit{position:absolute;top:-50px;left:50%;width:360px;height:360px;transform:translateX(-50%);pointer-events:none}.visit-orbit span{position:absolute;border:1px solid var(--orange);border-radius:50%;inset:0;opacity:.7}.visit-orbit span:nth-child(2){inset:50px}.visit-orbit span:nth-child(3){inset:100px;background:var(--orange)}.calendar-panel{position:relative;z-index:1;background:#272725;border:1px solid #56554f;padding:30px;max-width:505px;width:100%;align-self:flex-end}.calendar-tag{display:flex;justify-content:space-between;align-items:center;color:#aaa99f}.calendar-check{color:var(--orange);font-size:18px}.selection-title{font:900 clamp(29px,3vw,45px)/1 var(--condensed);text-transform:uppercase;letter-spacing:-.035em;margin:35px 0 8px}.selection-time{font-size:15px;color:#bbb9b0;margin:0 0 30px}.calendar-button{width:100%;border:0;background:var(--orange);color:var(--ink);min-height:67px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:800;font-size:16px;padding:18px 22px;transition:background .2s,transform .2s}.calendar-button:hover{background:#ff7338;transform:translateY(-2px)}.calendar-button>span:last-child{font-size:26px;font-weight:400}.calendar-note{font-size:11px;line-height:1.55;color:#aaa99f;margin:16px 0 0}
+.site-footer{min-height:175px;background:var(--ink);color:var(--paper);padding:38px var(--pad) 44px;display:flex;justify-content:space-between;align-items:end;gap:35px;border-top:1px solid #56554f}.footer-name{font:900 clamp(25px,3vw,48px)/1 var(--condensed);letter-spacing:-.045em;white-space:nowrap}.footer-name span{color:var(--orange)}.site-footer p{font:600 10px/1.6 var(--body);letter-spacing:.09em;color:#a4a39b;margin:0}.footer-poster{background:none;color:var(--paper);padding:9px 0;border:0;border-bottom:1px solid var(--orange);font:700 13px var(--body);white-space:nowrap}.footer-poster span{color:var(--orange);padding-left:15px}
+.work-dialog{padding:0;background:var(--paper);border:0;color:var(--ink);width:min(1040px,calc(100vw - 40px));max-width:none;max-height:min(820px,calc(100dvh - 40px));box-shadow:0 30px 100px rgba(0,0,0,.4)}.work-dialog::backdrop{background:rgba(15,15,15,.82);backdrop-filter:blur(6px)}.dialog-shell{display:grid;grid-template-columns:1fr 1fr;min-height:570px}.dialog-art{min-height:570px;background:#1a1a19}.dialog-art svg{display:block;width:100%;height:100%;object-fit:cover}.dialog-info{display:flex;flex-direction:column;padding:29px 35px 22px;min-width:0}.dialog-top{display:flex;justify-content:space-between;align-items:center}.dialog-top .micro{color:var(--orange)}.dialog-close{width:44px;height:44px;border:1px solid var(--ink);display:grid;place-items:center;background:transparent;font-size:32px;line-height:1;transition:background .2s,color .2s}.dialog-close:hover{background:var(--ink);color:var(--paper)}.dialog-main{margin:auto 0;padding:45px 0}.dialog-eyebrow{color:var(--inksoft)}.dialog-info h2{font:900 clamp(48px,5.2vw,82px)/.93 var(--condensed);text-transform:uppercase;letter-spacing:-.067em;margin:25px 0}.dialog-info p{font-size:15px;line-height:1.65;max-width:390px;margin:0}.dialog-facts{margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:22px}.dialog-facts>div{border-top:1px solid var(--line);padding-top:12px}.dialog-facts .micro{display:block;color:var(--inksoft);margin-bottom:9px}.dialog-facts strong{font-size:13px;line-height:1.4;display:block}.dialog-bottom{color:var(--inksoft);border-top:1px solid var(--line);padding-top:14px}
+.poster-mode{position:fixed;inset:0;background:var(--orange);color:var(--ink);z-index:900;overflow:hidden}.poster-mode canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.poster-ui{position:absolute;inset:0;padding:clamp(18px,3vw,55px);display:flex;flex-direction:column;pointer-events:none}.poster-top,.poster-bottom{display:flex;justify-content:space-between;align-items:center;gap:25px}.poster-top button{pointer-events:auto;background:var(--ink);color:var(--white);border:1px solid var(--ink);font:700 14px var(--body);padding:13px 17px}.poster-top button span{font-size:20px;margin-left:25px}.poster-top button:hover{background:var(--paper);color:var(--ink)}.poster-live{display:flex;gap:10px;align-items:center}.live-dot{width:8px;height:8px;border-radius:50%;background:var(--ink);display:inline-block;animation:live-flicker 2s step-end infinite}@keyframes live-flicker{50%{opacity:.1}}.poster-middle{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative}.poster-kicker{font:bold clamp(11px,1.1vw,17px) var(--body);letter-spacing:.09em;margin-left:6px}.poster-bigtype{font:900 clamp(102px,20.3vw,350px)/.72 var(--condensed);letter-spacing:-.10em;transform:scaleX(.89);transform-origin:left center;white-space:nowrap;margin-top:35px}.poster-bigtype span{color:var(--paper);padding-left:.04em}.poster-side-note{position:absolute;right:0;bottom:17%;font:700 11px var(--body);letter-spacing:.1em;writing-mode:vertical-rl}.poster-bottom{padding-top:17px;border-top:1px solid var(--ink)}.poster-pause-sign{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);padding:8px 15px;font:bold 11px var(--body);letter-spacing:.1em}.noscript{padding:20px;background:#ffe8d9}
+@media (max-width:1100px){.main-nav{gap:17px}.hero h1{font-size:16vw}.hero-body{min-height:480px}.section-pad{padding-top:80px;padding-bottom:90px}.intro h2{font-size:8vw}.manifesto{min-height:630px}.dialog-shell{min-height:500px}.dialog-art{min-height:500px}.dialog-info{padding:23px}.visit-content{min-height:520px}}
+@media (max-width:800px){.site-header{height:74px}.main-nav{display:none}.site-header .poster-launch{margin-left:auto}.hero{min-height:calc(100svh - 74px)}.hero-index{display:none}.hero-body{min-height:510px}.hero h1{font-size:18vw}.hero-art{width:86%;right:-24%;top:3%;bottom:5%}.hero-type{padding-top:0}.hero-copy-wrap{margin-top:30px;gap:35px}.hero-bottom{grid-template-columns:1fr auto}.hero-bottom .hero-scroll{display:none}.hero-bottom-note{font-size:9px}.intro-main{grid-template-columns:1fr}.intro h2{font-size:clamp(75px,12vw,130px)}.intro-diagram{max-width:460px;width:75%;margin:40px auto 0}.works-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:52px 20px}.section-heading-row h2{font-size:clamp(66px,10vw,100px)}.section-heading-row p{max-width:200px}.manifesto-inner>p{font-size:12vw}.manifesto-field{right:-40%;width:100vw;height:100vw}.program-layout{grid-template-columns:1fr}.program-side{display:none}.visit-content{grid-template-columns:1fr;gap:25px}.visit h2{font-size:12vw}.visit-left{gap:20px}.visit-right{min-height:390px}.visit-orbit{right:0;left:auto;transform:none;top:-10px}.calendar-panel{align-self:flex-end;max-width:500px}.site-footer{flex-wrap:wrap}.footer-poster{margin-left:auto}.poster-bigtype{font-size:21vw}}
+@media (max-width:540px){:root{--pad:19px}.site-header{height:65px}.brand{font-size:22px}.brand-symbol{width:27px;height:27px}.site-header .poster-launch{font-size:11px;padding:12px 11px;gap:8px}.site-header .poster-launch .poster-launch-dot{display:none}.hero{min-height:calc(100svh - 65px);padding-bottom:0}.hero-topline{padding-top:17px}.hero-topline .micro{font-size:9px}.hero-body{min-height:460px;align-items:center}.hero-art{width:145%;right:-76%;top:-1%;bottom:14%;opacity:.82}.hero-art-index{right:45%;top:2%}.hero-art-cross{right:49%;bottom:3%}.hero-type{margin-top:11px}.hero-pretitle{font-size:9px;margin:0 0 23px 2px;white-space:nowrap}.hero h1{font-size:19.7vw;letter-spacing:-.092em;transform:scaleX(.96)}.hero h1 .hero-slash{height:.55em;transform:translate(.78em,.06em);font-size:.69em}.hero-orange-star{font-size:.17em!important}.hero-copy-wrap{margin:59px 0 0 3px;gap:19px}.hero-no{font-size:10px;white-space:nowrap}.hero-copy{font-size:14px}.hero-bottom{min-height:99px;grid-template-columns:1fr;gap:12px;justify-items:start;align-items:start;padding:15px 0 24px}.hero-bottom-note{font-size:9px}.text-link{font-size:14px;gap:15px}.text-link .link-arrow{font-size:25px}.section-pad{padding-top:67px;padding-bottom:75px}.section-label{grid-template-columns:62px 1fr auto;gap:6px;font-size:9px}.intro-main{padding-top:48px}.intro h2{font-size:clamp(61px,14vw,82px)}.intro-subcopy{grid-template-columns:1fr;gap:15px;margin-top:30px}.intro-subcopy p{font-size:15px}.intro-diagram{width:100%;max-width:345px;margin-top:42px}.section-heading-row{display:block;padding:34px 0 36px}.section-heading-row h2{font-size:clamp(47px,12vw,67px)}.section-heading-row p{margin:22px 0 0;max-width:320px;font-size:14px}.works-grid{grid-template-columns:1fr;gap:50px}.work-art{aspect-ratio:1.13}.work-card h3{font-size:34px}.work-card p{min-height:0}.work-open{margin-top:15px}.works-footnote{font-size:9px;margin-top:55px}.manifesto{min-height:540px;padding:60px var(--pad)}.manifesto-inner>p{font-size:12vw;margin:50px 0 90px}.manifesto-field{right:-68%;width:140vw;height:140vw}.manifesto-bottom{width:100%;font-size:9px}.program-header{display:block;padding:40px 0 37px}.program-header h2{font-size:clamp(64px,12vw,85px)}.program-header p{font-size:14px;margin-top:24px;max-width:330px}.day-tab{padding:15px 8px 14px;gap:10px}.day-tab span{font-size:9px;white-space:nowrap}.day-tab strong{font-size:clamp(28px,8vw,42px)}.event-row{grid-template-columns:49px minmax(0,1fr) 23px;gap:9px;padding:21px 3px}.event-kind{grid-column:2;grid-row:2;font-size:9px}.event-radio{grid-column:3;grid-row:1/3;width:19px;height:19px}.event-time{font-size:15px}.event-name{font-size:20px}.event-panel{min-height:275px}.visit{padding:67px var(--pad) 55px}.visit-content{padding-top:55px}.visit h2{font-size:clamp(53px,12.2vw,76px);margin:35px 0 30px}.visit-info{gap:20px}.visit-info strong{font-size:13px}.visit-info p{font-size:12px}.visit-right{min-height:385px}.visit-orbit{width:295px;height:295px;right:-75px}.calendar-panel{padding:23px}.selection-title{font-size:33px}.calendar-button{min-height:65px;font-size:14px;padding:14px 17px}.site-footer{gap:24px;align-items:start;flex-direction:column;min-height:0;padding-top:35px}.site-footer p{font-size:9px}.footer-poster{margin-left:0}.work-dialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px)}.dialog-shell{grid-template-columns:1fr;min-height:0}.dialog-art{height:min(37dvh,290px);min-height:0}.dialog-info{padding:20px}.dialog-main{padding:20px 0 25px}.dialog-info h2{font-size:clamp(42px,11vw,58px);margin:13px 0}.dialog-info p{font-size:13px;line-height:1.5}.dialog-facts{margin-top:23px}.dialog-bottom{font-size:9px}.poster-mode .poster-ui{padding:20px}.poster-top,.poster-bottom{align-items:start}.poster-live{font-size:9px}.poster-top button{font-size:12px;padding:10px}.poster-top button span{margin-left:6px}.poster-bigtype{font-size:22vw;margin-top:22px}.poster-kicker{font-size:10px;max-width:230px}.poster-side-note{bottom:10%;font-size:9px}.poster-bottom{font-size:8px;align-items:end}.poster-bottom span:last-child{max-width:125px;text-align:right}}
+@media (max-width:360px){.site-header .poster-launch{font-size:10px}.brand{gap:5px}.day-tab span{font-size:8px}.visit-info{grid-template-columns:1fr;gap:22px}.visit-right{min-height:420px}.hero h1{font-size:19vw}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.js-motion .reveal{opacity:1;transform:none}.manifesto-orbit{transform:none!important}}
+
+</style>
+  
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <div id="page">
+    <header class="site-header" id="top">
+      <a class="brand" href="#top" aria-label="ПОЛЕ / ФОРМА — на первый экран">
+        <svg class="brand-symbol" width="31" height="31" viewBox="0 0 31 31" fill="none" aria-hidden="true"><circle cx="15.5" cy="15.5" r="13.5" stroke="currentColor" stroke-width="2"/><circle cx="15.5" cy="15.5" r="6" fill="currentColor"/><path d="M1 15.5h29" stroke="currentColor" stroke-width="2"/></svg>
+        <span>П / Ф</span>
+      </a>
+      <nav class="main-nav" aria-label="Навигация по странице">
+        <a href="#concept">Идея</a>
+        <a href="#works">Экспонаты</a>
+        <a href="#program">Программа</a>
+        <a href="#visit">Посещение</a>
+      </nav>
+      <button class="poster-launch button-quiet" type="button" data-poster-open aria-haspopup="dialog"><span class="poster-launch-dot"></span> Режим афиши <span aria-hidden="true">↗</span></button>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-topline micro"><span><span class="tiny-square"></span> Выставка кинетического искусства</span><span class="hero-index">МОСКВА · 2027 / ВЫМЫШЛЕННЫЙ ПРОЕКТ</span></div>
+        <div class="hero-body">
+          <div class="hero-art" aria-hidden="true">
+            <canvas id="heroCanvas"></canvas>
+            <div class="hero-art-index">F / 00<br>POSITION — VARIABLE</div>
+            <div class="hero-art-cross">+</div>
+          </div>
+          <div class="hero-type">
+            <p class="hero-pretitle micro">21—23 МАЯ &nbsp;·&nbsp; ПАВИЛЬОН «КОНТУР»</p>
+            <h1 id="hero-title"><span class="hero-title-one">ПОЛЕ<span class="hero-orange-star">*</span></span><span class="hero-slash" aria-label="слэш">/</span><span class="hero-title-two">ФОРМА</span></h1>
+            <div class="hero-copy-wrap"><span class="hero-no">[ 00—06 ]</span><p class="hero-copy">Искусство, которое меняется,<br>когда меняетесь вы.</p></div>
+          </div>
+        </div>
+        <div class="hero-bottom">
+          <span class="micro hero-bottom-note">* ДЕМОНСТРАЦИОННАЯ АФИША. ВСЕ ДАННЫЕ ВЫМЫШЛЕНЫ.</span>
+          <a class="text-link" href="#works">Исследовать выставку <span class="link-arrow" aria-hidden="true">↘</span></a>
+          <span class="hero-scroll micro">ПРОКРУТИТЕ ВНИЗ &nbsp; ↓</span>
+        </div>
+      </section>
+
+      <section class="intro section-pad" id="concept" aria-labelledby="concept-title">
+        <div class="section-label"><span class="label-number">01 / 04</span><span>ИДЕЯ</span></div>
+        <div class="intro-main">
+          <div class="intro-copy reveal">
+            <h2 id="concept-title">ФОРМА<br>НЕ СТОИТ<br><em>НА МЕСТЕ.</em></h2>
+            <div class="intro-subcopy"><p>Шесть воображаемых инсталляций исследуют невидимые силы: импульс, равновесие, повторение и случайность.</p><p>Здесь зритель — не наблюдатель. Его присутствие становится частью композиции.</p></div>
+          </div>
+          <div class="intro-diagram reveal" aria-hidden="true">
+            <svg viewBox="0 0 440 400" fill="none">
+              <path d="M0 200H440M220 0V400" stroke="#161616" stroke-width="1" opacity=".22"/>
+              <circle cx="220" cy="200" r="152" stroke="#191919" stroke-width="1.4"/>
+              <circle cx="220" cy="200" r="110" stroke="#191919" stroke-width="1.4"/>
+              <circle cx="220" cy="200" r="69" stroke="#191919" stroke-width="1.4"/>
+              <path d="M73 127C107 12 270 36 325 140C393 268 235 367 117 281C17 208 69 122 176 103C260 88 303 185 257 237C210 292 145 238 161 189" stroke="#ff4b00" stroke-width="12" stroke-linecap="square"/>
+              <circle cx="220" cy="200" r="12" fill="#191919"/>
+              <path d="M370 200h60M220 13V0" stroke="#191919" stroke-width="2"/>
+              <text x="4" y="21" fill="#191919" font-family="monospace" font-size="13">X — 01</text><text x="353" y="390" fill="#191919" font-family="monospace" font-size="13">Y — ∞</text>
+            </svg>
+            <div class="diagram-caption micro"><span>ДИАГРАММА ВОЗДЕЙСТВИЯ</span><span>01 / 01</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="works section-pad" id="works" aria-labelledby="works-title">
+        <div class="section-label"><span class="label-number">02 / 04</span><span>ЭКСПОЗИЦИЯ</span><span class="section-label-tail">6 ЭКСПОНАТОВ</span></div>
+        <div class="section-heading-row"><h2 id="works-title">ШЕСТЬ<br><span class="outlined-word">ТРАЕКТОРИЙ</span></h2><p>Каждая работа — отдельное правило движения. Нажмите на экспонат, чтобы узнать, как он устроен.</p></div>
+        <div class="works-grid" id="worksGrid"></div>
+        <p class="works-footnote micro">* ИЗОБРАЖЕНИЯ И ОПИСАНИЯ СОЗДАНЫ СПЕЦИАЛЬНО ДЛЯ ДЕМОНСТРАЦИИ.</p>
+      </section>
+
+      <section class="manifesto" aria-label="Манифест выставки" id="manifesto">
+        <div class="manifesto-field" aria-hidden="true"><div class="manifesto-orbit orbit-a"></div><div class="manifesto-orbit orbit-b"></div><div class="manifesto-orbit orbit-c"></div><div class="manifesto-core"></div></div>
+        <div class="manifesto-inner"><span class="micro">НЕПОДВИЖНОСТЬ — ЭТО ТОЛЬКО МОМЕНТ</span><p>ФОРМА —<br>НЕ ОБЪЕКТ.<br><span>ФОРМА —<br>СОБЫТИЕ.</span></p><span class="manifesto-bottom micro">ПОЛЕ / ФОРМА &nbsp; © ДЕМО 2027</span></div>
+      </section>
+
+      <section class="program section-pad" id="program" aria-labelledby="program-title">
+        <div class="section-label"><span class="label-number">03 / 04</span><span>ПРОГРАММА</span><span class="section-label-tail">21—23 МАЯ 2027</span></div>
+        <div class="program-header"><h2 id="program-title">ТРИ ДНЯ.<br><em>ТРИ РИТМА.</em></h2><p>Выберите день и событие. Его можно добавить в календарь одним нажатием.</p></div>
+        <div class="program-layout">
+          <div class="program-side"><span class="program-star" aria-hidden="true">✳</span><p class="micro">СОБЫТИЕ / ВРЕМЯ / ФОРМАТ<br>ВСЕ ПУНКТЫ ПРОГРАММЫ ВЫМЫШЛЕНЫ</p></div>
+          <div class="program-content">
+            <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Выберите день программы">
+              <button id="day-tab-0" type="button" class="day-tab" role="tab" aria-selected="true" aria-controls="eventPanel" tabindex="0" data-day="0"><span>ПЯТНИЦА</span><strong>21.05</strong></button>
+              <button id="day-tab-1" type="button" class="day-tab" role="tab" aria-selected="false" aria-controls="eventPanel" tabindex="-1" data-day="1"><span>СУББОТА</span><strong>22.05</strong></button>
+              <button id="day-tab-2" type="button" class="day-tab" role="tab" aria-selected="false" aria-controls="eventPanel" tabindex="-1" data-day="2"><span>ВОСКРЕСЕНЬЕ</span><strong>23.05</strong></button>
+            </div>
+            <div class="event-panel" id="eventPanel" role="tabpanel" aria-labelledby="day-tab-0" tabindex="0">
+              <div class="events-list" id="eventsList"></div>
+            </div>
+            <div class="program-foot"><span aria-hidden="true">↳</span> <span>Выбранное событие отображается в блоке посещения ниже.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="visit" id="visit" aria-labelledby="visit-title">
+        <div class="section-label section-label-invert"><span class="label-number">04 / 04</span><span>ПОСЕЩЕНИЕ</span><span class="section-label-tail">ДОБАВЬТЕ В КАЛЕНДАРЬ</span></div>
+        <div class="visit-content">
+          <div class="visit-left"><span class="visit-caption micro"><span class="circle-flash"></span> ВАША ТОЧКА ВХОДА</span><h2 id="visit-title">ВСТРЕТИМСЯ<br>В <em>ПОЛЕ.</em></h2><div class="visit-info"><div><span class="info-label micro">КОГДА</span><strong>21—23 мая 2027</strong><p>Пт — Вс, по программе</p></div><div><span class="info-label micro">ГДЕ</span><strong>Павильон «Контур»</strong><p>Вымышленная площадка · Москва</p></div></div></div>
+          <div class="visit-right"><div class="visit-orbit" aria-hidden="true"><span></span><span></span><span></span></div><div class="calendar-panel"><span class="calendar-tag micro">ВЫБРАННОЕ СОБЫТИЕ <span class="calendar-check">✓</span></span><p id="selectionTitle" class="selection-title" aria-live="polite">Открытие поля</p><p id="selectionTime" class="selection-time">21 мая · 12:00—13:00</p><button id="calendarBtn" class="calendar-button" type="button"><span>Запланировать визит</span><span aria-hidden="true">↗</span></button><p class="calendar-note">Скачается файл .ics для календаря. Это не билет и не запись на реальную выставку.</p><div id="downloadStatus" role="status" class="sr-only"></div></div></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><a href="#top" class="footer-name">ПОЛЕ / ФОРМА <span aria-hidden="true">↑</span></a><p>АВТОРСКИЙ ДЕМОНСТРАЦИОННЫЙ ПРОЕКТ<br>НИ ВЫСТАВКА, НИ СОБЫТИЯ НЕ СУЩЕСТВУЮТ</p><button type="button" class="footer-poster" data-poster-open>Запустить режим афиши <span aria-hidden="true">↗</span></button></footer>
+  </div>
+
+  <dialog id="workDialog" class="work-dialog" aria-labelledby="dialogTitle" aria-describedby="dialogDescription">
+    <div class="dialog-shell"><div class="dialog-art" id="dialogArt" aria-hidden="true"></div><div class="dialog-info"><div class="dialog-top"><span class="micro" id="dialogIndex">ЭКСПОНАТ / 01</span><button type="button" id="dialogClose" class="dialog-close" aria-label="Закрыть подробности экспоната">×</button></div><div class="dialog-main"><div class="dialog-eyebrow micro" id="dialogAuthor"></div><h2 id="dialogTitle"></h2><p id="dialogDescription"></p><div class="dialog-facts"><div><span class="micro">ПРИНЦИП</span><strong id="dialogPrinciple"></strong></div><div><span class="micro">СРЕДА</span><strong id="dialogMedium"></strong></div></div></div><div class="dialog-bottom micro">ПОЛЕ / ФОРМА &nbsp;·&nbsp; ВЫМЫШЛЕННЫЙ ЭКСПОНАТ</div></div></div>
+  </dialog>
+
+  <div class="poster-mode" id="posterMode" role="dialog" aria-modal="true" aria-label="Полноэкранная анимированная афиша" hidden tabindex="-1">
+    <canvas id="posterCanvas" aria-hidden="true"></canvas>
+    <div class="poster-ui"><div class="poster-top micro"><span class="poster-live"><span class="live-dot"></span> РЕЖИМ АФИШИ / LIVE</span><button id="posterClose" type="button">Закрыть <span aria-hidden="true">×</span></button></div><div class="poster-middle"><span class="poster-kicker">ВЫСТАВКА КИНЕТИЧЕСКОГО ИСКУССТВА / ДЕМО</span><div class="poster-bigtype">ПОЛЕ<span>/</span><br>ФОРМА</div><span class="poster-side-note">ПРИСУТСТВИЕ ФОРМИРУЕТ ПРОСТРАНСТВО</span></div><div class="poster-bottom micro"><span>21—23.05.2027 &nbsp;·&nbsp; ВЫМЫШЛЕННАЯ ПЛОЩАДКА, МОСКВА</span><span>ESC — ВЫХОД &nbsp; / &nbsp; ПРОБЕЛ — ПАУЗА</span></div></div>
+    <div class="poster-pause-sign" id="posterPauseSign" hidden>ПАУЗА</div>
+  </div>
+  <noscript><div class="noscript">Для интерактивных экспонатов и программы необходим JavaScript. Основная информация о выставке доступна выше.</div></noscript>
+<script>
+/* ПОЛЕ / ФОРМА — авторский демонстрационный проект. Без сторонних библиотек. */
+'use strict';
+
+const works = [
+  {title:'Резонанс',author:'Лия Март / 2027',medium:'Свет · вибрация',short:'Кольца улавливают ритм присутствия и превращают его в волну.',description:'Двадцать четыре концентрические рамы отвечают на воображаемые шаги зрителя. Чем ближе импульс, тем дальше расходится рисунок: неподвижная геометрия начинает казаться живой.',principle:'Резонанс и затухание',environment:'Кинетическая инсталляция'},
+  {title:'Тихий вектор',author:'Илья Север / 2027',medium:'Линия · алгоритм',short:'Параллельные прямые постепенно теряют общее направление.',description:'Одинаковые линии сдвигаются на едва заметную величину. В каждом повторении накапливается погрешность, и строгая сетка превращается в самостоятельный ландшафт.',principle:'Смещение и накопление',environment:'Генеративная графика'},
+  {title:'Чёрное солнце',author:'Ника Орлова / 2027',medium:'Тень · вращение',short:'Круговая механика собирает тень в несуществующий объект.',description:'Три диска вращаются с разными скоростями. Их прорези создают силуэт, которого нет ни на одном отдельном диске. Объект появляется только во времени.',principle:'Интерференция и фаза',environment:'Оптический объект'},
+  {title:'Петля / 24',author:'Арсен Долин / 2027',medium:'Звук · траектория',short:'Двадцать четыре жеста образуют один непрерывный рисунок.',description:'Короткие воображаемые движения повторяются с небольшим сдвигом. Звуковая петля не совпадает с визуальной: пространство между ними и становится произведением.',principle:'Повторение и фазовый сдвиг',environment:'Аудиовизуальная партитура'},
+  {title:'Предел изгиба',author:'Марта Грей / 2027',medium:'Плоскость · давление',short:'Жёсткие квадраты подчиняются невидимой силе.',description:'Поле давления меняет угол каждого модуля. Простая ортогональная структура постепенно теряет равновесие и обретает новую симметрию на границе разрушения.',principle:'Деформация и баланс',environment:'Модульная скульптура'},
+  {title:'Ось отсутствия',author:'Данила Ру / 2027',medium:'Пустота · свет',short:'Центр композиции возникает там, где ничего не происходит.',description:'Сорок восемь лучей направлены к незаполненному центру. Внимание зрителя притягивает не объект, а пустота, вокруг которой выстроено всё движение.',principle:'Радиальная направленность',environment:'Световая структура'}
+];
+
+const days = [
+  {date:'2027-05-21',name:'21 мая',events:[
+    {start:'12:00',end:'13:00',title:'Открытие поля',kind:'Открытие / маршрут',desc:'Знакомство с экспозицией и принципами шести работ.'},
+    {start:'16:00',end:'17:00',title:'Геометрия движения',kind:'Публичный разговор',desc:'Как сделать невидимые силы видимыми.'},
+    {start:'19:00',end:'19:40',title:'Нулевая частота',kind:'Аудиовизуальный перформанс',desc:'Ритм, который постепенно распадается на тишину.'}
+  ]},
+  {date:'2027-05-22',name:'22 мая',events:[
+    {start:'11:00',end:'12:30',title:'Алгоритм и жест',kind:'Открытая мастерская',desc:'Рисуем траектории по собственным правилам.'},
+    {start:'15:00',end:'16:00',title:'Шесть траекторий',kind:'Экскурсия',desc:'Путешествие от импульса к равновесию.'},
+    {start:'18:30',end:'19:15',title:'Контур / шум',kind:'Световой сеанс',desc:'Наложение света, движения и звука.'}
+  ]},
+  {date:'2027-05-23',name:'23 мая',events:[
+    {start:'12:00',end:'13:00',title:'Медленное наблюдение',kind:'Медитативный маршрут',desc:'Смотрим, как изменяется восприятие за час.'},
+    {start:'16:00',end:'17:00',title:'Что движет формой',kind:'Встреча с авторами',desc:'Разговор о вымышленных машинах и реальных вопросах.'},
+    {start:'19:00',end:'20:00',title:'Финальный цикл',kind:'Заключительный перформанс',desc:'Шесть ритмов собираются в единую систему.'}
+  ]}
+];
+
+const $ = (selector, root=document) => root.querySelector(selector);
+const $$ = (selector, root=document) => Array.from(root.querySelectorAll(selector));
+const safeN = n => Number(n).toFixed(2);
+const polar = (cx,cy,r,a) => [cx+Math.cos(a)*r, cy+Math.sin(a)*r];
+const pathOf = points => points.map(([x,y],i) => `${i?'L':'M'}${safeN(x)} ${safeN(y)}`).join(' ');
+
+function workGraphic(index) {
+  const paper='#f2f0ea', black='#191919', orange='#ff4b00';
+  const frame = (bg, content) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice" focusable="false" aria-hidden="true"><rect width="600" height="600" fill="${bg}"/>${content}<g fill="none" stroke-width="1" opacity=".5"><path d="M22 22h24M22 22v24M578 22h-24M578 22v24M22 578h24M22 578v-24M578 578h-24M578 578v-24" stroke="${bg===black?paper:black}"/></g></svg>`;
+  if(index===0){
+    let lines = `<circle cx="330" cy="283" r="106" fill="${orange}"/>`;
+    for(let i=0;i<25;i++){
+      const rx=29+i*11, ry=23+i*9, cx=308+Math.sin(i*.44)*13, cy=292+Math.cos(i*.39)*10;
+      lines+=`<ellipse cx="${safeN(cx)}" cy="${safeN(cy)}" rx="${rx}" ry="${ry}" stroke="${i%7===0?orange:paper}" stroke-width="${i%7===0?3:1.8}" fill="none"/>`;
+    }
+    return frame(black,lines+`<circle cx="330" cy="283" r="10" fill="${black}"/>`);
+  }
+  if(index===1){
+    let lines='';
+    for(let i=0;i<36;i++){
+      const p=[];
+      for(let j=0;j<=28;j++){
+        const x=-50+j*25, y=46+i*15+Math.sin(j*.33+i*.16)*15+Math.sin(j*.09+i*.44)*17;
+        p.push([x,y]);
+      }
+      lines+=`<path d="${pathOf(p)}" fill="none" stroke="${i%9===0?orange:black}" stroke-width="${i%9===0?5:1.6}"/>`;
+    }
+    return frame(paper,lines+`<rect x="415" y="145" width="42" height="320" fill="${orange}" transform="rotate(23 436 305)"/>`);
+  }
+  if(index===2){
+    let lines=`<circle cx="300" cy="300" r="200" fill="${orange}"/>`;
+    for(let i=0;i<18;i++){
+      const radius=62+i*10;
+      lines+=`<circle cx="${300+Math.sin(i*.7)*20}" cy="${300+Math.cos(i*.66)*15}" r="${radius}" fill="none" stroke="${i%3===0?black:paper}" stroke-width="${i%5===0?6:1.7}"/>`;
+    }
+    for(let i=0;i<11;i++){
+      const a=(i/11)*Math.PI*2;const [x,y]=polar(300,300,214,a);const [x2,y2]=polar(300,300,47,a);
+      lines+=`<path d="M${safeN(x)} ${safeN(y)} L${safeN(x2)} ${safeN(y2)}" stroke="${black}" stroke-width="1.4"/>`;
+    }
+    return frame(black,lines+`<circle cx="300" cy="300" r="49" fill="${black}"/><path d="M267 300h66M300 267v66" stroke="${paper}" stroke-width="2"/>`);
+  }
+  if(index===3){
+    let lines='';
+    for(let i=0;i<24;i++){
+      const p=[];
+      for(let j=0;j<=72;j++){
+        const x=20+j*8, yy=84+i*18+Math.sin(j*.16+i*.32)*29+Math.cos(j*.06-i*.3)*14;
+        p.push([x,yy]);
+      }
+      lines+=`<path d="${pathOf(p)}" stroke="${i%7===0?paper:black}" stroke-width="${i%7===0?4:2}" fill="none"/>`;
+    }
+    return frame(orange,lines+`<rect x="453" y="47" width="36" height="36" fill="${black}"/>`);
+  }
+  if(index===4){
+    let lines='';
+    for(let row=0;row<7;row++)for(let col=0;col<7;col++){
+      const x=55+col*73,y=55+row*73,a=(row*7+col)*.12;
+      const size=24+18*Math.sin(a);
+      lines+=`<rect x="${safeN(x-size/2)}" y="${safeN(y-size/2)}" width="${safeN(size)}" height="${safeN(size)}" fill="none" stroke="${black}" stroke-width="2.3" transform="rotate(${safeN((row-3)*(col-3)*1.8)} ${x} ${y})"/>`;
+    }
+    lines+=`<path d="M140 390L365 180L485 335L295 515Z" fill="${orange}" style="mix-blend-mode:multiply" opacity=".96"/>`;
+    return frame(paper,lines);
+  }
+  let lines='';
+  for(let i=0;i<48;i++){
+    const a=i*Math.PI*2/48;
+    const [x1,y1]=polar(300,300,93,a),[x2,y2]=polar(300,300,305,a);
+    lines+=`<path d="M${safeN(x1)} ${safeN(y1)}L${safeN(x2)} ${safeN(y2)}" stroke="${i%6===0?orange:paper}" stroke-width="${i%6===0?7:1.5}"/>`;
+  }
+  lines+=`<circle cx="300" cy="300" r="90" fill="${black}" stroke="${orange}" stroke-width="10"/><rect x="281" y="281" width="38" height="38" fill="${paper}"/>`;
+  return frame(black,lines);
+}
+
+function renderWorks(){
+  const grid=$('#worksGrid');
+  grid.innerHTML=works.map((w,i)=>`<article class="work-card"><div class="work-art">${workGraphic(i)}</div><div class="work-card-head"><span class="work-index">${String(i+1).padStart(2,'0')} / 06</span><span class="work-medium">${w.medium}</span></div><h3>${w.title}</h3><p>${w.short}</p><button class="work-open" type="button" data-open-work="${i}" aria-label="Подробнее об экспонате «${w.title}»">Подробнее <span class="work-arrow" aria-hidden="true">↗</span></button></article>`).join('');
+}
+
+let workFocus=null;
+function openWork(i,trigger){
+  const work=works[i],dlg=$('#workDialog');if(!work)return;
+  workFocus=trigger;
+  $('#dialogArt').innerHTML=workGraphic(i);
+  $('#dialogIndex').textContent=`ЭКСПОНАТ / ${String(i+1).padStart(2,'0')}`;
+  $('#dialogAuthor').textContent=work.author;
+  $('#dialogTitle').textContent=work.title;
+  $('#dialogDescription').textContent=work.description;
+  $('#dialogPrinciple').textContent=work.principle;
+  $('#dialogMedium').textContent=work.environment;
+  dlg.showModal();$('#dialogClose').focus();
+}
+
+let selectedDay=0,selectedEvent=0;
+function selectDay(index,shouldFocus=false){
+  selectedDay=index;selectedEvent=0;
+  $$('.day-tab').forEach((tab,i)=>{
+    tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;
+  });
+  $('#eventPanel').setAttribute('aria-labelledby',`day-tab-${index}`);
+  $('#eventsList').innerHTML=days[index].events.map((e,i)=>`<button type="button" class="event-row" data-event="${i}" aria-pressed="${i===selectedEvent}"><span class="event-time">${e.start}</span><span class="event-name">${e.title}</span><span class="event-kind">${e.kind}</span><span class="event-radio" aria-hidden="true"></span></button>`).join('');
+  updateSelection();
+  if(shouldFocus) $(`#day-tab-${index}`).focus();
+}
+function selectEvent(index){
+  selectedEvent=index;
+  $$('.event-row').forEach((row,i)=>row.setAttribute('aria-pressed',String(i===index)));
+  updateSelection();
+}
+function updateSelection(){
+  const day=days[selectedDay],e=day.events[selectedEvent];
+  $('#selectionTitle').textContent=e.title;
+  $('#selectionTime').textContent=`${day.name} · ${e.start}—${e.end}`;
+  $('#calendarBtn').setAttribute('aria-label',`Запланировать визит: ${e.title}, ${day.name}, ${e.start}. Скачать файл календаря`);
+}
+function icsSafe(value){return String(value).replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');}
+function utcIcs(date,time){
+  const [y,m,d]=date.split('-').map(Number),[h,minute]=time.split(':').map(Number);
+  return new Date(Date.UTC(y,m-1,d,h-3,minute)).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+}
+function makeICS(dayIndex,eventIndex){
+  const day=days[dayIndex],ev=day.events[eventIndex];
+  const text=[
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//POLE FORMA//DEMO EXHIBITION//RU','CALSCALE:GREGORIAN','METHOD:PUBLISH',
+    'BEGIN:VEVENT',`UID:pole-forma-2027-${dayIndex}-${eventIndex}@demo.invalid`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')}`,
+    `DTSTART:${utcIcs(day.date,ev.start)}`,`DTEND:${utcIcs(day.date,ev.end)}`,
+    `SUMMARY:${icsSafe('ПОЛЕ / ФОРМА — '+ev.title)}`,
+    `DESCRIPTION:${icsSafe(ev.desc+' Демонстрационный проект. Событие вымышлено; календарная запись не является билетом.')}`,
+    `LOCATION:${icsSafe('Павильон «Контур» (вымышленная площадка), Москва')}`,
+    'END:VEVENT','END:VCALENDAR',''
+  ];
+  return text.join('\r\n');
+}
+function downloadICS(){
+  const day=days[selectedDay],ev=day.events[selectedEvent];
+  const blob=new Blob([makeICS(selectedDay,selectedEvent)],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=`pole-forma-${day.date}-${ev.start.replace(':','')}.ics`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  $('#downloadStatus').textContent=`Календарный файл для события «${ev.title}» подготовлен.`;
+}
+
+const motionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');
+let reduced=motionQuery.matches, visible=true;
+let pointer={x:0,y:0,tx:0,ty:0},scrollPhase=0;
+const heroCanvas=$('#heroCanvas'),posterCanvas=$('#posterCanvas');
+const sizes=new WeakMap();
+function setupCanvas(canvas){
+  const rect=canvas.getBoundingClientRect();
+  if(rect.width<1||rect.height<1)return null;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const width=Math.round(rect.width*dpr),height=Math.round(rect.height*dpr);
+  const s=sizes.get(canvas);
+  if(!s||s.width!==width||s.height!==height){canvas.width=width;canvas.height=height;sizes.set(canvas,{width,height,dpr});}
+  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w:rect.width,h:rect.height};
+}
+const lerp=(a,b,t)=>a+(b-a)*t;
+function drawHero(time){
+  const state=setupCanvas(heroCanvas);if(!state)return;
+  const {ctx,w,h}=state;
+  ctx.clearRect(0,0,w,h);
+  pointer.x=lerp(pointer.x,pointer.tx,reduced?1:.075);
+  pointer.y=lerp(pointer.y,pointer.ty,reduced?1:.075);
+  const t=reduced?0:time*.001,phase=reduced?0:Math.sin(t*.36),m=reduced?0:Math.min(scrollPhase,1);
+  const cx=w*.61+pointer.x*20, cy=h*.49+pointer.y*24;
+  ctx.save();
+  ctx.fillStyle='#ff4b00';ctx.beginPath();ctx.arc(cx+33,cy-18,Math.min(w,h)*.145,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<37;i++){
+    ctx.beginPath();
+    const r=25+i*12.1;
+    for(let j=0;j<=142;j++){
+      const a=j/142*Math.PI*2;
+      const wav=Math.sin(a*5+i*.3+t*.34)*(5+4*i/37)+Math.sin(a*3-i*.18-t*.25)*5;
+      const px=cx+Math.cos(a)*(r+wav)*(1.07+phase*.045);
+      const py=cy+Math.sin(a)*(r+wav)*.78;
+      const targetX=(j/142)*w, targetY=((i+1)/38)*h+Math.sin(j*.07+i*.31+t*.42)*21;
+      const x=lerp(px,targetX,m*.92),y=lerp(py,targetY,m*.92);
+      if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    if(m<.9)ctx.closePath();
+    const orange=i===7||i===19||i===31;
+    ctx.strokeStyle=orange?'rgba(255,75,0,.94)':i%4===0?'rgba(23,23,22,.42)':'rgba(23,23,22,.21)';
+    ctx.lineWidth=orange?2.8:i%5===0?1.55:.95;
+    ctx.stroke();
+  }
+  ctx.strokeStyle='rgba(23,23,22,.32)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(cx-230,cy);ctx.lineTo(cx+270,cy);ctx.moveTo(cx,cy-230);ctx.lineTo(cx,cy+230);ctx.stroke();
+  ctx.fillStyle='#171716';ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+let posterRunning=false,posterPaused=false,posterTime=0,posterOpenedAt=0,posterFocus=null,posterWasFullscreen=false;
+function drawPoster(time){
+  if($('#posterMode').hidden)return;
+  const state=setupCanvas(posterCanvas);if(!state)return;
+  const {ctx,w,h}=state;
+  ctx.fillStyle='#ff4b00';ctx.fillRect(0,0,w,h);
+  const t=reduced?0:(posterPaused?posterTime:(time-posterOpenedAt)*.001);
+  const cx=w*.76,cy=h*.52,min=Math.min(w,h);
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(reduced?-.15:t*.044);
+  ctx.fillStyle='#191919';ctx.beginPath();ctx.arc(0,0,min*.145,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<47;i++){
+    const r=min*.16+i*min*.0128;
+    ctx.beginPath();
+    for(let j=0;j<=170;j++){
+      const a=j/170*Math.PI*2;
+      const distortion=(reduced?0:Math.sin(a*6+t*.45+i*.23)*min*.006)+Math.sin(a*3+i*.31)*min*.008;
+      const x=Math.cos(a)*(r+distortion)*1.23,y=Math.sin(a)*(r+distortion)*.87;
+      if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=i%8===0?'rgba(242,240,234,.92)':'rgba(25,25,25,.55)';
+    ctx.lineWidth=i%8===0?3.1:1.3;ctx.stroke();
+  }
+  ctx.restore();
+  ctx.strokeStyle='rgba(25,25,25,.37)';ctx.lineWidth=1;ctx.beginPath();
+  ctx.moveTo(cx-1.2*min,cy);ctx.lineTo(cx+min,cy);ctx.moveTo(cx,cy-min);ctx.lineTo(cx,cy+min);ctx.stroke();
+}
+function drawLoop(timestamp){
+  if(visible){
+    if(!reduced){drawHero(timestamp);if(posterRunning)drawPoster(timestamp);}
+  }
+  requestAnimationFrame(drawLoop);
+}
+function updateScroll(){
+  const hero=$('.hero');
+  scrollPhase=Math.min(Math.max(-hero.getBoundingClientRect().top/(hero.offsetHeight||1),0),1);
+  const manif=$('#manifesto');
+  const rect=manif.getBoundingClientRect();
+  const p=Math.max(0,Math.min(1,(innerHeight-rect.top)/(innerHeight+rect.height)));
+  if(!reduced){
+    $('.orbit-a',manif).style.transform=`translate(${p*45}px,${-p*28}px) rotate(${p*80}deg)`;
+    $('.orbit-b',manif).style.transform=`translate(${-p*80}px,${p*60}px)`;
+    $('.orbit-c',manif).style.transform=`translate(${p*50}px,${-p*64}px)`;
+  }
+}
+function toggleReduced(){
+  reduced=motionQuery.matches;
+  document.documentElement.classList.toggle('js-motion',!reduced);
+  if(reduced){
+    $$('.reveal').forEach(el=>el.classList.add('is-visible'));
+    $$('.manifesto-orbit').forEach(el=>el.style.transform='');
+    pointer.x=pointer.y=pointer.tx=pointer.ty=0;
+    drawHero(0);if(posterRunning)drawPoster(0);
+  }
+  else {drawHero(performance.now());if(posterRunning)drawPoster(performance.now());}
+}
+function openPoster(e){
+  posterFocus=e?.currentTarget||document.activeElement;
+  const layer=$('#posterMode');
+  layer.hidden=false;posterRunning=true;posterPaused=false;posterTime=0;
+  posterOpenedAt=performance.now();$('#posterPauseSign').hidden=true;
+  document.body.classList.add('overlay-open');$('#page').inert=true;
+  layer.focus();drawPoster(posterOpenedAt);
+  if(typeof layer.requestFullscreen==='function'){
+    layer.requestFullscreen({navigationUI:'hide'}).then(()=>{posterWasFullscreen=true;}).catch(()=>{/* Оверлей занимает экран и без Fullscreen API. */});
+  }
+}
+function closePoster(){
+  if($('#posterMode').hidden)return;
+  if(document.fullscreenElement=== $('#posterMode')){document.exitFullscreen().catch(()=>{});}
+  $('#posterMode').hidden=true;posterRunning=false;posterWasFullscreen=false;
+  document.body.classList.remove('overlay-open');$('#page').inert=false;
+  if(posterFocus?.isConnected)posterFocus.focus();
+}
+function togglePosterPause(){
+  if(reduced)return;
+  if(!posterPaused){posterTime=(performance.now()-posterOpenedAt)*.001;posterPaused=true;}
+  else {posterOpenedAt=performance.now()-posterTime*1000;posterPaused=false;}
+  $('#posterPauseSign').hidden=!posterPaused;
+}
+
+function init(){
+  renderWorks();selectDay(0);
+  $('#worksGrid').addEventListener('click',e=>{
+    const button=e.target.closest('[data-open-work]');
+    if(button)openWork(Number(button.dataset.openWork),button);
+  });
+  $('#dialogClose').addEventListener('click',()=>$('#workDialog').close());
+  $('#workDialog').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close();});
+  $('#workDialog').addEventListener('close',()=>{if(workFocus?.isConnected)workFocus.focus();});
+  $('#dayTabs').addEventListener('click',e=>{
+    const button=e.target.closest('[data-day]');if(button)selectDay(Number(button.dataset.day));
+  });
+  $('#dayTabs').addEventListener('keydown',e=>{
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+    e.preventDefault();
+    let next=selectedDay;
+    if(e.key==='Home')next=0;else if(e.key==='End')next=2;
+    else next=(selectedDay+(e.key==='ArrowRight'?1:2))%3;
+    selectDay(next,true);
+  });
+  $('#eventsList').addEventListener('click',e=>{
+    const button=e.target.closest('[data-event]');if(button)selectEvent(Number(button.dataset.event));
+  });
+  $('#calendarBtn').addEventListener('click',downloadICS);
+  $$('[data-poster-open]').forEach(b=>b.addEventListener('click',openPoster));
+  $('#posterClose').addEventListener('click',closePoster);
+  document.addEventListener('keydown',e=>{
+    if(!$('#posterMode').hidden){
+      if(e.key==='Escape'){e.preventDefault();closePoster();}
+      else if(e.code==='Space'&&e.target===$('#posterMode')){e.preventDefault();togglePosterPause();}
+    }
+  });
+  document.addEventListener('fullscreenchange',()=>{
+    if(posterWasFullscreen&&!document.fullscreenElement&&!$('#posterMode').hidden)closePoster();
+  });
+  $('.hero').addEventListener('pointermove',e=>{
+    if(reduced||e.pointerType==='touch')return;
+    const box=e.currentTarget.getBoundingClientRect();
+    pointer.tx=((e.clientX-box.left)/box.width-.5)*2;
+    pointer.ty=((e.clientY-box.top)/box.height-.5)*2;
+  },{passive:true});
+  $('.hero').addEventListener('pointerleave',()=>{pointer.tx=0;pointer.ty=0;});
+  window.addEventListener('scroll',updateScroll,{passive:true});
+  window.addEventListener('resize',()=>{if(reduced){drawHero(0);if(posterRunning)drawPoster(0);}updateScroll();},{passive:true});
+  document.addEventListener('visibilitychange',()=>{visible=!document.hidden;});
+  if(typeof motionQuery.addEventListener==='function')motionQuery.addEventListener('change',toggleReduced);
+  if('IntersectionObserver' in window){
+    const ob=new IntersectionObserver(entries=>{
+      for(const e of entries)if(e.isIntersecting){e.target.classList.add('is-visible');ob.unobserve(e.target);}
+    },{threshold:.09});
+    $$('.reveal').forEach(el=>ob.observe(el));
+  } else $$('.reveal').forEach(el=>el.classList.add('is-visible'));
+  toggleReduced();updateScroll();requestAnimationFrame(drawLoop);
+}
+init();
+
+</script>
+</body>
+</html>

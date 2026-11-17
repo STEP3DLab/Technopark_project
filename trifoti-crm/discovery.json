@@ -1,34 +1,9 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-17T00:51:49.876930+00:00",
+  "generated_at": "2026-11-17T14:33:59.996236+00:00",
   "disclaimer": "Discovery candidates only. Verify the official notice, deadline, status and technical specification manually.",
   "sources_attempted": 6,
-  "errors": [
-    {
-      "query": "закупка изготовление арт объектов скульптур Москва",
-      "error": "HTTPError"
-    },
-    {
-      "query": "тендер изготовление наград статуэток кубков Москва",
-      "error": "HTTPError"
-    },
-    {
-      "query": "закупка изготовление выставочной экспозиции декораций Москва",
-      "error": "HTTPError"
-    },
-    {
-      "query": "закупка изготовление макетов 3D моделей Россия",
-      "error": "HTTPError"
-    },
-    {
-      "query": "закупка изготовление интерьерных панно рельефов Москва",
-      "error": "HTTPError"
-    },
-    {
-      "query": "тендер малые архитектурные формы Московская область",
-      "error": "HTTPError"
-    }
-  ],
+  "errors": [],
   "items": [
     {
       "id": "2e728947453a16056574",
@@ -36,11 +11,23 @@
       "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPMXZ5a0lpLW5ZaGJQRVJEbW5namlGYTdZamU2OVZZYWlONzRsRjVadFRhNEZ2bGpPeU9raFA5Tl82QkV6TnFWLVYyM19pOXZXZV8zLU5MdTFOMVNHV2pPc1E4Z3prQmFHa2RWSXc1QXVlb0wxUFNFV3FRTEJDeDB5ekM1N3EydFdreW1JdmZOeFhWZ1RmQlpfZThGZWk2eHRLY1lRZzNFeHFSSkFRdzlIZg?oc=5",
       "source": "Google News RSS — discovery, not primary procurement source",
       "query": "тендер малые архитектурные формы Московская область",
-      "published": "Mon, 16 Nov 2026 11:18:17 GMT",
+      "published": "Mon, 16 Nov 2026 11:18:12 GMT",
       "status": "unverified",
       "budget": null,
       "deadline": null,
       "first_seen": "2026-11-16T13:44:31.807367+00:00"
+    },
+    {
+      "id": "e72e3f77720932ea1b28",
+      "title": "Депутат раскрыл детали законопроекта об упрощении госзакупок - NEWS.ru",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPY2Y4NlVUNnRCYl9wNVRsX2JNVnlRemZVcTFrSEpDTklBOTh4Q3htMkphMVAwTTNsaGJXdFE2OVEyUndwMXRGQUF4M1RJLWVoWE5qRVQzQmxfbHVoRThqX0lkdmVGWHU2amUwa2V1ZGtLOUpYN0pLSEVfZ0IzT2c2RDE4a1JqYmF5aGx30gGQAUFVX3lxTE4tRnNzaTctWVFoOXFqNkxvMXV1RkNFNG5RWXJNYURaTlNWQ1FwYU9TSHdsa0RjTHpCT0tKR2lBcE55YzJFdWlObjNaelFOMEF3YkJCVjdVY3VpTlVvSDhlS1JfQXRoSko1RU1CQmZWU0pKSndkZ0lFdVpXUjV5cGs4Tk1xU04wV0pEblg0MkVxbQ?oc=5",
+      "source": "Google News RSS — discovery, not primary procurement source",
+      "query": "тендер малые архитектурные формы Московская область",
+      "published": "Mon, 16 Nov 2026 14:44:00 GMT",
+      "status": "unverified",
+      "budget": null,
+      "deadline": null,
+      "first_seen": "2026-11-17T14:33:59.996231+00:00"
     }
   ]
 }

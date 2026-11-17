@@ -1,9 +1,34 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-16T13:44:31.807391+00:00",
+  "generated_at": "2026-11-17T00:51:49.876930+00:00",
   "disclaimer": "Discovery candidates only. Verify the official notice, deadline, status and technical specification manually.",
   "sources_attempted": 6,
-  "errors": [],
+  "errors": [
+    {
+      "query": "закупка изготовление арт объектов скульптур Москва",
+      "error": "HTTPError"
+    },
+    {
+      "query": "тендер изготовление наград статуэток кубков Москва",
+      "error": "HTTPError"
+    },
+    {
+      "query": "закупка изготовление выставочной экспозиции декораций Москва",
+      "error": "HTTPError"
+    },
+    {
+      "query": "закупка изготовление макетов 3D моделей Россия",
+      "error": "HTTPError"
+    },
+    {
+      "query": "закупка изготовление интерьерных панно рельефов Москва",
+      "error": "HTTPError"
+    },
+    {
+      "query": "тендер малые архитектурные формы Московская область",
+      "error": "HTTPError"
+    }
+  ],
   "items": [
     {
       "id": "2e728947453a16056574",

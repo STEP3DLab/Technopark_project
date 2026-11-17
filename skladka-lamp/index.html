@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f3ed" />
+  <meta name="description" content="СКЛАДКА — дизайн-концепция скульптурного настольного светильника. Интерактивный 3D-конфигуратор с экспортом GLB." />
+  <title>СКЛАДКА — свет, которому придали форму</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <a href="./" class="brand" aria-label="СКЛАДКА, главная страница"><span class="brand-mark"><span></span><span></span><span></span></span><span>ФОРМА / СВЕТ</span></a>
+      <div class="header-right"><span class="header-code">ОБЪЕКТ 001 <i></i> 2026</span><span class="header-divider"></span><span class="header-kind">ПРЕДМЕТНЫЙ ДИЗАЙН</span></div>
+    </header>
+
+    <main class="content">
+      <section class="product-stage" aria-labelledby="product-name">
+        <div class="stage-top"><span class="eyebrow">КОЛЛЕКЦИЯ / ПРЕДМЕТЫ ДЛЯ ЖИЗНИ</span><span class="edition">01 — 03</span></div>
+        <div class="viewer" id="viewer" aria-label="Интерактивная трёхмерная модель светильника СКЛАДКА. Перемещайте указатель для вращения, колесо мыши или жест двумя пальцами для изменения масштаба." role="img">
+          <canvas id="scene" aria-label="3D-сцена светильника"></canvas>
+          <div class="viewer-halo" aria-hidden="true"></div>
+          <div class="scene-loading" id="sceneLoading"><span class="spinner"></span>Подготовка 3D-сцены</div>
+          <div class="light-caption" id="lightCaption"><span class="light-dot"></span><span>ТЁПЛЫЙ СВЕТ / 2700 K</span></div>
+          <div class="annotations" id="annotations" aria-hidden="true">
+            <div class="annotation" data-part="shade"><span class="annotation-line"></span><span class="annotation-text"><b>01</b> ПЛИССИРОВАННЫЙ КОРПУС</span></div>
+            <div class="annotation" data-part="led"><span class="annotation-line"></span><span class="annotation-text"><b>02</b> LED-МОДУЛЬ 2700 K</span></div>
+            <div class="annotation" data-part="diffuser"><span class="annotation-line"></span><span class="annotation-text"><b>03</b> ОПАЛОВЫЙ РАССЕИВАТЕЛЬ</span></div>
+            <div class="annotation" data-part="stem"><span class="annotation-line"></span><span class="annotation-text"><b>04</b> МЕТАЛЛИЧЕСКАЯ СТОЙКА</span></div>
+            <div class="annotation" data-part="base"><span class="annotation-line"></span><span class="annotation-text"><b>05</b> УТЯЖЕЛЁННОЕ ОСНОВАНИЕ</span></div>
+          </div>
+          <div class="viewer-interaction-hint" id="interactionHint"><span class="hint-icon">↔</span> ВРАЩАЙТЕ МОДЕЛЬ <span class="dot-sep">·</span> ПРИБЛИЖАЙТЕ</div>
+          <div class="canvas-fallback" id="canvasFallback" hidden>Для трёхмерной сцены необходим браузер с поддержкой WebGL 2.0.</div>
+        </div>
+        <div class="stage-footer">
+          <div class="intro"><div class="intro-index">ОБЪЕКТ / 001 <span class="index-line"></span> ДИЗАЙН-КОНЦЕПЦИЯ</div><h1 id="product-name">СКЛАДКА<span class="name-star">✳</span></h1><p>Свет, которому придали форму.</p></div>
+          <div class="object-meta"><span>НАСТОЛЬНЫЙ СВЕТИЛЬНИК</span><strong id="dimensionLabel">320 × 200 × 200 мм</strong><small>КОНЦЕПТ / НЕ СЕРИЙНОЕ ИЗДЕЛИЕ</small></div>
+        </div>
+      </section>
+
+      <aside class="config-panel" aria-label="Конфигуратор светильника">
+        <div class="panel-header"><div><span class="eyebrow">ВАШ ОБЪЕКТ</span><h2>Конфигурация</h2></div><span class="panel-step">01 / 04</span></div>
+        <div class="panel-rule"></div>
+        <section class="control-section"><div class="control-heading"><label>01 <span>Отделка</span></label><span class="control-value" id="finishValue">Молочная</span></div>
+          <div class="finish-options" role="group" aria-label="Выбор отделки">
+            <button class="finish-option selected" type="button" data-finish="milk" aria-pressed="true"><span class="finish-swatch swatch-milk"></span><span>Молочная</span></button>
+            <button class="finish-option" type="button" data-finish="terra" aria-pressed="false"><span class="finish-swatch swatch-terra"></span><span>Терракота</span></button>
+            <button class="finish-option" type="button" data-finish="graphite" aria-pressed="false"><span class="finish-swatch swatch-graphite"></span><span>Графит</span></button>
+          </div>
+        </section>
+        <div class="section-rule"></div>
+        <section class="control-section"><div class="control-heading"><label for="heightRange">02 <span>Высота абажура</span></label><span class="measure"><b id="heightValue">150</b> мм</span></div><input type="range" id="heightRange" min="120" max="180" step="2" value="150" /><div class="range-ends"><span>120 мм</span><span>180 мм</span></div></section>
+        <div class="section-rule"></div>
+        <section class="control-section"><div class="control-heading"><label for="pleatRange">03 <span>Количество складок</span></label><span class="measure"><b id="pleatsValue">28</b></span></div><input type="range" id="pleatRange" min="16" max="36" step="2" value="28" /><div class="range-ends"><span>16 складок</span><span>36 складок</span></div></section>
+        <div class="section-rule"></div>
+        <section class="control-section secondary-controls"><div class="control-heading"><label for="lightSwitch">04 <span>Освещение</span></label><span class="light-status" id="lightStatus">Включено</span></div><div class="switch-row"><div class="switch-copy"><strong>Тёплый вечерний свет</strong><small>LED / 2700 K</small></div><button type="button" class="switch on" id="lightSwitch" role="switch" aria-checked="true" aria-label="Включить или выключить подсветку"><span></span></button></div></section>
+        <div class="panel-rule bottom-rule"></div>
+        <div class="panel-actions"><button class="action-main" type="button" id="explodeButton"><span class="action-icon" id="explodeIcon">⤢</span><span id="explodeLabel">Разнести детали</span><span class="action-arrow">↗</span></button><button class="action-reset" type="button" id="resetButton" aria-label="Вернуться к презентационному ракурсу" title="Презентационный ракурс">↺</button></div>
+        <div class="export-heading"><span>ЭКСПОРТ</span><span>В ВАШЕМ ВАРИАНТЕ</span></div><div class="export-buttons"><button type="button" id="glbButton"><span class="download-icon">↓</span> 3D-МОДЕЛЬ <b>GLB</b></button><button type="button" id="pngButton"><span class="download-icon">↓</span> СНИМОК <b>PNG</b></button></div>
+        <p class="panel-footnote">Размеры ориентировочные. Электрика и узлы крепления требуют инженерной проработки.</p>
+      </aside>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <footer class="site-footer"><span>СКЛАДКА <b>®</b> / ЭСКИЗНАЯ СЕРИЯ</span><span>ФОРМА, РИТМ, СВЕТ</span></footer>
+  </div>
+  <script defer src="./app.js"></script>
+</body>
+</html>

@@ -1,71 +1,123 @@
 {
   "source": "https://dub-oliva-interior-3d.step3d.chatgpt.site/",
   "pages_url": "https://step3dlab.github.io/Technopark_project/dub-oliva-interior-3d/",
-  "downloaded_files": 16,
+  "downloaded_files": 29,
   "files": {
     "index.html": {
       "bytes": 3999,
-      "sha256": "1a774ccbac75860e9f6a230d4a9fd83ed1dd42d5525fb0dd6bf81cbf77d8125b"
-    },
-    "vendor/three.module.js": {
-      "bytes": 658900,
-      "sha256": "104f56145899722094556490d787aae0617cc2fc3382f31df02d724ea1aee341"
-    },
-    "apartment.glb": {
-      "bytes": 8892328,
-      "sha256": "1b562e4a5d62615bec23ade0227c6e57310e8aa7ef93d8c7f23de0d3c8f06a28"
-    },
-    "viewlinks.js": {
-      "bytes": 779,
-      "sha256": "4742c0aee959cebafa3532837e1598906e3e39921a54f98aa7fb0881a324aa21"
-    },
-    "vendor/three.core.js": {
-      "bytes": 1474799,
-      "sha256": "613e370f76638fdef83926642bf256dc9615684922de1ce1f63a8583e5d78578"
+      "sha256": "2d61545cdf302854a8efaecde4d3ee10f361b3b97ed89bf4999c638c2b78ad5a"
     },
     "app.js": {
       "bytes": 15792,
       "sha256": "7e070532b09ed1ff0a573de6222ba936bc307b9ab87ad28ef19fb9b4b11c8007"
     },
-    "media/photo-living.webp": {
-      "bytes": 273240,
-      "sha256": "2fa7c0eeb44ec6cc01393f23a9ffd7d8eb7dd769f028a87ad789bebff08b4542"
+    "cpu.js": {
+      "bytes": 10244,
+      "sha256": "a646d8f89eda5bb000dbae8fa220acacd2e07b24e24d94d00c2825605bf4c9bf"
     },
-    "cdn-cgi/challenge-platform/scripts/jsd/main.js": {
-      "bytes": 44015,
-      "sha256": "1c0aa0701dd196e0334a5cdbb8965ed118e3ffa0e70c2dba15137e9620d68e0e"
+    "media/photo-kitchen.webp": {
+      "bytes": 208076,
+      "sha256": "0d4524daa6212f25d4e3bb436e0a9937c10b737a895778ffefbcba4d66a18aca"
     },
-    "expand.js": {
-      "bytes": 862,
-      "sha256": "db3f2ba0cc4fc39ad1627ac1e5b6d399396b81a0f4a31db5c22dad624f66b306"
+    "vendor/objects/Reflector.js": {
+      "bytes": 11156,
+      "sha256": "542861de2dea2e24729a1fa4962424214e1637368017bdd48d5f27eb64dda0fb"
     },
-    "vendor/loaders/GLTFLoader.js": {
-      "bytes": 119861,
-      "sha256": "532ac726e120039acbcd6cf54328c57acbf7b438176afaa6951257126d11bff1"
+    "media/photo-bath.webp": {
+      "bytes": 259388,
+      "sha256": "52856241aa07926c18520623f3ea0b9c69cb3dfe88ca2a41d69f6065d9a422c1"
     },
-    "vendor/controls/OrbitControls.js": {
-      "bytes": 40918,
-      "sha256": "e7fca2fe9e7670a828af9b28084669a5909445b7f36f1f26cee9bf8f2961c32c"
+    "media/pano-bedroom.jpg": {
+      "bytes": 299596,
+      "sha256": "a8ddb071e079ba45f7bd60c8166d113afcac6816e7a221cfd0174ec0225906ed"
+    },
+    "media/pano-kitchen.jpg": {
+      "bytes": 355235,
+      "sha256": "2b9dfffca80197573dfd9fe35dec4b0287f015e35cb9b123f7ee034c6f07c91c"
     },
     "panorama.js": {
       "bytes": 5417,
       "sha256": "e310fa418f092240ddabc2525ca244943acbc38ec61cd02e2b479783ee263493"
     },
+    "media/photo-living.webp": {
+      "bytes": 273240,
+      "sha256": "2fa7c0eeb44ec6cc01393f23a9ffd7d8eb7dd769f028a87ad789bebff08b4542"
+    },
+    "media/photo-all.webp": {
+      "bytes": 61932,
+      "sha256": "1a9cb851c0d7e21d692a8ac14d96369e0d988e81d06da38f2199d16b7cafd84c"
+    },
+    "media/plan.webp": {
+      "bytes": 67502,
+      "sha256": "711a9304a3728383bcf7ee9a7c5acc196de9fbed7941f18d73615e60ef01d241"
+    },
+    "media/bath.webp": {
+      "bytes": 241314,
+      "sha256": "918a03a1f220d7f687b0d5e0b9c1eec7cb9f7034c09b1a52343c1722a3a05706"
+    },
+    "media/pano-living.jpg": {
+      "bytes": 370049,
+      "sha256": "07e7c314757064bcba36ba122882c279b62bf834bd8bb2e84b144d1e5c175729"
+    },
+    "expand.js": {
+      "bytes": 862,
+      "sha256": "db3f2ba0cc4fc39ad1627ac1e5b6d399396b81a0f4a31db5c22dad624f66b306"
+    },
+    "media/living.webp": {
+      "bytes": 307938,
+      "sha256": "5299cb1c7c7c6ff105c9cfc93629a35d2f7a2029e8b1bc49dfd2dae2346877a1"
+    },
+    "media/photo-bedroom.webp": {
+      "bytes": 303862,
+      "sha256": "b29a12674a278afbbbc401bb0f25695c79ffc673a0666bcbd9fab3f64de2bee6"
+    },
+    "media/kitchen.webp": {
+      "bytes": 294300,
+      "sha256": "52720b2e1c07ca999433afbb00500c863637dc05c049478d857e02377b806188"
+    },
+    "vendor/loaders/GLTFLoader.js": {
+      "bytes": 119861,
+      "sha256": "532ac726e120039acbcd6cf54328c57acbf7b438176afaa6951257126d11bff1"
+    },
     "media/site-preview.jpg": {
       "bytes": 152940,
       "sha256": "c6abbcd8e79f07aef37bd6d692f90ec2dd8d1b03906331085985f57c6e1b8e56"
     },
-    "cpu.js": {
-      "bytes": 10244,
-      "sha256": "a646d8f89eda5bb000dbae8fa220acacd2e07b24e24d94d00c2825605bf4c9bf"
+    "vendor/three.core.js": {
+      "bytes": 1474799,
+      "sha256": "613e370f76638fdef83926642bf256dc9615684922de1ce1f63a8583e5d78578"
+    },
+    "cdn-cgi/challenge-platform/scripts/jsd/main.js": {
+      "bytes": 44399,
+      "sha256": "f4416e20b79efba4fa4fa7bfbcfe88649dd9098c2177e4d8a877542f37f28f90"
+    },
+    "media/pano-bath.jpg": {
+      "bytes": 342848,
+      "sha256": "a637f90876964d539eb82f0fae8cadca430c9c2c814dd0ebc8d62f0a12502465"
+    },
+    "vendor/controls/OrbitControls.js": {
+      "bytes": 40918,
+      "sha256": "e7fca2fe9e7670a828af9b28084669a5909445b7f36f1f26cee9bf8f2961c32c"
+    },
+    "viewlinks.js": {
+      "bytes": 779,
+      "sha256": "4742c0aee959cebafa3532837e1598906e3e39921a54f98aa7fb0881a324aa21"
+    },
+    "media/bedroom.webp": {
+      "bytes": 319184,
+      "sha256": "62d40290c5526b5d180bb190ebbc9e76b0ed8d4382ae043a473102be13ed8215"
     },
     "style.css": {
       "bytes": 5276,
       "sha256": "590616c98f4d8c24696ff99cc8ddd8ff7cca78bf95e2ede081ffb30086597ae9"
     },
-    "vendor/objects/Reflector.js": {
-      "bytes": 11156,
-      "sha256": "542861de2dea2e24729a1fa4962424214e1637368017bdd48d5f27eb64dda0fb"
+    "apartment.glb": {
+      "bytes": 8892328,
+      "sha256": "1b562e4a5d62615bec23ade0227c6e57310e8aa7ef93d8c7f23de0d3c8f06a28"
+    },
+    "vendor/three.module.js": {
+      "bytes": 658900,
+      "sha256": "104f56145899722094556490d787aae0617cc2fc3382f31df02d724ea1aee341"
     }
   },
   "unavailable_candidates": {

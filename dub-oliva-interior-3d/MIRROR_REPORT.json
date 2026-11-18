@@ -1,193 +1,74 @@
 {
   "source": "https://dub-oliva-interior-3d.step3d.chatgpt.site/",
   "pages_url": "https://step3dlab.github.io/Technopark_project/dub-oliva-interior-3d/",
-  "downloaded_files": 21,
+  "downloaded_files": 16,
   "files": {
     "index.html": {
       "bytes": 3999,
-      "sha256": "77519d935279bc6577395f09bc2e2e75ce6e02a15bbd27e042bd0eed1711f87b"
+      "sha256": "1a774ccbac75860e9f6a230d4a9fd83ed1dd42d5525fb0dd6bf81cbf77d8125b"
     },
-    "expand.js": {
-      "bytes": 862,
-      "sha256": "db3f2ba0cc4fc39ad1627ac1e5b6d399396b81a0f4a31db5c22dad624f66b306"
+    "vendor/three.module.js": {
+      "bytes": 658900,
+      "sha256": "104f56145899722094556490d787aae0617cc2fc3382f31df02d724ea1aee341"
+    },
+    "apartment.glb": {
+      "bytes": 8892328,
+      "sha256": "1b562e4a5d62615bec23ade0227c6e57310e8aa7ef93d8c7f23de0d3c8f06a28"
     },
     "viewlinks.js": {
       "bytes": 779,
       "sha256": "4742c0aee959cebafa3532837e1598906e3e39921a54f98aa7fb0881a324aa21"
     },
-    "media/site-preview.jpg": {
-      "bytes": 152940,
-      "sha256": "c6abbcd8e79f07aef37bd6d692f90ec2dd8d1b03906331085985f57c6e1b8e56"
+    "vendor/three.core.js": {
+      "bytes": 1474799,
+      "sha256": "613e370f76638fdef83926642bf256dc9615684922de1ce1f63a8583e5d78578"
     },
     "app.js": {
       "bytes": 15792,
       "sha256": "7e070532b09ed1ff0a573de6222ba936bc307b9ab87ad28ef19fb9b4b11c8007"
-    },
-    "style.css": {
-      "bytes": 5276,
-      "sha256": "590616c98f4d8c24696ff99cc8ddd8ff7cca78bf95e2ede081ffb30086597ae9"
-    },
-    "panorama.js": {
-      "bytes": 5417,
-      "sha256": "e310fa418f092240ddabc2525ca244943acbc38ec61cd02e2b479783ee263493"
-    },
-    "vendor/three.module.js": {
-      "bytes": 658900,
-      "sha256": "104f56145899722094556490d787aae0617cc2fc3382f31df02d724ea1aee341"
     },
     "media/photo-living.webp": {
       "bytes": 273240,
       "sha256": "2fa7c0eeb44ec6cc01393f23a9ffd7d8eb7dd769f028a87ad789bebff08b4542"
     },
     "cdn-cgi/challenge-platform/scripts/jsd/main.js": {
-      "bytes": 42939,
-      "sha256": "8ef36dda348622a4b7373b3b52276908988954223e807a3b1ee07d221f0a3fbf"
+      "bytes": 44015,
+      "sha256": "1c0aa0701dd196e0334a5cdbb8965ed118e3ffa0e70c2dba15137e9620d68e0e"
     },
-    "apartment.glb": {
-      "bytes": 8892328,
-      "sha256": "1b562e4a5d62615bec23ade0227c6e57310e8aa7ef93d8c7f23de0d3c8f06a28"
+    "expand.js": {
+      "bytes": 862,
+      "sha256": "db3f2ba0cc4fc39ad1627ac1e5b6d399396b81a0f4a31db5c22dad624f66b306"
     },
     "vendor/loaders/GLTFLoader.js": {
       "bytes": 119861,
       "sha256": "532ac726e120039acbcd6cf54328c57acbf7b438176afaa6951257126d11bff1"
     },
-    "vendor/objects/Reflector.js": {
-      "bytes": 11156,
-      "sha256": "542861de2dea2e24729a1fa4962424214e1637368017bdd48d5f27eb64dda0fb"
+    "vendor/controls/OrbitControls.js": {
+      "bytes": 40918,
+      "sha256": "e7fca2fe9e7670a828af9b28084669a5909445b7f36f1f26cee9bf8f2961c32c"
+    },
+    "panorama.js": {
+      "bytes": 5417,
+      "sha256": "e310fa418f092240ddabc2525ca244943acbc38ec61cd02e2b479783ee263493"
+    },
+    "media/site-preview.jpg": {
+      "bytes": 152940,
+      "sha256": "c6abbcd8e79f07aef37bd6d692f90ec2dd8d1b03906331085985f57c6e1b8e56"
     },
     "cpu.js": {
       "bytes": 10244,
       "sha256": "a646d8f89eda5bb000dbae8fa220acacd2e07b24e24d94d00c2825605bf4c9bf"
     },
-    "vendor/utils/SkeletonUtils.js": {
-      "bytes": 11535,
-      "sha256": "b1632a703206c3d830de9fcbe515696770d04b71a15ee6b50afa6d2c3298c86f"
+    "style.css": {
+      "bytes": 5276,
+      "sha256": "590616c98f4d8c24696ff99cc8ddd8ff7cca78bf95e2ede081ffb30086597ae9"
     },
-    "vendor/controls/OrbitControls.js": {
-      "bytes": 40918,
-      "sha256": "e7fca2fe9e7670a828af9b28084669a5909445b7f36f1f26cee9bf8f2961c32c"
-    },
-    "vendor/three.core.js": {
-      "bytes": 1474799,
-      "sha256": "613e370f76638fdef83926642bf256dc9615684922de1ce1f63a8583e5d78578"
-    },
-    "vendor/utils/BufferGeometryUtils.js": {
-      "bytes": 39153,
-      "sha256": "7bda2a8ba836b2bcf67cb938d4b9e1bb5d1b1bc616817103ed858c0b58296ce7"
-    },
-    "vendor/scenes/material-browser.html": {
-      "bytes": 3999,
-      "sha256": "ea0d3ef0b14e20c391bcc558e3cf7a575b474cd6225425f3c3dfecac104b1650"
-    },
-    "vendor/scenes/bones-browser.html": {
-      "bytes": 3999,
-      "sha256": "b624fa63a8c3def99bbb030fb28b827112b222c08c7fba18ef228410b4e2004f"
-    },
-    "vendor/scenes/geometry-browser.html": {
-      "bytes": 3999,
-      "sha256": "898311670b73cbba19515ebdd51b61d673d6ec05ac38e9eb57499781e4bf5f55"
+    "vendor/objects/Reflector.js": {
+      "bytes": 11156,
+      "sha256": "542861de2dea2e24729a1fa4962424214e1637368017bdd48d5f27eb64dda0fb"
     }
   },
   "unavailable_candidates": {
-    "Дуб-и-олива.glb": "'ascii' codec can't encode characters in position 5-7: ordinal not in range(128)",
-    "vendor/Three.js": "unexpected HTML for asset",
-    "vendor/three.js": "unexpected HTML for asset",
-    "vendor/loaders/this.js": "unexpected HTML for asset",
-    "vendor/loaders/this.ktx2": "unexpected HTML for asset",
-    "vendor/renderItem.obj": "unexpected HTML for asset",
-    "vendor/textures/texture.png": "unexpected HTML for asset",
-    "vendor/gl.bin": "unexpected HTML for asset",
-    "vendor/state.bin": "unexpected HTML for asset",
-    "vendor/loaders/BINARY_EXTENSION_CHUNK_TYPES.JS": "unexpected HTML for asset",
-    "vendor/loaders/parser.options.ktx2": "unexpected HTML for asset",
-    "vendor/loaders/assets/models/model.gltf": "unexpected HTML for asset",
-    "vendor/loaders/mesh.bin": "unexpected HTML for asset",
-    "vendor/controls/onContextMenu.bin": "unexpected HTML for asset",
-    "vendor/loaders/Three.js": "unexpected HTML for asset",
-    "vendor/loaders/models/gltf/duck/duck.gltf": "unexpected HTML for asset",
-    "vendor/response.js": "unexpected HTML for asset",
-    "vendor/child.bin": "unexpected HTML for asset",
-    "vendor/animations/animation.js": "unexpected HTML for asset",
-    "vendor/sprite.png": "unexpected HTML for asset",
-    "vendor/THREE.Obj": "unexpected HTML for asset",
-    "vendor/py.png": "unexpected HTML for asset",
-    "vendor/controls/onMouseWheel.bin": "unexpected HTML for asset",
-    "vendor/controls/interceptControlUp.bin": "unexpected HTML for asset",
-    "vendor/parsedPath.obj": "unexpected HTML for asset",
-    "vendor/PropertyBinding.prototype.Bin": "unexpected HTML for asset",
-    "vendor/scenes/media/photo-living.webp": "unexpected HTML for asset",
-    "vendor/this.onEnded.bin": "unexpected HTML for asset",
-    "vendor/utils/three/addons/utils/BufferGeometryUtils.js": "unexpected HTML for asset",
-    "vendor/source.bin": "unexpected HTML for asset",
-    "vendor/this.bin": "unexpected HTML for asset",
-    "vendor/utils/three/addons/utils/SkeletonUtils.js": "unexpected HTML for asset",
-    "vendor/scenes/app.js": "unexpected HTML for asset",
-    "vendor/uuid.obj": "unexpected HTML for asset",
-    "vendor/controls/onKeyDown.bin": "unexpected HTML for asset",
-    "vendor/pz.png": "unexpected HTML for asset",
-    "vendor/controls/three/addons/controls/OrbitControls.js": "unexpected HTML for asset",
-    "vendor/binding.bin": "unexpected HTML for asset",
-    "vendor/object.bin": "unexpected HTML for asset",
-    "vendor/controls/this.obj": "unexpected HTML for asset",
-    "vendor/normal.png": "unexpected HTML for asset",
-    "vendor/scenes/apartment.glb": "unexpected HTML for asset",
-    "vendor/scenes/viewlinks.js": "unexpected HTML for asset",
-    "vendor/utils/sourceMesh.bin": "unexpected HTML for asset",
-    "vendor/controls/interceptControlDown.bin": "unexpected HTML for asset",
-    "vendor/scenes/expand.js": "unexpected HTML for asset",
-    "vendor/textures/sprite.png": "unexpected HTML for asset",
-    "vendor/scenes/vendor/three.module.js": "unexpected HTML for asset",
-    "vendor/this.Bin": "unexpected HTML for asset",
-    "vendor/nx.png": "unexpected HTML for asset",
-    "vendor/controls/onTouchStart.bin": "unexpected HTML for asset",
-    "vendor/intersect.obj": "unexpected HTML for asset",
-    "vendor/uniformsGroups.bin": "unexpected HTML for asset",
-    "vendor/currentState.obj": "unexpected HTML for asset",
-    "vendor/json.obj": "unexpected HTML for asset",
-    "vendor/loaders/this.parser.js": "unexpected HTML for asset",
-    "vendor/splineTube.bin": "unexpected HTML for asset",
-    "vendor/_gl.bin": "unexpected HTML for asset",
-    "vendor/objects/three/addons/objects/Reflector.js": "unexpected HTML for asset",
-    "vendor/controls/onMouseDown.bin": "unexpected HTML for asset",
-    "vendor/textures/land_ocean_ice_cloud_2048.jpg": "unexpected HTML for asset",
-    "vendor/loaders/object.userData.gltf": "unexpected HTML for asset",
-    "vendor/scenes/Дуб-и-олива.glb": "'ascii' codec can't encode characters in position 19-21: ordinal not in range(128)",
-    "vendor/material.js": "unexpected HTML for asset",
-    "vendor/data.bin": "unexpected HTML for asset",
-    "vendor/image.png": "unexpected HTML for asset",
-    "vendor/output.obj": "unexpected HTML for asset",
-    "vendor/results.obj": "unexpected HTML for asset",
-    "vendor/controls/onPointerUp.bin": "unexpected HTML for asset",
-    "vendor/...Obj": "unexpected HTML for asset",
-    "vendor/frames.bin": "unexpected HTML for asset",
-    "vendor/controls/onTouchMove.bin": "unexpected HTML for asset",
-    "vendor/source.obj": "unexpected HTML for asset",
-    "vendor/loaders/THREE.GLTF": "unexpected HTML for asset",
-    "vendor/loaders/parser.js": "unexpected HTML for asset",
-    "vendor/controls/onPointerDown.bin": "unexpected HTML for asset",
-    "vendor/scenes/style.css": "unexpected HTML for asset",
-    "vendor/px.png": "unexpected HTML for asset",
-    "vendor/controls/onMouseMove.bin": "unexpected HTML for asset",
-    "vendor/ny.png": "unexpected HTML for asset",
-    "vendor/loaders/three.js": "unexpected HTML for asset",
-    "vendor/data.obj": "unexpected HTML for asset",
-    "vendor/utils/examples/jsm/libs/mikktspace.module.js": "unexpected HTML for asset",
-    "vendor/loaders/three/addons/loaders/GLTFLoader.js": "unexpected HTML for asset",
-    "vendor/models/json/example.js": "unexpected HTML for asset",
-    "vendor/loaders/model.bin": "unexpected HTML for asset",
-    "vendor/loaders/BINARY_EXTENSION_CHUNK_TYPES.BIN": "unexpected HTML for asset",
-    "vendor/diffuse.png": "unexpected HTML for asset",
-    "vendor/THREE.Ico": "unexpected HTML for asset",
-    "vendor/controls/onPointerMove.bin": "unexpected HTML for asset",
-    "vendor/fish.gltf": "unexpected HTML for asset",
-    "vendor/models/json/pressure.js": "unexpected HTML for asset",
-    "vendor/utils/clonedMesh.bin": "unexpected HTML for asset",
-    "vendor/this.obj": "unexpected HTML for asset",
-    "vendor/nz.png": "unexpected HTML for asset",
-    "vendor/level.obj": "unexpected HTML for asset",
-    "vendor/lightgl.js": "unexpected HTML for asset",
-    "vendor/eventdispatcher.js": "unexpected HTML for asset",
-    "vendor/paper.js": "unexpected HTML for asset",
-    "vendor/handleVisibilityChange.bin": "unexpected HTML for asset"
+    "Дуб-и-олива.glb": "unexpected HTML for asset"
   }
 }

@@ -96,7 +96,12 @@ def main():
     if "<html" not in first_html.lower() and "<!doctype" not in first_html.lower():
         raise SystemExit("Unexpected source: not an HTML document")
     pending = set(assets_in(first_html))
-    for required in ["apartment.glb", "media/photo-living.webp", "vendor/three.core.js"]:
+    room_ids = ["all", "living", "kitchen", "bedroom", "bath"]
+    wanted = ["apartment.glb", "vendor/three.core.js", "media/site-preview.jpg", "media/plan.webp"]
+    wanted += ["media/photo-" + room + ".webp" for room in room_ids]
+    wanted += ["media/" + room + ".webp" for room in room_ids[1:]]
+    wanted += ["media/pano-" + room + ".jpg" for room in room_ids[1:]]
+    for required in wanted:
         pending.add((required, urljoin(ORIGIN, required)))
     visited = {"index.html"}
     while pending and len(visited) < MAX_ASSETS:
@@ -116,6 +121,9 @@ def main():
                     updated = re.sub(r"<base\s+href\s*=\s*['\"][^'\"]*['\"]\s*/?>", '<base href="' + TARGET_PREFIX + '">', updated, flags=re.I)
                 else:
                     updated = re.sub(r"<head\b[^>]*>", lambda m: m.group(0) + '\n<base href="' + TARGET_PREFIX + '">', updated, count=1, flags=re.I)
+            if filename == "index.html":
+                # Cloudflare injection on the origin is not part of the website.
+                updated = re.sub(r"<script>\(function\(\)\{function c\(\).*?</script>", "", updated, flags=re.S)
             path.write_text(updated, encoding="utf-8")
     if "apartment.glb" not in FILES:
         raise SystemExit("Critical 3D asset /apartment.glb could not be mirrored")

@@ -1,0 +1,4 @@
+const frame=document.querySelector('#viewport'),button=document.querySelector('#expand');
+function display(){const active=!!document.fullscreenElement||frame.classList.contains('enlarged');button.textContent=active?'×':'⛶';button.setAttribute('aria-label',active?'Свернуть изображение':'Развернуть изображение')}
+button.addEventListener('click',async()=>{if(document.fullscreenElement)await document.exitFullscreen();else if(frame.classList.contains('enlarged'))frame.classList.remove('enlarged');else if(frame.requestFullscreen){try{await frame.requestFullscreen()}catch{frame.classList.add('enlarged')}}else frame.classList.add('enlarged');display()});
+document.addEventListener('fullscreenchange',display);document.addEventListener('keydown',e=>{if(e.key==='Escape'){frame.classList.remove('enlarged');display()}});

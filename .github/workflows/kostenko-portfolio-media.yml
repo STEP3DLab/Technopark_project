@@ -1,0 +1,31 @@
+name: Prepare Kostenko portfolio photographs
+on:
+  push:
+    branches: [build/kostenko-portfolio-media]
+    paths:
+      - 'evgenia-kostenko/media-build/**'
+      - '.github/workflows/kostenko-portfolio-media.yml'
+permissions:
+  contents: write
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: evgenia-kostenko
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'pillow==11.3.0'
+      - run: python evgenia-kostenko/media-build/prepare.py
+      - name: Store the optimised originals in the media branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- evgenia-kostenko/assets
+          if ! git diff --cached --quiet; then
+            git commit -m 'Prepare portfolio, studio and design-document images'
+            git push origin HEAD:refs/heads/build/kostenko-portfolio-media
+          fi

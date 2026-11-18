@@ -7,7 +7,7 @@ import json
 import re
 import time
 from pathlib import Path
-from urllib.parse import unquote, urljoin, urlparse
+from urllib.parse import unquote, quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
@@ -17,7 +17,7 @@ TARGET_PUBLIC = "https://step3dlab.github.io" + TARGET_PREFIX
 ROOT = Path(__file__).resolve().parent
 HOST = urlparse(ORIGIN).netloc
 MAX_SIZE = 90 * 1024 * 1024
-MAX_ASSETS = 140
+MAX_ASSETS = 70
 EXT = r"(?:html?|css|m?js|json|glb|gltf|bin|webp|avif|jpe?g|png|svg|gif|ico|woff2?|ttf|otf|mp4|webm|hdr|ktx2|basis|wasm|obj|mtl)"
 ASSET_RE = re.compile(
     r"(?:(?:https?:)?//[^\s\"'`<>(),;]+|(?:\.\.?/|/)?[\w@%+./-]+)\." + EXT + r"(?:\?[^\s\"'`<>(),;]*)?",
@@ -47,6 +47,8 @@ def local_path(reference: str, base: str = ORIGIN):
     return raw_path, remote
 
 def download(path: str, remote: str):
+    remote_parts = urlparse(remote)
+    remote = remote_parts._replace(path=quote(remote_parts.path, safe='/%')).geturl()
     request = Request(remote, headers={"User-Agent": "Mozilla/5.0 (compatible; site-backup/1.0)", "Accept": "*/*"})
     for attempt in range(2):
         try:
@@ -94,7 +96,7 @@ def main():
     if "<html" not in first_html.lower() and "<!doctype" not in first_html.lower():
         raise SystemExit("Unexpected source: not an HTML document")
     pending = set(assets_in(first_html))
-    for required in ["apartment.glb", "media/photo-living.webp"]:
+    for required in ["apartment.glb", "media/photo-living.webp", "vendor/three.core.js"]:
         pending.add((required, urljoin(ORIGIN, required)))
     visited = {"index.html"}
     while pending and len(visited) < MAX_ASSETS:
@@ -103,7 +105,7 @@ def main():
             continue
         visited.add(path)
         payload = download(path, remote)
-        if payload and Path(path).suffix.lower() in TEXT_EXT:
+        if payload and Path(path).suffix.lower() in TEXT_EXT and not path.startswith(("vendor/", "cdn-cgi/")):
             pending.update(assets_in(payload.decode("utf-8-sig", "replace"), remote))
     for filename in list(FILES):
         if Path(filename).suffix.lower() in TEXT_EXT:

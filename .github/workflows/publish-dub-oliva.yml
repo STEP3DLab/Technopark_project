@@ -9,7 +9,7 @@ permissions:
   contents: write
 concurrency:
   group: publish-dub-oliva-interior-3d
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   snapshot:
     runs-on: ubuntu-latest

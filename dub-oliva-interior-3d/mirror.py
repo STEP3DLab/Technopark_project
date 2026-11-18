@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from urllib.parse import unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 ORIGIN = "https://dub-oliva-interior-3d.step3d.chatgpt.site/"
 TARGET_PREFIX = "/Technopark_project/dub-oliva-interior-3d/"
@@ -47,9 +48,9 @@ def local_path(reference: str, base: str = ORIGIN):
 
 def download(path: str, remote: str):
     request = Request(remote, headers={"User-Agent": "Mozilla/5.0 (compatible; site-backup/1.0)", "Accept": "*/*"})
-    for attempt in range(3):
+    for attempt in range(2):
         try:
-            with urlopen(request, timeout=45) as resp:
+            with urlopen(request, timeout=14) as resp:
                 payload = resp.read(MAX_SIZE + 1)
                 if len(payload) > MAX_SIZE:
                     raise ValueError("asset exceeds 90 MiB")
@@ -61,8 +62,12 @@ def download(path: str, remote: str):
                 FILES[path] = {"bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}
                 print("OK", path, len(payload), flush=True)
                 return payload
+        except HTTPError as err:
+            FAILURES[path] = f'HTTP {err.code}'
+            print('SKIP', path, err.code, flush=True)
+            return None
         except Exception as err:
-            if attempt == 2:
+            if attempt == 1:
                 FAILURES[path] = str(err)
                 print("ERROR", path, str(err), flush=True)
                 return None

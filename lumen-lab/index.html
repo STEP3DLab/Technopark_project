@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111917">
+  <meta name="description" content="Люмен LM-04 — интерактивный 3D-стенд Технопарка РГСУ. Посмотрите устройство в разборе, испытайте цифровой пульт и скачайте файлы для изготовления демонстрационного макета.">
+  <title>Люмен LM-04 — интерактивный инженерный стенд</title>
+  <link rel="icon" href="./assets/mark.svg" type="image/svg+xml">
+  <link rel="preload" href="./assets/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+<a class="skip" href="#model">К модели</a>
+<header class="masthead" id="top">
+  <div class="frame top-line">
+    <a class="brand" href="#top" aria-label="Люмен, начало страницы"><span class="brand-mark" aria-hidden="true"></span><span>Lumen<span class="brand-lite">Lab</span></span></a>
+    <span class="header-institute">Технопарк РГСУ</span>
+    <nav class="navlinks" id="navlinks" aria-label="Основное меню"><a class="current" href="#model">3D-модель</a><a href="#simulator">Симулятор</a><a href="#assembly">Сборка</a></nav>
+    <a class="github" href="https://github.com/STEP3DLab/Technopark_project/tree/main/lumen-lab" target="_blank" rel="noopener"><i data-icon="git"></i><span>GitHub</span></a>
+    <button class="nav-toggle ico" aria-expanded="false" aria-controls="navlinks" aria-label="Открыть меню"><i data-icon="menu"></i></button>
+  </div>
+</header>
+
+<main>
+<section id="model" class="hero" aria-labelledby="hero-title">
+  <div class="frame hero-inner">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="tickline"></span>Инженерный атлас</div>
+      <h1 id="hero-title">Люмен<span>.</span></h1>
+      <p class="hero-intro">Цифровой стенд аппарата<br class="wide-break"> для лазерной абляции</p>
+      <p class="hero-note">Исследуйте конструкцию в 3D и проверьте работу пульта. По этим же моделям можно собрать демонстрационный макет без излучения.</p>
+      <div class="hero-actions"><a class="btn mint" href="#simulator"><i data-icon="sliders"></i>Открыть симулятор</a><a class="text-btn" href="#assembly"><i data-icon="layers"></i>Файлы для сборки</a></div>
+      <div class="hero-id"><span class="line-short"></span><b>LM–04</b><span class="slash">/</span><span>РЕВИЗИЯ A</span></div>
+    </div>
+    <div class="device-stage" id="stage" data-view="assembly">
+      <div class="stage-bar"><span class="stage-caption"><i data-icon="cube"></i>3D-обзор</span><div class="segment" role="group" aria-label="Представление модели"><button type="button" id="assembled" aria-pressed="true">В сборе</button><button type="button" id="exploded" aria-pressed="false">В разборе</button></div></div>
+      <div class="viewport" id="viewport" tabindex="0" role="group" aria-label="Трёхмерная модель. Стрелки вращают, плюс и минус меняют масштаб, Enter выбирает деталь, Home возвращает исходный вид.">
+        <canvas id="scene" aria-hidden="true"></canvas><canvas id="overlay" aria-hidden="true"></canvas>
+        <img id="viewer-poster" src="./assets/model-poster.png" alt="Пассивный пульт LM-04 в сборе" hidden>
+        <p id="load-state" class="loading" role="status">Загрузка модели…</p>
+      </div>
+      <div id="part-readout" class="part-readout" hidden><b id="part-title"></b><button class="mini-x" id="clear-part" aria-label="Снять выделение">×</button><span id="part-desc"></span></div>
+      <div class="stage-bottom"><span class="orbit-hint"><i data-icon="orbit"></i><span>Вращайте модель</span></span><div class="view-tools" role="group" aria-label="Инструменты 3D">
+       <button class="ico" id="auto" aria-label="Автовращение" data-tip="Автовращение" aria-pressed="false"><i data-icon="spin"></i></button>
+       <button class="ico" id="dims" aria-label="Показать габариты" data-tip="Габариты" aria-pressed="false"><i data-icon="ruler"></i></button>
+       <button class="ico" id="reset-view" aria-label="Исходный вид" data-tip="Исходный вид"><i data-icon="reset"></i></button>
+       <button class="ico" id="full" aria-label="Развернуть модель" data-tip="Полный экран"><i data-icon="expand"></i></button>
+      </div></div>
+    </div>
+  </div>
+  <div class="frame spec-strip">
+    <div><i data-icon="box"></i><span>Габариты макета</span><b id="spec-size">180 × 134 × 77,8 <small>мм</small></b></div>
+    <div><i data-icon="channels"></i><span>Каналы симулятора</span><b>2 <em>/</em> 4</b></div>
+    <div><i data-icon="printer"></i><span>Изготовление</span><b>FDM-печать</b></div>
+    <div><i data-icon="file"></i><span>Модели и чертежи</span><b>STEP <em>/</em> STL <em>/</em> PDF</b></div>
+  </div>
+</section>
+
+<section id="simulator" class="paper section sim-section" aria-labelledby="sim-title">
+  <div class="frame">
+    <div class="sec-heading"><div><div class="eyebrow dark-kicker"><span class="tickline"></span>Интерфейс оператора</div><h2 id="sim-title">Симулятор пульта<span>.</span></h2></div><p>Включите каналы и запустите сеанс. График показывает условную индикацию, все действия записываются в журнал.</p></div>
+    <div class="console">
+      <div class="monitor">
+        <div class="monitor-bar"><span class="device-label"><i data-icon="activity"></i>LM–04 <span>/</span> MONITOR</span><span id="sim-state" class="sim-state" role="status">Ожидание</span></div>
+        <div class="time-block"><div><span class="monitor-label">Время сеанса</span><output id="elapsed">00:00</output></div><div class="monitor-count"><span class="monitor-label">Включено каналов</span><strong id="channel-count">2 / 2</strong></div></div>
+        <div class="chart-wrap"><canvas id="trace" role="img" aria-label="График условной индикации каналов за последние 16 секунд"></canvas></div>
+        <div class="graph-foot"><span id="graph-legend"></span><span>Окно 16 с</span></div>
+      </div>
+      <div class="operator">
+        <div class="operator-head"><h3>Каналы</h3><div class="segment light" role="group" aria-label="Количество каналов"><button id="n2" aria-pressed="true">2</button><button id="n4" aria-pressed="false">4</button></div></div>
+        <p class="muted compact">Задайте уровень индикации.</p>
+        <div id="channels"></div>
+        <div class="operator-actions"><button id="primary-sim" class="btn ink"><i data-icon="play"></i><span>Подготовить</span></button><button id="stop-sim" class="stop" disabled><i data-icon="stop"></i>Стоп</button></div>
+        <p id="sim-hint" class="sim-hint" aria-live="polite"></p>
+      </div>
+    </div>
+    <details class="log"><summary><span><i data-icon="list"></i>Журнал сеанса <b id="log-count">0</b></span><i class="detail-mark" data-icon="plus"></i></summary><div><ol id="event-log"></ol><button id="export-log" class="text-btn dark-text"><i data-icon="download"></i>Скачать CSV</button></div></details>
+  </div>
+</section>
+
+<section id="assembly" class="section assembly-section" aria-labelledby="assy-title">
+  <div class="frame">
+    <div class="sec-heading"><div><div class="eyebrow dark-kicker"><span class="tickline"></span>Изготовление · ревизия A</div><h2 id="assy-title">Сборка макета<span>.</span></h2></div><p>Восемь печатных деталей образуют настольный пульт. Наклонная панель и четыре глухие метки воспроизводят компоновку устройства.</p></div>
+    <div class="make-grid">
+      <div class="build-guide">
+        <div class="kit-plate"><img src="./assets/model-exploded.png" loading="lazy" alt="Разнесённый вид печатных деталей пульта LM-04"><span class="plate-label">LM–04 <span>/</span> СБОРОЧНЫЙ ВИД</span></div>
+        <div class="steps" id="step-list"></div>
+      </div>
+      <div class="downloads"><div class="download-title"><div><span class="micro">КОМПЛЕКТ LM–04</span><h3>Файлы для мастерской</h3></div><i data-icon="stack"></i></div>
+        <a class="btn mint full-width" href="./kit/LM-04-kit.zip" download><i data-icon="download"></i>Скачать комплект <span>ZIP</span></a>
+        <div id="files"></div>
+        <p class="build-note"><i data-icon="info"></i><span>Геометрия проверена в CAD. Физическую сборку и посадки предстоит подтвердить на первом отпечатке.</span></p>
+      </div>
+    </div>
+    <details class="source-details"><summary><span><i data-icon="book"></i>Исходная задача и аналоги</span><i class="detail-mark" data-icon="plus"></i></summary><div class="sources-body"><p>Исходная задача — изучить управление аппаратом абляции с несколькими световодами. В этой ревизии исследуются расположение органов управления, эргономика корпуса и сценарии интерфейса. Клинические режимы, лазерный модуль и оптический тракт относятся к отдельной медицинской разработке.</p><p>В описании FiberLase S две длины волны подаются через один волоконный инструмент. У EchoLaser производитель описывает одновременную работу нескольких световодов. Для клинического применения в России предусмотрена регистрация медицинского изделия.</p><div class="source-links"><a href="https://vpgmed.ru/ru-ru/products/FiberLase-Series/FiberLase-S" target="_blank" rel="noopener">FiberLase S · VPG</a><a href="https://www.elesta-echolaser.com/echolaser/?lang=en" target="_blank" rel="noopener">EchoLaser · Elesta</a><a href="https://roszdravnadzor.gov.ru/medproducts/registration" target="_blank" rel="noopener">Росздравнадзор</a></div></div></details>
+  </div>
+</section>
+</main>
+<footer><div class="frame"><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"></span><span>Lumen<span class="brand-lite">Lab</span></span></a><span>Технопарк РГСУ · Инженерное проектирование</span><a href="#top">К началу <i data-icon="top"></i></a></div></footer>
+<noscript><p>Для 3D-обзора и симулятора включите JavaScript. <a href="./kit/LM-04-kit.zip">Скачать комплект для сборки</a>.</p></noscript>
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>

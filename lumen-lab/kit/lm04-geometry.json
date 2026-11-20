@@ -1,0 +1,73 @@
+{
+  "model": "LM-04",
+  "revision": "A",
+  "units": "mm",
+  "envelope_mm": [
+    180.0,
+    134.0,
+    77.802
+  ],
+  "slope_degrees": 20.0,
+  "clearance_per_side_mm": 0.25,
+  "tape_thickness_mm": 0.2,
+  "printed_parts": {
+    "01-base": {
+      "size_mm": [
+        180.0,
+        134.0,
+        8.0
+      ],
+      "cad_valid_single_solid": true,
+      "triangles": 3220,
+      "closed_oriented_mesh": true,
+      "mesh_volume_mm3": 191202.72
+    },
+    "02-housing": {
+      "size_mm": [
+        176.0,
+        130.0,
+        69.802
+      ],
+      "cad_valid_single_solid": true,
+      "triangles": 9958,
+      "closed_oriented_mesh": true,
+      "mesh_volume_mm3": 1037678.67
+    },
+    "03-panel": {
+      "size_mm": [
+        162.0,
+        110.0,
+        2.8
+      ],
+      "cad_valid_single_solid": true,
+      "triangles": 2100,
+      "closed_oriented_mesh": true,
+      "mesh_volume_mm3": 40747.69
+    },
+    "04-screen": {
+      "size_mm": [
+        94.0,
+        54.0,
+        1.6
+      ],
+      "cad_valid_single_solid": true,
+      "triangles": 500,
+      "closed_oriented_mesh": true,
+      "mesh_volume_mm3": 8076.92
+    },
+    "05-marker": {
+      "size_mm": [
+        12.2,
+        12.2,
+        2.15
+      ],
+      "cad_valid_single_solid": true,
+      "triangles": 4104,
+      "closed_oriented_mesh": true,
+      "mesh_volume_mm3": 240.54
+    }
+  },
+  "instances": 12,
+  "interference_free_pairs": 66,
+  "physical_fit_verified": false
+}

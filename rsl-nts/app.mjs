@@ -1,9 +1,11 @@
 import {classify} from './recognizer.mjs';
+import {classifyMotion} from './motion.mjs';
 const $ = id => document.getElementById(id);
 const video = $('video'), run = $('run'), status = $('status');
 const data = {
   question:{label:'вопрос'}, help:{label:'помочь'}, outside:{label:'дом (вне словаря)'}
 };
+let motionModel=null;
 let mode='example', revision=0, stream=null, fileUrl=null, model, detectorPromise=null, proposed='', previousText=null, busy=false;
 const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
 const asset = async path => {
@@ -69,10 +71,12 @@ $('stop').addEventListener('click',()=>setMode('camera'));
 async function getDetector(){
   if(!detectorPromise) detectorPromise=(async()=>{
     const base='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21';
+    const runtimeCanvas=document.createElement('canvas');
+    if(!runtimeCanvas.getContext('webgl2')) throw Error('WebGL недоступен');
     const {FilesetResolver,HandLandmarker}=await import(base+'/vision_bundle.mjs');
     const wasm=await FilesetResolver.forVisionTasks(base+'/wasm');
     return HandLandmarker.createFromOptions(wasm,{
-      baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',delegate:'CPU'},
+      canvas:runtimeCanvas,baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',delegate:'CPU'},
       runningMode:'IMAGE',numHands:2,minHandDetectionConfidence:.45,minHandPresenceConfidence:.45
     });
   })().catch(()=>{detectorPromise=null;throw Error('Не удалось загрузить модуль распознавания. Проверьте соединение или откройте встроенный пример.');});
@@ -123,25 +127,41 @@ async function captureVideo(token) {
   }
   return {aspect:capture.aspect,images};
 }
-async function extract(token) {
-  status.textContent='Загрузка модуля распознавания. При первом запуске потребуется интернет…';
-  const detector=await getDetector();stillCurrent(token);
-  const {aspect,images}=await captureVideo(token),frames=[];
-  status.textContent='Определяем положение рук в 16 кадрах…';
-  for(const img of images){
-    stillCurrent(token);
-    const got=detector.detect(img);
-    frames.push(got.landmarks.map((pts,k)=>({side:got.handedness[k][0].categoryName,landmarks:pts.map(p=>[p.x,p.y,p.z])})));
-    await sleep(0);
+async function analyzeInput(token) {
+  status.textContent='Подготовка распознавания. При первом запуске потребуется интернет…';
+  let detector;
+  try { detector=await getDetector(); } catch { /* Use the measured CPU-only fallback. */ }
+  stillCurrent(token);
+  const {aspect,images}=await captureVideo(token);
+  if(detector){
+    try{
+      const frames=[];
+      const frame=document.createElement('canvas');
+      frame.width=images[0].width;frame.height=images[0].height;
+      const context=frame.getContext('2d');
+      status.textContent='Определяем положение рук в 16 кадрах…';
+      for(const img of images){
+        stillCurrent(token);context.putImageData(img,0,0);
+        const got=detector.detect(frame);
+        frames.push(got.landmarks.map((pts,k)=>({side:got.handedness[k][0].categoryName,landmarks:pts.map(p=>[p.x,p.y,p.z])})));
+        await sleep(0);
+      }
+      return classify({aspect,frames},model);
+    } catch(error) {
+      if(error.name==='AbortError')throw error;
+    }
   }
-  return {aspect,frames};
+  stillCurrent(token);status.textContent='Анализируем движение в кадрах без графического ускорения…';
+  if(!motionModel)motionModel=await asset('./assets/motion-model.json');
+  stillCurrent(token);
+  return classifyMotion(images,motionModel);
 }
 function showResult(result,truth){
   $('word').textContent=result.accepted?result.word:'Жест не распознан';
   $('detail').textContent=result.accepted?'Проверьте слово перед добавлением.':(result.valid<model.minFrames?'В нескольких кадрах система потеряла руки. Покажите жест ещё раз.':'Модель не смогла уверенно выбрать слово. Повторите жест или введите слово вручную.');
   $('truth').hidden=!truth;if(truth)$('truth').textContent='Разметка корпуса: '+truth+'.';
   proposed=result.accepted?result.word:'';$('add').disabled=!proposed;
-  status.textContent=mode==='example'?'Обработаны сохранённые координаты рук из 16 кадров.':'Завершено. Кадров с видимой рукой: '+result.valid+' из 16.';
+  status.textContent=mode==='example'?'Обработаны сохранённые координаты рук из 16 кадров.':result.method==='motion'?'Резервный режим. Программа сравнила движение на 16 кадрах.':'Основная модель обработала 16 кадров. Рука видна в '+result.valid+'.';
 }
 run.addEventListener('click',async()=>{
   if(busy||!model)return;
@@ -149,8 +169,8 @@ run.addEventListener('click',async()=>{
   try{
     if(mode==='camera'&&!stream){await enableCamera(token);return;}
     const sample=$('example').value;
-    const clip=mode==='example'?await asset('./samples/'+sample+'.json'):await extract(token);
-    stillCurrent(token);showResult(classify(clip,model),mode==='example'?data[sample].label:null);
+    const result=mode==='example'?classify(await asset('./samples/'+sample+'.json'),model):await analyzeInput(token);
+    stillCurrent(token);showResult(result,mode==='example'?data[sample].label:null);
   }catch(e){
     if(e.name!=='AbortError'&&token===revision) status.textContent=e.name==='NotAllowedError'?'Нет доступа к камере. Разрешите его в браузере или откройте пример.':e.name==='NotFoundError'?'Камера не найдена. Выберите пример или видеофайл.':e.message;
   }finally{if(token===revision){busy=false;updateRun();}}

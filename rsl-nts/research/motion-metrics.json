@@ -1,0 +1,12 @@
+{
+  "C": 1000.0,
+  "cvMacroF1": 0.431,
+  "threshold": 0.5148,
+  "trainN": 118,
+  "testN": 40,
+  "outsideN": 40,
+  "top1": 12,
+  "acceptedKnown": 27,
+  "acceptedCorrect": 11,
+  "acceptedOutside": 28
+}

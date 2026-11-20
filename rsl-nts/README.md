@@ -39,7 +39,9 @@ python research/extract.py --annotations /path/to/annotations.csv --slovo /path/
 python research/evaluate.py tracks.json reproduced
 ```
 
-В каталоге reproduced появятся model.json, predictions.csv и metrics.json. В приложении используются те же функции признаков из recognizer.mjs. Для локального запуска выполните в каталоге rsl-nts команду `python -m http.server 8000` и откройте `http://localhost:8000`. Камера работает в безопасном контексте HTTPS или localhost.
+В каталоге reproduced появятся model.json, predictions.csv и metrics.json. В приложении используются те же функции признаков из recognizer.mjs. Если браузер не может воспользоваться WebGL, приложение автоматически применяет резервную модель по изменению яркости и направлению движения в 16 кадрах. В той же независимой проверке её первый кандидат был верен в 12 из 40 записей, после порога верны 11 из 27 предложенных ответов. На посторонних жестах она ошибочно предложила слово в 28 из 40 случаев. Режим явно указан на экране. Его результаты измерены отдельно от основной модели. [Показатели резервной модели](research/motion-metrics.json). Для воспроизведения используйте команду `python research/evaluate_motion.py --annotations /path/to/annotations.csv --slovo /path/to/slovo --output reproduced` с NumPy, OpenCV и scikit-learn.
+
+Для локального запуска выполните в каталоге rsl-nts команду `python -m http.server 8000` и откройте `http://localhost:8000`. Камера работает в безопасном контексте HTTPS или localhost.
 
 ## Источники и условия использования
 

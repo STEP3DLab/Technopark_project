@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT.parent / "assets"
 ARCHIVE = ROOT / "LM-04B-kit.zip"
 DOCS = ["START.md","electronics/README.md","mechanics/README.md","firmware/README.md",
-        "desktop/README.md","data/FORMAT.md","platform/comparison.md"]
+        "desktop/README.md","data/FORMAT.md","platform/comparison.md",
+        "workshop/BUILD.md","workshop/METHOD.md","workshop/SYSTEM.md",
+        "qualification/README.md"]
 SHARED = ["inter.woff2","plex.woff2","mark.svg","inter-OFL.txt","plex-OFL.txt"]
 
 def kept(p):
@@ -23,7 +25,7 @@ def kept(p):
 def render():
     for name in DOCS:
         src=ROOT/name
-        body=subprocess.check_output(["pandoc","--from=gfm","--to=html5","--wrap=none",str(src)],text=True)
+        body=subprocess.check_output(["pandoc","--from=gfm+tex_math_dollars","--to=html5","--mathml","--wrap=none",str(src)],text=True)
         def local_link(m):
             path,anchor=m.group(1).split("#",1) if "#" in m.group(1) else (m.group(1),"")
             if ":" in path or path.startswith("/") or not path:return m.group(0)

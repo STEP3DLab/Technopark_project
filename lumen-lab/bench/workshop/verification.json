@@ -1,0 +1,77 @@
+{
+  "revision": "LM04B-B2",
+  "checkedAt": "2026-11-20T20:39:35+03:00",
+  "scope": "Digital software, ECAD and CAD checks only. No physical acceptance is recorded.",
+  "software": {
+    "node_tests": 53,
+    "python_tests": 25,
+    "passed": 78,
+    "failed": 0,
+    "skipped": 0
+  },
+  "electronics": {
+    "kicad_version": "9.0.2",
+    "erc_violations": 0,
+    "drc_violations": 0,
+    "unconnected": 0,
+    "schematic_parity_issues": 0
+  },
+  "thermal_block": {
+    "valid_step": true,
+    "analytic_volume_matches": true,
+    "physically_built": false
+  },
+  "pdfs": {
+    "assembly-cards.pdf": {
+      "pages": 4,
+      "text_present": true
+    },
+    "thermal-block.pdf": {
+      "pages": 1,
+      "text_present": true
+    }
+  },
+  "local_html_links_checked": 147,
+  "browser_test": "Independent interaction checks are outside this digital-check report.",
+  "physical_logger_accepted": false,
+  "medical_requirements_physically_confirmed": 0,
+  "medical_requirements_total": 27,
+  "inputSha256": {
+    "analysis.mjs": "a2cfd77b0a9e6441d69192a3aeb4697d9f3d05ebcaa91b1ffd0a2161771af008",
+    "app.mjs": "4fb4ffebe5222ab26c3bc9cfc1b4eb816ab5eed222101867b79c3d379f73dad0",
+    "checks/emulator_to_recorder.py": "8ef7207f18defdf5deaf131d99d06371319c7d097181df146ba16a9ac008730c",
+    "checks/power.test.mjs": "4cdb19b2202d216d50096f9d035fae4b257b2bc70151e31f32b49fbe811a5f45",
+    "checks/qualification.test.mjs": "5a3f7350cf3f3f501cacbd6fe268ce955c4d3ffe7067486f6f262c0ac70399da",
+    "checks/test_firmware.py": "fff0dd73134788a5c8b7ea7376703e6eedb34f13c448e85ffc8b523535b739ae",
+    "checks/test_firmware_image.py": "4ada15d547858a80de3ebf33a6f287b3948f9443bf2865764664adbe18e50b4e",
+    "checks/test_recorder.py": "8eaec1a17d3192a4f8a136657df23857cf42879f877c2ef6ae3424481b2490ee",
+    "checks/transport.test.mjs": "1b5af411dbbde7f2dfd997957455a6fbef7c874d889d286be11232044d86dca9",
+    "desktop/record.py": "0cc5e1c7049ae22aa574a3cd89d4b541c12ddb6dbbf233bebc5c664e0e9a1aca",
+    "electronics/LM04B.kicad_pcb": "e48249c4ae144897a699975ecf8e7c3969334c740d6c880deb42d1a6968e7b48",
+    "electronics/LM04B.kicad_sch": "3bf4f769daaff309dbf636e44d9f8476c1ce450bdfefe7492127132576df4476",
+    "electronics/sources/board.py": "0faf3cc39b61266e3f6e30446329cee5eac1d0db95c0580ffe1695c7b46bb182",
+    "electronics/sources/manual.py": "43f4316e3eca8a82a7db18355f07f2c25783cad268fa8b75c9cdf709a3b9d8c5",
+    "electronics/sources/pack.py": "5c0c7a479ae1dd3fc665ebc8e136a0b1473a4ecd7bf4ea87fb15e6a562bdc01c",
+    "electronics/sources/schematic.py": "9b983155feeff741ccd399afd2c4cef760d8a3f4bb446a925e42f1b2e12c8a43",
+    "electronics/sources/verify.py": "c56c4eaed2aec4433860ceef16c6cbd4cd6413366b5d02236e8bbce4128df753",
+    "firmware/LM04B-Pico-v1.uf2": "a8aa55f4dd7c13af16673c23b67dfabfadb04b277cf18639cd2f212dc96a4880",
+    "firmware/build_uf2.py": "a9f9f7037f945a5b07ba65bd6576624ca0b5dc3d255ed2527277ac1329ee8b25",
+    "firmware/install.py": "282d8c44415f3b4d2dbdce695a7d6332e315f56a379ef31702ce0fd5194743b4",
+    "firmware/main.py": "e79e8607e32e1becf07f9c435a5c2b76b549a7e02f8791f69c0810f752bb6e2a",
+    "mechanics/lm04b-housing.py": "f8a6ac0e23ffefff084b3b9a65d70070d9be27be1425f0b1c20480f4804ae18f",
+    "mechanics/lm04b-housing.step": "b9accedd6c456f59a695f0cf77b756d02c4c36f22afda1f57eebaef1667b0832",
+    "overlap.mjs": "e42b2e66d12f5d17fa1e32a0c2d8c6d5526e27e27468ee0e81e079a9f495e43c",
+    "plot.mjs": "8a6abc3c3c0bd206351b8ae50dc70e8aa87baf5acd1c376e983698bdd92a964b",
+    "protocol.mjs": "cbfff265310f24b7c08ce66e4176bc31deceee7b467be524c7994246be0e080f",
+    "qualification/app.mjs": "7bc9e2615710e014b72baa8426f92f2eaa7b98707b272e19a25140db9416ccd7",
+    "qualification/engine.mjs": "996ab3b3c2627d22248dc00ecc1a60d72d7bc87cea2aba44be547d5af92c6aa3",
+    "qualification/verify.mjs": "05d3c02001f439067125bca3c70fb8b6443d3a04d2d2a187b39dd2579464037c",
+    "release.py": "aee02422a515495fd89ce67d2c690a228d49740371a35f86c765192dce844ffa",
+    "stream.mjs": "d9a97c56a7229046356107958f6e4581e29eb6b684c8908f855aff3f2d600a26",
+    "viewer.mjs": "1f2256a025ea86bd10ab31ee40895449ca1fdc07689b4018649bac2d9f97e3f0",
+    "workshop/build_assets.py": "8dcd83596a55da0b5c10fa266164514a89e804b8371e74a15512a2ae140ef445",
+    "workshop/check_integrity.py": "6f677d7394eb4dd66868e8f066ce46fcc08a4f5facaac0368c1db75e87b492f6",
+    "workshop/thermal-block.step": "3eed0426991587931bcaf81aa5d42c36dbc55b4a3c1ca179c306450b434ec7bd",
+    "workshop/validate.py": "96225df5aa66da8fa268d59c2b9f178d4e1ad46f4c789c4c1337aceaca65c78e"
+  }
+}

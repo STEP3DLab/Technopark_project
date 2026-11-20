@@ -1,0 +1,37 @@
+{
+  "revision": "TB-1",
+  "material": "Aluminium, density assumption 2700 kg/m3",
+  "units": "mm",
+  "valid_solid": true,
+  "solid_count": 1,
+  "bbox_mm": [
+    80.0,
+    40.0,
+    60.0
+  ],
+  "bore_diameter_mm": 6.2,
+  "full_diameter_depth_mm": 50.0,
+  "drill_point_angle_deg": 118,
+  "centres_xy_mm": [
+    [
+      20,
+      20
+    ],
+    [
+      40,
+      20
+    ],
+    [
+      60,
+      20
+    ]
+  ],
+  "minimum_bottom_wall_mm": 8.137332081014563,
+  "volume_mm3": 187415.15893144836,
+  "analytical_volume_mm3": 187415.15893144833,
+  "mass_kg_assuming_density_2700": 0.5060209291149106,
+  "physically_built": false,
+  "thermal_uniformity_measured": false,
+  "thermal_stability_measured": false,
+  "step_sha256": "3eed0426991587931bcaf81aa5d42c36dbc55b4a3c1ca179c306450b434ec7bd"
+}

@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111917">
   <meta name="description" content="Люмен LM-04 — интерактивный 3D-стенд Технопарка РГСУ. Посмотрите устройство в разборе, испытайте цифровой пульт и скачайте файлы для изготовления демонстрационного макета.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Люмен LM-04 · Интерактивный инженерный стенд">
+  <meta property="og:description" content="Трёхмерная модель пульта, симулятор на два или четыре канала и файлы для изготовления пассивного макета.">
+  <meta property="og:image" content="https://step3dlab.github.io/Technopark_project/lumen-lab/assets/site-preview.jpg">
+  <meta property="og:image:alt" content="Интерактивный стенд Люмен LM-04 с трёхмерной моделью пульта">
+  <meta name="twitter:card" content="summary_large_image">
   <title>Люмен LM-04 — интерактивный инженерный стенд</title>
   <link rel="icon" href="./assets/mark.svg" type="image/svg+xml">
   <link rel="preload" href="./assets/inter.woff2" as="font" type="font/woff2" crossorigin>
@@ -40,7 +47,7 @@
         <img id="viewer-poster" src="./assets/model-poster.png" alt="Пассивный пульт LM-04 в сборе" hidden>
         <p id="load-state" class="loading" role="status">Загрузка модели…</p>
       </div>
-      <div id="part-readout" class="part-readout" hidden><b id="part-title"></b><button class="mini-x" id="clear-part" aria-label="Снять выделение">×</button><span id="part-desc"></span></div>
+      <div id="part-readout" class="part-readout" role="status" aria-live="polite" hidden><b id="part-title"></b><button class="mini-x" id="clear-part" aria-label="Снять выделение">×</button><span id="part-desc"></span></div>
       <div class="stage-bottom"><span class="orbit-hint"><i data-icon="orbit"></i><span>Вращайте модель</span></span><div class="view-tools" role="group" aria-label="Инструменты 3D">
        <button class="ico" id="auto" aria-label="Автовращение" data-tip="Автовращение" aria-pressed="false"><i data-icon="spin"></i></button>
        <button class="ico" id="dims" aria-label="Показать габариты" data-tip="Габариты" aria-pressed="false"><i data-icon="ruler"></i></button>

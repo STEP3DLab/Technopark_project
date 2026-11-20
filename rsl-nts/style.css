@@ -1,0 +1,57 @@
+:root{font-family:Arial,Helvetica,sans-serif;color:#102344;background:#f7f9fc;font-synthesis:none;--navy:#082567;--blue:#102fa1;--light:#d5e4f4;--line:#cad6e6;--muted:#465a74}
+*{box-sizing:border-box}
+body{margin:0}
+.wrap{width:min(1120px,calc(100% - 64px));margin:auto}
+header{background:white;border-bottom:1px solid var(--line)}
+.head,.identity,footer,.actions,.modes,.links,.text-tools,.source{display:flex;align-items:center}
+.head{justify-content:space-between;min-height:80px}
+.identity{gap:14px;color:var(--navy);font-weight:700;font-size:13px;letter-spacing:.01em;line-height:1.25}
+.identity img{width:29px;height:45px}
+a{color:var(--blue);text-underline-offset:4px}
+.head>a{font-size:14px}
+.intro{padding:40px 0 24px}
+.eyebrow{font-size:13px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--blue);margin:0 0 10px}
+h1,h2,p{margin:0}
+h1{font-size:clamp(38px,6vw,66px);line-height:1.06;letter-spacing:-.045em;color:var(--navy)}
+.lead{font-size:19px;line-height:1.5;color:var(--muted);margin:12px 0 8px;max-width:760px}
+.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,1fr);gap:30px;align-items:start}
+.workspace>section{min-width:0}
+.modes{gap:5px;flex-wrap:wrap;margin-bottom:12px}
+button,select,input,textarea{font:inherit}
+button,select{cursor:pointer}
+button{border:0}
+.modes button,.text-tools button{background:transparent;color:var(--navy);font-size:15px;padding:10px 13px;border-radius:5px}
+.modes [aria-pressed="true"]{background:var(--light);font-weight:bold}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #007fff;outline-offset:3px}
+.stage{aspect-ratio:16/9;background:#102346;display:grid;position:relative;place-items:center;border-radius:8px;overflow:hidden}
+.stage video{width:100%;height:100%;object-fit:contain;min-height:0}
+.stage>#stage-empty{position:absolute;color:white;font-size:17px;padding:20px;text-align:center}
+.stage.live video{transform:scaleX(-1)}
+.source{gap:12px;min-height:56px;flex-wrap:wrap;color:var(--muted);font-size:15px}
+select{border:1px solid #a8b9d0;background:white;border-radius:5px;padding:7px 12px;color:var(--navy)}
+input[type=file]{max-width:100%;font-size:14px}
+.actions{gap:10px;flex-wrap:wrap}
+.primary,.secondary{padding:12px 17px;font-weight:bold;font-size:15px;border-radius:6px}
+.primary{background:var(--blue);color:white}
+.secondary{border:1px solid #8ea5c6;color:var(--navy);background:transparent}
+button:enabled:hover{filter:brightness(.92)}
+button:disabled{opacity:.45;cursor:default}
+.hint{font-size:15px;line-height:1.45;color:var(--muted)}
+#status{min-height:44px;margin-top:10px}
+.output{background:white;border:1px solid var(--line);border-radius:10px;padding:23px 25px;margin-top:48px}
+h2,.heading{color:var(--navy);font-size:24px;font-weight:700;line-height:1.2;letter-spacing:-.025em}
+.prediction{border-bottom:1px solid var(--line);padding:14px 0 20px;margin-bottom:19px}
+#word{font-weight:bold;font-size:clamp(28px,3.8vw,42px);letter-spacing:-.04em;color:var(--blue);line-height:1.1;margin-bottom:8px;overflow-wrap:anywhere}
+#add{margin-top:13px}
+.truth{font-size:14px;margin-top:8px;color:#324159}
+.heading{display:block;font-size:20px;margin-bottom:10px}
+textarea{border:1px solid #a6b8cf;background:#fcfdff;width:100%;border-radius:6px;padding:10px;color:var(--navy);line-height:1.45;resize:vertical}
+.text-tools{gap:12px;flex-wrap:wrap}
+.text-tools button{padding:6px 0;text-decoration:underline;font-size:14px}
+#copy-status:empty{display:none}
+.dictionary,#experiment{border-top:1px solid var(--line);margin-top:28px;padding-top:24px}
+.dictionary p,#experiment p{line-height:1.55;margin-top:10px;max-width:860px}
+.links{flex-wrap:wrap;gap:12px 24px;margin-top:16px;font-size:15px}
+footer{padding:30px 0 22px;color:var(--muted);font-size:13px;gap:15px;flex-wrap:wrap}
+[hidden]{display:none!important}
+@media(max-width:750px){.wrap{width:calc(100% - 36px)}.head{min-height:68px}.intro{padding:28px 0 16px}.workspace{grid-template-columns:1fr;gap:8px}.output{margin-top:0;padding:18px}.lead{font-size:17px}.modes button{padding:9px 12px}.source{padding:7px 0}.head>a{font-size:12px}}

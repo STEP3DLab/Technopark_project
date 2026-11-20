@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#082567"><title>Транскриптер РЖЯ · Детский технопарк РГСУ</title>
+<link rel="icon" href="./assets/rgsu.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
+</head><body>
+<header><div class="wrap head"><div class="identity"><img src="./assets/rgsu.svg" alt="РГСУ"><span>Российский государственный<br>социальный университет</span></div><a href="#experiment">Об эксперименте</a></div></header>
+<main class="wrap"><div class="intro"><p class="eyebrow">Детский технопарк РГСУ</p><h1>Транскриптер РЖЯ</h1><p class="lead">Покажите один жест из словаря. Программа предложит слово, которое можно добавить в текст.</p></div>
+<div class="workspace"><section aria-label="Видео для распознавания">
+<div class="modes" role="group" aria-label="Источник видео"><button type="button" data-mode="example" aria-pressed="true">Примеры</button><button type="button" data-mode="camera" aria-pressed="false">Камера</button><button type="button" data-mode="file" aria-pressed="false">Видеофайл</button></div>
+<div class="stage" id="stage"><video id="video" playsinline muted controls preload="metadata" poster="./samples/question.jpg" src="./samples/question.mp4"></video><div id="stage-empty" hidden></div></div>
+<div class="source" id="example-pane"><label for="example">Запись из Slovo</label><select id="example"><option value="question">Пример 1</option><option value="help">Пример 2</option><option value="outside">Пример 3</option></select></div>
+<div class="source" id="camera-pane" hidden><span>Держите лицо и руки в кадре. На жест отведено 2 секунды.</span></div>
+<div class="source" id="file-pane" hidden><label for="file">Короткий ролик с одним жестом</label><input id="file" type="file" accept="video/*"></div>
+<div class="actions"><button id="run" class="primary" type="button" disabled>Распознать пример</button><button id="stop" type="button" class="secondary" hidden>Выключить камеру</button></div>
+<p id="status" class="hint" role="status" aria-live="polite">Загрузка словаря…</p>
+</section>
+<section class="output" aria-label="Результат и текст"><h2>Результат</h2><div class="prediction"><p id="word" aria-live="polite">Пока нет слова</p><p class="hint" id="detail">Выберите источник видео и запустите распознавание.</p><p class="truth" id="truth" hidden></p><button id="add" class="secondary" type="button" disabled>Добавить слово</button></div>
+<label for="transcript" class="heading">Ваш текст</label><textarea id="transcript" rows="3" placeholder="Здесь появятся подтверждённые слова"></textarea><div class="text-tools"><button id="undo" type="button" disabled>Отменить добавление</button><button id="copy" type="button" disabled>Копировать</button></div><p id="copy-status" class="hint" aria-live="polite"></p>
+</section></div>
+<section class="dictionary"><h2>Словарь прототипа</h2><p>Вопрос, помочь, имя, время, сегодня, завтра, школа, вода.</p></section>
+<section id="experiment"><h2>Как проверяли распознавание</h2><p>Для обучения использовали 118 записей Slovo от 11 человек. На 40 новых записях словаря модель выбрала верное слово в 33 случаях. После порога уверенности она предложила 24 слова, 23 из них верны. Ещё в 17 из 40 записей с другими жестами программа ошибочно предложила слово из словаря.</p><p>В примерах программа применяет модель к сохранённым координатам рук. Для камеры и загруженного видео она извлекает координаты заново в браузере. Видео остаётся на вашем устройстве. Полноценный перевод фраз потребует отдельной модели.</p><div class="links"><a href="https://github.com/STEP3DLab/Technopark_project/tree/main/rsl-nts">Проект и методика на GitHub</a><a href="./research/predictions.csv" download>Результаты по записям (CSV)</a><a href="https://github.com/hukenovs/slovo">Исходный корпус Slovo</a></div></section>
+</main><footer class="wrap">Проектный центр «Детский технопарк» РГСУ · 2026 <a href="./sources.html">Авторы и источники</a></footer><script type="module" src="./app.mjs"></script></body></html>

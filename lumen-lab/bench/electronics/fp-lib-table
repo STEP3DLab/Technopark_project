@@ -1,0 +1,7 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Module")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Module.pretty")(options "")(descr ""))
+  (lib (name "Resistor_THT")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Resistor_THT.pretty")(options "")(descr ""))
+  (lib (name "MountingHole")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/MountingHole.pretty")(options "")(descr ""))
+  (lib (name "LM04")(type "KiCad")(uri "${KIPRJMOD}/LM04.pretty")(options "")(descr ""))
+)

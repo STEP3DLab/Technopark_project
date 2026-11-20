@@ -1,0 +1,35 @@
+{
+  "pcb_lift_test_mm": [
+    0,
+    1.5,
+    5,
+    12,
+    24,
+    36
+  ],
+  "screwdriver_sweep_d_mm": 6.5,
+  "lead_sweep_d_mm": 3.2,
+  "usb_overmold_test_mm": [
+    20,
+    11
+  ],
+  "physical_assembly_tested": false,
+  "assembly_bounds_mm": [
+    [
+      -5.0,
+      -11.0,
+      -0.0
+    ],
+    [
+      85.0,
+      63.0,
+      37.65
+    ]
+  ],
+  "stl_triangles": {
+    "tray": 6012,
+    "lid": 4336
+  },
+  "cad_component_nodes": 44,
+  "closed_oriented_stl": true
+}

@@ -1,0 +1,166 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Прошивка USB-термометра LM04B · LM-04B</title><link rel="stylesheet" href="../bench.css"></head><body class="guide"><header><div class="wrap top"><a class="brand" href="../index.html"><span class="brandmark"></span>Lumen<span>Lab</span></a><a class="repo" href="../index.html">К стенду LM-04B ↗</a></div></header><main class="wrap reading"><h1 id="прошивка-usb-термометра-lm04b">Прошивка USB-термометра LM04B</h1>
+<p><strong><code>LM04B-Pico-v1.uf2</code></strong> содержит загрузочный образ для классической Raspberry Pi Pico с RP2040 и флеш-памятью 2 МиБ. В образ входят официальная MicroPython RPI_PICO v1.25.0 и приложение <code>main.py</code>. Плата измеряет температуру двух внешних DS18B20 и передаёт результаты через USB CDC. Приложение не принимает управляющие команды.</p>
+<h2 id="подключение-датчиков">Подключение датчиков</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Цепь</th>
+<th style="text-align: right;">Контакт Pico</th>
+<th>Подключение</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>T1, DQ</td>
+<td style="text-align: right;">4, GP2</td>
+<td>DQ первого DS18B20, отдельный резистор 4,7 кОм к 3V3</td>
+</tr>
+<tr class="even">
+<td>T2, DQ</td>
+<td style="text-align: right;">5, GP3</td>
+<td>DQ второго DS18B20, отдельный резистор 4,7 кОм к 3V3</td>
+</tr>
+<tr class="odd">
+<td>Питание</td>
+<td style="text-align: right;">36, 3V3(OUT)</td>
+<td>VDD обоих датчиков</td>
+</tr>
+<tr class="even">
+<td>Общий провод</td>
+<td style="text-align: right;">3 или 8, GND</td>
+<td>GND обоих датчиков</td>
+</tr>
+</tbody>
+</table>
+<p>Каждый канал использует собственную трёхпроводную линию. Для готовых герметичных щупов назначение жил берут из документации поставщика. <a href="https://datasheets.raspberrypi.com/pico/Pico-R3-A4-Pinout.pdf">Распиновка Pico</a> · <a href="https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf">Паспорт DS18B20, стр. 3–4 и 7–12</a></p>
+<h2 id="загрузка-готового-образа">Загрузка готового образа</h2>
+<p><strong>Полный образ заменит всё содержимое флеш-памяти Pico, включая существующие программы и файлы.</strong> Для обновления одного файла на плате с подходящей версией MicroPython предназначен отдельный способ ниже. При необходимости заранее скопируйте имеющиеся файлы с платы.</p>
+<ol type="1">
+<li>Отсоедините Pico. Удерживая BOOTSEL, подключите кабель Micro-USB с передачей данных. Отпустите кнопку после появления съёмного тома <code>RPI-RP2</code>.</li>
+<li>Скопируйте <code>LM04B-Pico-v1.uf2</code> на этот том. После загрузки том исчезнет и появится последовательный USB-порт.</li>
+<li>Выберите порт в программе стенда. Сначала удобно проверить строки с отключёнными датчиками, затем подключить каждый DS18B20 к своему разъёму. Исправный канал выдаёт <code>ok</code> и температуру, отключённый выдаёт <code>no_sensor</code> и <code>null</code>.</li>
+</ol>
+<p>Для подтверждения записи всех блоков можно использовать picotool 2.1.1 с поддержкой USB. Подключите одну плату в режиме BOOTSEL и запустите команду из этой папки. Она загрузит образ, сравнит его с содержимым флеш-памяти и запустит плату. <a href="https://micropython.org/download/RPI_PICO/">Загрузчик Pico</a> · <a href="https://github.com/raspberrypi/picotool/blob/2.1.1/README.md#load">Руководство picotool</a></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">picotool</span> load <span class="at">-v</span> <span class="at">-x</span> LM04B-Pico-v1.uf2</span></code></pre></div>
+<p>Размер образа — 4 194 304 байта. Полезные данные UF2 занимают 2 МиБ. SHA-256 файла — <code>a8aa55f4dd7c13af16673c23b67dfabfadb04b277cf18639cd2f212dc96a4880</code>.</p>
+<h2 id="чтение-с-платы-и-обновление-приложения">Чтение с платы и обновление приложения</h2>
+<p>Команды выполняются на компьютере из этой папки в окружении Python 3.9 или новее. Для <code>mpremote</code> освободите порт, закрыв соединение в регистраторе или терминале. В командах укажите имя своей платы из списка портов. В Windows это может быть <code>COM5</code>, в Linux — <code>/dev/ttyACM0</code>, в macOS — <code>/dev/cu.usbmodem…</code>. <a href="https://docs.micropython.org/en/v1.25.0/reference/mpremote.html">Команды mpremote v1.25.0</a></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> pip install mpremote==1.25.0</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> mpremote connect list</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> install.py <span class="at">--port</span> COM5 <span class="at">--verify-only</span></span></code></pre></div>
+<p>Последняя команда проверяет тип платы и версию MicroPython, считывает с платы весь <code>/main.py</code>, побайтово сравнивает его с файлом комплекта и перезапускает приложение. SHA-256 исходника — <code>e79e8607e32e1becf07f9c435a5c2b76b549a7e02f8791f69c0810f752bb6e2a</code>.</p>
+<p>Для обновления одного приложения на классической Pico с <strong>официальной RPI_PICO v1.25.0</strong> используйте следующую команду. При необходимости сначала отдельно загрузите зафиксированную среду MicroPython через BOOTSEL. <a href="https://micropython.org/resources/firmware/RPI_PICO-20250415-v1.25.0.uf2">Исходный UF2 MicroPython</a></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> install.py <span class="at">--port</span> COM5</span></code></pre></div>
+<p>Установщик записывает временный файл, проверяет его SHA-256 на плате, заменяет <code>/main.py</code> операцией переименования, затем считывает итоговый файл и сравнивает байты. Другие пользовательские файлы сохраняются. Если на плате есть пользовательский <code>boot.py</code>, он должен передавать выполнение <code>main.py</code>. После неудачной передачи можно повторить установку. Ручной перезапуск после прерванного сеанса обслуживания выполняется командой <code>python -m mpremote connect COM5 reset</code>.</p>
+<p>Для просмотра строк после запуска подойдёт <code>python -m mpremote connect COM5 repl</code>. Выход из просмотра — <code>Ctrl+]</code>. Обычная программа регистрации только читает данные. Плата продолжает измерения, когда окно регистрации закрыто.</p>
+<h2 id="данные-с-платы">Данные с платы</h2>
+<p>Примерно раз в секунду приложение начинает новый цикл на двух шинах. Оно проверяет единственность и CRC адреса каждого датчика, его семейство <code>28h</code> и внешнее питание. После команды преобразования драйвер ожидает состояния «занят», затем «готов». При исправном ответе повторно проверяются адрес и CRC девяти байтов памяти результата. Оба преобразования идут одновременно. Предельное время ожидания для каждого — 850 мс. <a href="https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf">Команды и времена преобразования DS18B20</a></p>
+<p>Каждая завершённая строка USB — один JSON-объект версии <code>LM04B/1</code>. При подключении посередине передачи читатель может получить хвост строки до первого перевода строки.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>board</code></td>
+<td>8 байт аппаратного идентификатора платы, 16 строчных шестнадцатеричных цифр</td>
+</tr>
+<tr class="even">
+<td><code>boot</code></td>
+<td>8 случайных байт нового сеанса, включая мягкий перезапуск приложения</td>
+</tr>
+<tr class="odd">
+<td><code>seq</code></td>
+<td>Номер с нуля. Потерянной записи может соответствовать пропуск номера</td>
+</tr>
+<tr class="even">
+<td><code>ms</code></td>
+<td>Миллисекунды от запуска приложения до завершения цикла. Учитываются переполнения аппаратного счётчика</td>
+</tr>
+<tr class="odd">
+<td><code>t1</code>, <code>t2</code></td>
+<td>Отдельные объекты каналов. <code>id</code> хранит восемь байт Dallas ROM в порядке передачи, <code>c</code> — число в °C или <code>null</code>, <code>s</code> — состояние</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th><code>s</code></th>
+<th>Что наблюдалось</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ok</code></td>
+<td>Адрес, цикл преобразования и содержимое памяти результата прошли проверки</td>
+</tr>
+<tr class="even">
+<td><code>no_sensor</code></td>
+<td>После сброса шины отсутствует импульс присутствия</td>
+</tr>
+<tr class="odd">
+<td><code>bus_short</code></td>
+<td>Освобождённая линия DQ удерживается в нуле</td>
+</tr>
+<tr class="even">
+<td><code>wrong_family</code></td>
+<td>Обнаружено устройство с другим кодом семейства</td>
+</tr>
+<tr class="odd">
+<td><code>multiple_devices</code></td>
+<td>В ходе поиска обнаружено расхождение адресных битов</td>
+</tr>
+<tr class="even">
+<td><code>rom_crc</code></td>
+<td>Ошибка CRC восьми байтов адреса</td>
+</tr>
+<tr class="odd">
+<td><code>parasite_power</code></td>
+<td>Датчик сообщил о паразитном питании</td>
+</tr>
+<tr class="even">
+<td><code>conversion_timeout</code></td>
+<td>Пропущен ответ «занят» либо истекло время ожидания готовности</td>
+</tr>
+<tr class="odd">
+<td><code>scratchpad_crc</code></td>
+<td>Ошибка CRC памяти результата</td>
+</tr>
+<tr class="even">
+<td><code>invalid_data</code></td>
+<td>Некорректная конфигурация или значение вне диапазона −55…+125 °C</td>
+</tr>
+<tr class="odd">
+<td><code>startup_85</code></td>
+<td>Ровно +85 °C совпадает со значением после сброса питания датчика</td>
+</tr>
+<tr class="even">
+<td><code>sensor_changed</code></td>
+<td>Изменился достоверный адрес на этом канале. Следующий цикл измерит новый датчик</td>
+</tr>
+<tr class="odd">
+<td><code>bus_error</code></td>
+<td>Ошибка ввода-вывода или исчезновение ответов во время поиска ROM</td>
+</tr>
+</tbody>
+</table>
+<p>Во всех ошибочных состояниях <code>c</code> равно <code>null</code>. Точное значение +85 °C всегда отмечается <code>startup_85</code> — при перезапуске самого датчика в ходе цикла его стартовый код может иметь правильную CRC. Это ограничение относится и к действительной температуре ровно +85 °C. Разрешение 9–12 бит считывается из конфигурации датчика, неопределённые младшие биты игнорируются.</p>
+<h2 id="воспроизведение-сборки">Воспроизведение сборки</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> pip install littlefs-python==0.16.0</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> build_uf2.py <span class="at">--verify</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> build_uf2.py <span class="at">--output</span> LM04B-rebuilt.uf2</span></code></pre></div>
+<p>Сценарий загружает официальный образ фиксированной версии и проверяет его SHA-256 <code>e0c40eacf1afc550a6add74888c48bb981b28788a6d75a62a0e2444e997b9864</code>. Для локальной копии добавьте <code>--base RPI_PICO-20250415-v1.25.0.uf2</code>. Файловая система LittleFS v2.1 начинается со смещения <code>0xA0000</code>, содержит 352 блока по 4096 байт и использует размер программирования 256 байт. Сценарий формирует 8192 блока UF2 с идентификатором RP2040, разбирает каждый блок, повторно монтирует файловую систему и сверяет <code>main.py</code>. Команда <code>--verify</code> сравнивает результат с готовым образом побайтово. <a href="https://github.com/micropython/micropython/blob/v1.25.0/ports/rp2/boards/RPI_PICO/mpconfigboard.h">Конфигурация платы</a> · <a href="https://github.com/micropython/micropython/blob/v1.25.0/ports/rp2/rp2_flash.c">Размещение флеш-памяти</a> · <a href="https://github.com/micropython/micropython/blob/v1.25.0/ports/rp2/modules/_boot.py">Монтирование при старте</a></p>
+<h2 id="проверки">Проверки</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> unittest discover <span class="at">-s</span> ../checks <span class="at">-p</span> <span class="st">&quot;test_firmware*.py&quot;</span> <span class="at">-v</span></span></code></pre></div>
+<p>21 проверка охватывает код приложения, ошибки двух независимых каналов, замену датчика, переполнения счётчика, пропадание USB, структуру UF2, идентичность базового образа и проверку установки. Для проверки сборки внутри этого набора нужен указанный выше пакет <code>littlefs-python</code>.</p>
+<p>Файл <a href="qualification-rp2040.jsonl">qualification-rp2040.jsonl</a> содержит четыре последовательных USB-кадра из готового образа, запущенного на эмуляторе RP2040js 1.4.2. Два программных датчика отвечали на импульсы GPIO, формировали ROM, бит занятости и память результата. Последовательно проверены два показания, отключение T1, замена его ROM и стартовый код +85 °C на T2, затем восстановление двух каналов. Заголовок файла помечает данные как синтетические. Идентификатор виртуальной флеш-памяти и байты генератора случайных чисел здесь определяет эмулятор.</p>
+<p>Для повторения нужны Node.js, npm и Python. Команды выполняются из папки прошивки. Последний аргумент задаёт файл с полученными строками.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">--no-save</span> <span class="at">--package-lock</span><span class="op">=</span>false rp2040js@1.4.2</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-c</span> <span class="st">&quot;from urllib.request import urlretrieve; urlretrieve(&#39;https://raw.githubusercontent.com/wokwi/rp2040js/v1.4.2/demo/bootrom.ts&#39;,&#39;bootrom-v1.4.2.ts&#39;)&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> qualification/gpio-smoke.cjs LM04B-Pico-v1.uf2 rp2040js bootrom-v1.4.2.ts repeat.jsonl</span></code></pre></div>
+<p>На хосте сверены байты образа и содержимое файловой системы. Через виртуальный USB CDC версия mpremote 1.25.0 считала файл с работающей MicroPython. Отдельно через тот же интерфейс проверены запись временного файла, проверка его хеша на плате, переименование и побайтовое чтение результата. Для этого теста операции стирания и программирования флеш-памяти Boot ROM выполняла программная модель. Физическая Pico и реальные щупы для проверки отсутствовали. Погрешность измерения, исправность монтажа и устойчивость конкретных кабелей определяются при проверке собранного экземпляра. Уведомления об исходном ПО собраны в <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</p>
+</main></body></html>

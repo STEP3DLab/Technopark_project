@@ -1,10 +1,10 @@
-import {renderHome} from './home.js?v=1.3.0';
-import {CONFIG} from './config.js?v=1.3.0';
-import {api,isConfigured,encodeAudio} from './api.js?v=1.3.0';
-import {createSteps} from './questions.js?v=1.3.0';
-import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.0';
-import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.0';
-import {renderBooking} from './booking.js?v=1.3.0';
+import {renderHome} from './home.js?v=1.3.1';
+import {CONFIG} from './config.js?v=1.3.1';
+import {api,isConfigured,encodeAudio} from './api.js?v=1.3.1';
+import {createSteps} from './questions.js?v=1.3.1';
+import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.1';
+import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.1';
+import {renderBooking} from './booking.js?v=1.3.1';
 
 const $=id=>document.getElementById(id);
 export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -45,7 +45,7 @@ function home(){
 }
 function about(){
   document.title='О проекте · За пределами зрения';
-  main.innerHTML=`<article class="page-shell about-page"><a class="back-link" href="#home">На главную</a><h1>О проекте</h1><p class="lead">«За пределами зрения» — исследовательский проект о тактильной интерпретации искусства.</p><h2>Цель</h2><p>Определить, какие способы построения рельефа помогают незрячим и слабовидящим людям распознавать объекты и понимать композицию изображения.</p><h2>Участие</h2><p>Участник исследует три физические панели, затем описывает восприятие и оценивает понятность каждой. Названия произведений заранее не сообщаются. Ответы собираются индивидуально, до общего обсуждения.</p><p>Основная группа — незрячие и слабовидящие участники от 18 лет. Участие добровольное: можно пропускать отдельные вопросы, делать перерывы и отозвать ответы.</p><h2>Самостоятельный опрос</h2><p>Вопросы доступны текстом и с озвучиванием. Ответить можно текстом или голосовой записью. Код либо логин и пароль выдаются после записи. Для исследования нужны панели на площадке.</p><h2>Площадка эксперимента</h2><p>Экспериментальные встречи проходят в Технопарке Российского государственного социального университета: Москва, ул. Вильгельма Пика, 4, строение 8. <a href="#visit">Как добраться</a>.</p><div class="about-actions"><a class="button" href="#booking">Записаться</a><a class="button secondary" href="#access">Пройти опрос</a></div></article>`;
+  main.innerHTML=`<article class="page-shell about-page"><a class="back-link" href="#home">На главную</a><h1>О проекте</h1><p class="lead">«За пределами зрения» — исследовательский проект о тактильной интерпретации искусства.</p><h2>Цель</h2><p>Определить, какие способы построения рельефа помогают незрячим и слабовидящим людям распознавать объекты и понимать композицию изображения.</p><h2>Участие</h2><p>Участник исследует три физические панели, затем описывает восприятие и оценивает понятность каждой. Названия произведений заранее не сообщаются. Ответы собираются индивидуально, до общего обсуждения.</p><p>Основная группа — незрячие и слабовидящие участники от 18 лет. Участие добровольное: можно пропускать отдельные вопросы, делать перерывы и отозвать ответы.</p><h2>Самостоя&shy;тельный опрос</h2><p>Вопросы доступны текстом и с озвучиванием. Ответить можно текстом или голосовой записью. Код либо логин и пароль выдаются после записи. Для исследования нужны панели на площадке.</p><h2>Площадка эксперимента</h2><p>Экспериментальные встречи проходят в Технопарке Российского государственного социального университета: Москва, ул. Вильгельма Пика, 4, строение 8. <a href="#visit">Как добраться</a>.</p><div class="about-actions"><a class="button" href="#booking">Записаться</a><a class="button secondary" href="#access">Пройти опрос</a></div></article>`;
 }
 function access(){
   document.title='Вход участника · За пределами зрения';
@@ -215,7 +215,7 @@ function visit(){
   const address='Москва, улица Вильгельма Пика, 4, строение 8';
   const map='https://yandex.ru/maps/?text='+encodeURIComponent(address+' РГСУ');
   document.title='Как нас найти · За пределами зрения';
-  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><div class="eyebrow">Как нас найти</div><h1>Как добраться</h1><p class="lead">Площадка проведения эксперимента — Технопарк Российского государственного социального университета.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна встреча</h2><p>Укажите это в поле «Нужна ли помощь при посещении?» при записи. Организатор сможет согласовать встречу у входа и помочь добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. В том же письме находятся логин, пароль и код участника. Точный вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.0" download><span>Памятка участника<small>Адрес, маршрут на карте и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Выбрать время посещения </a></section>`;
+  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><div class="eyebrow">Как нас найти</div><h1>Как добраться</h1><p class="lead">Площадка проведения эксперимента — Технопарк Российского государственного социального университета.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна встреча</h2><p>Укажите это в поле «Нужна ли помощь при посещении?» при записи. Организатор сможет согласовать встречу у входа и помочь добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. В том же письме находятся логин, пароль и код участника. Точный вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.1" download><span>Памятка участника<small>Адрес, маршрут на карте и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Выбрать время посещения </a></section>`;
   $('copy-address').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(address);$('copy-status').textContent='Адрес скопирован.'}catch{$('copy-status').textContent=address}});
 }
 async function route(){

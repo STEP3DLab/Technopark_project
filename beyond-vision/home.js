@@ -19,24 +19,24 @@ export function renderHome(main) {
       </section>
       <section class="journal-statement" aria-labelledby="project-heading">
         <h2 id="project-heading" class="editorial-label">Проект</h2>
-        <p>Как изображение становится осязаемой формой? Мы исследуем тактильные интерпретации живописи — <em>распознавание предметов и понимание композиции.</em></p>
+        <p>Как изображение становится осязаемой формой? Мы исследуем тактильные интерпретации живописи — распознавание предметов и понимание композиции.</p>
       </section>
       <section class="journal-stories" aria-label="Познакомиться с исследованием">
         <article class="journal-story">
-          <p class="editorial-label">Искусство / Исследование</p>
-          <h2>За изображением —<br><em>новый опыт.</em></h2>
+          <p class="editorial-label">Искусство / исследование</p>
+          <h2>За изображением — новый опыт.</h2>
           <div><p>Разные способы построения рельефа предлагают разные пути знакомства с картиной. Нас интересует, что помогает понять отдельный предмет и произведение в целом.</p><a class="editorial-link" href="#about">О проекте</a></div>
         </article>
         <article class="journal-story">
-          <p class="editorial-label">Участие / Диалог</p>
-          <h2>Каждый опыт<br><em>заслуживает внимания.</em></h2>
+          <p class="editorial-label">Участие / диалог</p>
+          <h2>Каждый опыт заслуживает внимания.</h2>
           <div><p>Приглашаем незрячих и слабовидящих участников от 18 лет. Встреча проходит с физическими панелями; ответить на вопросы можно текстом или голосом.</p><a class="editorial-link" href="#booking">Об участии и записи</a></div>
         </article>
       </section>
     </div>
     <section class="journal-invitation" aria-labelledby="invitation-title"><div class="journal-invitation-inner">
-      <div><p class="editorial-label">Познакомиться с форматом</p><h2 id="invitation-title">Начните<br><em>с простого вопроса.</em></h2></div>
+      <div><p class="editorial-label">Познакомиться с форматом</p><h2 id="invitation-title">Начните с простого вопроса.</h2></div>
       <div><p>До встречи можно попробовать интерфейс опроса: один вопрос, текстовый ответ и знакомство с озвучиванием.</p><p class="invitation-note">Без регистрации и отправки ответа.</p><a class="button" href="#demo">Попробовать опрос</a></div>
     </div></section>
-    <div class="journal-home journal-visit"><div><p class="editorial-label">Экспериментальные встречи</p><h2>Увидимся<br><em>на исследовании.</em></h2></div><div><p>Москва, улица Вильгельма Пика,<br>4, строение 8.</p><p>Посещение по предварительной записи.</p><a class="editorial-link" href="#visit">Как добраться</a></div></div>`;
+    <div class="journal-home journal-visit"><div><p class="editorial-label">Экспериментальные встречи</p><h2>Увидимся на исследовании.</h2></div><div><p>Москва, улица Вильгельма Пика,<br>4, строение 8.</p><p>Посещение по предварительной записи.</p><a class="editorial-link" href="#visit">Как добраться</a></div></div>`;
 }

@@ -35,8 +35,15 @@ function highlight(name){
 function setView(name='default',parameters){
   if(!controls)return;
   const data=models[current], center=data.h/2;
-  const radius=(data.h===30?60:65)*Math.max(1,1/camera.aspect);
   const [az,el]=name==='top'?[0,89.8]:name==='front'?[0,0]:data.angle;
+  const tilt=deg(el), halfFov=Math.tan(deg(camera.fov/2));
+  const envelope=current==='cup'?[[12.5,-15],[17.4,0],[20,15]]:[[14,-12.5],[22,0],[23,12.5]];
+  let radius=0;
+  for(const [r,y] of envelope)for(let i=0;i<64;i++){
+    const theta=i*Math.PI/32,side=r*Math.cos(theta);
+    const depth=y*Math.sin(tilt)+side*Math.cos(tilt), up=y*Math.cos(tilt)-side*Math.sin(tilt);
+    radius=Math.max(radius,depth+1.17*Math.abs(up)/halfFov,depth+1.17*Math.abs(r*Math.sin(theta))/(camera.aspect*halfFov));
+  }
   let v=[az,el,radius,0,center,0];
   if(parameters){const values=parameters.split(',').map(Number);
     if(values.length===6&&values.every(Number.isFinite)&&values[2]>=12&&values[2]<=200&&values.slice(3).every(x=>Math.abs(x)<100)){

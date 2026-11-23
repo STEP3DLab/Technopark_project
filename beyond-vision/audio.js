@@ -1,4 +1,4 @@
-import {CONFIG} from './config.js?v=1.2.1';
+import {CONFIG} from './config.js?v=1.3.0';
 export const hasSpeech=()=>('speechSynthesis' in window&&'SpeechSynthesisUtterance' in window);
 let utterance;
 export function stopSpeech(){if(hasSpeech())window.speechSynthesis.cancel()}
@@ -36,3 +36,4 @@ export class Recorder {
   stop(){if(this.recorder?.state==='recording')this.recorder.stop();else this.cleanup()}
   cleanup(){clearInterval(this.interval);this.stream?.getTracks().forEach(t=>t.stop());this.active=false;}
 }
+

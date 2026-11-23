@@ -12,7 +12,8 @@ for(const name of (await fs.readdir(root)).filter(n=>n.endsWith('.js'))){
 }
 const indexPath=path.join(root,'index.html');
 let html=await fs.readFile(indexPath,'utf8');
-html=html.replace(/((?:src|href)="(?:app\.js|styles\.css|assets\/mark\.svg))(?:\?v=[^"]+)?"/g,`$1?v=${version}"`);
+html=html.replace(/((?:src|href)="(?:app\.js|styles\.css|journal\.css|assets\/mark\.svg))(?:\?v=[^"]+)?"/g,`$1?v=${version}"`);
 await fs.writeFile(indexPath,html);
 const packagePath=path.join(root,'package.json'),pkg=JSON.parse(await fs.readFile(packagePath,'utf8'));pkg.version=version;await fs.writeFile(packagePath,JSON.stringify(pkg)+'\n');
 console.log(`Release ${version}: versioned HTML assets and complete module graph.`);
+

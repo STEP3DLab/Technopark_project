@@ -1,4 +1,4 @@
-import {api,isConfigured} from './api.js?v=1.2.1';
+import {api,isConfigured} from './api.js?v=1.3.0';
 
 const months=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
 const dayLabel=date=>new Date(`${date}T12:00:00+03:00`).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',weekday:'long',timeZone:'Europe/Moscow'});
@@ -73,3 +73,4 @@ function saveCalendar(slot,id){
   const text=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Beyond Vision//Research Visits//RU','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${id}@beyond-vision`,`DTSTAMP:${stamp}`,`DTSTART:${format(slot.start)}`,`DTEND:${format(slot.end)}`,'SUMMARY:За пределами зрения — исследование',`LOCATION:${safe(slot.location||'Москва, Вильгельма Пика, 4, строение 8')}`,'DESCRIPTION:Исследование тактильных интерпретаций картин. Доступ к опросу — в письме организатора.','END:VEVENT','END:VCALENDAR',''].join('\r\n');
   const url=URL.createObjectURL(new Blob([text],{type:'text/calendar;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Za_predelami_zreniya.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);
 }
+

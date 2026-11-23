@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {CanvasRenderer} from './canvas-renderer.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
 
 const $ = id => document.getElementById(id);
@@ -47,7 +48,8 @@ function setView(name='default',parameters){
   camera.position.setFromSpherical(sph).add(controls.target);controls.update();highlight(name);paint();
 }
 function init3D(){
-  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}
+  catch{renderer=new CanvasRenderer();}
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   const canvas=renderer.domElement;canvas.tabIndex=0;canvas.setAttribute('aria-label','Вращение модели стрелками. Масштаб клавишами плюс и минус.');$('canvasMount').append(canvas);

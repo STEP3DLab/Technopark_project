@@ -1,4 +1,4 @@
-import {CONFIG} from './config.js?v=1.3.1';
+import {CONFIG} from './config.js?v=1.3.2';
 export const hasSpeech=()=>('speechSynthesis' in window&&'SpeechSynthesisUtterance' in window);
 let utterance;
 export function stopSpeech(){if(hasSpeech())window.speechSynthesis.cancel()}

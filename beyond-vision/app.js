@@ -1,10 +1,10 @@
-import {renderHome} from './home.js?v=1.3.1';
-import {CONFIG} from './config.js?v=1.3.1';
-import {api,isConfigured,encodeAudio} from './api.js?v=1.3.1';
-import {createSteps} from './questions.js?v=1.3.1';
-import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.1';
-import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.1';
-import {renderBooking} from './booking.js?v=1.3.1';
+import {renderHome} from './home.js?v=1.3.2';
+import {CONFIG} from './config.js?v=1.3.2';
+import {api,isConfigured,encodeAudio} from './api.js?v=1.3.2';
+import {createSteps} from './questions.js?v=1.3.2';
+import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.2';
+import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.2';
+import {renderBooking} from './booking.js?v=1.3.2';
 
 const $=id=>document.getElementById(id);
 export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -215,7 +215,7 @@ function visit(){
   const address='Москва, улица Вильгельма Пика, 4, строение 8';
   const map='https://yandex.ru/maps/?text='+encodeURIComponent(address+' РГСУ');
   document.title='Как нас найти · За пределами зрения';
-  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><div class="eyebrow">Как нас найти</div><h1>Как добраться</h1><p class="lead">Площадка проведения эксперимента — Технопарк Российского государственного социального университета.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна встреча</h2><p>Укажите это в поле «Нужна ли помощь при посещении?» при записи. Организатор сможет согласовать встречу у входа и помочь добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. В том же письме находятся логин, пароль и код участника. Точный вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.1" download><span>Памятка участника<small>Адрес, маршрут на карте и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Выбрать время посещения </a></section>`;
+  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><div class="eyebrow">Как нас найти</div><h1>Как добраться</h1><p class="lead">Площадка проведения эксперимента — Технопарк Российского государственного социального университета.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна встреча</h2><p>Укажите это в поле «Нужна ли помощь при посещении?» при записи. Организатор сможет согласовать встречу у входа и помочь добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. В том же письме находятся логин, пароль и код участника. Точный вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.2" download><span>Памятка участника<small>Адрес, маршрут на карте и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Выбрать время посещения </a></section>`;
   $('copy-address').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(address);$('copy-status').textContent='Адрес скопирован.'}catch{$('copy-status').textContent=address}});
 }
 async function route(){

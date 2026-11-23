@@ -1735,6 +1735,16 @@
             "query": "\"206320000012600274\" обследование ноябрь 2026",
             "date": "2026-11-23",
             "status": "secondary_signal_primary_unverified"
+          },
+          {
+            "url": "https://zakupki.kontur.ru/32616581060",
+            "date": "2026-11-23",
+            "status": "secondary_confirmation_eis_number_deduped_with_rts_4102902"
+          },
+          {
+            "url": "https://zakupki.kontur.ru/IS90803259",
+            "date": "2026-11-23",
+            "status": "secondary_confirmation_roseltorg_alias_B1811261558593_sro"
           }
         ],
         "checkedUrls": [
@@ -1761,7 +1771,9 @@
           "https://synapsenet.ru/search/populyarnie-zaprosi/obsledovanie-tehnicheskogo-sostoyaniya",
           "https://zakupki.kontur.ru/32616584180",
           "https://zakupki.kontur.ru/32616548327",
-          "https://zakupki.kontur.ru/206320000012600274"
+          "https://zakupki.kontur.ru/206320000012600274",
+          "https://zakupki.kontur.ru/32616581060",
+          "https://zakupki.kontur.ru/IS90803259"
         ],
         "sheetSyncStatus": "synced"
       },
@@ -12421,6 +12433,16 @@
               "query": "\"206320000012600274\" обследование ноябрь 2026",
               "date": "2026-11-23",
               "status": "secondary_signal_primary_unverified"
+            },
+            {
+              "url": "https://zakupki.kontur.ru/32616581060",
+              "date": "2026-11-23",
+              "status": "secondary_confirmation_eis_number_deduped_with_rts_4102902"
+            },
+            {
+              "url": "https://zakupki.kontur.ru/IS90803259",
+              "date": "2026-11-23",
+              "status": "secondary_confirmation_roseltorg_alias_B1811261558593_sro"
             }
           ],
           "checkedUrls": [
@@ -12447,7 +12469,9 @@
             "https://synapsenet.ru/search/populyarnie-zaprosi/obsledovanie-tehnicheskogo-sostoyaniya",
             "https://zakupki.kontur.ru/32616584180",
             "https://zakupki.kontur.ru/32616548327",
-            "https://zakupki.kontur.ru/206320000012600274"
+            "https://zakupki.kontur.ru/206320000012600274",
+            "https://zakupki.kontur.ru/32616581060",
+            "https://zakupki.kontur.ru/IS90803259"
           ],
           "sheetSyncStatus": "synced"
         }
@@ -21897,7 +21921,7 @@
       "caseNumber": "6307668",
       "title": "Владимир: обследование несущих конструкций кровли и двух колонн здания",
       "category": "Обследование зданий и конструкций (смежная закупка)",
-      "region": "Москва — заказчик; Владимирская область — объект",
+      "region": "Регион заказчика по конкретной процедуре не подтверждён; Владимирская область — объект",
       "objectSubject": "Владимирская область",
       "objectRegion": "Владимир, почтовое здание",
       "sourceType": "procurement_adjacent",
@@ -21917,14 +21941,16 @@
       "discoveredAt": "2026-11-23T08:14:32+03:00",
       "sourceUrl": "https://synapsenet.ru/zakupki/zakupkimosru/6307668--vladimirskaya-obl-okazanie-uslug-po-obsledovaniyu-tehnicheskogo",
       "documentUrl": null,
-      "additionalSources": [],
+      "additionalSources": [
+        "https://zakupki.kontur.ru/IS90803259"
+      ],
       "procurementStage": "applications_reported_secondary",
       "procurementVerifiedAt": null,
       "primaryAccess": "Первичные документы и последующие протоколы не извлечены",
-      "verification": "23.11.2026: вторичная индексированная карточка; сроки и условия документации требуют повторной проверки. Не судебный запрос.",
+      "verification": "23.11.2026: вторичная индексированная карточка; сроки и условия документации требуют повторной проверки. Не судебный запрос.\n23.11: дополнительная вторичная карточка Контур Росэлторг №B1811261558593 подтверждает тот же объект во Владимире, 147 000 ₽, 24.11 08:00 МСК. Указано требование СРО; заказчика и полномочия филиала сверить с первоисточником.",
       "travelRequired": true,
       "eligibilityStatus": "needs_qualification_review",
-      "eligibilityNote": "Малая цена, выезд и СРО; действующая карточка портала поставщиков не получена",
+      "eligibilityNote": "Малая цена, выезд и СРО; действующая карточка портала поставщиков не получена; Контур указывает прямое требование членства СРО, право участия АНО проверить.",
       "summary": "Владимир: обследование несущих конструкций кровли и двух колонн здания. Малая цена, выезд и СРО; действующая карточка портала поставщиков не получена",
       "decisionSummary": "Смежная закупка, не открытое судебное приглашение. Проверить участие АНО.",
       "nextAction": "Срочно сверить портал поставщиков №6307668, срок, СРО, ТЗ и рентабельность.",
@@ -21935,7 +21961,7 @@
       "id": "proc-4102902",
       "courtId": null,
       "court": "МАОУ «Кулаковская средняя общеобразовательная школа» — заказчик, не суд",
-      "caseNumber": "4102902",
+      "caseNumber": "32616581060 (ЕИС / 223-ФЗ); 4102902 (РТС-тендер)",
       "title": "Тюменская область: обследование технического состояния здания школы",
       "category": "Обследование зданий и конструкций (смежная закупка)",
       "region": "Тюменская область",
@@ -21958,19 +21984,22 @@
       "discoveredAt": "2026-11-23T08:14:32+03:00",
       "sourceUrl": "https://synapsenet.ru/search/populyarnie-zaprosi/obsledovanie-tehnicheskogo-sostoyaniya",
       "documentUrl": null,
-      "additionalSources": [],
+      "additionalSources": [
+        "https://zakupki.kontur.ru/32616581060"
+      ],
       "procurementStage": "applications_reported_secondary",
       "procurementVerifiedAt": null,
       "primaryAccess": "Первичные документы и последующие протоколы не извлечены",
-      "verification": "23.11.2026: вторичная индексированная карточка; сроки и условия документации требуют повторной проверки. Не судебный запрос.",
+      "verification": "23.11.2026: вторичная индексированная карточка; сроки и условия документации требуют повторной проверки. Не судебный запрос.\nДополнительная сверка 23.11: вторичная карточка Контур №32616581060 и РТС-тендер №4102902 относятся к одной закупке; не создавать второй ID. НМЦД 498 000 ₽; срок 24.11 07:00 МСК. Первичное ЕИС/РТС не извлечено.",
       "travelRequired": true,
       "eligibilityStatus": "needs_qualification_review",
       "eligibilityNote": "Первичное РТС-тендер и условия СРО не проверены; выезд обязателен",
       "summary": "Тюменская область: обследование технического состояния здания школы. Первичное РТС-тендер и условия СРО не проверены; выезд обязателен",
       "decisionSummary": "Смежная закупка, не открытое судебное приглашение. Проверить участие АНО.",
-      "nextAction": "Срочно проверить РТС-тендер №4102902, срок, проект ТЗ, допуск и выезд.",
+      "nextAction": "Срочно проверить ЕИС №32616581060 / РТС №4102902, СРО, актуальный приём, документацию и выезд в Тюменскую область.",
       "researchQuery": "\"4102902\" обследование строительных конструкций ноябрь 2026",
-      "sourceExcerpt": "Сигнал по поиску 23.11; первичная стадия и все ограничения не верифицированы."
+      "sourceExcerpt": "Сигнал по поиску 23.11; первичная стадия и все ограничения не верифицированы.",
+      "officialProcurementNumber": "32616581060"
     },
     {
       "id": "proc-32616584180",

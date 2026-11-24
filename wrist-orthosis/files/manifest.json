@@ -1,0 +1,172 @@
+{
+  "revision": "V01 bench",
+  "units": "mm",
+  "gear_ratio": "5:1",
+  "gear_pair": [
+    18,
+    90
+  ],
+  "module_mm": 0.6,
+  "center_distance_mm": 32.4,
+  "gear_samples": 81,
+  "max_sampled_profile_overlap_mm2": 0.0,
+  "min_sampled_clearance_mm": 0.13161244673975742,
+  "parts": [
+    {
+      "id": "upper",
+      "triangles": 6290,
+      "size_mm": [
+        107.0,
+        55.0,
+        155.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 112219.49
+    },
+    {
+      "id": "lower",
+      "triangles": 3470,
+      "size_mm": [
+        107.0,
+        31.0,
+        150.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 50860.89
+    },
+    {
+      "id": "plate",
+      "triangles": 3788,
+      "size_mm": [
+        64.0,
+        88.0,
+        4.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 22029.45
+    },
+    {
+      "id": "motorwall",
+      "triangles": 2392,
+      "size_mm": [
+        49.0,
+        101.0,
+        13.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 29311.21
+    },
+    {
+      "id": "supportwall",
+      "triangles": 1024,
+      "size_mm": [
+        47.5,
+        42.0,
+        13.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 10041.99
+    },
+    {
+      "id": "driven",
+      "triangles": 7696,
+      "size_mm": [
+        55.2,
+        55.18,
+        12.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 18549.85
+    },
+    {
+      "id": "pinion",
+      "triangles": 2968,
+      "size_mm": [
+        18.0,
+        18.0,
+        11.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 1243.76
+    },
+    {
+      "id": "spool",
+      "triangles": 1724,
+      "size_mm": [
+        26.0,
+        26.0,
+        25.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 6217.33
+    },
+    {
+      "id": "bush",
+      "triangles": 864,
+      "size_mm": [
+        13.0,
+        13.0,
+        7.4
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 417.48
+    },
+    {
+      "id": "shaft",
+      "triangles": 360,
+      "size_mm": [
+        6.0,
+        6.0,
+        68.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 1826.45
+    },
+    {
+      "id": "spacer2",
+      "triangles": 576,
+      "size_mm": [
+        10.0,
+        10.0,
+        1.8
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 83.36
+    },
+    {
+      "id": "spacer3",
+      "triangles": 576,
+      "size_mm": [
+        10.0,
+        10.0,
+        2.8
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 129.67
+    },
+    {
+      "id": "collar",
+      "triangles": 912,
+      "size_mm": [
+        12.0,
+        12.0,
+        4.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 307.45
+    }
+  ]
+}

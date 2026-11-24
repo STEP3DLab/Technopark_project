@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y openscad
-          python -m pip install numpy trimesh shapely scipy
+          python -m pip install numpy trimesh shapely scipy networkx
       - name: Extract verified original source
         run: |
           cd wrist-orthosis

@@ -16,3 +16,7 @@ h1,h2,h3{color:#082567}h1{font-weight:700;letter-spacing:-1.8px;line-height:1.12
 @media(max-width:960px){.x-overview{grid-template-columns:1fr;min-height:0}.x-overview .device-stage{max-width:none;margin:0}.x-overview .spec-strip{display:flex}.x-viewer{height:clamp(290px,60vw,430px)}.x-step-stage .x-viewer{height:300px}}
 @media(max-width:700px){.x-sidebar>.x-back,.x-sidebar>.x-project-name{display:none}.x-sidebar .nav-label{margin-top:12px}.x-overview .hero-copy h1{font-size:40px}.x-overview .spec-strip{gap:23px}.x-overview .spec-strip strong{font-size:23px}.x-tools{padding:9px;gap:5px}.x-tools button{font-size:11px;padding:7px 8px}.x-tools label{font-size:11px}.x-component-grid{grid-template-columns:1fr 1fr;gap:9px}.x-component{padding:13px}.x-component .card-title{font-size:14px}.x-component p{font-size:12px}.x-hero,.x-projects{grid-template-columns:1fr}.x-hero{gap:24px}.x-home-header{padding:20px 22px}.x-home-header .muted{font-size:11px}.x-card-content{padding:20px}.x-card-foot{padding:13px 20px}.x-step-layout .step-content{padding:15px}.x-viewer{height:330px}.x-home .page-footer{margin-top:30px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* University blue takes precedence over earlier experimental palettes. */
+:root{--rgsu-blue:#082567;--green:var(--rgsu-blue);--lime:#d5e4f4;--paper:#f5f7fc;--ink:#142447;--muted:#596783;--warm:#edf3fc}
+.x-brand,.x-brand i,.x-hero h1,.x-hero h1 i{color:var(--rgsu-blue)}.note.warm{background:#edf3fc;border-color:#d5e4f4}

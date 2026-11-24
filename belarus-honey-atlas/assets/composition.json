@@ -1,0 +1,49 @@
+{
+  "space": "blender-z-up",
+  "bees": [
+    {
+      "id": "boris",
+      "region": "minsk",
+      "position": [
+        -0.22,
+        0.12,
+        0.755
+      ],
+      "angle": 0.488692,
+      "scale": 1.0
+    },
+    {
+      "id": "ada",
+      "region": "vitebsk",
+      "position": [
+        1.38,
+        2.26,
+        0.45
+      ],
+      "angle": 2.530727,
+      "scale": 0.9
+    },
+    {
+      "id": "dmitry",
+      "region": "brest",
+      "position": [
+        -2.09,
+        -2.09,
+        0.495
+      ],
+      "angle": -0.890118,
+      "scale": 0.69
+    },
+    {
+      "id": "evgenia",
+      "region": "gomel",
+      "position": [
+        1.55,
+        -2.18,
+        0.451
+      ],
+      "angle": 0.733038,
+      "scale": 0.63
+    }
+  ]
+}

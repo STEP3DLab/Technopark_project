@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10251e">
+<title>Беларусь в сотах — Медовый атлас</title>
+<meta name="description" content="Интерактивная скульптурная карта Беларуси. Шесть рельефных частей и четыре ювелирные миниатюры пчёл, посвящённые семье Бориса Грызлова.">
+<meta property="og:title" content="Беларусь в сотах · Медовый атлас"><meta property="og:description" content="Рассмотрите скульптурную карту и четыре семейные миниатюры в 3D."><meta property="og:image" content="https://step3dlab.github.io/Technopark_project/belarus-honey-atlas/assets/hero.webp">
+<link rel="icon" href="./assets/mark.svg" type="image/svg+xml"><link rel="preload" href="./assets/CormorantGaramond.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="./assets/hero.webp" as="image"><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<svg class="symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<symbol id="hive" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M24 2 43 13v22L24 46 5 35V13Z"/><path d="m22.4 18-2.2-3.8M25.6 18l2.2-3.8M21.5 22c-4-7.5-10.3-6.7-9.2-2.1.7 3.3 5.1 6.7 9 6.8m5.2-4.7c4-7.5 10.3-6.7 9.2-2.1-.7 3.3-5.1 6.7-9 6.8M20.5 26.1l-4.2 4m11.2-4 4.2 4"/><path d="M24 17.6c-4.1 0-4.8 5.4-2 7.2-3.6 2.4-.4 8 2 10.2 2.4-2.2 5.6-7.8 2-10.2 2.8-1.8 2.1-7.2-2-7.2Z"/><path d="M21 28h6m-5.4 3h4.8"/></g></symbol>
+<symbol id="cube" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2.8 8.2 4.6v9.2L12 21.2l-8.2-4.6V7.4Z"/><path d="m4 7.5 8 4.6 8-4.6M12 12.1v9.1M8.2 5l8.2 4.7"/></g></symbol>
+<symbol id="expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 2 8M4 5v5h5" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="drag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="4.5" transform="rotate(-20 12 12)"/><ellipse cx="12" cy="12" rx="4.5" ry="9" transform="rotate(-20 12 12)"/><circle cx="12" cy="12" r="1" fill="currentColor"/></g></symbol>
+</svg>
+<a class="skip" href="#viewer">Перейти к 3D-модели</a>
+<header class="top" id="top"><div class="header-inner">
+<a class="brand" href="#top" aria-label="Медовый атлас, начало"><svg aria-hidden="true"><use href="#hive"/></svg><span>Медовый атлас</span></a>
+<nav aria-label="Разделы"><a href="#work" class="nav-current">Произведение</a><a href="#viewer">3D-зал</a><a href="#family">Семья</a></nav>
+</div></header>
+<main>
+<section class="hero" id="work" aria-labelledby="title">
+<div class="hero-art" id="hero-art"><img id="hero-img" src="./assets/hero.webp" alt="Золотистый рельеф Беларуси из шести сотовых фрагментов с четырьмя ювелирными пчёлами" fetchpriority="high"></div>
+<div class="hero-content"><div class="eyebrow light"><span></span>Скульптурная картография</div>
+<h1 id="title">Беларусь<br><em>в сотах</em></h1>
+<p class="lead">Рельефная картина для семьи Бориса Грызлова. Шесть областей складываются в единый силуэт, на сотах встречаются четыре пчелы.</p>
+<a class="gold-button" href="#viewer"><svg aria-hidden="true"><use href="#cube"/></svg>Рассмотреть в 3D</a>
+</div>
+<div class="hero-lower"><div class="edition"><span aria-hidden="true"></span>Цифровая скульптура<span class="ed-sep">/</span>2026</div>
+<div class="plates" role="group" aria-label="Ракурс картины"><button type="button" data-shot="hero" aria-pressed="true">Общий вид</button><button type="button" data-shot="detail" aria-pressed="false">Деталь</button></div>
+</div>
+</section>
+<section class="workshop" id="viewer" aria-labelledby="viewer-title"><div class="section-inner">
+<div class="section-intro"><div><div class="eyebrow"><span></span>Интерактивный зал</div><h2 id="viewer-title">Анатомия <em>рельефа</em></h2></div><p>Поверните карту, взгляните на высоту сот сбоку или раздвиньте области, чтобы увидеть линии сборки.</p></div>
+<div class="exhibit">
+<div class="viewport" id="viewport" tabindex="0" role="region" aria-label="Трёхмерный рельеф Беларуси. Поворот стрелками, плюс и минус для масштаба.">
+<div class="viewport-poster" id="view-poster"></div><div class="canvas-mount" id="mount"></div>
+<div class="view-status" id="view-status" role="status"><span>Загрузка рельефа…</span></div>
+<button type="button" class="full icon-button" id="full" aria-label="Развернуть просмотр" title="Развернуть просмотр"><svg><use href="#expand"/></svg></button>
+<div class="view-tools"><span class="gesture"><svg aria-hidden="true"><use href="#drag"/></svg>Вращайте жестом</span><div class="zoom"><button id="minus" aria-label="Уменьшить масштаб" title="Уменьшить">−</button><button id="plus" aria-label="Увеличить масштаб" title="Увеличить">+</button><button id="reset" aria-label="Исходный вид" title="Исходный вид"><svg><use href="#reset"/></svg></button></div></div>
+</div>
+<aside class="inspector"><div class="inspector-top"><svg aria-hidden="true"><use href="#cube"/></svg><h3>Конструкция</h3></div>
+<div class="modes" role="group" aria-label="Сборка областей"><button data-mode="whole" aria-pressed="true">В сборе</button><button data-mode="apart" aria-pressed="false">По частям</button></div>
+<label for="region">Области Беларуси</label><div class="select-wrap"><select id="region"><option value="all">Вся карта</option><option value="brest">Брестская область</option><option value="vitebsk">Витебская область</option><option value="gomel">Гомельская область</option><option value="grodno">Гродненская область</option><option value="minsk">Минская область</option><option value="mogilev">Могилёвская область</option></select></div>
+<p class="region-note" id="region-note" aria-live="polite">Каждая область образует отдельную деталь для 3D-печати. Минск включён в центральный фрагмент.</p>
+<button class="top-view" id="top-view" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 4 9 8-9 8-9-8Z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Вид сверху</button>
+</aside></div></div></section>
+<section class="family" id="family" aria-labelledby="family-title"><div class="section-inner family-inner">
+<div class="macro"><img src="./assets/detail.webp" alt="Крупный план пчелы с тонкими прожилками крыльев на золотистых сотах" loading="lazy"></div>
+<div class="family-text"><div class="eyebrow"><span></span>Семейная композиция</div><h2 id="family-title">Четыре <em>пчелы</em></h2><p>Две крупные фигуры обозначают супругов. Две миниатюры поменьше — их детей. Выберите имя, чтобы рассмотреть пчелу на карте.</p>
+<div class="people">
+<button data-bee="boris"><span>Борис Грызлов</span><small>Отец</small><svg aria-hidden="true"><use href="#cube"/></svg></button>
+<button data-bee="ada"><span>Ада Грызлова</span><small>Супруга</small><svg aria-hidden="true"><use href="#cube"/></svg></button>
+<button data-bee="dmitry"><span>Дмитрий</span><small>Сын</small><svg aria-hidden="true"><use href="#cube"/></svg></button>
+<button data-bee="evgenia"><span>Евгения</span><small>Дочь</small><svg aria-hidden="true"><use href="#cube"/></svg></button></div>
+</div></div></section>
+</main>
+<footer><div class="footer-inner"><a class="brand" href="#top"><svg aria-hidden="true"><use href="#hive"/></svg><span>Медовый атлас</span></a><button id="open-notes" type="button">О произведении и источниках</button></div></footer>
+<dialog id="notes"><div class="dialog-head"><div class="eyebrow"><span></span>Паспорт произведения</div><button class="close" id="close-notes" aria-label="Закрыть">×</button></div><h2>Беларусь <em>в сотах</em></h2><p>Цифровой проект подарочного панно. Золотистая отделка, тёмные полосы брюшка и светлые перепонки крыльев переданы материалами 3D-модели.</p><h3>География</h3><p>Контуры областей основаны на данных <a href="https://www.geoboundaries.org/" target="_blank" rel="noopener">geoBoundaries / CIESIN</a> (<a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>). Границы упрощены, Минск объединён с Минской областью в одной детали. Высоты взяты из <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">Mapzen Terrain Tiles</a> и усилены для передачи рельефа. <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md" target="_blank" rel="noopener">Атрибуция высотных данных</a>.</p><h3>Посвящение</h3><p>Борис и Ада Грызловы, их сын Дмитрий и дочь Евгения. <a href="https://www.vedomosti.ru/person/1232043-grizlov-boris" target="_blank" rel="noopener">Биографическая справка «Ведомостей»</a>.</p></dialog>
+<script type="module" src="./app.js"></script>
+</body></html>

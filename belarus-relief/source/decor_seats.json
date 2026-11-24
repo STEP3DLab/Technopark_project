@@ -1,0 +1,116 @@
+[
+  {
+    "id": "brest-star",
+    "region": "brest",
+    "shape": "circle",
+    "x": 23.45,
+    "y": 52.62,
+    "radius": 6.609
+  },
+  {
+    "id": "brest-label",
+    "region": "brest",
+    "shape": "rect",
+    "xmin": 31.55,
+    "ymin": 47.135,
+    "xmax": 60.797,
+    "ymax": 58.105,
+    "x": 46.173,
+    "y": 52.62
+  },
+  {
+    "id": "grodno-star",
+    "region": "grodno",
+    "shape": "circle",
+    "x": 24.22,
+    "y": 152.26,
+    "radius": 6.609
+  },
+  {
+    "id": "grodno-label",
+    "region": "grodno",
+    "shape": "rect",
+    "xmin": 32.32,
+    "ymin": 146.772,
+    "xmax": 67.396,
+    "ymax": 157.748,
+    "x": 49.858,
+    "y": 152.26
+  },
+  {
+    "id": "vitebsk-star",
+    "region": "vitebsk",
+    "shape": "circle",
+    "x": 262.65,
+    "y": 247.61,
+    "radius": 6.609
+  },
+  {
+    "id": "vitebsk-label",
+    "region": "vitebsk",
+    "shape": "rect",
+    "xmin": 213.338,
+    "ymin": 242.826,
+    "xmax": 254.55,
+    "ymax": 252.394,
+    "x": 233.944,
+    "y": 247.61
+  },
+  {
+    "id": "minsk-star",
+    "region": "minsk",
+    "shape": "circle",
+    "x": 163.81,
+    "y": 166.25,
+    "radius": 9.237
+  },
+  {
+    "id": "minsk-label",
+    "region": "minsk",
+    "shape": "rect",
+    "xmin": 174.41,
+    "ymin": 161.693,
+    "xmax": 208.043,
+    "ymax": 170.806,
+    "x": 191.226,
+    "y": 166.25
+  },
+  {
+    "id": "mogilev-star",
+    "region": "mogilev",
+    "shape": "circle",
+    "x": 267.4,
+    "y": 165.94,
+    "radius": 6.609
+  },
+  {
+    "id": "mogilev-label",
+    "region": "mogilev",
+    "shape": "rect",
+    "xmin": 275.5,
+    "ymin": 161.109,
+    "xmax": 319.173,
+    "ymax": 170.771,
+    "x": 297.337,
+    "y": 165.94
+  },
+  {
+    "id": "gomel-star",
+    "region": "gomel",
+    "shape": "circle",
+    "x": 291.66,
+    "y": 73.48,
+    "radius": 7.66
+  },
+  {
+    "id": "gomel-label",
+    "region": "gomel",
+    "shape": "rect",
+    "xmin": 246.469,
+    "ymin": 68.923,
+    "xmax": 282.56,
+    "ymax": 78.037,
+    "x": 264.514,
+    "y": 73.48
+  }
+]

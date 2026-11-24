@@ -1,0 +1,49 @@
+{
+  "name": "Зубр",
+  "id": "bison",
+  "path": "models/bison/bison.stl",
+  "units": "mm",
+  "bounds": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      57.492,
+      32.457,
+      6.199
+    ]
+  ],
+  "size": [
+    57.492,
+    32.457,
+    6.199
+  ],
+  "origin_xy_mm": [
+    77.5,
+    57.0
+  ],
+  "mount_z_source": "data/seat_heights.json#bison",
+  "mount_z_mm": 6.64,
+  "placement_xyz_mm": [
+    77.5,
+    57.0,
+    6.64
+  ],
+  "volume_cm3": 3.735,
+  "triangles": 49920,
+  "watertight": true,
+  "euler_number": 2,
+  "source": "Авторский профиль по утверждённому эскизу, аналитический скульптурный рельеф и чеканка поверхности. Обратная сторона плоская.",
+  "sash": {
+    "path": "print/sash-1to1.pdf",
+    "vector_master": "print/sash.svg",
+    "texture": "print/sash-texture.png",
+    "width_mm": 340,
+    "height_mm": 38,
+    "finished_size_includes_fringe": true,
+    "fringe_per_end_mm": 10,
+    "designation": "Орнаментальная стилизация по мотивам слуцкого пояса"
+  }
+}

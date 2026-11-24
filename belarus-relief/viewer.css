@@ -1,0 +1,23 @@
+.assembly-viewer { --av-ink:#203d34; --av-line:#c6c9bd; --av-paper:#f6f4ec; overflow:hidden; border:1px solid var(--av-line); border-radius:14px; background:var(--av-paper); color:#182b24; }
+.assembly-viewer .av-stage { position:relative; width:100%; height:clamp(360px,55vw,590px); background:radial-gradient(ellipse at 43% 25%,#f6f6ef 0%,#e7e7da 58%,#d6dacd 100%); }
+.assembly-viewer canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+.assembly-viewer canvas:active { cursor:grabbing; }
+.assembly-viewer .av-status { position:absolute; inset:50% auto auto 50%; transform:translate(-50%,-50%); background:rgba(249,248,242,.94); padding:.72rem 1rem; border-radius:8px; line-height:1.3; font-size:.875rem; text-align:center; pointer-events:none; }
+.assembly-viewer .av-status[hidden] { display:none; }
+.assembly-viewer .av-tools { display:flex; flex-wrap:wrap; gap:.55rem; padding: .8rem .95rem 0; align-items:center; }
+.assembly-viewer .av-button { display:inline-flex; min-height:40px; justify-content:center; align-items:center; box-sizing:border-box; border:1px solid var(--av-line); border-radius:7px; padding:.45rem .8rem; color:var(--av-ink); background:#fffefa; font:inherit; font-size:.9rem; line-height:1.25; text-decoration:none; cursor:pointer; }
+.assembly-viewer .av-button:hover, .assembly-viewer .av-button[aria-pressed="true"] { background:var(--av-ink); color:#fff; border-color:var(--av-ink); }
+.assembly-viewer .av-button:focus-visible, .assembly-viewer canvas:focus-visible { outline:2px solid #ad541e; outline-offset:-3px; }
+.assembly-viewer .av-button:disabled { cursor:wait; opacity:.55; }
+.assembly-viewer .av-zoom { display:inline-flex; gap:.25rem; }
+.assembly-viewer .av-icon { font-size:1.2rem; min-width:40px; padding:.3rem .6rem; }
+.assembly-viewer .av-hint { font-size:.83rem; line-height:1.45; color:#49584b; padding:.65rem 1rem .85rem; }
+.assembly-viewer .av-poster { display:block; width:100%; height:100%; object-fit:contain; }
+@media(max-width:520px){.assembly-viewer .av-stage{height:clamp(290px,88vw,400px)}.assembly-viewer .av-tools{gap:.4rem;padding:.65rem .65rem 0}.assembly-viewer .av-button{padding:.4rem .65rem}}
+.assembly-viewer .av-relief { margin:.8rem 1rem 0; padding:.75rem 0 .1rem; border-top:1px solid var(--av-line); }
+.assembly-viewer .av-relief-label { display:grid; grid-template-columns:max-content minmax(5rem,15rem) 3.7rem; gap:.8rem; align-items:center; color:var(--av-ink); font-size:.95rem; }
+.assembly-viewer .av-relief input { width:100%; min-width:0; accent-color:var(--av-ink); cursor:pointer; }
+.assembly-viewer .av-relief output { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
+.assembly-viewer .av-relief p { margin:.3rem 0 0; font-size:.82rem; line-height:1.45; color:#49584b; }
+.assembly-viewer .av-relief a { color:var(--av-ink); text-decoration:underline; text-underline-offset:.15em; }
+@media(max-width:420px){.assembly-viewer .av-relief{margin:.7rem .65rem 0}.assembly-viewer .av-relief-label{gap:.5rem;grid-template-columns:max-content minmax(3rem,1fr) 3.6rem;font-size:.89rem}}

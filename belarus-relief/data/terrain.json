@@ -1,0 +1,309 @@
+{
+  "units": "mm",
+  "axes": {
+    "X": "east",
+    "Y": "north",
+    "Z": "up/out of backing"
+  },
+  "base_mm": 4.0,
+  "relief_range_mm": 12.0,
+  "map_to_backing_xy_mm": [
+    30.3,
+    65.0
+  ],
+  "source": "Geographic outlines from the original assembly based on geoBoundaries / CIESIN, BLR ADM1, CC BY 3.0. Relative terrain reconstructed from the earlier Mapzen Terrain Tiles-derived physical mesh; smoothed and vertically rescaled, with local level seats for decoration. Absolute elevation in metres is not recoverable from that mesh.",
+  "regions": [
+    {
+      "id": "brest",
+      "name": "Брестская область",
+      "path": "models/regions/brest.stl",
+      "bbox": [
+        [
+          0.724,
+          13.813,
+          0.0
+        ],
+        [
+          166.576,
+          133.797,
+          12.26
+        ]
+      ],
+      "dimensions_mm": [
+        165.852,
+        119.984,
+        12.26
+      ],
+      "triangles": 14360,
+      "volume_cm3": 69.809,
+      "footprint_mm2": 10060.35,
+      "perimeter_mm": 658.59,
+      "watertight": true,
+      "orientation_consistent": true,
+      "euler_characteristic": 2
+    },
+    {
+      "id": "grodno",
+      "name": "Гродненская область",
+      "path": "models/regions/grodno.stl",
+      "bbox": [
+        [
+          12.789,
+          93.306,
+          0.0
+        ],
+        [
+          131.49,
+          234.604,
+          14.048
+        ]
+      ],
+      "dimensions_mm": [
+        118.701,
+        141.298,
+        14.048
+      ],
+      "triangles": 12032,
+      "volume_cm3": 59.551,
+      "footprint_mm2": 7857.29,
+      "perimeter_mm": 630.67,
+      "watertight": true,
+      "orientation_consistent": true,
+      "euler_characteristic": 2
+    },
+    {
+      "id": "vitebsk",
+      "name": "Витебская область",
+      "path": "models/regions/vitebsk.stl",
+      "bbox": [
+        [
+          114.365,
+          186.792,
+          0.0
+        ],
+        [
+          300.81,
+          309.52,
+          12.258
+        ]
+      ],
+      "dimensions_mm": [
+        186.445,
+        122.728,
+        12.258
+      ],
+      "triangles": 18376,
+      "volume_cm3": 101.98,
+      "footprint_mm2": 13170.35,
+      "perimeter_mm": 763.72,
+      "watertight": true,
+      "orientation_consistent": true,
+      "euler_characteristic": 2
+    },
+    {
+      "id": "minsk",
+      "name": "Минская область",
+      "path": "models/regions/minsk.stl",
+      "bbox": [
+        [
+          106.884,
+          70.946,
+          0.0
+        ],
+        [
+          236.837,
+          235.404,
+          14.627
+        ]
+      ],
+      "dimensions_mm": [
+        129.953,
+        164.458,
+        14.627
+      ],
+      "triangles": 18188,
+      "volume_cm3": 116.412,
+      "footprint_mm2": 12587.9,
+      "perimeter_mm": 787.07,
+      "watertight": true,
+      "orientation_consistent": true,
+      "euler_characteristic": 2
+    },
+    {
+      "id": "mogilev",
+      "name": "Могилёвская область",
+      "path": "models/regions/mogilev.stl",
+      "bbox": [
+        [
+          185.035,
+          89.43,
+          0.0
+        ],
+        [
+          358.628,
+          202.171,
+          11.294
+        ]
+      ],
+      "dimensions_mm": [
+        173.593,
+        112.741,
+        11.294
+      ],
+      "triangles": 14208,
+      "volume_cm3": 73.298,
+      "footprint_mm2": 9004.19,
+      "perimeter_mm": 721.06,
+      "watertight": true,
+      "orientation_consistent": true,
+      "euler_characteristic": 2
+    },
+    {
+      "id": "gomel",
+      "name": "Гомельская область",
+      "path": "models/regions/gomel.stl",
+      "bbox": [
+        [
+          154.247,
+          0.464,
+          0.0
+        ],
+        [
+          323.735,
+          130.165,
+          7.862
+        ]
+      ],
+      "dimensions_mm": [
+        169.488,
+        129.701,
+        7.862
+      ],
+      "triangles": 16960,
+      "volume_cm3": 72.007,
+      "footprint_mm2": 12258.28,
+      "perimeter_mm": 720.83,
+      "watertight": true,
+      "orientation_consistent": true,
+      "euler_characteristic": 2
+    }
+  ],
+  "seats": [
+    {
+      "id": "brest-star",
+      "xy_mm": [
+        23.45,
+        52.62
+      ],
+      "z_mm": 6.132
+    },
+    {
+      "id": "brest-label",
+      "xy_mm": [
+        46.173,
+        52.62
+      ],
+      "z_mm": 6.132
+    },
+    {
+      "id": "grodno-star",
+      "xy_mm": [
+        24.22,
+        152.26
+      ],
+      "z_mm": 5.122
+    },
+    {
+      "id": "grodno-label",
+      "xy_mm": [
+        49.858,
+        152.26
+      ],
+      "z_mm": 5.122
+    },
+    {
+      "id": "vitebsk-star",
+      "xy_mm": [
+        262.65,
+        247.61
+      ],
+      "z_mm": 6.49
+    },
+    {
+      "id": "vitebsk-label",
+      "xy_mm": [
+        233.944,
+        247.61
+      ],
+      "z_mm": 6.49
+    },
+    {
+      "id": "minsk-star",
+      "xy_mm": [
+        163.81,
+        166.25
+      ],
+      "z_mm": 11.045
+    },
+    {
+      "id": "minsk-label",
+      "xy_mm": [
+        191.226,
+        166.25
+      ],
+      "z_mm": 11.045
+    },
+    {
+      "id": "mogilev-star",
+      "xy_mm": [
+        267.4,
+        165.94
+      ],
+      "z_mm": 8.61
+    },
+    {
+      "id": "mogilev-label",
+      "xy_mm": [
+        297.337,
+        165.94
+      ],
+      "z_mm": 8.61
+    },
+    {
+      "id": "gomel-star",
+      "xy_mm": [
+        291.66,
+        73.48
+      ],
+      "z_mm": 5.604
+    },
+    {
+      "id": "gomel-label",
+      "xy_mm": [
+        264.514,
+        73.48
+      ],
+      "z_mm": 5.604
+    },
+    {
+      "id": "bison",
+      "xy_mm": [
+        77.5,
+        57.0
+      ],
+      "z_mm": 6.64
+    }
+  ],
+  "bounds_mm": [
+    [
+      0.724,
+      0.464,
+      0.0
+    ],
+    [
+      358.628,
+      309.52,
+      14.627
+    ]
+  ]
+}

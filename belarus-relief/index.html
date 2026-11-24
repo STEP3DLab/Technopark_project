@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#193e34">
+<title>Рельефная карта Беларуси — проект мастерской</title>
+<meta name="description" content="Утверждённый проект панно. Интерактивная 3D-сборка, детали для печати, чертежи, пошаговое изготовление и смета.">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"><link rel="preload" as="font" href="assets/CormorantGaramond.woff" type="font/woff" crossorigin>
+<script src="app.js" defer></script><script type="module" src="viewer.js"></script></head>
+<body><a class="skip" href="#main">К содержанию</a>
+<header class="mast"><div class="container mast-inner"><a class="wordmark" href="#main"><img src="assets/mark.svg" alt="">Атлас мастерской</a>
+<nav aria-label="Разделы проекта"><a href="#model">3D-сборка</a><a href="#process">Техпроцесс</a><a href="#budget">Смета</a><a href="#files">Файлы</a></nav>
+<a class="repo-link" href="https://github.com/STEP3DLab/Technopark_project/tree/main/belarus-relief">GitHub <span aria-hidden="true"></span></a></div></header>
+<main id="main">
+<section class="hero"><div class="container hero-grid"><div class="hero-copy"><p class="eyebrow"><span></span> Производственный проект</p>
+<h1>Рельефная карта<br><em>Беларуси</em></h1>
+<p class="lead">Шесть печатных областей, рубиновые звёзды городов и бронзовый зубр. От первого слоя пластика до готового панно в деревянной раме.</p>
+<div class="hero-actions"><a class="button primary" href="downloads/belarus-production.zip" download>Скачать комплект <span aria-hidden="true">↓</span></a><a class="button ghost" href="#model">Посмотреть в 3D</a></div>
+<dl class="hero-data"><div><dt>Карта</dt><dd>358 × 309 <small>мм</small></dd></div><div><dt>Наружная рама</dt><dd>450 × 420 <small>мм</small></dd></div><div><dt>Перепад по шкале</dt><dd>12 <small>мм</small></dd></div></dl></div>
+<figure class="hero-art"><a href="assets/approved.webp" target="_blank" aria-label="Открыть утверждённый эскиз крупно"><img src="assets/approved.webp" width="1309" height="1201" alt="Утверждённый эскиз. Зелёная рельефная карта Беларуси, бронзовые названия городов и зубр, красный велюр и тканая полоса внизу." fetchpriority="high"></a><figcaption><span>Утверждённый эскиз</span><a href="assets/approved.webp" target="_blank">Открыть крупнее </a></figcaption></figure>
+</div></section>
+<section class="section assembly" id="model"><div class="container"><div class="section-title"><div><p class="eyebrow"><span></span> Конструкция</p><h2>Панно в сборе</h2></div><a class="inline-link" href="models/panel.glb" download>Скачать 3D-сборку <span aria-hidden="true">↓</span></a></div>
+<div class="model-grid"><div class="model-wrap"><div id="panel-viewer" data-model="models/panel.glb" data-poster="assets/approved.webp"></div></div>
+<aside class="spec"><h3>Устройство панно</h3><dl><div><dt>Основа</dt><dd>Фанера 420 × 390 × 6 мм, красный велюр.</dd></div><div><dt>Карта</dt><dd>6 деталей из PLA, номинальное основание 4 мм. Плоские площадки под накладной декор.</dd></div><div><dt>Декор</dt><dd>6 звёзд, 6 бронзовых надписей и отдельный барельеф зубра.</dd></div><div><dt>Лента</dt><dd>340 × 38 мм. Цветочный орнамент на золотистом поле.</dd></div><div><dt>Рама</dt><dd>Сосновая рейка 20 × 20 мм, тёмная морилка, световой проём 410 × 380 мм.</dd></div></dl><a class="inline-link" href="print/frame.pdf" target="_blank">Чертёж рамы </a></aside></div>
+<p class="model-note">Эскиз показывает отделку. Сборка построена из производственных моделей. Относительные высоты основаны на Mapzen Terrain Tiles. Шкала рельефа — 12 мм при базе 4 мм. После выравнивания площадок под декор максимальная толщина области составляет 14,63 мм. <a href="source/RELIEF-SOURCES.md">Источники рельефа</a></p>
+<div class="palette"><h3>Палитра областей</h3><div class="swatches" id="swatches"></div><p>Ориентир для пробной выкраски на загрунтованном PLA. Сравнивайте высохшие образцы при освещении готового панно.</p></div>
+</div></section>
+<section class="section process" id="process"><div class="container"><div class="section-title"><div><p class="eyebrow"><span></span> В мастерской</p><h2>Порядок изготовления</h2></div><a class="inline-link" href="print/workbook.pdf" target="_blank">Инструкция для печати </a></div>
+<div class="process-grid"><aside class="work-aside"><h3>Маршрут одного изделия</h3><p>План на одно изделие — 5–8 часов ручной работы и 10–15 машино-часов FDM. При готовых материалах ориентир составляет 2–3 дня с учётом сушки. Открывайте операции по порядку. Завершённые шаги сохраняются на этом устройстве.</p><div class="progress-rail"><i id="progress-bar"></i></div><span id="progress-label" aria-live="polite"></span><div class="frame-thumb"><img src="assets/frame.svg" loading="lazy" alt="Размеры задника и рамы."><a href="print/frame.pdf" target="_blank">Размеры и раскрой рамы </a></div></aside>
+<div id="steps" class="steps"></div></div></div></section>
+<section class="section economy" id="budget"><div class="container"><div class="section-title"><div><p class="eyebrow"><span></span> На одно панно</p><h2>Материалы и смета</h2></div><a class="inline-link" href="downloads/specification.xlsx" download>Скачать расчёт XLSX ↓</a></div>
+<p class="section-lead">Укажите свои цены и расход. «Расход на изделие» учитывает использованную долю упаковки, «покупка с нуля» — целые упаковки. Остатки пригодятся для следующего экземпляра.</p>
+<div id="totals" class="totals"></div><p class="budget-note" id="cost-date"></p>
+<details class="cost-detail" open><summary>Спецификация материалов <span>Количество и цены</span></summary><div class="table-scroll"><table id="budget-table"><caption class="visually-hidden">Смета материалов в рублях</caption><thead><tr><th>Материал и источник</th><th>Расход</th><th>Цена за ед., ₽</th><th>На панно, ₽</th><th>Закупка, ₽</th></tr></thead><tbody></tbody></table></div></details>
+<details class="cost-detail"><summary>Работа и оборудование <span>Настраиваемые ставки</span></summary><div class="table-scroll"><table id="labor-table"><thead><tr><th>Статья</th><th>Объём</th><th>Ставка, ₽</th><th>На панно, ₽</th></tr></thead><tbody></tbody></table></div></details>
+<p class="budget-foot"><span id="cost-notes"></span><button id="cost-reset" type="button">Вернуть исходные цены и расход</button></p></div></section>
+<section class="section file-section" id="files"><div class="container"><div class="section-title"><div><p class="eyebrow"><span></span> Для производства</p><h2>Файлы проекта</h2></div><a class="button primary" href="downloads/belarus-production.zip" download>Весь комплект ↓</a></div><p class="section-lead">STL открываются в миллиметрах. В общем комплекте — модели, шаблоны 1:1, спецификация и техпроцесс. Исходные параметры открыты в репозитории.</p>
+<div class="file-filter" id="file-filter" role="group" aria-label="Фильтр файлов"></div><div class="file-list" id="file-list"></div></div></section>
+</main><footer><div class="container"><span>Рельефная карта Беларуси</span><a href="https://github.com/STEP3DLab/Technopark_project/tree/main/belarus-relief">Исходные файлы на GitHub </a><a href="#main">К началу ↑</a></div></footer>
+<noscript><p>Для интерактивной сборки и калькулятора включите JavaScript. <a href="downloads/belarus-production.zip">Скачать производственный комплект</a> или <a href="print/workbook.pdf">открыть пошаговую инструкцию</a>.</p></noscript></body></html>

@@ -1,0 +1,501 @@
+{
+  "units": "mm",
+  "coordinate_system": "X east, Y north, Z outward. Range end is exclusive. STL coordinates are local.",
+  "font": "DejaVu Serif Condensed Bold, raised lettering on a single contour-shaped carrier.",
+  "sources": {
+    "font": "https://dejavu-fonts.github.io/",
+    "licence": "https://dejavu-fonts.github.io/License.html"
+  },
+  "brest_adjustment_mm": [
+    4.5,
+    0
+  ],
+  "parts": [
+    {
+      "id": "brest-star",
+      "kind": "star",
+      "file": "models/decor/star-12mm.stl",
+      "name": "Брест",
+      "target_region": "brest",
+      "translation_mm": [
+        23.45,
+        52.62,
+        6.132
+      ],
+      "materials_face_ranges": {
+        "gilt": [
+          0,
+          170
+        ],
+        "ruby": [
+          170,
+          180
+        ]
+      },
+      "faces": 180,
+      "volume_cm3": 0.0547,
+      "bbox_local_mm": [
+        -6.0,
+        -5.1039,
+        0.0,
+        6.0,
+        6.3088,
+        2.04
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "tip_span_mm": 12,
+      "geographic_reference_xy_mm": [
+        18.95,
+        52.62
+      ]
+    },
+    {
+      "id": "brest-label",
+      "kind": "label",
+      "file": "models/decor/name-brest.stl",
+      "name": "Брест",
+      "target_region": "brest",
+      "translation_mm": [
+        32.05,
+        47.635,
+        6.132
+      ],
+      "materials_face_ranges": {
+        "carrier": [
+          0,
+          816
+        ],
+        "bronze": [
+          816,
+          1700
+        ]
+      },
+      "faces": 1700,
+      "volume_cm3": 0.2077,
+      "bbox_local_mm": [
+        0.0,
+        0.0,
+        0.0,
+        28.247,
+        9.9698,
+        1.7
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "carrier_height_mm": 0.65,
+      "total_height_mm": 1.7
+    },
+    {
+      "id": "grodno-star",
+      "kind": "star",
+      "file": "models/decor/star-12mm.stl",
+      "name": "Гродно",
+      "target_region": "grodno",
+      "translation_mm": [
+        24.22,
+        152.26,
+        5.122
+      ],
+      "materials_face_ranges": {
+        "gilt": [
+          0,
+          170
+        ],
+        "ruby": [
+          170,
+          180
+        ]
+      },
+      "faces": 180,
+      "volume_cm3": 0.0547,
+      "bbox_local_mm": [
+        -6.0,
+        -5.1039,
+        0.0,
+        6.0,
+        6.3088,
+        2.04
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "tip_span_mm": 12,
+      "geographic_reference_xy_mm": [
+        24.22,
+        152.26
+      ]
+    },
+    {
+      "id": "grodno-label",
+      "kind": "label",
+      "file": "models/decor/name-grodno.stl",
+      "name": "Гродно",
+      "target_region": "grodno",
+      "translation_mm": [
+        32.82,
+        147.272,
+        5.122
+      ],
+      "materials_face_ranges": {
+        "carrier": [
+          0,
+          910
+        ],
+        "bronze": [
+          910,
+          1860
+        ]
+      },
+      "faces": 1860,
+      "volume_cm3": 0.2584,
+      "bbox_local_mm": [
+        0.0,
+        0.0,
+        0.0,
+        34.0757,
+        9.9755,
+        1.7
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "carrier_height_mm": 0.65,
+      "total_height_mm": 1.7
+    },
+    {
+      "id": "vitebsk-star",
+      "kind": "star",
+      "file": "models/decor/star-12mm.stl",
+      "name": "Витебск",
+      "target_region": "vitebsk",
+      "translation_mm": [
+        262.65,
+        247.61,
+        6.49
+      ],
+      "materials_face_ranges": {
+        "gilt": [
+          0,
+          170
+        ],
+        "ruby": [
+          170,
+          180
+        ]
+      },
+      "faces": 180,
+      "volume_cm3": 0.0547,
+      "bbox_local_mm": [
+        -6.0,
+        -5.1039,
+        0.0,
+        6.0,
+        6.3088,
+        2.04
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "tip_span_mm": 12,
+      "geographic_reference_xy_mm": [
+        262.65,
+        247.61
+      ]
+    },
+    {
+      "id": "vitebsk-label",
+      "kind": "label",
+      "file": "models/decor/name-vitebsk.stl",
+      "name": "Витебск",
+      "target_region": "vitebsk",
+      "translation_mm": [
+        213.838,
+        243.326,
+        6.49
+      ],
+      "materials_face_ranges": {
+        "carrier": [
+          0,
+          1036
+        ],
+        "bronze": [
+          1036,
+          2296
+        ]
+      },
+      "faces": 2296,
+      "volume_cm3": 0.2985,
+      "bbox_local_mm": [
+        0.0,
+        0.0,
+        0.0,
+        40.2115,
+        8.5679,
+        1.7
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "carrier_height_mm": 0.65,
+      "total_height_mm": 1.7
+    },
+    {
+      "id": "minsk-star",
+      "kind": "star",
+      "file": "models/decor/star-17mm.stl",
+      "name": "Минск",
+      "target_region": "minsk",
+      "translation_mm": [
+        163.81,
+        166.25,
+        11.045
+      ],
+      "materials_face_ranges": {
+        "gilt": [
+          0,
+          170
+        ],
+        "ruby": [
+          170,
+          180
+        ]
+      },
+      "faces": 180,
+      "volume_cm3": 0.1286,
+      "bbox_local_mm": [
+        -8.5,
+        -7.2305,
+        0.0,
+        8.5,
+        8.9374,
+        2.89
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "tip_span_mm": 17,
+      "geographic_reference_xy_mm": [
+        163.81,
+        166.25
+      ]
+    },
+    {
+      "id": "minsk-label",
+      "kind": "label",
+      "file": "models/decor/name-minsk.stl",
+      "name": "Минск",
+      "target_region": "minsk",
+      "translation_mm": [
+        174.91,
+        162.193,
+        11.045
+      ],
+      "materials_face_ranges": {
+        "carrier": [
+          0,
+          718
+        ],
+        "bronze": [
+          718,
+          1500
+        ]
+      },
+      "faces": 1500,
+      "volume_cm3": 0.2409,
+      "bbox_local_mm": [
+        0.0,
+        0.0,
+        0.0,
+        32.6325,
+        8.113,
+        1.7
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "carrier_height_mm": 0.65,
+      "total_height_mm": 1.7
+    },
+    {
+      "id": "mogilev-star",
+      "kind": "star",
+      "file": "models/decor/star-12mm.stl",
+      "name": "Могилёв",
+      "target_region": "mogilev",
+      "translation_mm": [
+        267.4,
+        165.94,
+        8.61
+      ],
+      "materials_face_ranges": {
+        "gilt": [
+          0,
+          170
+        ],
+        "ruby": [
+          170,
+          180
+        ]
+      },
+      "faces": 180,
+      "volume_cm3": 0.0547,
+      "bbox_local_mm": [
+        -6.0,
+        -5.1039,
+        0.0,
+        6.0,
+        6.3088,
+        2.04
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "tip_span_mm": 12,
+      "geographic_reference_xy_mm": [
+        267.4,
+        165.94
+      ]
+    },
+    {
+      "id": "mogilev-label",
+      "kind": "label",
+      "file": "models/decor/name-mogilev.stl",
+      "name": "Могилёв",
+      "target_region": "mogilev",
+      "translation_mm": [
+        276.0,
+        161.609,
+        8.61
+      ],
+      "materials_face_ranges": {
+        "carrier": [
+          0,
+          1105
+        ],
+        "bronze": [
+          1105,
+          2328
+        ]
+      },
+      "faces": 2328,
+      "volume_cm3": 0.3179,
+      "bbox_local_mm": [
+        0.0,
+        0.0,
+        0.0,
+        42.6733,
+        8.6623,
+        1.7
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "carrier_height_mm": 0.65,
+      "total_height_mm": 1.7
+    },
+    {
+      "id": "gomel-star",
+      "kind": "star",
+      "file": "models/decor/star-14mm.stl",
+      "name": "Гомель",
+      "target_region": "gomel",
+      "translation_mm": [
+        291.66,
+        73.48,
+        5.604
+      ],
+      "materials_face_ranges": {
+        "gilt": [
+          0,
+          170
+        ],
+        "ruby": [
+          170,
+          180
+        ]
+      },
+      "faces": 180,
+      "volume_cm3": 0.0795,
+      "bbox_local_mm": [
+        -7.0,
+        -5.9546,
+        0.0,
+        7.0,
+        7.3602,
+        2.38
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "tip_span_mm": 14,
+      "geographic_reference_xy_mm": [
+        291.66,
+        73.48
+      ]
+    },
+    {
+      "id": "gomel-label",
+      "kind": "label",
+      "file": "models/decor/name-gomel.stl",
+      "name": "Гомель",
+      "target_region": "gomel",
+      "translation_mm": [
+        246.969,
+        69.423,
+        5.604
+      ],
+      "materials_face_ranges": {
+        "carrier": [
+          0,
+          865
+        ],
+        "bronze": [
+          865,
+          1768
+        ]
+      },
+      "faces": 1768,
+      "volume_cm3": 0.2411,
+      "bbox_local_mm": [
+        0.0,
+        0.0,
+        0.0,
+        35.0913,
+        8.1139,
+        1.7
+      ],
+      "verified": {
+        "watertight": true,
+        "consistent_winding": true,
+        "connected_solids": 1
+      },
+      "carrier_height_mm": 0.65,
+      "total_height_mm": 1.7
+    }
+  ]
+}

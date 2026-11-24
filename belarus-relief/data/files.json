@@ -1,0 +1,212 @@
+[
+  {
+    "group": "Комплекты",
+    "title": "Комплект для мастерской",
+    "path": "downloads/belarus-production.zip",
+    "type": "ZIP",
+    "detail": "Модели, чертежи, смета и исходники"
+  },
+  {
+    "group": "Комплекты",
+    "title": "Шесть областей для FDM",
+    "path": "downloads/regions-stl.zip",
+    "type": "ZIP",
+    "detail": "Шесть STL в общей системе координат, мм"
+  },
+  {
+    "group": "Сборка",
+    "title": "Собранное панно",
+    "path": "models/panel.glb",
+    "type": "GLB",
+    "detail": "Цветная сборка для просмотра и импорта в Blender"
+  },
+  {
+    "group": "Печать",
+    "title": "Раскладка всего мелкого декора",
+    "path": "models/decor-plate.3mf",
+    "type": "3MF",
+    "detail": "13 деталей, поле от 115 × 75 мм"
+  },
+  {
+    "group": "Документы",
+    "title": "Маршрутная карта мастерской",
+    "path": "print/workbook.pdf",
+    "type": "PDF",
+    "detail": "7 страниц · спецификация и восемь операций"
+  },
+  {
+    "group": "Документы",
+    "title": "Смета и спецификация",
+    "path": "downloads/specification.xlsx",
+    "type": "XLSX",
+    "detail": "Три листа · расход, закупка, работа и состав"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Монтаж на обычном принтере",
+    "path": "templates/assembly-a4.pdf",
+    "type": "PDF",
+    "detail": "Четыре листа A4 с перекрытием, масштаб 1:1"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Монтажный мастер",
+    "path": "templates/assembly-1to1.pdf",
+    "type": "PDF",
+    "detail": "Один лист 460 × 430 мм, масштаб 1:1"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Векторный монтажный шаблон",
+    "path": "templates/assembly-1to1.svg",
+    "type": "SVG",
+    "detail": "Контурная разметка задника и областей в мм"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Рама и четверть",
+    "path": "print/frame.pdf",
+    "type": "PDF",
+    "detail": "Габариты, запилы и размеры посадки"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Разметка городов и звёзд",
+    "path": "print/decor-placement.pdf",
+    "type": "PDF",
+    "detail": "Четыре листа A4, масштаб 1:1"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Вектор размещения декора",
+    "path": "print/decor-placement.svg",
+    "type": "SVG",
+    "detail": "Редактируемая схема в миллиметрах"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Цветочная лента",
+    "path": "print/sash-1to1.pdf",
+    "type": "PDF",
+    "detail": "Один лист A3, контрольная шкала 50 мм"
+  },
+  {
+    "group": "Шаблоны",
+    "title": "Исходник орнамента",
+    "path": "print/sash.svg",
+    "type": "SVG",
+    "detail": "Редактируемые цветные контуры"
+  },
+  {
+    "group": "Печать",
+    "title": "Брестская область",
+    "path": "models/regions/brest.stl",
+    "type": "STL",
+    "detail": "165,9 × 120,0 × 12,3 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Гродненская область",
+    "path": "models/regions/grodno.stl",
+    "type": "STL",
+    "detail": "118,7 × 141,3 × 14,0 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Витебская область",
+    "path": "models/regions/vitebsk.stl",
+    "type": "STL",
+    "detail": "186,4 × 122,7 × 12,3 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Минская область",
+    "path": "models/regions/minsk.stl",
+    "type": "STL",
+    "detail": "130,0 × 164,5 × 14,6 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Могилёвская область",
+    "path": "models/regions/mogilev.stl",
+    "type": "STL",
+    "detail": "173,6 × 112,7 × 11,3 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Гомельская область",
+    "path": "models/regions/gomel.stl",
+    "type": "STL",
+    "detail": "169,5 × 129,7 × 7,9 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Зубр",
+    "path": "models/bison/bison.stl",
+    "type": "STL",
+    "detail": "57,49 × 32,46 × 6,20 мм · 1 деталь"
+  },
+  {
+    "group": "Печать",
+    "title": "Рубиновая звезда 12 мм",
+    "path": "models/decor/star-12mm.stl",
+    "type": "STL",
+    "detail": "На панно — 4 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Рубиновая звезда 14 мм",
+    "path": "models/decor/star-14mm.stl",
+    "type": "STL",
+    "detail": "На панно — 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Рубиновая звезда 17 мм",
+    "path": "models/decor/star-17mm.stl",
+    "type": "STL",
+    "detail": "На панно — 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Надпись «Брест»",
+    "path": "models/decor/name-brest.stl",
+    "type": "STL",
+    "detail": "Одно слово с подложкой · 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Надпись «Гродно»",
+    "path": "models/decor/name-grodno.stl",
+    "type": "STL",
+    "detail": "Одно слово с подложкой · 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Надпись «Витебск»",
+    "path": "models/decor/name-vitebsk.stl",
+    "type": "STL",
+    "detail": "Одно слово с подложкой · 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Надпись «Минск»",
+    "path": "models/decor/name-minsk.stl",
+    "type": "STL",
+    "detail": "Одно слово с подложкой · 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Надпись «Могилёв»",
+    "path": "models/decor/name-mogilev.stl",
+    "type": "STL",
+    "detail": "Одно слово с подложкой · 1 шт."
+  },
+  {
+    "group": "Печать",
+    "title": "Надпись «Гомель»",
+    "path": "models/decor/name-gomel.stl",
+    "type": "STL",
+    "detail": "Одно слово с подложкой · 1 шт."
+  }
+]

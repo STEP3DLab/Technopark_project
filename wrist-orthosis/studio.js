@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
-import { createSoftwareViewer } from './software-viewer.js';
+import { createSoftwareViewer } from './software-viewer.js?v=v07-20261125';
 
 const groups = {
   shells: ['upper', 'lower'], cassette: ['plate', 'motorwall', 'supportwall'],
-  servo: ['servo_body', 'servo_flange', 'pinion', 'motorwall'],
+  servo: ['motor_', 'plate', 'belt_ref_', 'fastener_horn_', 'pinion', 'motorwall'],
   gears: ['driven', 'pinion'],
   spool: ['shaft', 'spool', 'bush_', 'spacer_', 'collar_'],
   guide: ['upper', 'cable_'],
@@ -44,13 +44,13 @@ export async function createViewer(host) {
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(220,240), new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cvs),transparent:true,depthWrite:false}));
   shadow.position.set(0,75,-34); scene.add(shadow);
   let root;
-  try { root = (await new GLTFLoader().loadAsync(new URL('./files/assembly-studio.glb', import.meta.url).href)).scene; }
+  try { root = (await new GLTFLoader().loadAsync(new URL('./v07/files/assembly-studio.glb', import.meta.url).href)).scene; }
   catch (e) { renderer.dispose(); controls.dispose(); host.replaceChildren(); throw e; }
   scene.add(root);
   const nodes = [];
   root.traverse(o => {
     if (!o.isMesh) return;
-    o.material.flatShading = true;
+    o.material.flatShading = false;
     o.material.needsUpdate = true;
     nodes.push({ mesh:o, name:o.name.toLowerCase(), start:o.position.clone() });
   });
@@ -64,7 +64,7 @@ export async function createViewer(host) {
       if (n === 'lower') o.position.z -= 45 * amount;
       else if (n === 'upper') {}
       else if (n === 'plate') o.position.z += 15 * amount;
-      else if (n === 'motorwall' || n.startsWith('servo')) o.position.add(new THREE.Vector3(-43*amount,0,28*amount));
+      else if (n === 'motorwall' || n.startsWith('motor_')) o.position.add(new THREE.Vector3(-43*amount,0,28*amount));
       else if (n === 'supportwall') o.position.add(new THREE.Vector3(43*amount,0,28*amount));
       else o.position.z += 50 * amount;
     }

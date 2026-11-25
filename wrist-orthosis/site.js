@@ -54,7 +54,7 @@ $('step-next').addEventListener('click', () => showStep(step + 1, true));
 $('step-pagination').hidden = false;
 showStep(0);
 
-const titles = { hero: 'Сборка устройства', side: 'Вид сбоку', exploded: 'Разнесённая сборка', shells: 'Две створки корпуса', cassette: 'Съёмная кассета', servo: 'Крепление сервопривода', gears: 'Зубчатая пара 18 / 90', spool: 'Вал и катушка', guide: 'Направляющая троса' };
+const titles = { hero: 'Сборка устройства', side: 'Вид сбоку', top: 'Вид сверху', exploded: 'Разнесённая сборка', shells: 'Две створки корпуса', cassette: 'Съёмная кассета', servo: 'Крепление сервопривода', gears: 'Зубчатая пара 18 / 90', spool: 'Вал и катушка', guide: 'Направляющая троса' };
 const image = $('hero-image'), stage = $('visual-stage'), message = $('viewer-message');
 let viewer = null, viewerPromise = null, viewerActive = false;
 function selection(id) {
@@ -65,7 +65,7 @@ function showImage(id) {
   viewer?.pause();
   stage.classList.remove('live');
   $('viewer-controls').hidden = true;
-  image.src = `assets/${id}.webp`;
+  image.src = `v07/assets/${id}.webp`;
   image.alt = titles[id] || 'CAD-визуализация ортеза';
   $('view-title').textContent = titles[id] || 'Конструкция';
   message.textContent = '';
@@ -78,7 +78,7 @@ async function open3d(group = null) {
   message.textContent = 'Загрузка 3D-сборки…';
   $('open-3d').setAttribute('aria-busy', 'true');
   try {
-    viewerPromise ||= import('./studio.js?v=20261124-rgsu-2').then(mod => mod.createViewer($('canvas-host'))).catch(e => { viewerPromise = null; throw e; });
+    viewerPromise ||= import('./studio.js?v=v07-20261125').then(mod => mod.createViewer($('canvas-host'))).catch(e => { viewerPromise = null; throw e; });
     viewer = await viewerPromise;
     if (!viewerActive) return;
     stage.classList.add('live');

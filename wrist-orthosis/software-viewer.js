@@ -1,7 +1,7 @@
 /* Canvas renderer for the SAME CAD geometry when WebGL is unavailable. */
 const groups = {
   shells: ['upper', 'lower'], cassette: ['plate', 'motorwall', 'supportwall'],
-  servo: ['servo_body', 'servo_flange', 'pinion', 'motorwall'],
+  servo: ['motor_', 'plate', 'belt_ref_', 'fastener_horn_', 'pinion', 'motorwall'],
   gears: ['driven', 'pinion'], spool: ['shaft', 'spool', 'bush_', 'spacer_', 'collar_'],
   guide: ['upper', 'cable_'],
 };
@@ -11,12 +11,12 @@ function color(n) {
   if (['plate','motorwall','supportwall'].includes(n)) return [8,37,103];
   if (['driven','pinion'].includes(n)) return [62,115,200];
   if (n === 'spool') return [153,183,226];
-  if (n.startsWith('servo')) return [35,45,65];
+  if (n.startsWith('motor_')) return [35,45,65];
   if (n.startsWith('cable')) return [18,67,150];
   return [161,177,202];
 }
 export async function createSoftwareViewer(host) {
-  const response = await fetch(new URL('./files/assembly-view.json', import.meta.url));
+  const response = await fetch(new URL('./v07/files/assembly-view.json', import.meta.url));
   if (!response.ok) throw Error('CAD geometry unavailable');
   const data = await response.json();
   const canvas = document.createElement('canvas');
@@ -47,7 +47,7 @@ export async function createSoftwareViewer(host) {
     if(n==='lower')return [0,0,-45*amount];
     if(n==='upper')return [0,0,0];
     if(n==='plate')return [0,0,15*amount];
-    if(n==='motorwall'||n.startsWith('servo'))return [-43*amount,0,28*amount];
+    if(n==='motorwall'||n.startsWith('motor_'))return [-43*amount,0,28*amount];
     if(n==='supportwall')return [43*amount,0,28*amount];
     return [0,0,50*amount];
   }

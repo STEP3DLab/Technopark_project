@@ -1,0 +1,270 @@
+{
+  "revision": "V07 bench",
+  "units": "mm",
+  "gear_ratio": "5:1",
+  "gear_pair": [
+    18,
+    90
+  ],
+  "module_mm": 0.4,
+  "center_distance_mm": 21.7,
+  "gear_outer_diameters_mm": [
+    8.0,
+    36.8
+  ],
+  "shell_length_mm": 110,
+  "inner_width_mm": [
+    88,
+    78
+  ],
+  "inner_height_without_gap_mm": [
+    62,
+    54
+  ],
+  "guide_length_mm": 72,
+  "guide_extension_mm": 50,
+  "guide_holes_y_mm": [
+    106,
+    125,
+    147
+  ],
+  "guide_width_mm": 28,
+  "guide_integral_with_upper_shell": true,
+  "guide_hole_diameter_mm": 6.2,
+  "guide_eye_outer_diameter_mm": 16,
+  "guide_chamfer_mm": 1.2,
+  "guide_chamfer_angle_deg": 45,
+  "guide_entry_diameter_mm": 8.6,
+  "guide_thickness_mm": 7,
+  "guide_root_width_mm": 38,
+  "gear_tooth_thinning_mm": 0.14,
+  "gear_samples": 81,
+  "max_sampled_profile_overlap_mm2": 0.0,
+  "min_sampled_clearance_mm": 0.16641403427302245,
+  "servo_support": {
+    "integral_with_plate": true,
+    "shelf_top_z_mm": 50.95,
+    "body_bottom_z_mm": 50.95,
+    "flat_support_mm": [
+      41.6,
+      56.5,
+      14.95
+    ],
+    "raised_stops": false,
+    "slot_size_mm": [
+      10.4,
+      3.8
+    ],
+    "belt_width_mm": 8,
+    "belt_count": 2,
+    "reference_dimensions_confirmed": false
+  },
+  "shell_strap_slots": {
+    "count_per_half": 4,
+    "size_mm": [
+      26,
+      5.5
+    ],
+    "integral_through_wall": true,
+    "center_z_mm": 10,
+    "y_mm": [
+      22,
+      83
+    ]
+  },
+  "wrist_position_estimated": true,
+  "parts": [
+    {
+      "id": "upper",
+      "triangles": 7998,
+      "size_mm": [
+        94.0,
+        52.0,
+        160.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 85197.9
+    },
+    {
+      "id": "lower",
+      "triangles": 3412,
+      "size_mm": [
+        94.0,
+        34.0,
+        110.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 36233.52
+    },
+    {
+      "id": "plate",
+      "triangles": 4936,
+      "size_mm": [
+        102.0,
+        94.5,
+        14.95
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 54278.57
+    },
+    {
+      "id": "motorwall",
+      "triangles": 1252,
+      "size_mm": [
+        39.0,
+        91.0,
+        13.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 21123.45
+    },
+    {
+      "id": "supportwall",
+      "triangles": 992,
+      "size_mm": [
+        30.0,
+        42.0,
+        13.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 6117.45
+    },
+    {
+      "id": "driven",
+      "triangles": 7656,
+      "size_mm": [
+        36.8,
+        36.78,
+        12.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 8444.78
+    },
+    {
+      "id": "pinion",
+      "triangles": 3616,
+      "size_mm": [
+        20.0,
+        20.0,
+        14.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 1853.45
+    },
+    {
+      "id": "spool",
+      "triangles": 1684,
+      "size_mm": [
+        26.0,
+        26.0,
+        25.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 6213.33
+    },
+    {
+      "id": "bush",
+      "triangles": 864,
+      "size_mm": [
+        13.0,
+        13.0,
+        7.4
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 417.48
+    },
+    {
+      "id": "shaft",
+      "triangles": 360,
+      "size_mm": [
+        6.0,
+        6.0,
+        68.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 1826.45
+    },
+    {
+      "id": "spacer2",
+      "triangles": 576,
+      "size_mm": [
+        10.0,
+        10.0,
+        1.8
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 83.36
+    },
+    {
+      "id": "spacer3",
+      "triangles": 576,
+      "size_mm": [
+        10.0,
+        10.0,
+        2.8
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 129.67
+    },
+    {
+      "id": "collar",
+      "triangles": 916,
+      "size_mm": [
+        12.0,
+        12.0,
+        4.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 307.1
+    },
+    {
+      "id": "fit_coupon",
+      "triangles": 2592,
+      "size_mm": [
+        64.0,
+        31.0,
+        5.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 8482.24
+    },
+    {
+      "id": "servo_coupon",
+      "triangles": 612,
+      "size_mm": [
+        44.0,
+        16.0,
+        3.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 1893.56
+    },
+    {
+      "id": "guide_coupon",
+      "triangles": 1020,
+      "size_mm": [
+        28.0,
+        23.0,
+        10.0
+      ],
+      "watertight": true,
+      "connected": true,
+      "volume_mm3": 3456.87
+    }
+  ]
+}

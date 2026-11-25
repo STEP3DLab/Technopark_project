@@ -1,0 +1,294 @@
+{
+  "candidate_pairs": 36,
+  "all_pairs": 210,
+  "tested_parts": 21,
+  "method": "AABB filter then CGAL intersection on assembled meshes; fixed angular position; includes approximate servo envelope, not cable, belt or fastener reference envelopes; internal case unions excluded",
+  "results": [
+    {
+      "pair": [
+        "bush_left",
+        "motorwall"
+      ],
+      "volume_mm3": 0.0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "bush_left",
+        "shaft"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "bush_right",
+        "shaft"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "bush_right",
+        "supportwall"
+      ],
+      "volume_mm3": 0.0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "collar_left",
+        "shaft"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "collar_right",
+        "shaft"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "driven",
+        "motorwall"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "driven",
+        "pinion"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "driven",
+        "plate"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "driven",
+        "shaft"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "driven",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motor_body",
+        "motor_boss"
+      ],
+      "status": "intentional_reference_union"
+    },
+    {
+      "pair": [
+        "motor_body",
+        "motor_ears"
+      ],
+      "status": "intentional_reference_union"
+    },
+    {
+      "pair": [
+        "motor_body",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motor_ears",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motor_horn",
+        "motor_spline"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motor_horn",
+        "motorwall"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motor_spline",
+        "motorwall"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motorwall",
+        "pinion"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motorwall",
+        "plate"
+      ],
+      "volume_mm3": 0.0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motorwall",
+        "shaft"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motorwall",
+        "spacer_left"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "motorwall",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "pinion",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "plate",
+        "spool"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "plate",
+        "supportwall"
+      ],
+      "volume_mm3": 0.0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "plate",
+        "upper"
+      ],
+      "volume_mm3": 0.0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "shaft",
+        "spacer_left"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "shaft",
+        "spacer_middle"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "shaft",
+        "spacer_right"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "shaft",
+        "spool"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "shaft",
+        "supportwall"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "spacer_right",
+        "supportwall"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "spool",
+        "supportwall"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "spool",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    },
+    {
+      "pair": [
+        "supportwall",
+        "upper"
+      ],
+      "volume_mm3": 0,
+      "status": "clear"
+    }
+  ]
+}

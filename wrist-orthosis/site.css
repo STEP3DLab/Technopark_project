@@ -72,3 +72,13 @@ main{padding:0 16px;min-width:0;max-width:100%}.topline{min-height:48px;gap:8px;
 }
 @media(prefers-reduced-motion:reduce){.home-link:hover .home-arrow{transform:none}}
 .sidebar .home-link{color:var(--blue,#082567)}.report-content .home-link{margin:0}
+
+/* Optical alignment of the x.lab wordmark with the back arrow on phones. */
+@media(max-width:700px){
+ .mobile-head .home-link{align-items:center;min-height:44px}
+ .mobile-head .home-wordmark{font-family:Evolventa,Arial,sans-serif;font-size:27px;font-weight:700;line-height:1;letter-spacing:-2.1px;transform:translateY(-1.5px)}
+ .mobile-head .home-arrow{align-self:center;flex-shrink:0}
+}
+@media(max-width:350px){
+ .mobile-head .home-wordmark{font-size:24px;letter-spacing:-1.8px}
+}

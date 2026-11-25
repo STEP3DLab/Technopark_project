@@ -22,7 +22,7 @@ export async function createSoftwareViewer(host) {
   const canvas = document.createElement('canvas');
   canvas.setAttribute('aria-label','Вращаемая CAD-сборка ортеза');
   host.replaceChildren(canvas);
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d',{alpha:false}); if(!ctx)throw Error('No canvas 2D');
   const meshes = Object.entries(data).map(([name,m]) => {
     const verts = new Float32Array(m.vertices.flat());
     const faces = new Uint32Array(m.faces.flat());
@@ -54,13 +54,13 @@ export async function createSoftwareViewer(host) {
   function visible(n){return (!group||groups[group].some(p=>n===p||n.startsWith(p)))&&!(hiddenShell&&['upper','lower'].includes(n));}
   function render(){
     scheduled=false;if(!running)return;
-    const dpr=Math.min(devicePixelRatio,2);
+    const dpr=Math.min(devicePixelRatio||1,matchMedia('(pointer:coarse)').matches?1.25:1.6,Math.sqrt(950000/Math.max(1,host.clientWidth*host.clientHeight)));
     width=host.clientWidth||host.parentElement.clientWidth||500;
     height=host.clientHeight||host.parentElement.clientHeight||420;
     if(canvas.width!==Math.round(width*dpr)||canvas.height!==Math.round(height*dpr)){
       canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
     }
-    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#f5f7fc';ctx.fillRect(0,0,width,height);
     const ca=Math.cos(azimuth),sa=Math.sin(azimuth),ce=Math.cos(elevation),se=Math.sin(elevation);
     const right=[-sa,ca,0],up=[-ca*se,-sa*se,ce],toward=[ca*ce,sa*ce,se];
     const batch=[];let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
@@ -80,14 +80,15 @@ export async function createSoftwareViewer(host) {
         batch.push([depth[a]+depth[b]+depth[c],xy[a*3],xy[a*3+1],xy[b*3],xy[b*3+1],xy[c*3],xy[c*3+1],shades[f/3],depth[a],depth[b],depth[c]]);
       }
     }
-    if(!Number.isFinite(minx))return;
+    if(!Number.isFinite(minx))return false;
     const scale=Math.min(width*.85/(maxx-minx||1),height*.83/(maxy-miny||1))*zoom;
     const cx=(minx+maxx)/2,cy=(miny+maxy)/2;
     // Per-pixel depth prevents the long CAD triangles from drawing through
     // one another, and avoids the seams of antialiased Canvas triangle fills.
     const pw=canvas.width,ph=canvas.height;
     const pixels=ctx.createImageData(pw,ph),rgba=pixels.data;
-    const zbuffer=new Float32Array(pw*ph);zbuffer.fill(-Infinity);
+    const zbuffer=new Float32Array(pw*ph);zbuffer.fill(-Infinity);let painted=0;
+    for(let p=0;p<rgba.length;p+=4){rgba[p]=245;rgba[p+1]=247;rgba[p+2]=252;rgba[p+3]=255;}
     for(const t of batch){
       const x0=pw/2+(t[1]-cx)*scale*dpr,y0=ph/2-(t[2]-cy)*scale*dpr;
       const x1=pw/2+(t[3]-cx)*scale*dpr,y1=ph/2-(t[4]-cy)*scale*dpr;
@@ -105,14 +106,15 @@ export async function createSoftwareViewer(host) {
           const c=1-a-b;if(a<-.00001||b<-.00001||c<-.00001)continue;
           const z=a*t[8]+b*t[9]+c*t[10],index=y*pw+x;
           if(z<=zbuffer[index])continue;
-          zbuffer[index]=z;const p=index*4;
+          if(zbuffer[index]===-Infinity)painted++;zbuffer[index]=z;const p=index*4;
           rgba[p]=t[7][0];rgba[p+1]=t[7][1];rgba[p+2]=t[7][2];rgba[p+3]=255;
         }
       }
     }
-    ctx.putImageData(pixels,0,0);
+    ctx.putImageData(pixels,0,0);return painted>50;
   }
-  function request(){if(!scheduled){scheduled=true;requestAnimationFrame(render);}}
+  function drawNow(){if(!render())throw Error('Empty frame');}
+  function request(){if(!scheduled){scheduled=true;requestAnimationFrame(()=>{try{if(running&&!render())throw Error('Empty frame');else scheduled=false;}catch(e){scheduled=false;running=false;window.dispatchEvent(new Event('xlab-3d-failure'));}});}}
   const pointers=new Map();let previous=null,pinchDistance=null;
   canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);previous=[e.clientX,e.clientY];});
   canvas.addEventListener('pointermove',e=>{
@@ -125,8 +127,9 @@ export async function createSoftwareViewer(host) {
   function release(e){pointers.delete(e.pointerId);previous=null;pinchDistance=null;}
   canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
   canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.6,Math.min(3,zoom*Math.exp(-e.deltaY*.001)));request();},{passive:false});
-  new ResizeObserver(request).observe(host);request();
+  new ResizeObserver(request).observe(host);drawNow();
   return {
+    drawNow,
     focus(g){group=groups[g]?g:null;amount=0;hiddenShell=false;azimuth=group==='gears'?-2.9:-.95;elevation=.58;zoom=1;request();},
     explode(v){amount=v;request();},hideShell(v){hiddenShell=v;request();},
     top(){elevation=1.55;request();},pause(){running=false;},resume(){running=true;request();},

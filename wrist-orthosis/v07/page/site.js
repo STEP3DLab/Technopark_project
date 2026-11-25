@@ -12,10 +12,10 @@ menu.addEventListener('click', () => {
   menu.setAttribute('aria-expanded', String(open));
   menu.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
 });
-sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+document.querySelectorAll('#sidebar a,.mobile-dock a').forEach(a => a.addEventListener('click', closeMenu));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 const sections = [...document.querySelectorAll('main>section[id]')];
-const links = [...sidebar.querySelectorAll('nav a')];
+const links = [...sidebar.querySelectorAll('nav a'), ...document.querySelectorAll('[data-mobile-route]')];
 function active(id) {
   links.forEach(a => {
     const selected = a.hash === '#' + id;
@@ -56,12 +56,12 @@ showStep(0);
 
 const titles = { hero: 'Сборка устройства', side: 'Вид сбоку', top: 'Вид сверху', exploded: 'Разнесённая сборка', shells: 'Две створки корпуса', cassette: 'Съёмная кассета', servo: 'Крепление сервопривода', gears: 'Зубчатая пара 18 / 90', spool: 'Вал и катушка', guide: 'Направляющая троса' };
 const image = $('hero-image'), stage = $('visual-stage'), message = $('viewer-message');
-let viewer = null, viewerPromise = null, viewerActive = false;
+let viewer = null, viewerPromise = null, viewerActive = false, ticket=0, currentGroup=null, softwareOnly=false;
 function selection(id) {
   document.querySelectorAll('.gallery-tools button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.image === id || (id === '3d' && b.id === 'open-3d'))));
 }
 function showImage(id) {
-  viewerActive = false;
+  ticket++; viewerActive = false; $('open-3d').removeAttribute('aria-busy');
   viewer?.pause();
   stage.classList.remove('live');
   $('viewer-controls').hidden = true;
@@ -73,27 +73,28 @@ function showImage(id) {
 }
 document.querySelectorAll('[data-image]').forEach(b => b.addEventListener('click', () => showImage(b.dataset.image)));
 async function open3d(group = null) {
-  viewerActive = true;
-  selection('3d');
+  const request=++ticket; currentGroup=group; viewerActive = true;
+  stage.classList.remove('live'); $('viewer-controls').hidden=true; selection('3d');
   message.textContent = 'Загрузка 3D-сборки…';
   $('open-3d').setAttribute('aria-busy', 'true');
   try {
-    viewerPromise ||= import('./studio.js?v=v07-20261125').then(mod => mod.createViewer($('canvas-host'))).catch(e => { viewerPromise = null; throw e; });
+    viewerPromise ||= import('./studio.js?v=mobile-20261125').then(mod => mod.createViewer($('canvas-host'),{softwareOnly})).catch(e => { viewerPromise = null; throw e; });
     viewer = await viewerPromise;
-    if (!viewerActive) return;
-    stage.classList.add('live');
-    $('viewer-controls').hidden = false;
+    if (!viewerActive||request!==ticket) return;
     $('explode').value = '0'; $('hide-shell').checked = false;
     viewer.focus(group);
-    viewer.resume();
+    viewer.resume(); viewer.drawNow?.();
+    stage.classList.add('live'); $('viewer-controls').hidden=false;
     $('view-title').textContent = group ? titles[group] : 'Интерактивная 3D-сборка';
     message.textContent = 'Вращайте пальцем или мышью';
   } catch (e) {
+    if(request!==ticket)return; viewerActive=false;viewer?.pause();viewer=null;viewerPromise=null;
     stage.classList.remove('live');
     message.textContent = '3D не открылось. Все ракурсы доступны кнопками под изображением.';
     selection(null);
-  } finally { $('open-3d').removeAttribute('aria-busy'); }
+  } finally { if(request===ticket)$('open-3d').removeAttribute('aria-busy'); }
 }
+window.addEventListener('xlab-3d-failure',()=>{const retry=viewerActive&&!softwareOnly;viewer?.pause();viewer=null;viewerPromise=null;stage.classList.remove('live');$('viewer-controls').hidden=true;softwareOnly=true;if(retry)open3d(currentGroup);else{viewerActive=false;message.textContent='3D недоступно. Выберите CAD-ракурс.';selection(null);}});
 $('open-3d').addEventListener('click', () => open3d());
 document.querySelectorAll('[data-group]').forEach(b => b.addEventListener('click', () => {
   showImage(b.dataset.group);

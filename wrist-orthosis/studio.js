@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
-import { createSoftwareViewer } from './software-viewer.js?v=v07-20261125';
+import { createSoftwareViewer } from './software-viewer.js?v=mobile-20261125';
 
 const groups = {
   shells: ['upper', 'lower'], cassette: ['plate', 'motorwall', 'supportwall'],
@@ -10,15 +10,19 @@ const groups = {
   spool: ['shaft', 'spool', 'bush_', 'spacer_', 'collar_'],
   guide: ['upper', 'cable_'],
 };
-export async function createViewer(host) {
-  const probe = document.createElement('canvas');
-  if (!probe.getContext('webgl2')) return createSoftwareViewer(host);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
+export async function createViewer(host, options={}) {
+  const touch=matchMedia('(pointer:coarse)').matches || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(options.softwareOnly||touch) return createSoftwareViewer(host);
+  try { return await createWebGLViewer(host); }
+  catch(e) { host.replaceChildren(); return createSoftwareViewer(host); }
+}
+async function createWebGLViewer(host) {
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.12;
-  renderer.setClearColor(0, 0);
+  renderer.setClearColor(0xf5f7fc,1);
   host.replaceChildren(renderer.domElement);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, .1, 3000);
@@ -54,6 +58,7 @@ export async function createViewer(host) {
     o.material.needsUpdate = true;
     nodes.push({ mesh:o, name:o.name.toLowerCase(), start:o.position.clone() });
   });
+  if(!nodes.length) throw Error('Empty CAD assembly');
   let selectedGroup = null, shellHidden = false, amount = 0, running = true;
   const direction = new THREE.Vector3(1.25,-1.6,1.25).normalize();
   function matches(name) { return !selectedGroup || groups[selectedGroup].some(id => name === id || name.startsWith(id)); }
@@ -94,14 +99,16 @@ export async function createViewer(host) {
   renderer.domElement.addEventListener('webglcontextlost', e => {
     e.preventDefault(); running = false;
     host.closest('.visual-stage')?.classList.remove('live');
-    document.getElementById('viewer-message').textContent = '3D приостановлено. Выберите ракурс под изображением.';
+    renderer.setAnimationLoop(null); observer.disconnect(); controls.dispose(); window.dispatchEvent(new Event('xlab-3d-failure'));
   });
   renderer.setAnimationLoop(() => {
     if (!running || document.hidden || !host.clientWidth || !host.clientHeight) return;
-    controls.update(); renderer.render(scene, camera);
+    try{controls.update();renderer.render(scene,camera);}catch(e){running=false;renderer.setAnimationLoop(null);window.dispatchEvent(new Event('xlab-3d-failure'));}
   });
-  apply(); fit();
+  function drawNow(){resize();controls.update();renderer.render(scene,camera);if(!renderer.info.render.triangles)throw Error('Empty frame');}
+  apply(); fit(); drawNow();
   return {
+    drawNow,
     focus(group) { selectedGroup = group && groups[group] ? group : null; amount = 0; shellHidden = false; apply(); fit(); },
     explode(value) { amount=value; apply(); fit(); },
     hideShell(value) { shellHidden=value; apply(); fit(); },

@@ -2,7 +2,7 @@
 export const CONFIG = Object.freeze({
   apiUrl: '',
   studyId: 'tactile-rgsu-2026-v1',
-  version: '1.3.2',
+  version: '1.3.3',
   maxRecordingSeconds: 120,
   maxAudioBytes: 2500000,
 });

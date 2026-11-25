@@ -1,10 +1,10 @@
-import {renderHome} from './home.js?v=1.3.2';
-import {CONFIG} from './config.js?v=1.3.2';
-import {api,isConfigured,encodeAudio} from './api.js?v=1.3.2';
-import {createSteps} from './questions.js?v=1.3.2';
-import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.2';
-import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.2';
-import {renderBooking} from './booking.js?v=1.3.2';
+import {renderHome} from './home.js?v=1.3.3';
+import {CONFIG} from './config.js?v=1.3.3';
+import {api,isConfigured,encodeAudio} from './api.js?v=1.3.3';
+import {createSteps} from './questions.js?v=1.3.3';
+import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.3';
+import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.3';
+import {renderBooking} from './booking.js?v=1.3.3';
 
 const $=id=>document.getElementById(id);
 export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -41,21 +41,28 @@ for(const [id,key] of [['large-text','large'],['high-contrast','contrast'],['aut
 
 function home(){
   document.title='Другие измерения искусства · За пределами зрения';
-  renderHome(main);
+  renderHome(main,{bookingConfigured:isConfigured()});
 }
 function about(){
   document.title='О проекте · За пределами зрения';
-  main.innerHTML=`<article class="page-shell about-page"><a class="back-link" href="#home">На главную</a><h1>О проекте</h1><p class="lead">«За пределами зрения» — исследовательский проект о тактильной интерпретации искусства.</p><h2>Цель</h2><p>Определить, какие способы построения рельефа помогают незрячим и слабовидящим людям распознавать объекты и понимать композицию изображения.</p><h2>Участие</h2><p>Участник исследует три физические панели, затем описывает восприятие и оценивает понятность каждой. Названия произведений заранее не сообщаются. Ответы собираются индивидуально, до общего обсуждения.</p><p>Основная группа — незрячие и слабовидящие участники от 18 лет. Участие добровольное: можно пропускать отдельные вопросы, делать перерывы и отозвать ответы.</p><h2>Самостоя&shy;тельный опрос</h2><p>Вопросы доступны текстом и с озвучиванием. Ответить можно текстом или голосовой записью. Код либо логин и пароль выдаются после записи. Для исследования нужны панели на площадке.</p><h2>Площадка эксперимента</h2><p>Экспериментальные встречи проходят в Технопарке Российского государственного социального университета: Москва, ул. Вильгельма Пика, 4, строение 8. <a href="#visit">Как добраться</a>.</p><div class="about-actions"><a class="button" href="#booking">Записаться</a><a class="button secondary" href="#access">Пройти опрос</a></div></article>`;
+  main.innerHTML=`<article class="page-shell about-page"><a class="back-link" href="#home">На главную</a><h1>О проекте</h1>
+    <p class="lead">«За пределами зрения» — исследовательский проект о тактильном восприятии живописи.</p>
+    <h2>Что исследуем</h2><p>Сравниваем способы создания рельефных версий картин. Изучаем, как незрячие и слабовидящие люди распознают предметы и понимают их расположение в композиции. Результаты планируем использовать при проектировании тактильных адаптаций живописи.</p>
+    <h2>Как проходит участие</h2><p>На встрече вы исследуете на ощупь три рельефные панели и отвечаете на вопросы о каждой. Названия произведений заранее не сообщаются. Ответы собираются индивидуально, до общего обсуждения.</p>
+    <p>Приглашаем незрячих и слабовидящих участников от 18 лет. Участие добровольное: можно пропускать вопросы, делать перерывы и отозвать ответы.</p>
+    <h2>Как отвечать на вопросы</h2><p>Вопросы можно читать или слушать, отвечать — текстом или голосовой записью. Код либо логин и пароль выдаёт организатор. Для исследования нужны физические рельефные панели на площадке.</p>
+    <h2>Где проходят встречи</h2><p>Технопарк РГСУ. Москва, ул. Вильгельма Пика, 4, строение 8. Посещение по предварительной записи. <a href="#visit">Как добраться</a>.</p>
+    <div class="about-actions"><a class="button" href="#booking">Участие и запись</a><a class="button secondary" href="#access">Вход участника</a></div><p class="small"><a href="#privacy">О ваших данных</a></p></article>`;
 }
 function access(){
   document.title='Вход участника · За пределами зрения';
-  main.innerHTML=`<section class="page-shell"><a class="back-link" href="#home">На главную</a><div class="eyebrow">Личное пространство участника</div><h1>Вход участника</h1><p class="lead">Введите доступ, выданный организатором. Если вы уже начали, ответы откроются с того места, где вы остановились.</p>
-    ${!isConfigured()?'<div class="notice neutral"><strong>Приём ответов ещё не открыт.</strong><p>Организатор сообщит, когда можно начать. Сейчас можно познакомиться с тем, как устроен опрос.</p></div>':''}
+  main.innerHTML=`<section class="page-shell"><a class="back-link" href="#home">На главную</a><h1>Вход участника</h1><p class="lead">Введите код или логин и пароль, выданные организатором.</p><p>Если вы уже начали опрос, продолжите с места остановки.</p>
+    ${!isConfigured()?'<div class="notice neutral"><strong>Приём ответов ещё не открыт.</strong><p>Организатор сообщит, когда можно начать.</p></div>':''}
     <form id="access-form" class="access-box"><div class="auth-tabs" role="tablist" aria-label="Способ входа"><button type="button" role="tab" id="code-tab" aria-selected="true" aria-controls="code-fields" tabindex="0">По коду</button><button type="button" role="tab" id="password-tab" aria-selected="false" aria-controls="password-fields" tabindex="-1">Логин и пароль</button></div>
       <div id="code-fields" role="tabpanel" aria-labelledby="code-tab"><label class="field-label" for="participant-code">Код участника</label><input class="code-input" id="participant-code" name="code" inputmode="numeric" autocomplete="off" maxlength="19" aria-describedby="code-hint"><p class="small muted" id="code-hint">12 цифр с вашей карточки. Пробелы можно не вводить.</p></div>
-      <div id="password-fields" role="tabpanel" aria-labelledby="password-tab" hidden><label class="field-label" for="participant-login">Логин</label><input class="standard-input" id="participant-login" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="40"><label class="field-label spaced" for="participant-password">Пароль</label><div class="password-wrap"><input class="standard-input" id="participant-password" name="password" type="password" autocomplete="current-password" maxlength="100"><button id="show-password" type="button" aria-label="Показать пароль" aria-pressed="false">Показать</button></div><p class="small muted">Если доступ потерян, обратитесь к организатору. Самостоятельная смена пароля не требуется.</p></div>
-      <div class="error-message" id="access-error" role="alert"></div><button class="button" type="submit" ${!isConfigured()?'disabled':''}>Войти в исследование </button>
-    </form><a class="demo-link" href="#demo"><span>Познакомиться с опросом<small>Один пробный вопрос · без регистрации и отправки</small></span></a></section>`;
+      <div id="password-fields" role="tabpanel" aria-labelledby="password-tab" hidden><label class="field-label" for="participant-login">Логин</label><input class="standard-input" id="participant-login" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="40"><label class="field-label spaced" for="participant-password">Пароль</label><div class="password-wrap"><input class="standard-input" id="participant-password" name="password" type="password" autocomplete="current-password" maxlength="100"><button id="show-password" type="button" aria-label="Показать пароль" aria-pressed="false">Показать</button></div><p class="small muted">Если вы потеряли доступ, обратитесь к организатору.</p></div>
+      <div class="error-message" id="access-error" role="alert"></div><button class="button" type="submit" ${!isConfigured()?'disabled':''}>Войти в опрос</button>
+    </form><a class="demo-link" href="#demo"><span>Начните с простого вопроса.<small>Попробовать опрос · без регистрации и отправки ответа</small></span></a></section>`;
   let mode='code';
   function selectTab(next){mode=next;for(const m of ['code','password']){$(`${m}-tab`).setAttribute('aria-selected',String(m===mode));$(`${m}-tab`).tabIndex=m===mode?0:-1;$(`${m}-fields`).hidden=m!==mode}$(`${next}-tab`).focus()}
   for(const m of ['code','password']){$(`${m}-tab`).addEventListener('click',()=>selectTab(m));$(`${m}-tab`).addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectTab(mode==='code'?'password':'code')}})}
@@ -71,7 +78,7 @@ function access(){
       session={...result.session,token:result.token};storageWrite('vision-token',result.token);
       demo=false;steps=createSteps(session.schedule);stepIndex=firstUnanswered();
       location.hash=session.status==='completed'?'done':'study';
-    }catch(error){$('access-error').textContent=error.message;button.disabled=false;button.textContent='Войти в исследование'}finally{busy=false}
+    }catch(error){$('access-error').textContent=error.message;button.disabled=false;button.textContent='Войти в опрос'}finally{busy=false}
   });
 }
 function firstUnanswered(){return Math.max(0,steps.findIndex(step=>step.kind==='review'||!session.answers[step.id]))}
@@ -184,7 +191,7 @@ async function saveStep(step){
   if((step.kind==='choice'||step.kind==='scale')&&!currentDraft.value){$('question-error').textContent='Выберите ответ. Можно выбрать вариант без оценки.';return}
   if(step.kind==='explore'&&!currentDraft.value?.seconds){$('question-error').textContent='Сначала исследуйте панель и включите отсчёт. Когда закончите, нажмите «Готово».';return}
   if(step.required&&!currentDraft.text?.trim()&&!currentDraft.blob&&!(currentAnswer().hasAudio&&!currentDraft.removeAudio)){$('question-error').textContent='Добавьте описание текстом или голосом. Если изображение не удалось распознать, так и скажите.';$('answer-text')?.focus();return}
-  if(demo){clearMedia();main.innerHTML=`<section class="page-shell"><div class="done-symbol" aria-hidden="true">✓</div><h1>Пробный опрос завершён.</h1><p class="lead">В настоящем опросе вопросы будут появляться по одному. Голос можно прослушать перед отправкой, а на любом шаге — сделать перерыв.</p><p class="small muted">Пробный ответ удалён. Ничего не отправлялось.</p><a class="button" href="#booking">Выбрать посещение</a><p><a class="text-button" href="#access">Войти с выданным доступом</a></p></section>`;focusHeading();return}
+  if(demo){clearMedia();main.innerHTML=`<section class="page-shell"><div class="done-symbol" aria-hidden="true">✓</div><h1>Пробный опрос завершён.</h1><p class="lead">В настоящем опросе вопросы будут появляться по одному. Голос можно прослушать перед отправкой, а на любом шаге — сделать перерыв.</p><p class="small muted">Пробный ответ удалён. Ничего не отправлялось.</p><a class="button" href="#booking">Участие и запись</a><p><a class="text-button" href="#access">Войти с выданным доступом</a></p></section>`;focusHeading();return}
   busy=true;$('next-step').disabled=true;$('previous-step').disabled=true;
   $('save-caption').textContent=step.kind==='review'?'Завершаем участие…':'Сохраняем ответ…';
   await persistDraft();
@@ -215,7 +222,7 @@ function visit(){
   const address='Москва, улица Вильгельма Пика, 4, строение 8';
   const map='https://yandex.ru/maps/?text='+encodeURIComponent(address+' РГСУ');
   document.title='Как нас найти · За пределами зрения';
-  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><div class="eyebrow">Как нас найти</div><h1>Как добраться</h1><p class="lead">Площадка проведения эксперимента — Технопарк Российского государственного социального университета.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна встреча</h2><p>Укажите это в поле «Нужна ли помощь при посещении?» при записи. Организатор сможет согласовать встречу у входа и помочь добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. В том же письме находятся логин, пароль и код участника. Точный вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.2" download><span>Памятка участника<small>Адрес, маршрут на карте и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Выбрать время посещения </a></section>`;
+  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><h1>Как добраться</h1><p class="lead">Технопарк РГСУ.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна помощь</h2><p>При записи укажите, что вас нужно встретить. Организатор согласует встречу у входа и поможет добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. Сохраните код участника или логин и пароль. Вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.3" download><span>Памятка участника<small>Адрес и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Участие и запись</a></section>`;
   $('copy-address').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(address);$('copy-status').textContent='Адрес скопирован.'}catch{$('copy-status').textContent=address}});
 }
 async function route(){

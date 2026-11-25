@@ -20,3 +20,8 @@ h1,h2,h3{color:#082567}h1{font-weight:700;letter-spacing:-1.8px;line-height:1.12
 /* University blue takes precedence over earlier experimental palettes. */
 :root{--rgsu-blue:#082567;--green:var(--rgsu-blue);--lime:#d5e4f4;--paper:#f5f7fc;--ink:#142447;--muted:#596783;--warm:#edf3fc}
 .x-brand,.x-brand i,.x-hero h1,.x-hero h1 i{color:var(--rgsu-blue)}.note.warm{background:#edf3fc;border-color:#d5e4f4}
+
+/* x.lab: same neutral studio background for both original CAD previews. */
+.x-card-image{display:block;position:relative;aspect-ratio:1.55;overflow:hidden;background:linear-gradient(180deg,#fafcff 0%,#e6edf7 100%)}
+.x-card-image img{position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain;object-position:center;mix-blend-mode:normal}
+.x-card-image .label-number,.x-card-image .type{z-index:2;pointer-events:none}

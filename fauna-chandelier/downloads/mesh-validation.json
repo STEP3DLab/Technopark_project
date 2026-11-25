@@ -1,0 +1,124 @@
+{
+  "project": "FAUNA",
+  "version": "2.0",
+  "units": "mm",
+  "coordinates": "Z up, front -Y, base at Z=0",
+  "stage": "Prototype decorative parts; no physical print, thermal or suspension test performed.",
+  "mounting": {
+    "pilot_hole_diameter_mm": 3.2,
+    "pilot_hole_depth_mm": 5.0,
+    "centres_mm": [
+      [
+        -22,
+        0,
+        0
+      ],
+      [
+        22,
+        0,
+        0
+      ]
+    ]
+  },
+  "animals": {
+    "fox": {
+      "cad_valid": true,
+      "cad_solids": 1,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_components": 1,
+      "stl_triangles": 16792,
+      "preview_triangles": 3300,
+      "size_mm": [
+        108.49,
+        91.99,
+        156.84
+      ],
+      "bounds_mm": [
+        [
+          -45.0,
+          -57.996,
+          0.0
+        ],
+        [
+          63.485,
+          33.993,
+          156.835
+        ]
+      ],
+      "solid_volume_cm3": 440.043,
+      "stl_bytes": 839684,
+      "step_bytes": 3257235,
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_difference_percent": 4e-05,
+      "pilot_holes_checked": true
+    },
+    "hare": {
+      "cad_valid": true,
+      "cad_solids": 1,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_components": 1,
+      "stl_triangles": 20284,
+      "preview_triangles": 3596,
+      "size_mm": [
+        84.0,
+        83.29,
+        175.49
+      ],
+      "bounds_mm": [
+        [
+          -41.998,
+          -41.297,
+          0.0
+        ],
+        [
+          42.0,
+          41.99,
+          175.486
+        ]
+      ],
+      "solid_volume_cm3": 343.724,
+      "stl_bytes": 1014284,
+      "step_bytes": 2521397,
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_difference_percent": 0.07738,
+      "pilot_holes_checked": true
+    },
+    "owl": {
+      "cad_valid": true,
+      "cad_solids": 1,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_components": 1,
+      "stl_triangles": 28688,
+      "preview_triangles": 5438,
+      "size_mm": [
+        96.41,
+        76.37,
+        143.03
+      ],
+      "bounds_mm": [
+        [
+          -48.198,
+          -42.367,
+          0.0
+        ],
+        [
+          48.214,
+          34.0,
+          143.032
+        ]
+      ],
+      "solid_volume_cm3": 483.928,
+      "stl_bytes": 1434484,
+      "step_bytes": 1551164,
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_difference_percent": 0.00119,
+      "pilot_holes_checked": true
+    }
+  }
+}

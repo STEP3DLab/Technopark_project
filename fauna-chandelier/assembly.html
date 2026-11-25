@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17221c">
+<meta name="description" content="FAUNA: размеры, состав и последовательность сборки прототипа люстры с лисой, зайцем и совой.">
+<title>Сборка FAUNA — инструкция прототипа</title>
+<style>
+:root{color-scheme:dark;--bg:#17221c;--panel:#1e2c23;--paper:#f1eee4;--muted:#bcc4b9;--bronze:#d4b47a;--line:#3e4c3f;--ink:#17221c}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--paper);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:inherit;text-underline-offset:5px}button{font:inherit}header,main,footer{width:min(1100px,calc(100% - 64px));margin-inline:auto}header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0;border-bottom:1px solid var(--line)}.brand{font:600 24px/1.2 Georgia,serif;letter-spacing:.12em;text-decoration:none}.back{color:var(--muted);font-size:14px}.hero{padding:58px 0 34px}.eyebrow{color:var(--bronze);letter-spacing:.13em;font-size:13px;text-transform:uppercase}.hero h1{font:400 clamp(42px,7vw,76px)/1.07 Georgia,serif;letter-spacing:-.035em;margin:16px 0 22px}.hero p{max-width:730px;color:var(--muted);font-size:18px;line-height:1.7;margin:0}.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:26px}.print-btn{background:var(--paper);border:1px solid var(--paper);border-radius:50px;color:var(--ink);padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer}.print-btn:hover{background:var(--bronze);border-color:var(--bronze)}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--bronze);outline-offset:5px}.quiet{font-size:14px;color:var(--muted)}.specs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0;padding:25px 0;gap:20px}.specs dt{color:var(--muted);font-size:14px}.specs dd{margin:6px 0 0;font:400 30px/1.2 Georgia,serif}.section{padding:44px 0;border-bottom:1px solid var(--line)}h2{font:400 32px/1.2 Georgia,serif;margin:0 0 20px;letter-spacing:-.02em}h3{font-size:18px;line-height:1.4;margin:0 0 9px;font-weight:600}p{margin:0 0 16px}.lead-note{max-width:850px;color:var(--muted)}.status{margin-top:25px;background:var(--panel);padding:21px 24px;border-left:3px solid var(--bronze)}.status p{margin:0}.status strong{color:var(--bronze);font-weight:600}.diagram{margin:24px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}.diagram svg{display:block;width:100%;height:auto;color:var(--paper)}figcaption{font-size:14px;color:var(--muted);padding:0 24px 22px}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px}.parts{margin:0;padding:0;list-style:none}.parts li{padding:14px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:38px 1fr;gap:12px}.parts li:last-child{border-bottom:1px solid var(--line)}.qty{font:400 25px/1.3 Georgia,serif;color:var(--bronze)}.parts strong{display:block;font-size:16px;font-weight:600}.parts small{display:block;font-size:14px;color:var(--muted);line-height:1.6;margin-top:4px}.steps{list-style:none;counter-reset:step;margin:26px 0 0;padding:0}.steps li{counter-increment:step;display:grid;grid-template-columns:44px 1fr;gap:20px;border-top:1px solid var(--line);padding:25px 0}.steps li::before{content:counter(step);display:grid;place-content:center;width:36px;height:36px;border:1px solid var(--bronze);border-radius:50%;font:400 19px Georgia,serif;color:var(--bronze)}.steps p{color:var(--muted);margin:0;max-width:850px}.mini-spec{margin:0}.mini-spec div{display:flex;justify-content:space-between;gap:24px;border-top:1px solid var(--line);padding:12px 0}.mini-spec dt{color:var(--muted)}.mini-spec dd{margin:0;text-align:right}.note{margin-top:18px;color:var(--muted);font-size:14px}.checks{padding-left:22px;color:var(--muted);margin:16px 0 0}.checks li{padding:4px 0 4px 3px}.checks li::marker{color:var(--bronze)}.last{border-bottom:0;padding-bottom:48px}footer{border-top:1px solid var(--line);padding:25px 0 38px;display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:14px}footer a{white-space:nowrap}.base-table{width:100%;border-collapse:collapse;margin:22px 0 0;font-size:14px;text-align:left}.base-table caption{text-align:left;font-size:18px;font-weight:600;padding-bottom:10px}.base-table th,.base-table td{border-top:1px solid var(--line);padding:12px 16px 12px 0;vertical-align:top}.base-table th{font-weight:500;color:var(--muted)}.base-table td:first-child{color:var(--paper);font-weight:600}.base-table tbody tr:last-child td{border-bottom:1px solid var(--line)}.svg-label{font:16px ui-sans-serif,system-ui,sans-serif;fill:#f1eee4}.svg-meta{font:14px ui-sans-serif,system-ui,sans-serif;fill:#bcc4b9}.svg-title{font:600 17px ui-sans-serif,system-ui,sans-serif;fill:#f1eee4}.svg-dim{font:15px ui-sans-serif,system-ui,sans-serif;fill:#d4b47a}.svg-dimension{fill:none;stroke:#d4b47a;stroke-width:1.2}.svg-dashed{fill:none;stroke:#bcc4b9;stroke-width:1;stroke-dasharray:5 5}
+@media(max-width:720px){header,main,footer{width:calc(100% - 36px)}header{padding:21px 0}.brand{font-size:21px}.back{font-size:13px}.hero{padding-top:38px}.hero p{font-size:16px}.specs{grid-template-columns:repeat(2,1fr);row-gap:24px}.specs dd{font-size:28px}.section{padding:32px 0}.two-cols{grid-template-columns:1fr;gap:28px}.steps li{grid-template-columns:33px 1fr;gap:13px}.steps li::before{width:31px;height:31px}.status{padding:18px}.diagram{overflow-x:auto}.diagram svg{min-width:660px}.diagram figcaption{min-width:0;padding:0 18px 18px}footer{flex-direction:column;gap:5px}h2{font-size:29px}.mini-spec div{gap:16px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A4;margin:16mm}
+@media print{:root{color-scheme:light;--bg:#fff;--panel:#f4f5f1;--paper:#1e2921;--muted:#4e584e;--bronze:#806030;--line:#c9cfc5;--ink:#1e2921}body{font-size:10pt;line-height:1.5;background:#fff}header,main,footer{width:100%}header{padding:0 0 12px}.hero{padding:24px 0}.hero h1{font-size:35pt;margin:10px 0 14px}.hero p{font-size:11pt}.hero-actions,.back,.no-print{display:none}.specs{padding:16px 0;gap:12px}.specs dt,.quiet,.note,.parts small,figcaption,footer{font-size:9pt}.specs dd{font-size:20pt}.section{padding:24px 0}h2{font-size:21pt}h3{font-size:12pt}.two-cols{gap:25px}.parts strong{font-size:10pt}.steps{margin-top:14px}.steps li{padding:16px 0;break-inside:avoid;grid-template-columns:29px 1fr;gap:12px}.steps li::before{width:26px;height:26px;font-size:13pt}.diagram{break-inside:avoid;border-radius:0}.diagram svg{min-width:0}.svg-label,.svg-title{fill:#1e2921}.svg-meta{fill:#4e584e}.svg-dim{fill:#806030}.svg-dimension{stroke:#806030}.svg-dashed{stroke:#788074}.status{padding:14px 18px;break-inside:avoid}h2,h3{break-after:avoid}footer{padding:16px 0 0}a{text-decoration:none}.parts li{break-inside:avoid}.print-bronze{stroke:#a18350}.last{padding-bottom:24px}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html" aria-label="FAUNA — вернуться к модели">FAUNA</a><a class="back" href="index.html">Вернуться к 3D-модели</a></header>
+<main>
+<section class="hero" aria-labelledby="page-title">
+<div class="eyebrow">Инструкция прототипа</div>
+<h1 id="page-title">От модели<br>к сборке.</h1>
+<p>Лиса, заяц и сова на металлическом кольце. Ниже — состав конструкции, размеры и последовательность работы. Декоративные фигурки снимаются отдельно от световых модулей.</p>
+<div class="hero-actions"><button class="print-btn" type="button" onclick="window.print()">Распечатать инструкцию</button><span class="quiet">Все размеры указаны в миллиметрах</span></div>
+</section>
+<dl class="specs">
+<div><dt>Наружный диаметр</dt><dd>600 мм</dd></div>
+<div><dt>Высота всей композиции</dt><dd>≈640 мм</dd></div>
+<div><dt>Световые модули</dt><dd>3 × Ø100</dd></div>
+<div><dt>Проектное питание</dt><dd>24 В</dd></div>
+</dl>
+<div class="status"><p><strong>Этап: пробный образец.</strong> Расчёт несущих деталей, тепловые и физические испытания ещё не выполнены. До изготовления металлических деталей нужно выбрать конкретные световые модули, крепёж и потолочное крепление, затем согласовать их размеры.</p></div>
+<section class="section" aria-labelledby="construction-title">
+<h2 id="construction-title">Как устроена люстра</h2>
+<p class="lead-note">Кольцо соединено с тремя внутренними площадками металлическими консолями. Каждая площадка удерживает декоративную фигурку; плафон подвешивается к металлическому узлу независимо от неё. Точки тросов выбираются между консолями с проверкой зазоров до животных; сечение назначается по расчёту. На схеме показано размещение узлов, без назначения допустимой нагрузки.</p>
+<figure class="diagram">
+<svg viewBox="0 0 980 480" role="img" aria-labelledby="diagram-title diagram-desc">
+<title id="diagram-title">Схема кольца, консолей и пробных отверстий фигурки</title>
+<desc id="diagram-desc">Вид сверху: наружный диаметр кольца 600 миллиметров, средний радиус 295, центры площадок на радиусе 235, три консоли длиной по осям 60. Отдельная схема пробных отверстий снизу фигурки: два глухих отверстия диаметром 3,2 глубиной 5, центры X минус 22 и плюс 22, Y ноль.</desc>
+<defs><marker id="dim-start" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><path d="M7 0L0 3.5L7 7" fill="none" stroke="#d4b47a"/></marker><marker id="dim-end" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="none" stroke="#d4b47a"/></marker></defs>
+<text class="svg-title" x="30" y="35">Размещение узлов · вид сверху</text>
+<circle class="print-bronze" cx="244" cy="235" r="177" fill="none" stroke="#d4b47a" stroke-width="6"/>
+<circle class="svg-dashed" cx="244" cy="235" r="141"/>
+<path class="svg-dashed" d="M244 45V425M54 235H438"/>
+<g stroke="#d4b47a" stroke-width="5" fill="none"><path d="M421 235H385"/><path d="M155.5 81.709L173.5 112.89"/><path d="M155.5 388.291L173.5 357.11"/></g>
+<g stroke="#d4b47a" stroke-width="1.5" fill="#283b2e"><rect x="356.8" y="213.4" width="56.4" height="43.2" rx="4"/><rect x="145.3" y="91.29" width="56.4" height="43.2" rx="4" transform="rotate(-120 173.5 112.89)"/><rect x="145.3" y="335.51" width="56.4" height="43.2" rx="4" transform="rotate(120 173.5 357.11)"/></g>
+<g fill="#d4b47a"><circle cx="244" cy="235" r="3"/><circle cx="385" cy="235" r="3"/><circle cx="173.5" cy="112.89" r="3"/><circle cx="173.5" cy="357.11" r="3"/></g>
+<path class="svg-dimension" d="M64 423V455M424 423V455"/><path class="svg-dimension" d="M66 444H422" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+<text class="svg-dim" x="244" y="435" text-anchor="middle">Ø600 снаружи</text>
+<path class="svg-dimension" d="M246 235L365 235"/>
+<text class="svg-dim" x="301" y="222" text-anchor="middle">R235</text>
+<path class="svg-dimension" d="M244 235L365 105"/>
+<text class="svg-dim" x="302" y="155" transform="rotate(-47 302 155)">R295</text>
+<path class="svg-dimension" d="M385 259V289M421 247V289"/><path class="svg-dimension" d="M386 280H420" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+<text class="svg-dim" x="403" y="309" text-anchor="middle">60</text>
+<text class="svg-meta" x="244" y="382" text-anchor="middle">Три узла через 120°</text>
+<path d="M484 57V434" stroke="#3e4c3f"/>
+<text class="svg-title" x="530" y="85">Низ фигурки · отверстия</text>
+<text class="svg-meta" x="530" y="111">Контур основания показан условно</text>
+<path d="M575 180Q575 155 607 155H850Q884 155 884 190V270Q884 301 850 301H605Q575 301 575 270Z" fill="none" stroke="#bcc4b9" stroke-width="1.5"/>
+<path class="svg-dashed" d="M544 228H916M730 138V319"/>
+<circle cx="664" cy="228" r="4.8" stroke="#d4b47a" stroke-width="1.5" fill="none"/>
+<circle cx="796" cy="228" r="4.8" stroke="#d4b47a" stroke-width="1.5" fill="none"/>
+<circle cx="730" cy="228" r="2.5" fill="#bcc4b9"/>
+<text class="svg-meta" x="740" y="218">0</text>
+<text class="svg-meta" x="900" y="218">X</text>
+<text class="svg-meta" x="741" y="148">Y</text>
+<path class="svg-dimension" d="M664 244V345M796 244V345"/><path class="svg-dimension" d="M666 336H794" marker-start="url(#dim-start)" marker-end="url(#dim-end)"/>
+<text class="svg-dim" x="730" y="329" text-anchor="middle">44 между центрами</text>
+<text class="svg-label" x="530" y="382">2 × Ø3,2 · глубина 5</text>
+<text class="svg-meta" x="530" y="411">Центры: X = −22 и +22; Y = 0</text>
+<text class="svg-meta" x="530" y="438">Пробные глухие отверстия, без резьбы</text>
+</svg>
+<figcaption>Сечение кольца в модели — условный круг Ø10. Консоли: от среднего радиуса кольца R295 до центров площадок R235. Размер каждой площадки — 94 × 72 × 4. Геометрию креплений уточняют после выбора комплектующих.</figcaption>
+</figure>
+</section>
+<section class="section" aria-labelledby="parts-title">
+<h2 id="parts-title">Что подготовить</h2>
+<div class="two-cols">
+<ul class="parts">
+<li><span class="qty">3</span><div><strong>Декоративные фигурки</strong><small>Лиса, заяц и сова. Плоская опора и два пробных глухих отверстия снизу каждой фигурки.</small></div></li>
+<li><span class="qty">1</span><div><strong>Металлическое кольцо</strong><small>Наружный Ø600. Фактическое сечение и материал назначаются после проверки нагрузки.</small></div></li>
+<li><span class="qty">3</span><div><strong>Консоли с площадками</strong><small>Переход от R295 к R235. Площадки 94 × 72 × 4; отверстия в них согласовать с выбранным крепежом фигурок и плафонов.</small></div></li>
+</ul>
+<ul class="parts">
+<li><span class="qty">3</span><div><strong>Готовые LED-модули с плафонами</strong><small>Проектная архитектура: 24 В, наружный Ø100. Подвес, теплоотвод и электрические соединения — по документации выбранных модулей.</small></div></li>
+<li><span class="qty">1</span><div><strong>Комплект питания и проводки</strong><small>Совместимый блок питания и соединители выбираются по характеристикам трёх модулей. Потребление пока не назначено.</small></div></li>
+<li><span class="qty">1</span><div><strong>Комплект металлических подвесов</strong><small>Подвесы кольца, подвесы плафонов, узлы фиксации и потолочное крепление. Колпак в модели — Ø140 × 24.</small></div></li>
+</ul>
+</div>
+<table class="base-table">
+<caption>Основания фигурок</caption>
+<thead><tr><th scope="col">Фигурка</th><th scope="col">Эллипс X × Y</th><th scope="col">Толщина</th></tr></thead>
+<tbody>
+<tr><td>Лиса</td><td>90 × 68 мм</td><td>8 мм</td></tr>
+<tr><td>Заяц</td><td>84 × 66 мм</td><td>8 мм</td></tr>
+<tr><td>Сова</td><td>88 × 68 мм</td><td>8 мм</td></tr>
+</tbody>
+</table>
+<p class="note">Для всех трёх оснований выбрана общая площадка 94 × 72 × 4. Внизу фигурок предусмотрены два пробных глухих отверстия Ø3,2 глубиной 5, с центрами X = −22 и +22, Y = 0. Окончательный узел крепления требует проверки на образце.</p>
+<p class="note">Фигурки — съёмные декоративные детали. Они не заменяют несущие узлы люстры и крепления плафонов.</p>
+</section>
+<section class="section" aria-labelledby="print-title">
+<div class="two-cols">
+<div>
+<h2 id="print-title">Пробная печать</h2>
+<p class="lead-note">PETG выбран для декоративного пробного исполнения. Параметры ниже — стартовая настройка для проверки модели в вашем слайсере.</p>
+<p class="note">До печати всех трёх фигурок проверьте выбранный способ крепления на небольшом образце основания. Диаметр Ø3,2 и глубина 5 — пробная геометрия, а не готовое резьбовое гнездо или посадка под вставку М3.</p>
+</div>
+<dl class="mini-spec">
+<div><dt>Высота слоя</dt><dd>0,20 мм</dd></div>
+<div><dt>Стенки</dt><dd>4 периметра</dd></div>
+<div><dt>Заполнение</dt><dd>15–20%</dd></div>
+<div><dt>Ориентация</dt><dd>Плоским основанием вниз</dd></div>
+<div><dt>Поддержки</dt><dd>По нависаниям конкретной модели</dd></div>
+</dl>
+</div>
+</section>
+<section class="section" aria-labelledby="steps-title">
+<h2 id="steps-title">Последовательность сборки</h2>
+<ol class="steps">
+<li><div><h3>Подобрать свет и крепёж</h3><p>Зафиксировать реальные размеры LED-модулей, подвесов, блока питания и крепёжных узлов. Сверить их с местами в модели. Разработать узлы соединения кольца, консолей и потолочного подвеса под выбранные детали и фактическую нагрузку.</p></div></li>
+<li><div><h3>Проверить крепление фигурок</h3><p>Напечатать образец основания с двумя пробными отверстиями. Проверить посадку, толщину вокруг отверстий и удержание выбранного крепежа. При необходимости изменить диаметр и глубину в модели. После этого напечатать лису, зайца и сову, снять поддержки и проверить опорные поверхности.</p></div></li>
+<li><div><h3>Собрать металлическую основу на столе</h3><p>Разместить три консоли через 120°. Средняя линия кольца — R295, центры площадок — R235. Выбрать точки тросов между консолями и проверить зазоры до фигурок. Проверить соосность креплений, отсутствие люфта и горизонтальность площадок. Сначала выполнить пробную сборку без фигурок и световых модулей.</p></div></li>
+<li><div><h3>Установить плафоны и фигурки</h3><p>Закрепить плафоны через их металлические узлы. В модели центры плафонов находятся на 155 мм ниже плоскости кольца. Установить фигурки на площадки и закрепить выбранным, проверенным на образце способом. Предусмотреть возможность снять фигурки и обслужить свет независимо друг от друга.</p></div></li>
+<li><div><h3>Собрать электрическую часть</h3><p>Выполнить низковольтные соединения по документации модулей и блока питания. Провести провода без натяжения, зажатия и контакта с острыми кромками; предусмотреть разгрузку натяжения. Подключение сетевой части выполняет специалист.</p></div></li>
+<li><div><h3>Проверить образец на стенде</h3><p>Проверить крепления, балансировку, удержание фигурок, электрические соединения и нагрев в рабочем режиме. Сопоставить результаты с требованиями выбранных компонентов. Потолочное крепление подбирают под основание потолка и проверенную конструкцию; монтаж выполняют после этих проверок.</p></div></li>
+</ol>
+</section>
+<section class="section last" aria-labelledby="dimensions-title">
+<div class="two-cols">
+<div>
+<h2 id="dimensions-title">Высота и обслуживание</h2>
+<p class="lead-note">За ноль принята плоскость кольца. Центр потолочного колпака находится на +420 мм, центр каждого плафона — на −155 мм. Верх колпака: +432 мм; низ плафонов: −205 мм.</p>
+<p>Геометрическая высота модели — <strong>637 мм</strong>, ориентир для размещения — <strong>около 640 мм</strong>. Реальное положение зависит от выбранного крепления и подвесов.</p>
+</div>
+<div>
+<h3>Перед установкой должны быть определены</h3>
+<ul class="checks">
+<li>Состав и размеры несущих соединений.</li>
+<li>Реальная масса сборки и допустимая нагрузка креплений.</li>
+<li>Совместимость модулей и блока питания.</li>
+<li>Тепловые зазоры по результатам проверки.</li>
+<li>Доступ к соединениям и замене световых модулей.</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+<footer><span>FAUNA · комплект для разработки прототипа</span><a href="index.html">Модель и файлы проекта</a></footer>
+</body>
+</html>

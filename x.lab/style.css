@@ -36,3 +36,12 @@ html,body{background:#f5f7fc;color:#142447}
 .x-project-heading{padding:13px 0}.x-projects{gap:14px;grid-template-columns:minmax(0,1fr)}.x-project-card{border-radius:12px;min-width:0}.x-card-image{aspect-ratio:1.3}.x-card-image img{inset:12px 0 0;width:100%;height:calc(100% - 12px);object-fit:contain}.x-card-image .label-number{top:13px;left:14px}.x-card-image .type{top:15px;right:14px;font-size:9px}
 .x-card-content{padding:17px 15px;align-items:center;gap:9px}.x-card-content>div{min-width:0}.x-card-content .eyebrow{font-size:10px}.x-card-content h3{font-size:23px;line-height:1.16;margin:5px 0 7px;overflow-wrap:anywhere}.x-card-content p{font-size:13px;line-height:1.45}.x-arrow{width:44px;height:44px;flex-basis:44px}.x-card-foot{padding:10px 15px;font-size:11px}.x-home .page-footer{margin-top:25px;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
 }
+
+/* x.lab — consistent mobile header baseline and optical wordmark alignment. */
+
+@media(max-width:700px){
+ .x-home-header{box-sizing:border-box;height:calc(64px + env(safe-area-inset-top,0px));min-height:calc(64px + env(safe-area-inset-top,0px));padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;align-items:center}
+ .x-home-header>a:first-child{display:inline-flex;align-items:center;min-height:44px}
+ .x-home-header .x-brand{display:block;font-family:Evolventa,Arial,sans-serif;font-weight:700;font-size:27px;line-height:1;letter-spacing:-2.1px}
+}
+@media(max-width:350px){.x-home-header .x-brand{font-size:24px;letter-spacing:-1.8px}}

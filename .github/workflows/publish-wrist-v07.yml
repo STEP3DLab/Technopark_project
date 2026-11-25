@@ -1,0 +1,51 @@
+name: Build and publish wrist orthosis V07
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wrist-orthosis/v07/model.scad'
+      - 'wrist-orthosis/v07/build.py'
+      - 'wrist-orthosis/v07/verify_assembly.py'
+      - 'wrist-orthosis/v07/publish.py'
+      - 'wrist-orthosis/v07/page/**'
+      - '.github/workflows/publish-wrist-v07.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-wrist-v07
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install CAD and render dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openscad xvfb xauth libgl1 libegl1 libxrender1
+          python -m pip install numpy trimesh scipy shapely networkx pillow vtk
+      - name: Build original V07 solids and test gear profiles
+        run: python wrist-orthosis/v07/build.py
+      - name: Check assembled mechanical meshes
+        run: python wrist-orthosis/v07/verify_assembly.py
+      - name: Render CAD views, package files, verify and activate website
+        run: xvfb-run -a python wrist-orthosis/v07/publish.py
+      - name: Commit verified release
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add wrist-orthosis/v07/files wrist-orthosis/v07/assets wrist-orthosis/index.html wrist-orthosis/site.js wrist-orthosis/studio.js wrist-orthosis/software-viewer.js wrist-orthosis/report.html x.lab/index.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'release(wrist-orthosis): publish V07 CAD files, checked meshes and illustrated guide'
+          for i in 1 2 3 4 5; do
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 5
+            git fetch origin main
+            git rebase origin/main || exit 1
+          done
+          exit 1

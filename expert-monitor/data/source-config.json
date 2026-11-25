@@ -625,5 +625,60 @@
     "extractLinks": false,
     "region": "Магаданская область",
     "scope": "Федеральная ротация, требуется проверка дел"
+  },
+  {
+    "id": "research-20261125-proc-17623",
+    "name": "25.11 — закупка 17623",
+    "url": "https://sti-trade.ru/tenders/tenders_detail.php?LOT_ID=17623",
+    "type": "procurement_primary",
+    "status": "primary_public_stage",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Республика Башкортостан",
+    "notes": "На первичной STI-Trade этап 1, приём 23.11–25.11 10:00 МСК; цена только после входа. Документы перечислены, содержание ТЗ не проверено."
+  },
+  {
+    "id": "research-20261125-proc-0162300005326002172",
+    "name": "25.11 — закупка 0162300005326002172",
+    "url": "https://zakupki.kontur.ru/0162300005326002172",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Свердловская область",
+    "notes": "Контур: срок 26.11 08:00 МСК, НМЦК 790000, место выполнения и условия участия; ЕИС timeout."
+  },
+  {
+    "id": "research-20261125-proc-0173200001326000033",
+    "name": "25.11 — закупка 0173200001326000033",
+    "url": "https://zakupki.kontur.ru/0173200001326000033",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Москва",
+    "notes": "Контур: срок 04.12 09:00 МСК, НМЦК 3276352,68; ЕИС timeout."
+  },
+  {
+    "id": "research-20261125-proc-32616600261",
+    "name": "25.11 — закупка 32616600261",
+    "url": "https://zakupki.kontur.ru/32616600261",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Свердловская область",
+    "notes": "Контур и Intec: срок 02.12, Контур 09:00 МСК; ЕИС timeout."
+  },
+  {
+    "id": "research-20261125-proc-32616588564",
+    "name": "25.11 — закупка 32616588564",
+    "url": "https://zakupki.kontur.ru/32616588564",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Пермский край",
+    "notes": "Контур: 04.12 06:00 МСК, НМЦД 2 млн, только МСП; ЕИС timeout."
   }
 ]

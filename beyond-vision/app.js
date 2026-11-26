@@ -1,10 +1,9 @@
-import {renderHome} from './home.js?v=1.3.3';
-import {CONFIG} from './config.js?v=1.3.3';
-import {api,isConfigured,encodeAudio} from './api.js?v=1.3.3';
-import {createSteps} from './questions.js?v=1.3.3';
-import {drafts,readSettings,writeSettings} from './storage.js?v=1.3.3';
-import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.3.3';
-import {renderBooking} from './booking.js?v=1.3.3';
+import {renderHome} from './home.js?v=1.4.0';
+import {CONFIG} from './config.js?v=1.4.0';
+import {api,isConfigured,encodeAudio} from './api.js?v=1.4.0';
+import {drafts,readSettings,writeSettings} from './storage.js?v=1.4.0';
+import {Recorder,speak,stopSpeech,hasSpeech} from './audio.js?v=1.4.0';
+import {renderBooking} from './booking.js?v=1.4.0';
 
 const $=id=>document.getElementById(id);
 export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -18,7 +17,7 @@ const storageRead=(key)=>{try{return sessionStorage.getItem(key)}catch{return nu
 const storageWrite=(key,val)=>{try{val==null?sessionStorage.removeItem(key):sessionStorage.setItem(key,val)}catch{}};
 let deviceKey=storageRead('vision-device');
 if(!deviceKey){deviceKey=crypto.randomUUID();storageWrite('vision-device',deviceKey)}
-const draftKey=()=>`${session.pid}:${steps[stepIndex]?.id}`;
+const draftKey=()=>`${session?.runId||'demo'}:${steps[stepIndex]?.id}`;
 const announce=text=>{$('announcer').textContent=text};
 const focusHeading=()=>{const heading=main.querySelector('h1');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}window.scrollTo({top:0,behavior:'instant'})};
 document.querySelector('.skip-link').addEventListener('click',e=>{e.preventDefault();main.focus();main.scrollIntoView()});
@@ -48,7 +47,7 @@ function about(){
   main.innerHTML=`<article class="page-shell about-page"><a class="back-link" href="#home">На главную</a><h1>О проекте</h1>
     <p class="lead">«За пределами зрения» — исследовательский проект о тактильном восприятии живописи.</p>
     <h2>Что исследуем</h2><p>Сравниваем способы создания рельефных версий картин. Изучаем, как незрячие и слабовидящие люди распознают предметы и понимают их расположение в композиции. Результаты планируем использовать при проектировании тактильных адаптаций живописи.</p>
-    <h2>Как проходит участие</h2><p>На встрече вы исследуете на ощупь три рельефные панели и отвечаете на вопросы о каждой. Названия произведений заранее не сообщаются. Ответы собираются индивидуально, до общего обсуждения.</p>
+    <h2>Как проходит участие</h2><p>На встрече вы исследуете на ощупь выданные рельефные панели или пробники и отвечаете на вопросы назначенного теста. Названия произведений заранее не сообщаются. Ответы собираются индивидуально, до общего обсуждения.</p>
     <p>Приглашаем незрячих и слабовидящих участников от 18 лет. Участие добровольное: можно пропускать вопросы, делать перерывы и отозвать ответы.</p>
     <h2>Как отвечать на вопросы</h2><p>Вопросы можно читать или слушать, отвечать — текстом или голосовой записью. Код либо логин и пароль выдаёт организатор. Для исследования нужны физические рельефные панели на площадке.</p>
     <h2>Где проходят встречи</h2><p>Технопарк РГСУ. Москва, ул. Вильгельма Пика, 4, строение 8. Посещение по предварительной записи. <a href="#visit">Как добраться</a>.</p>
@@ -56,7 +55,7 @@ function about(){
 }
 function access(){
   document.title='Вход участника · За пределами зрения';
-  main.innerHTML=`<section class="page-shell"><a class="back-link" href="#home">На главную</a><h1>Вход участника</h1><p class="lead">Введите код или логин и пароль, выданные организатором.</p><p>Если вы уже начали опрос, продолжите с места остановки.</p>
+  main.innerHTML=`<section class="page-shell"><a class="back-link" href="#home">На главную</a><h1>Вход участника</h1><p class="lead">Введите код или логин и пароль, выданные организатором.</p><p>Откроется тест, назначенный организатором для вашего кода. Если вы уже начали его, продолжите с места остановки.</p>
     ${!isConfigured()?'<div class="notice neutral"><strong>Приём ответов ещё не открыт.</strong><p>Организатор сообщит, когда можно начать.</p></div>':''}
     <form id="access-form" class="access-box"><div class="auth-tabs" role="tablist" aria-label="Способ входа"><button type="button" role="tab" id="code-tab" aria-selected="true" aria-controls="code-fields" tabindex="0">По коду</button><button type="button" role="tab" id="password-tab" aria-selected="false" aria-controls="password-fields" tabindex="-1">Логин и пароль</button></div>
       <div id="code-fields" role="tabpanel" aria-labelledby="code-tab"><label class="field-label" for="participant-code">Код участника</label><input class="code-input" id="participant-code" name="code" inputmode="numeric" autocomplete="off" maxlength="19" aria-describedby="code-hint"><p class="small muted" id="code-hint">12 цифр с вашей карточки. Пробелы можно не вводить.</p></div>
@@ -75,16 +74,20 @@ function access(){
     busy=true;const button=e.submitter;button.disabled=true;button.textContent='Проверяем доступ…';$('access-error').textContent='';
     try{
       const result=await api('login',{...credentials,deviceKey});
-      session={...result.session,token:result.token};storageWrite('vision-token',result.token);
-      demo=false;steps=createSteps(session.schedule);stepIndex=firstUnanswered();
+      applyManagedSession(result.session,result.token);storageWrite('vision-token',result.token);
+      demo=false;
       location.hash=session.status==='completed'?'done':'study';
     }catch(error){$('access-error').textContent=error.message;button.disabled=false;button.textContent='Войти в опрос'}finally{busy=false}
   });
 }
-function firstUnanswered(){return Math.max(0,steps.findIndex(step=>step.kind==='review'||!session.answers[step.id]))}
+function applyManagedSession(data,token){
+  if(!data?.runId||!Array.isArray(data.steps)||data.steps.length<3||!data.answers)throw new Error('Сервер не вернул назначенный тест. Обратитесь к организатору.');
+  session={...data,token};steps=data.steps;stepIndex=firstUnanswered();
+}
+function firstUnanswered(){return Math.max(0,steps.findIndex(step=>step.kind==='review'||!Object.prototype.hasOwnProperty.call(session.answers,step.id)))}
 function currentAnswer(){return demo?{}:session?.answers?.[steps[stepIndex]?.id]||{}}
 async function persistDraft(){
-  if(demo||!session||!steps[stepIndex])return;
+  if(demo||!session||session.status==='completed'||!steps[stepIndex]||steps[stepIndex].kind==='review')return;
   try{await drafts.put(draftKey(),{...currentDraft,updatedAt:Date.now()})}catch{if($('save-caption'))$('save-caption').textContent='Не удалось сохранить черновик на устройстве. Не закрывайте страницу до отправки ответа.'}
 }
 function clearMedia(){stopExploration?.();stopExploration=null;clearInterval(timerInterval);clearTimeout(draftTimer);stopSpeech();recorder?.stop();recorder=null;if(audioObjectUrl){URL.revokeObjectURL(audioObjectUrl);audioObjectUrl=null}}
@@ -98,7 +101,7 @@ function getValueMarkup(step){
   }
   if(step.kind==='explore')return `<div class="panel-badge">Маркировка панели <strong>${esc(step.panel)}</strong></div><div class="timer-box"><div class="timer" id="explore-clock" aria-hidden="true">${timeFormat(currentDraft.value?.seconds||0)}</div><p class="sr-only">Таймер исследования. Ограничения по времени нет.</p><button class="button" id="timer-toggle" type="button">${currentDraft.value?.seconds?'Продолжить исследовать':'Начать исследовать'}</button><p>Когда закончите, нажмите «Готово» внизу.</p></div>`;
   if(step.kind==='text')return `<label class="field-label" for="answer-text">${esc(step.label)}</label><textarea id="answer-text" class="response-text" maxlength="6000" aria-describedby="text-hint">${esc(currentDraft.text||'')}</textarea><div class="text-meta"><span id="text-hint">Можно использовать диктовку клавиатуры телефона.</span><span id="character-count">${(currentDraft.text||'').length} / 6000</span></div><div class="record-zone" id="record-zone">${recordMarkup()}</div>`;
-  if(step.kind==='review')return `<div class="review-list">${session.schedule.map((p,i)=>`<div class="review-row"><span>Панель ${i+1} · ${esc(p)}</span><span>Ответы сохранены</span></div>`).join('')}<div class="review-row"><span>Итоговые вопросы</span><span>Ответы сохранены</span></div></div><p class="small muted">После завершения анкету нельзя изменять. Организатор получает ответы под вашим номером участника.</p>`;
+  if(step.kind==='review')return `<div class="review-list">${(session.schedule||[]).map(p=>`<div class="review-row"><span>Панель · ${esc(p)}</span><span>Ответы сохранены</span></div>`).join('')}<div class="review-row"><span>Все вопросы анкеты</span><span>Ответы сохранены</span></div></div><p class="small muted">После завершения анкету нельзя изменять. Организатор получает ответы под вашим номером участника.</p>`;
   return '';
 }
 function recordMarkup(){
@@ -116,7 +119,7 @@ async function renderStep(){
   if(!demo){try{const saved=await drafts.get(draftKey());if(saved)currentDraft={...currentDraft,...saved}}catch{}}
   if(version!==renderVersion)return;
   document.title=`${step.section} · За пределами зрения`;
-  main.innerHTML=`<section class="study-shell">${demo?'<div class="demo-banner">Знакомство с опросом. Пробные ответы не отправляются и не сохраняются.</div>':''}<div class="study-header"><span>${demo?'Пробный вопрос':`Участник ${esc(session.pid)}`} · ${stepIndex+1} из ${steps.length}</span><button class="text-button" id="pause-button" type="button">${demo?'На главную':'Сделать перерыв'}</button></div><div class="study-progress" role="progressbar" aria-label="Прогресс опроса" aria-valuemin="0" aria-valuemax="${steps.length}" aria-valuenow="${stepIndex}" aria-valuetext="Шаг ${stepIndex+1} из ${steps.length}"><div style="width:${stepIndex/steps.length*100}%"></div></div><div class="question"><div class="question-top"><div class="eyebrow">${esc(step.section)}</div><button id="listen-question" class="listen-button" type="button" aria-pressed="false" ${!hasSpeech()?'disabled':''}>${speaker}<span>Слушать вопрос</span></button></div><h1>${esc(step.title)}</h1><p class="question-description">${esc(step.text)}</p><form id="question-form"><div class="question-body">${getValueMarkup(step)}</div><p class="error-message" id="question-error" role="alert"></p><div class="question-actions"><button id="previous-step" class="button ghost" type="button">← ${stepIndex?'Назад':'На главную'}</button><button class="button" id="next-step" type="submit">${step.kind==='review'?'Завершить участие':step.kind==='explore'?'Готово':demo?'Завершить пробу':'Далее'} </button></div></form><div id="save-caption" class="save-caption" role="status">${demo?'Ответы в пробе никуда не отправляются.':currentAnswer().savedAt?'Ответ сохранён в исследовании.':'Ответ отправится после нажатия «Далее».'}</div></div></section>`;
+  main.innerHTML=`<section class="study-shell">${demo?'<div class="demo-banner">Знакомство с опросом. Пробные ответы не отправляются и не сохраняются.</div>':''}<div class="study-header"><span>${demo?'Пробный вопрос':`${esc(session.testTitle)} · Участник ${esc(session.pid)}`} · ${stepIndex+1} из ${steps.length}</span><button class="text-button" id="pause-button" type="button">${demo?'На главную':'Сделать перерыв'}</button></div><div class="study-progress" role="progressbar" aria-label="Прогресс опроса" aria-valuemin="0" aria-valuemax="${steps.length}" aria-valuenow="${stepIndex}" aria-valuetext="Шаг ${stepIndex+1} из ${steps.length}"><div style="width:${stepIndex/steps.length*100}%"></div></div><div class="question"><div class="question-top"><div class="eyebrow">${esc(step.section)}</div><button id="listen-question" class="listen-button" type="button" aria-pressed="false" ${!hasSpeech()?'disabled':''}>${speaker}<span>Слушать вопрос</span></button></div><h1>${esc(step.title)}</h1><p class="question-description">${esc(step.text)}</p><form id="question-form"><div class="question-body">${getValueMarkup(step)}</div><p class="error-message" id="question-error" role="alert"></p><div class="question-actions"><button id="previous-step" class="button ghost" type="button">← ${stepIndex?'Назад':'На главную'}</button><button class="button" id="next-step" type="submit">${step.kind==='review'?'Завершить участие':step.kind==='explore'?'Готово':demo?'Завершить пробу':'Далее'} </button></div></form><div id="save-caption" class="save-caption" role="status">${demo?'Ответы в пробе никуда не отправляются.':currentAnswer().savedAt?'Ответ сохранён в исследовании.':'Ответ отправится после нажатия «Далее».'}</div></div></section>`;
   focusHeading();bindStep(step);if(settings.autoSpeech)speakQuestion(step);
 }
 function speakQuestion(step){
@@ -180,7 +183,7 @@ function pauseDialog(){
 }
 function audioConsentDialog(){
   dialog('Ответить голосом?', '<p>Голосовой ответ сохраняется в закрытой папке Google Диска. Доступ есть у команды исследования. Запись можно прослушать и удалить до отправки.</p><p>Нажимая «Разрешить», вы соглашаетесь на сохранение голосовых ответов для этого исследования. Можно продолжить текстом.</p>',[
-    {label:'Разрешить голосовые ответы',action:async d=>{const consent={...session.answers.consent,value:{...session.answers.consent.value,audio:true}};const button=d.querySelector('button');button.disabled=true;try{const result=await api('save',{token:session.token,id:'consent',requestId:crypto.randomUUID(),answer:{value:consent.value}});session.answers.consent=result.answer;d.close();refreshRecording()}catch(error){button.disabled=false;d.querySelector('p').textContent=error.message}}},
+    {label:'Разрешить голосовые ответы',action:async d=>{const consent={...session.answers.consent,value:{...session.answers.consent.value,audio:true}};const button=d.querySelector('button');button.disabled=true;try{const result=await api('save',{token:session.token,runId:session.runId,id:'consent',requestId:crypto.randomUUID(),answer:{value:consent.value}});session.answers.consent=result.answer;d.close();refreshRecording()}catch(error){button.disabled=false;d.querySelector('p').textContent=error.message}}},
     {label:'Продолжить текстом',action:d=>d.close()},
   ]);
 }
@@ -197,21 +200,21 @@ async function saveStep(step){
   await persistDraft();
   try{
     if(step.kind==='review'){
-      const result=await api('finish',{token:session.token,requestId:currentDraft.requestId});session.status='completed';session.receipt=result.receipt;location.hash='done';return;
+      const result=await api('finish',{token:session.token,runId:session.runId,requestId:currentDraft.requestId});session.status='completed';session.receipt=result.receipt;location.hash='done';return;
     }
     const answer={text:currentDraft.text||'',value:currentDraft.value??null,skipped:step.kind==='text'&&!step.required&&!currentDraft.text?.trim()&&!currentDraft.blob&&(!currentAnswer().hasAudio||currentDraft.removeAudio),keepAudio:currentAnswer().hasAudio&&!currentDraft.removeAudio};
     if(currentDraft.blob)answer.audio=await encodeAudio(currentDraft.blob);
-    const result=await api('save',{token:session.token,id:step.id,requestId:currentDraft.requestId,answer},currentDraft.blob?90000:45000);
+    const result=await api('save',{token:session.token,runId:session.runId,id:step.id,requestId:currentDraft.requestId,answer},currentDraft.blob?90000:45000);
     session.answers[step.id]=result.answer;await drafts.delete(draftKey()).catch(()=>{});stepIndex++;await renderStep();announce('Ответ сохранён. Следующий вопрос.');
-  }catch(error){$('question-error').textContent=error.message;$('save-caption').textContent='Ответ пока не подтверждён сервером. Черновик сохранён на устройстве.';$('next-step').disabled=false;$('previous-step').disabled=false;if(['AUTH','DISABLED'].includes(error.code))$('question-error').innerHTML=`${esc(error.message)} <a href="#access">Войти снова</a>`}
+  }catch(error){$('question-error').textContent=error.message;$('save-caption').textContent='Ответ пока не подтверждён сервером. Черновик сохранён на устройстве.';$('next-step').disabled=false;$('previous-step').disabled=false;if(['AUTH','DISABLED','TEST_CHANGED','NO_TEST','TEST_CLOSED'].includes(error.code))$('question-error').innerHTML=`${esc(error.message)} <a href="#access">Войти снова</a>`}
   finally{busy=false}
 }
 function done(){
   document.title='Спасибо за участие · За пределами зрения';
-  main.innerHTML=`<section class="page-shell"><div class="eyebrow">Исследование завершено</div><div class="done-symbol" aria-hidden="true">✓</div><h1>Спасибо за участие</h1><p class="lead">Спасибо. Ответы сохранены и помогут сделать тактильное искусство понятнее.</p><div class="notice neutral"><p>Пожалуйста, пока не обсуждайте содержание панелей с теми, кто ещё участвует. Организатор пригласит вас к общему обсуждению отдельно.</p></div><p class="small muted">Номер подтверждения<br><span class="receipt">${esc(session?.receipt||'')}</span></p><a class="button" href="#home">Вернуться на главную </a><div class="withdraw-zone"><p class="small muted">Если вы передумали участвовать, можно отозвать ответы этой анкеты.</p><button class="text-button" id="withdraw-button" type="button">Отозвать мои ответы</button><p id="withdraw-error" class="error-message" role="alert"></p></div></section>`;
+  main.innerHTML=`<section class="page-shell"><div class="eyebrow">Исследование завершено</div><div class="done-symbol" aria-hidden="true">✓</div><h1>Спасибо за участие</h1><p class="lead">Спасибо. Ответы сохранены и помогут сделать тактильное искусство понятнее.</p><div class="notice neutral"><p>Пожалуйста, пока не обсуждайте содержание панелей с теми, кто ещё участвует. Организатор пригласит вас к общему обсуждению отдельно.</p></div><p class="small muted">${esc(session?.testTitle||'Анкета')}<br>Номер подтверждения<br><span class="receipt">${esc(session?.receipt||'')}</span></p><a class="button" href="#home">Вернуться на главную </a><div class="withdraw-zone"><p class="small muted">Если вы передумали участвовать, можно отозвать ответы этой анкеты.</p><button class="text-button" id="withdraw-button" type="button">Отозвать мои ответы</button><p id="withdraw-error" class="error-message" role="alert"></p></div></section>`;
   $('withdraw-button').addEventListener('click',()=>dialog('Отозвать участие?', '<p>Ответы этой анкеты будут помечены как отозванные и исключены из исследования. Связанные голосовые файлы будут перемещены в корзину. Для удаления записи на посещение обратитесь к организатору.</p>',[
     {label:'Оставить ответы',action:d=>d.close()},
-    {label:'Отозвать участие',action:async d=>{d.querySelectorAll('button').forEach(b=>b.disabled=true);try{await api('withdraw',{token:session.token});storageWrite('vision-token',null);session=null;d.close();main.innerHTML='<section class="page-shell"><h1>Участие отозвано.</h1><p class="lead">Ваши ответы исключены из исследования.</p><a class="button" href="#home">На главную</a></section>';focusHeading()}catch(error){d.close();$('withdraw-error').textContent=error.message}}},
+    {label:'Отозвать участие',action:async d=>{d.querySelectorAll('button').forEach(b=>b.disabled=true);try{await api('withdraw',{token:session.token,runId:session.runId});storageWrite('vision-token',null);session=null;d.close();main.innerHTML='<section class="page-shell"><h1>Участие отозвано.</h1><p class="lead">Ваши ответы исключены из исследования.</p><a class="button" href="#home">На главную</a></section>';focusHeading()}catch(error){d.close();$('withdraw-error').textContent=error.message}}},
   ]));
 }
 function privacy(){
@@ -222,7 +225,7 @@ function visit(){
   const address='Москва, улица Вильгельма Пика, 4, строение 8';
   const map='https://yandex.ru/maps/?text='+encodeURIComponent(address+' РГСУ');
   document.title='Как нас найти · За пределами зрения';
-  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><h1>Как добраться</h1><p class="lead">Технопарк РГСУ.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна помощь</h2><p>При записи укажите, что вас нужно встретить. Организатор согласует встречу у входа и поможет добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. Сохраните код участника или логин и пароль. Вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.3.3" download><span>Памятка участника<small>Адрес и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Участие и запись</a></section>`;
+  main.innerHTML=`<section class="page-shell visit-page"><a class="back-link" href="#home">На главную</a><h1>Как добраться</h1><p class="lead">Технопарк РГСУ.</p><div class="address-card"><span class="small muted">Москва</span><h2>Вильгельма Пика, 4<br>строение 8</h2><p>Посещение по предварительной записи.</p><a class="button" href="${map}" target="_blank" rel="noopener noreferrer">Построить маршрут <span class="sr-only"> в Яндекс Картах, в новой вкладке</span></a><button class="text-button" id="copy-address" type="button">Скопировать адрес</button><p class="small muted" id="copy-status" role="status"></p></div><div class="visit-details"><h2>Если нужна помощь</h2><p>При записи укажите, что вас нужно встретить. Организатор согласует встречу у входа и поможет добраться до места исследования.</p><h2>Перед посещением</h2><p>Проверьте время в письме с подтверждением. Сохраните код участника или логин и пароль. Вход и аудиторию уточните у организатора.</p></div><a class="download-card" href="assets/visit-guide.pdf?v=1.4.0" download><span>Памятка участника<small>Адрес и подготовка к посещению · PDF</small></span></a><a class="button" href="#booking">Участие и запись</a></section>`;
   $('copy-address').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(address);$('copy-status').textContent='Адрес скопирован.'}catch{$('copy-status').textContent=address}});
 }
 async function route(){
@@ -238,7 +241,7 @@ async function route(){
   if(['home','about','participate',''].includes(target)){
     demo=false;if(target==='about'||target==='participate')about();else home();focusHeading();return;
   }
-  if(target==='access'){demo=false;access();focusHeading();return}
+  if(target==='access'){demo=false;session=null;steps=[];storageWrite('vision-token',null);access();focusHeading();return}
   if(target==='booking'){demo=false;await renderBooking(main,{focusHeading,announce,esc});return}
   if(target==='visit'){demo=false;visit();focusHeading();return}
   if(target==='privacy'){privacy();focusHeading();return}
@@ -250,10 +253,10 @@ async function route(){
     if(!session){
       const token=storageRead('vision-token');if(!token){location.hash='access';return}
       main.innerHTML='<section class="page-shell"><h1>Открываем анкету</h1><p role="status">Открываем сохранённые ответы…</p></section>';
-      try{const result=await api('resume',{token});session={...result.session,token};steps=createSteps(session.schedule);stepIndex=firstUnanswered()}catch(error){storageWrite('vision-token',null);access();if($('access-error'))$('access-error').textContent=error.message;focusHeading();return}
+      try{const result=await api('resume',{token});applyManagedSession(result.session,token)}catch(error){storageWrite('vision-token',null);access();if($('access-error'))$('access-error').textContent=error.message;focusHeading();return}
     }
     if(session.status==='completed'){done();focusHeading();return}
-    if(!steps.length||steps.length===1)steps=createSteps(session.schedule);
+    if(steps!==session.steps){steps=session.steps;stepIndex=firstUnanswered();}
     await renderStep();return;
   }
   location.hash='home';

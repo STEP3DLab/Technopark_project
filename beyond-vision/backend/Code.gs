@@ -4,7 +4,7 @@
  */
 const APP = Object.freeze({
   spreadsheetId: '1C0Bc63nyd-0qp2GniTJ_KxxZAOyBrd3cLBVRLXjnh28',
-  studyId: 'tactile-rgsu-2026-v1', version: '1.4.0', timezone: 'Europe/Moscow',
+  studyId: 'tactile-rgsu-2026-v1', version: '1.4.1', timezone: 'Europe/Moscow',
   maxAudioBytes: 2500000, maxText: 6000, tokenHours: 72,
   sheets: {slots:'Окна',bookings:'Записи',access:'Доступ',sessions:'Сессии',answers:'Ответы',settings:'Настройки',tests:'Тесты',questions:'Вопросы',assignments:'Назначения',runs:'Прохождения тестов',results:'Ответы тестов'},
 });
@@ -266,7 +266,7 @@ function setup(){
   ]);}
   onOpen();SpreadsheetApp.getUi().alert('Сервис подготовлен. Папка для аудио закрыта. Теперь разверните проект как веб-приложение от вашего имени с доступом «Все». URL /exec нужно указать в конфигурации сайта.');
 }
-function onOpen(){SpreadsheetApp.getUi().createMenu('За пределами зрения').addItem('Подготовить сервис','setup').addItem('Создать код для выбранного теста','createTestAccess').addItem('Показать код выбранного участника','showTestAccess').addItem('Выдать доступ выбранной записи','issueSelectedBooking').addItem('Повторить неотправленные письма','retryPendingMail').addItem('Отменить выбранную запись','cancelSelectedBooking').addItem('Заменить доступ выбранной записи','resetSelectedAccess').addToUi();}
+function onOpen(){SpreadsheetApp.getUi().createMenu('За пределами зрения').addItem('Управление тестированиями','openTestManager').addSeparator().addItem('Подготовить сервис','setup').addItem('Создать код для выбранного теста','createTestAccess').addItem('Показать код выбранного участника','showTestAccess').addItem('Выдать доступ выбранной записи','issueSelectedBooking').addItem('Повторить неотправленные письма','retryPendingMail').addItem('Отменить выбранную запись','cancelSelectedBooking').addItem('Заменить доступ выбранной записи','resetSelectedAccess').addToUi();}
 function selectedBooking_(){const active=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();if(active.getName()!==APP.sheets.bookings)throw new Error('Выберите строку на листе «Записи».');const row=active.getActiveRange().getRow();if(row<2)throw new Error('Выберите строку участника, ниже заголовка.');return {row,values:active.getRange(row,1,1,HEADERS.bookings.length).getValues()[0]};}
 function issueSelectedBooking(){
   const selected=selectedBooking_();
@@ -472,4 +472,143 @@ function showTestAccess(){
   const pid=String(sheet.getRange(sheet.getActiveRange().getRow(),1).getValue()),record=rows_('access').find(r=>String(r.values[0])===pid&&r.values[5]==='active');
   if(!record){ui.alert('Активный доступ не найден.');return;}
   ui.alert('Участник '+pid+'\nКод: '+credentials_(record).code+'\nПередайте код только этому участнику.');
+}
+
+
+/* Organizer dialog. The participant doPost API never dispatches these functions. */
+function requireOrganizer_(){
+  const active=SpreadsheetApp.getActiveSpreadsheet();
+  if(!active||active.getId()!==book_().getId())fail_('ORGANIZER','Откройте редактор из операционной таблицы.');
+}
+function openTestManager(){
+  requireOrganizer_();
+  SpreadsheetApp.getUi().showModalDialog(HtmlService.createHtmlOutput(MANAGER_HTML).setWidth(1040).setHeight(720),'Управление тестированиями');
+}
+function adminListTests(){
+  requireOrganizer_();
+  const questions=rows_('questions'),runs=rows_('runs'),assignments=rows_('assignments');
+  const tests=rows_('tests').filter(r=>r.values[0]).map(r=>{
+    const v=r.values,id=String(v[0]),version=String(v[1]),same=(row,i,j)=>String(row.values[i])===id&&String(row.values[j])===version;
+    const rr=runs.filter(x=>same(x,2,3));
+    return {id,version,title:uncell_(v[2]),status:String(v[3]),questions:questions.filter(x=>same(x,0,1)).length,started:rr.length,completed:rr.filter(x=>x.values[7]==='completed').length,inProgress:rr.filter(x=>x.values[7]==='in_progress').length,withdrawn:rr.filter(x=>x.values[7]==='withdrawn').length,assigned:assignments.filter(x=>same(x,1,2)&&x.values[3]==='Активно').length};
+  });
+  const participants=rows_('access').filter(r=>r.values[5]==='active').map(r=>({pid:String(r.values[0]),assignments:assignments.filter(x=>x.values[0]===r.values[0]&&x.values[3]==='Активно').map(x=>({id:String(x.values[1]),version:String(x.values[2])}))}));
+  const links={};['tests','questions','assignments','runs','results'].forEach(k=>links[k]=book_().getUrl()+'#gid='+sheet_(k).getSheetId());
+  return {tests,participants,links,studyOpen:open_('study')};
+}
+function adminTestData_(id,version){
+  const v=testRecord_(id,version);
+  const records=rows_('questions').filter(r=>String(r.values[0])===id&&String(r.values[1])===version).sort((a,b)=>Number(a.values[2])-Number(b.values[2]));
+  const qs=records.map(r=>r.values);
+  return {test:v,records,qs,etag:hash_(JSON.stringify([v,qs])),used:rows_('runs').some(r=>String(r.values[2])===id&&String(r.values[3])===version)};
+}
+function adminLoadTest(id,version){
+  requireOrganizer_();
+  const d=adminTestData_(testKey_(id,48),testKey_(version,16)),v=d.test;
+  return {id:String(v[0]),version:String(v[1]),title:uncell_(v[2]),status:String(v[3]),intro:uncell_(v[4]),note:uncell_(v[5]),etag:d.etag,used:d.used,questions:d.qs.map(q=>({id:String(q[3]),kind:String(q[4]),section:uncell_(q[5]),title:uncell_(q[6]),text:uncell_(q[7]),options:uncell_(q[8]),required:String(q[9])==='Да',trial:String(q[10]||''),label:uncell_(q[11])}))};
+}
+function adminNormalizeTest_(payload,id,version){
+  if(!payload||!Array.isArray(payload.questions)||!payload.questions.length||payload.questions.length>60)fail_('TEST_CONFIG','Добавьте от 1 до 60 вопросов.');
+  const test=[id,version,text_(payload.title,220),'Черновик',text_(payload.intro,2000),text_(payload.note,2000)];
+  if(!test[2])fail_('TEST_CONFIG','Введите название теста.');
+  const questions=payload.questions.map((q,i)=>{
+    const kind=String(q.kind||''),qid=String(q.id||'').trim()||'q_'+uuid_().replace(/-/g,'').slice(0,12);
+    const trial=q.trial===''||q.trial==null?'':Number(q.trial);
+    return [id,version,i+1,qid,kind,text_(q.section,150)||'Вопросы',text_(q.title,500),text_(q.text,2500),['choice','scale'].includes(kind)?text_(q.options,5000):'',kind==='text'&&q.required===true?'Да':'Нет',trial,kind==='text'?text_(q.label,150)||'Ваш ответ':''];
+  });
+  makeSteps_(test,questions,['ПАНЕЛЬ-1','ПАНЕЛЬ-2','ПАНЕЛЬ-3']);
+  return {test,questions};
+}
+function adminPreviewTest(payload){
+  requireOrganizer_();
+  const data=adminNormalizeTest_(payload,'PREVIEW','1');
+  return {steps:makeSteps_(data.test,data.questions,['ПАНЕЛЬ-1','ПАНЕЛЬ-2','ПАНЕЛЬ-3'])};
+}
+function adminSaveTest(payload){
+  requireOrganizer_();
+  return locked_(()=>{
+    if(!payload||typeof payload!=='object')fail_('TEST_CONFIG','Нет данных теста.');
+    const mode=String(payload.mode||'new');
+    let id,version,previous=null;
+    if(mode==='new'){id='TEST-'+uuid_().replace(/-/g,'').slice(0,12).toUpperCase();version='1';}
+    else{
+      id=testKey_(payload.id,48);const sourceVersion=testKey_(payload.version,16);
+      previous=adminTestData_(id,sourceVersion);
+      if(previous.etag!==String(payload.etag||''))fail_('CONFLICT','Тест изменился в таблице. Откройте его заново.');
+      if(mode==='clone'){
+        const versions=rows_('tests').filter(r=>String(r.values[0])===id).map(r=>Number(r.values[1])).filter(n=>Number.isSafeInteger(n)&&n>=1);
+        version=String(Math.max(0,...versions)+1);previous=null;
+      }else if(mode==='edit'){
+        version=sourceVersion;
+        if(previous.used)fail_('VERSION_LOCKED','Эту версию уже проходили. Создайте новую версию.');
+        if(String(previous.test[3])!=='Черновик')fail_('TEST_CONFIG','Открытую или закрытую версию нельзя изменять здесь. Создайте новую версию.');
+      }else fail_('TEST_CONFIG','Неизвестная операция.');
+    }
+    if(!previous&&rows_('tests').some(r=>String(r.values[0])===id&&String(r.values[1])===version))fail_('CONFLICT','Версия уже существует. Повторите действие.');
+    const data=adminNormalizeTest_(payload,id,version);
+    if(previous){
+      const record=rows_('tests').find(r=>String(r.values[0])===id&&String(r.values[1])===version),old=previous.records,target=sheet_('questions');
+      const common=Math.min(old.length,data.questions.length);
+      for(let i=0;i<common;i++)writeRow_('questions',old[i].row,data.questions[i]);
+      for(let i=common;i<data.questions.length;i++)append_('questions',data.questions[i]);
+      for(let i=common;i<old.length;i++)target.getRange(old[i].row,1,1,HEADERS.questions.length).clearContent();
+      writeRow_('tests',record.row,data.test);
+    }else{
+      data.questions.forEach(q=>append_('questions',q));
+      append_('tests',data.test);
+    }
+    SpreadsheetApp.flush();return {id,version,title:data.test[2],status:'Черновик'};
+  });
+}
+function adminSetTestStatus(id,version,status){
+  requireOrganizer_();
+  return locked_(()=>{
+    id=testKey_(id,48);version=testKey_(version,16);
+    if(!['Открыт','Закрыт','Черновик'].includes(status))fail_('TEST_CONFIG','Неизвестный статус.');
+    const d=adminTestData_(id,version),record=rows_('tests').find(r=>String(r.values[0])===id&&String(r.values[1])===version);
+    if(status==='Черновик'&&d.used)fail_('VERSION_LOCKED','Использованная версия не может стать редактируемым черновиком.');
+    if(status==='Открыт'){makeSteps_(d.test,d.qs,['ПАНЕЛЬ-1','ПАНЕЛЬ-2','ПАНЕЛЬ-3']);assertVersion_(id,version,d.test,d.qs);}
+    const v=record.values;v[3]=status;writeRow_('tests',record.row,v);SpreadsheetApp.flush();return {id,version,status};
+  });
+}
+function adminAssignTest(payload){
+  requireOrganizer_();
+  return locked_(()=>{
+    const id=testKey_(payload.id,48),version=testKey_(payload.version,16),d=adminTestData_(id,version);
+    if(String(d.test[3])!=='Открыт')fail_('TEST_CLOSED','Сначала откройте тест.');
+    const panels=Array.from({length:3},(_,i)=>text_(payload.panels&&payload.panels[i],80)),automatic=id==='RELIEF-3'&&panels.every(v=>!v);
+    makeSteps_(d.test,d.qs,automatic?schedule_(1):panels);assertVersion_(id,version,d.test,d.qs);
+    let access;
+    const request=requestId_(payload.requestId),marker='editor:'+request;
+    if(payload.pid){
+      access=rows_('access').find(r=>String(r.values[0])===String(payload.pid)&&r.values[5]==='active');
+      if(!access)fail_('AUTH','Участник не найден или его доступ отключён.');
+    }else{
+      const previous=rows_('assignments').find(r=>String(r.values[7])===marker);
+      if(previous){
+        access=rows_('access').find(r=>r.values[0]===previous.values[0]&&r.values[5]==='active');
+        if(!access)fail_('AUTH','Ранее созданный доступ неактивен.');
+        if(String(previous.values[1])!==id||String(previous.values[2])!==version)fail_('CONFLICT','Повторный запрос относится к другому тесту.');
+        return {pid:access.values[0],code:credentials_(access).code,already:true};
+      }
+      access=createAccess_('');
+    }
+    const pid=String(access.values[0]),runId=pid+'|'+id+'|'+version,old=rows_('assignments').filter(r=>String(r.values[0])===pid&&r.values[3]==='Активно');
+    if(old.length===1&&String(old[0].values[1])===id&&String(old[0].values[2])===version&&old[0].values.slice(4,7).map(String).join('|')===panels.join('|'))return {pid,code:credentials_(access).code,already:true};
+    const run=rows_('runs').find(r=>String(r.values[0])===runId);
+    if(run){
+      if(run.values[7]==='withdrawn')fail_('DISABLED','Это прохождение отозвано. Для нового испытания нужна другая версия.');
+      const existing=JSON.parse(String(run.values[11])),proposed=automatic?access.values.slice(6,9).map(String):panels;
+      if(JSON.stringify(existing)!==JSON.stringify(proposed))fail_('VERSION_LOCKED','В начатом прохождении маркировки неизменны. Создайте новую версию для повторного испытания.');
+    }
+    if(old.length&&payload.replace!==true)fail_('CONFIRM','Подтвердите замену активного назначения. Старые ответы сохранятся.');
+    old.forEach(r=>{const v=r.values.slice();v[3]='Закрыто';writeRow_('assignments',r.row,v);});
+    append_('assignments',[pid,id,version,'Активно',...panels,marker]);SpreadsheetApp.flush();
+    return {pid,code:credentials_(access).code,already:false};
+  });
+}
+function adminRunSummary(id,version){
+  requireOrganizer_();id=testKey_(id,48);version=testKey_(version,16);
+  const rr=rows_('runs').filter(r=>String(r.values[2])===id&&String(r.values[3])===version),responses=rows_('results');
+  return rr.map(r=>{const v=r.values,steps=JSON.parse(String(v[10]||'[]')),total=steps.filter(q=>q.kind!=='review').length,done=responses.filter(x=>String(x.values[1])===String(v[0])).length;return {pid:String(v[1]),state:String(v[7]),done,total,updated:String(v[6]),receipt:String(v[8]||'')};});
 }

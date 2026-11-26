@@ -4,9 +4,9 @@
  */
 const APP = Object.freeze({
   spreadsheetId: '1C0Bc63nyd-0qp2GniTJ_KxxZAOyBrd3cLBVRLXjnh28',
-  studyId: 'tactile-rgsu-2026-v1', version: '1.0.0', timezone: 'Europe/Moscow',
+  studyId: 'tactile-rgsu-2026-v1', version: '1.4.0', timezone: 'Europe/Moscow',
   maxAudioBytes: 2500000, maxText: 6000, tokenHours: 72,
-  sheets: {slots:'Окна',bookings:'Записи',access:'Доступ',sessions:'Сессии',answers:'Ответы',settings:'Настройки'},
+  sheets: {slots:'Окна',bookings:'Записи',access:'Доступ',sessions:'Сессии',answers:'Ответы',settings:'Настройки',tests:'Тесты',questions:'Вопросы',assignments:'Назначения',runs:'Прохождения тестов',results:'Ответы тестов'},
 });
 const HEADERS = Object.freeze({
   slots:['ID окна','Дата','Начало','Окончание','Мест','Статус','Адрес','Примечание'],
@@ -15,6 +15,11 @@ const HEADERS = Object.freeze({
   sessions:['Участник','Начата','Обновлена','Статус','Подтверждение','Отозвана'],
   answers:['ID ответа','Участник','Вопрос','Номер панели','Маркировка','Текст','Значение JSON','Пропущен','ID аудио','Ссылка аудио','Сохранён','ID запроса','Редакция'],
   settings:['Ключ','Значение','Описание'],
+  tests:['ID теста','Версия','Название (видит участник)','Статус','Инструкция участнику','Комментарий организатора'],
+  questions:['ID теста','Версия','Порядок','ID вопроса','Тип','Раздел','Вопрос / заголовок','Подсказка / инструкция','Варианты (по строкам)','Обязательный текст','Номер панели','Подпись поля'],
+  assignments:['Участник','ID теста','Версия','Статус','Панель 1','Панель 2','Панель 3','Комментарий'],
+  runs:['ID прохождения','Участник','ID теста','Версия','Название','Начато','Обновлено','Статус','Подтверждение','Отозвано','Снимок вопросов JSON','Панели JSON'],
+  results:['ID ответа','ID прохождения','Участник','ID теста','Версия','ID вопроса','Порядок','Тип','Вопрос (снимок)','Номер панели','Маркировка','Текст ответа','Значение JSON','Пропущен','ID аудио','Ссылка аудио','Сохранён','ID запроса','Редакция'],
 });
 let spreadsheetCache_;
 function book_(){
@@ -58,10 +63,10 @@ function doPost(e){return handle_(()=>{
   if(p.action==='slots')return publicSlots_();
   if(p.action==='book')return register_(p);
   if(p.action==='login')return login_(p);
-  if(p.action==='resume')return {session:session_(authorize_(p.token))};
-  if(p.action==='save')return save_(p);
-  if(p.action==='finish')return finish_(p);
-  if(p.action==='withdraw')return withdraw_(p);
+  if(p.action==='resume')return locked_(()=>{if(!open_('study'))fail_('CLOSED','Исследование пока не открыто.');return {session:managedSession_(authorize_(p.token),true)};});
+  if(p.action==='save')return managedSave_(p);
+  if(p.action==='finish')return managedFinish_(p);
+  if(p.action==='withdraw')return managedWithdraw_(p);
   fail_('ACTION','Это действие недоступно.');
 });}
 function date_(value){
@@ -102,7 +107,7 @@ function credentials_(access){
 }
 function createAccess_(bookingId){
   const next=rows_('access').reduce((max,r)=>Math.max(max,Number(String(r.values[0]).replace(/^U/,''))||0),0)+1;
-  const pid='U'+('0000'+next).slice(-4),salt=uuid_(),nonce=uuid_(),schedule=schedule_(next);
+  const pid='U'+String(next).padStart(4,'0'),salt=uuid_(),nonce=uuid_(),schedule=schedule_(next);
   const values=[pid,'vision-'+String(next).padStart(4,'0'),salt,'','','active',...schedule,nonce,bookingId,now_()];
   const creds=credentials_(values);values[3]=hash_(salt+'|'+creds.password);values[4]=hash_(salt+'|'+creds.code);
   return {row:append_('access',values),values};
@@ -175,8 +180,7 @@ function login_(p){return locked_(()=>{
     if(valid){found=access;break;}
   }
   if(!found)fail_('AUTH','Доступ не найден. Проверьте код либо логин и пароль.');
-  if(!rows_('sessions').some(r=>r.values[0]===found.values[0]))append_('sessions',[found.values[0],now_(),now_(),'in_progress','','']);
-  return {token:token_(found),session:session_(found)};
+  return {token:token_(found),session:managedSession_(found,true)};
 });}
 function answers_(pid){return rows_('answers').filter(r=>r.values[1]===pid);}
 function response_(r){
@@ -262,7 +266,7 @@ function setup(){
   ]);}
   onOpen();SpreadsheetApp.getUi().alert('Сервис подготовлен. Папка для аудио закрыта. Теперь разверните проект как веб-приложение от вашего имени с доступом «Все». URL /exec нужно указать в конфигурации сайта.');
 }
-function onOpen(){SpreadsheetApp.getUi().createMenu('За пределами зрения').addItem('Подготовить сервис','setup').addItem('Выдать доступ выбранной записи','issueSelectedBooking').addItem('Повторить неотправленные письма','retryPendingMail').addItem('Отменить выбранную запись','cancelSelectedBooking').addItem('Заменить доступ выбранной записи','resetSelectedAccess').addToUi();}
+function onOpen(){SpreadsheetApp.getUi().createMenu('За пределами зрения').addItem('Подготовить сервис','setup').addItem('Создать код для выбранного теста','createTestAccess').addItem('Показать код выбранного участника','showTestAccess').addItem('Выдать доступ выбранной записи','issueSelectedBooking').addItem('Повторить неотправленные письма','retryPendingMail').addItem('Отменить выбранную запись','cancelSelectedBooking').addItem('Заменить доступ выбранной записи','resetSelectedAccess').addToUi();}
 function selectedBooking_(){const active=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();if(active.getName()!==APP.sheets.bookings)throw new Error('Выберите строку на листе «Записи».');const row=active.getActiveRange().getRow();if(row<2)throw new Error('Выберите строку участника, ниже заголовка.');return {row,values:active.getRange(row,1,1,HEADERS.bookings.length).getValues()[0]};}
 function issueSelectedBooking(){
   const selected=selectedBooking_();
@@ -281,4 +285,180 @@ function resetSelectedAccess(){
   const selected=selectedBooking_();
   locked_(()=>{const access=rows_('access').find(r=>r.values[0]===selected.values[9]);if(!access)throw new Error('Сначала выдайте доступ этой записи.');access.values[9]=uuid_();access.values[2]=uuid_();const c=credentials_(access);access.values[3]=hash_(access.values[2]+'|'+c.password);access.values[4]=hash_(access.values[2]+'|'+c.code);writeRow_('access',access.row,access.values);selected.values[10]='pending';writeRow_('bookings',selected.row,selected.values)});
   const result=sendBookingMail_(selected.values[0]);SpreadsheetApp.getUi().alert(result==='sent'?'Новый доступ отправлен на почту. Прежний пароль, код и сеансы больше не действуют.':'Доступ заменён. Проверьте статус письма на листе «Записи».');
+}
+
+
+/* v1.4 — управляемые анкеты. Старые листы и функции оставлены для истории. */
+function testKey_(value,max){
+  const key=String(value==null?'':value).trim();
+  if(!new RegExp('^[A-Za-z0-9_-]{1,'+max+'}$').test(key))fail_('TEST_CONFIG','Некорректный ID теста или версия. Обратитесь к организатору.');
+  return key;
+}
+function testRecord_(testId,version){
+  const list=rows_('tests').filter(r=>String(r.values[0])===testId&&String(r.values[1])===version);
+  if(list.length!==1)fail_('TEST_CONFIG','Организатору нужно проверить ID и версию теста.');
+  return list[0].values;
+}
+function assignment_(access){
+  const pid=String(access.values[0]);
+  const active=rows_('assignments').filter(r=>String(r.values[0]).trim()===pid&&String(r.values[3]).trim()==='Активно');
+  if(active.length===0)fail_('NO_TEST','Для вашего кода пока не назначен тест. Обратитесь к организатору.');
+  if(active.length!==1)fail_('TEST_CONFIG','Организатору нужно оставить одно активное назначение для вашего кода.');
+  const v=active[0].values,testId=testKey_(v[1],48),version=testKey_(v[2],16);
+  const panels=v.slice(4,7).map(x=>text_(x,80));
+  // Для перенесённой исходной анкеты допускается прежнее сбалансированное назначение.
+  if(testId==='RELIEF-3'&&panels.every(x=>!x))for(let i=0;i<3;i++)panels[i]=String(access.values[i+6]||'');
+  return {pid,testId,version,panels,runId:pid+'|'+testId+'|'+version};
+}
+function makeSteps_(test,questions,panels){
+  const title=text_(test[2],220);if(!title)fail_('TEST_CONFIG','У теста отсутствует название.');
+  const expand=(value,max)=>text_(value,max).replace(/\{panel([1-3])\}/g,(_,i)=>{
+    const p=panels[Number(i)-1];if(!p)fail_('TEST_CONFIG','Для теста необходимо указать маркировку панели '+i+'.');return p;
+  });
+  const steps=[{id:'consent',kind:'consent',section:'Знакомство',title:'Перед началом',text:expand(test[4],2000)||'Участие добровольное. Можно остановиться или сделать перерыв.'}];
+  const ids=new Set(['consent','review']),orders=new Set();
+  if(!questions.length||questions.length>60)fail_('TEST_CONFIG','В тесте должно быть от 1 до 60 вопросов.');
+  questions.slice().sort((a,b)=>Number(a[2])-Number(b[2])).forEach(v=>{
+    const order=Number(v[2]),id=String(v[3]).trim(),kind=String(v[4]).trim(),trial=v[10]===''||v[10]==null?0:Number(v[10]);
+    if(!Number.isInteger(order)||order<1||orders.has(order)||!/^[-A-Za-z0-9_.]{1,60}$/.test(id)||ids.has(id)||!['text','choice','scale','training','explore'].includes(kind)||![0,1,2,3].includes(trial))fail_('TEST_CONFIG','Проверьте порядок, ID, тип и номер панели в вопросах.');
+    ids.add(id);orders.add(order);
+    const q={id,kind,section:expand(v[5],150)||'Вопросы',title:expand(v[6],500),text:expand(v[7],2500),required:kind==='text'&&String(v[9]).trim()==='Да'};
+    if(!q.title)fail_('TEST_CONFIG','У вопроса отсутствует заголовок.');
+    if(trial){if(!panels[trial-1])fail_('TEST_CONFIG','Не указана маркировка панели '+trial+'.');q.trial=trial;q.panel=panels[trial-1];}
+    if(kind==='explore'&&!trial)fail_('TEST_CONFIG','Для таймера исследования нужен номер панели.');
+    if(kind==='text')q.label=expand(v[11],150)||'Ваш ответ';
+    if(kind==='choice'||kind==='scale'){
+      const lines=expand(v[8],5000).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+      if(lines.length<2||lines.length>(kind==='scale'?10:20))fail_('TEST_CONFIG','Проверьте список вариантов ответа.');
+      if(kind==='scale')q.labels=lines;
+      else{
+        const values=new Set();q.options=lines.map((line,i)=>{
+          const split=line.indexOf('|'),value=split<0?String(i+1):line.slice(0,split).trim(),label=split<0?line:line.slice(split+1).trim();
+          if(!/^[-A-Za-z0-9_]{1,40}$/.test(value)||!label||values.has(value))fail_('TEST_CONFIG','Проверьте уникальность кодов и подписи вариантов ответа.');
+          values.add(value);return [value,label];
+        });
+      }
+    }
+    steps.push(q);
+  });
+  steps.push({id:'review',kind:'review',section:'Завершение',title:'Завершение опроса',text:'Все шаги пройдены. Отправьте анкету, чтобы завершить участие.'});
+  if(JSON.stringify(steps).length>45000)fail_('TEST_CONFIG','Анкета слишком объёмная для одной версии.');
+  return steps;
+}
+function managedRows_(runId){return rows_('results').filter(r=>String(r.values[1])===runId);}
+function managedResponse_(r){
+  const v=r.values;let value=null;try{value=JSON.parse(String(v[12]||'null'))}catch(e){}
+  return {text:uncell_(v[11]),value,skipped:v[13]===true||String(v[13])==='true',hasAudio:!!v[14],savedAt:v[16],revision:Number(v[18]||1)};
+}
+function managedState_(access,create,expected){
+  const a=assignment_(access);
+  if(expected!==undefined&&String(expected)!==a.runId)fail_('TEST_CHANGED','Назначение изменилось. Войдите снова, чтобы открыть актуальный тест.');
+  const matches=rows_('runs').filter(r=>String(r.values[0])===a.runId);
+  if(matches.length>1)fail_('TEST_CONFIG','Обнаружено повторное прохождение. Обратитесь к организатору.');
+  let record=matches[0];
+  if(!record){
+    if(!create)fail_('TEST_CHANGED','Войдите снова для начала назначенного теста.');
+    const test=testRecord_(a.testId,a.version);
+    if(String(test[3]).trim()!=='Открыт')fail_('TEST_CLOSED','Этот тест пока не открыт организатором.');
+    const questions=rows_('questions').filter(r=>String(r.values[0])===a.testId&&String(r.values[1])===a.version).map(r=>r.values);
+    const steps=makeSteps_(test,questions,a.panels);
+    const values=[a.runId,a.pid,a.testId,a.version,text_(test[2],220),now_(),now_(),'in_progress','','',JSON.stringify(steps),JSON.stringify(a.panels)];
+    record={row:append_('runs',values),values};
+  }
+  const v=record.values;
+  if(v[7]==='withdrawn')fail_('DISABLED','Участие отозвано. Обратитесь к организатору.');
+  // Снимок фиксирует версию и маркировки: редактирование таблицы не меняет начатый тест.
+  const steps=JSON.parse(String(v[10])),schedule=JSON.parse(String(v[11])).filter(Boolean);
+  const answers=Object.create(null);managedRows_(a.runId).forEach(r=>answers[r.values[5]]=managedResponse_(r));
+  return {record,steps,session:{pid:a.pid,runId:a.runId,testId:a.testId,testVersion:a.version,testTitle:String(v[4]),schedule,steps,answers,status:String(v[7]),receipt:String(v[8]||'')}};
+}
+function managedSession_(access,create){return managedState_(access,create).session;}
+function managedValidate_(step,a,existing){
+  a=a||{};const value=a.value==null?null:a.value,kind=step.kind;
+  let text='',normalized=null,keepAudio=false,skipped=false;
+  if(kind==='consent'){
+    if(!value||value.adult!==true||value.data!==true||typeof value.audio!=='boolean')fail_('CONSENT','Для участия нужно добровольное согласие и подтверждение возраста.');
+    normalized={adult:true,data:true,audio:value.audio};
+  }else if(kind==='choice'){
+    if(typeof value!=='string'||!step.options.some(o=>o[0]===value))fail_('VALIDATION','Выберите один из предложенных вариантов.');
+    normalized=value;skipped=value==='skip';
+  }else if(kind==='scale'){
+    const allowed=step.labels.map((_,i)=>String(i+1)).concat('skip');
+    if(!allowed.includes(String(value)))fail_('VALIDATION','Выберите предложенную оценку либо вариант без оценки.');
+    normalized=String(value);skipped=normalized==='skip';
+  }else if(kind==='training'){
+    if(value!==true)fail_('VALIDATION','Сначала завершите подготовительный шаг.');normalized=true;
+  }else if(kind==='explore'){
+    if(!value||!Number.isInteger(value.seconds)||value.seconds<1||value.seconds>7200)fail_('VALIDATION','Проверьте время исследования.');
+    normalized={seconds:value.seconds,timing:'self-reported-phone'};
+  }else if(kind==='text'){
+    text=text_(a.text,APP.maxText);keepAudio=a.keepAudio===true&&!!(existing&&existing.values[14]);
+    if(step.required&&!text&&!a.audio&&!keepAudio)fail_('VALIDATION','Добавьте ответ текстом или голосом.');
+    skipped=!text&&!a.audio&&!keepAudio;
+  }else fail_('QUESTION','Такого вопроса нет.');
+  if(a.audio&&kind!=='text')fail_('VALIDATION','Для этого вопроса голосовой ответ недоступен.');
+  return {text,value:normalized,skipped,keepAudio,audio:kind==='text'?a.audio:null};
+}
+function managedSave_(p){return locked_(()=>{
+  if(!open_('study'))fail_('CLOSED','Исследование пока не открыто.');
+  const access=authorize_(p.token),m=managedState_(access,false,String(p.runId||'')),s=m.session;
+  if(s.status==='completed')fail_('COMPLETED','Анкета уже завершена.');
+  const id=text_(p.id,60),index=m.steps.findIndex(q=>q.id===id&&q.kind!=='review'),requestId=requestId_(p.requestId);
+  if(index<0)fail_('QUESTION','Такого вопроса нет в назначенном тесте.');
+  for(let i=0;i<index;i++)if(!s.answers[m.steps[i].id])fail_('ORDER','Сначала завершите предыдущий шаг.');
+  const step=m.steps[index],records=managedRows_(s.runId),existing=records.find(r=>r.values[5]===id);
+  if(existing&&existing.values[17]===requestId)return {answer:managedResponse_(existing)};
+  const a=managedValidate_(step,p.answer,existing);
+  if(a.audio&&!(s.answers.consent&&s.answers.consent.value&&s.answers.consent.value.audio))fail_('AUDIO_CONSENT','Для голосового ответа нужно отдельное согласие.');
+  if(id==='consent'&&!a.value.audio&&records.some(r=>r.values[14]))fail_('AUDIO_CONSENT','Для отзыва ранее отправленного аудио обратитесь к организатору или отзовите участие.');
+  const oldId=existing&&existing.values[14]||'';
+  let audio={id:a.keepAudio?oldId:'',url:a.keepAudio&&existing?existing.values[15]:''};
+  if(a.audio)audio=audio_(s.pid+'_'+s.testId+'_'+s.testVersion,id,a.audio);
+  const stamp=now_(),values=[s.runId+'|'+id,s.runId,s.pid,s.testId,s.testVersion,id,index+1,step.kind,step.title,step.trial||'',step.panel||'',a.text,JSON.stringify(a.value),a.skipped,audio.id,audio.url,stamp,requestId,existing?Number(existing.values[18]||1)+1:1];
+  try{if(existing)writeRow_('results',existing.row,values);else append_('results',values);SpreadsheetApp.flush()}catch(error){if(audio.id&&audio.id!==oldId)trash_(audio.id);throw error;}
+  if(oldId&&oldId!==audio.id)trash_(oldId);
+  m.record.values[6]=stamp;writeRow_('runs',m.record.row,m.record.values);
+  return {answer:managedResponse_({values})};
+});}
+function managedFinish_(p){return locked_(()=>{
+  if(!open_('study'))fail_('CLOSED','Исследование пока не открыто.');
+  const m=managedState_(authorize_(p.token),false,String(p.runId||'')),s=m.session;
+  if(s.status==='completed')return {receipt:s.receipt};
+  if(m.steps.some(q=>q.kind!=='review'&&!s.answers[q.id]))fail_('INCOMPLETE','Не все шаги сохранены. Вернитесь к опросу.');
+  const receipt='BV-'+uuid_().replace(/-/g,'').slice(0,16).toUpperCase();
+  const v=m.record.values;v[6]=now_();v[7]='completed';v[8]=receipt;writeRow_('runs',m.record.row,v);return {receipt};
+});}
+function managedWithdraw_(p){return locked_(()=>{
+  // Отзыв возможен для собственного прохождения даже после закрытия/смены назначения.
+  const access=authorize_(p.token),pid=String(access.values[0]),runId=text_(p.runId,100);
+  const record=rows_('runs').find(r=>String(r.values[0])===runId&&String(r.values[1])===pid);
+  if(!record)fail_('AUTH','Прохождение не найдено.');
+  const v=record.values;v[6]=now_();v[7]='withdrawn';v[9]=now_();writeRow_('runs',record.row,v);
+  managedRows_(runId).forEach(r=>{trash_(r.values[14]);const a=r.values.slice();a[11]='[участие отозвано]';a[12]='null';a[14]='';a[15]='';a[16]=now_();writeRow_('results',r.row,a)});
+  return {withdrawn:true};
+});}
+function createTestAccess(){
+  const ui=SpreadsheetApp.getUi(),sheet=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  if(sheet.getName()!==APP.sheets.tests||sheet.getActiveRange().getRow()<2){ui.alert('Выберите строку открытого теста на листе «Тесты».');return;}
+  const test=sheet.getRange(sheet.getActiveRange().getRow(),1,1,HEADERS.tests.length).getValues()[0];
+  const id=testKey_(test[0],48),version=testKey_(test[1],16);
+  if(String(test[3]).trim()!=='Открыт'){ui.alert('Сначала откройте тест на листе «Тесты».');return;}
+  const input=ui.prompt('Новый участник','Укажите до трёх кодов панелей через запятую. Если панелей нет, оставьте пустым. Для RELIEF-3 пустое поле использует прежнее автоматическое назначение.',ui.ButtonSet.OK_CANCEL);
+  if(input.getSelectedButton()!==ui.Button.OK)return;
+  const panels=input.getResponseText().split(',').map(x=>text_(x,80));if(panels.length>3){ui.alert('Укажите не более трёх панелей.');return;}while(panels.length<3)panels.push('');
+  const result=locked_(()=>{
+    const current=testRecord_(id,version);if(String(current[3]).trim()!=='Открыт')fail_('TEST_CLOSED','Тест закрыт.');
+    const questions=rows_('questions').filter(r=>String(r.values[0])===id&&String(r.values[1])===version).map(r=>r.values);
+    makeSteps_(current,questions,id==='RELIEF-3'&&panels.every(x=>!x)?schedule_(1):panels);
+    const access=createAccess_('');append_('assignments',[access.values[0],id,version,'Активно',...panels,'Создано через меню']);
+    return {pid:access.values[0],code:credentials_(access).code};
+  });
+  ui.alert('Участник '+result.pid+'\nКод: '+result.code+'\nПередайте код только этому участнику. Сайт: '+setting_('Адрес сайта','https://step3dlab.github.io/Technopark_project/beyond-vision/')+'#access');
+}
+function showTestAccess(){
+  const ui=SpreadsheetApp.getUi(),sheet=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  if(sheet.getName()!==APP.sheets.access||sheet.getActiveRange().getRow()<2){ui.alert('Выберите участника на листе «Доступ».');return;}
+  const pid=String(sheet.getRange(sheet.getActiveRange().getRow(),1).getValue()),record=rows_('access').find(r=>String(r.values[0])===pid&&r.values[5]==='active');
+  if(!record){ui.alert('Активный доступ не найден.');return;}
+  ui.alert('Участник '+pid+'\nКод: '+credentials_(record).code+'\nПередайте код только этому участнику.');
 }

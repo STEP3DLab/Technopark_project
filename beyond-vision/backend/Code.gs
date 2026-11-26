@@ -18,7 +18,7 @@ const HEADERS = Object.freeze({
   tests:['ID теста','Версия','Название (видит участник)','Статус','Инструкция участнику','Комментарий организатора'],
   questions:['ID теста','Версия','Порядок','ID вопроса','Тип','Раздел','Вопрос / заголовок','Подсказка / инструкция','Варианты (по строкам)','Обязательный текст','Номер панели','Подпись поля'],
   assignments:['Участник','ID теста','Версия','Статус','Панель 1','Панель 2','Панель 3','Комментарий'],
-  runs:['ID прохождения','Участник','ID теста','Версия','Название','Начато','Обновлено','Статус','Подтверждение','Отозвано','Снимок вопросов JSON','Панели JSON'],
+  runs:['ID прохождения','Участник','ID теста','Версия','Название','Начато','Обновлено','Статус','Подтверждение','Отозвано','Снимок вопросов JSON','Панели JSON','Хеш версии'],
   results:['ID ответа','ID прохождения','Участник','ID теста','Версия','ID вопроса','Порядок','Тип','Вопрос (снимок)','Номер панели','Маркировка','Текст ответа','Значение JSON','Пропущен','ID аудио','Ссылка аудио','Сохранён','ID запроса','Редакция'],
 });
 let spreadsheetCache_;
@@ -345,6 +345,16 @@ function makeSteps_(test,questions,panels){
   if(JSON.stringify(steps).length>45000)fail_('TEST_CONFIG','Анкета слишком объёмная для одной версии.');
   return steps;
 }
+function versionFingerprint_(test,questions){
+  const normalized=questions.slice().sort((a,b)=>Number(a[2])-Number(b[2])).map(row=>row.slice(2,12).map(v=>String(v==null?'':v)));
+  return hash_(JSON.stringify([String(test[2]||''),String(test[4]||''),normalized]));
+}
+function assertVersion_(testId,version,test,questions){
+  const fingerprint=versionFingerprint_(test,questions);
+  const previous=rows_('runs').filter(r=>String(r.values[2])===testId&&String(r.values[3])===version);
+  if(previous.some(r=>String(r.values[12]||'')!==fingerprint))fail_('VERSION_LOCKED','Содержание этой версии уже использовалось. Организатору нужно создать новую версию теста.');
+  return fingerprint;
+}
 function managedRows_(runId){return rows_('results').filter(r=>String(r.values[1])===runId);}
 function managedResponse_(r){
   const v=r.values;let value=null;try{value=JSON.parse(String(v[12]||'null'))}catch(e){}
@@ -361,8 +371,8 @@ function managedState_(access,create,expected){
     const test=testRecord_(a.testId,a.version);
     if(String(test[3]).trim()!=='Открыт')fail_('TEST_CLOSED','Этот тест пока не открыт организатором.');
     const questions=rows_('questions').filter(r=>String(r.values[0])===a.testId&&String(r.values[1])===a.version).map(r=>r.values);
-    const steps=makeSteps_(test,questions,a.panels);
-    const values=[a.runId,a.pid,a.testId,a.version,text_(test[2],220),now_(),now_(),'in_progress','','',JSON.stringify(steps),JSON.stringify(a.panels)];
+    const steps=makeSteps_(test,questions,a.panels),fingerprint=assertVersion_(a.testId,a.version,test,questions);
+    const values=[a.runId,a.pid,a.testId,a.version,text_(test[2],220),now_(),now_(),'in_progress','','',JSON.stringify(steps),JSON.stringify(a.panels),fingerprint];
     record={row:append_('runs',values),values};
   }
   const v=record.values;
@@ -450,6 +460,7 @@ function createTestAccess(){
     const current=testRecord_(id,version);if(String(current[3]).trim()!=='Открыт')fail_('TEST_CLOSED','Тест закрыт.');
     const questions=rows_('questions').filter(r=>String(r.values[0])===id&&String(r.values[1])===version).map(r=>r.values);
     makeSteps_(current,questions,id==='RELIEF-3'&&panels.every(x=>!x)?schedule_(1):panels);
+    assertVersion_(id,version,current,questions);
     const access=createAccess_('');append_('assignments',[access.values[0],id,version,'Активно',...panels,'Создано через меню']);
     return {pid:access.values[0],code:credentials_(access).code};
   });

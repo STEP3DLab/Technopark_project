@@ -320,7 +320,7 @@ function makeSteps_(test,questions,panels){
   if(!questions.length||questions.length>60)fail_('TEST_CONFIG','В тесте должно быть от 1 до 60 вопросов.');
   questions.slice().sort((a,b)=>Number(a[2])-Number(b[2])).forEach(v=>{
     const order=Number(v[2]),id=String(v[3]).trim(),kind=String(v[4]).trim(),trial=v[10]===''||v[10]==null?0:Number(v[10]);
-    if(!Number.isInteger(order)||order<1||orders.has(order)||!/^[-A-Za-z0-9_.]{1,60}$/.test(id)||ids.has(id)||!['text','choice','scale','training','explore'].includes(kind)||![0,1,2,3].includes(trial))fail_('TEST_CONFIG','Проверьте порядок, ID, тип и номер панели в вопросах.');
+    if(!Number.isInteger(order)||order<1||orders.has(order)||!/^[-A-Za-z0-9_.]{1,60}$/.test(id)||ids.has(id)||Object.prototype.hasOwnProperty.call(Object.prototype,id)||!['text','choice','scale','training','explore'].includes(kind)||![0,1,2,3].includes(trial))fail_('TEST_CONFIG','Проверьте порядок, ID, тип и номер панели в вопросах.');
     ids.add(id);orders.add(order);
     const q={id,kind,section:expand(v[5],150)||'Вопросы',title:expand(v[6],500),text:expand(v[7],2500),required:kind==='text'&&String(v[9]).trim()==='Да'};
     if(!q.title)fail_('TEST_CONFIG','У вопроса отсутствует заголовок.');

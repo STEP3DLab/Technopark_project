@@ -680,5 +680,49 @@
     "extractLinks": false,
     "region": "Пермский край",
     "notes": "Контур: 04.12 06:00 МСК, НМЦД 2 млн, только МСП; ЕИС timeout."
+  },
+  {
+    "id": "research-20261127-proc-4695317",
+    "name": "27.11 — закупка 4695317",
+    "url": "https://www.b2b-center.ru/market/vizualnoe-i-instrumentalnoe-obsledovanie-konstruktsii-sushchestvuiushchikh/tender-4695317/",
+    "type": "procurement_primary",
+    "status": "primary_public_stage",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Санкт-Петербург",
+    "notes": "Первичная карточка B2B-Center: статус активно, 3 заявки, автопродление 30 мин; ТЗ и условия участия за входом; срок МСК указан в списке связанных процедур."
+  },
+  {
+    "id": "research-20261127-proc-0829600008426000262",
+    "name": "27.11 — закупка 0829600008426000262",
+    "url": "https://rostender.info/region/volgogradskaya-oblast/voljskij/96797627-tender-obsledovanie-stroitelnyh-konstrukcij-mnogokvartirnogo-doma",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Волгоградская область",
+    "notes": "РосТендер: приём заявок до 01.12 10:00 МСК; НМЦК округлена; ЕИС и переход Фабрикант 327735 недоступны."
+  },
+  {
+    "id": "research-20261127-proc-0813500000126023153",
+    "name": "27.11 — закупка 0813500000126023153",
+    "url": "https://rostender.info/region/udmurtskaya-respublika/96891538-tender-zz-0017-53137-2026-okazanie-uslug-po-opredeleniyu-ocenki-i-kategorii-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-opredelenie",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Удмуртская Республика",
+    "notes": "РосТендер: срок 03.12 06:00 МСК, НМЦК 113863,33; ЕИС и ZakazRF недоступны. Не дубликат 0813500000126023014 (другой номер)."
+  },
+  {
+    "id": "research-20261127-proc-1272366",
+    "name": "27.11 — закупка 1272366",
+    "url": "https://rostender.info/region/krasnoyarskij-kraj/krasnoyarsk/96799992-tender-vypolnenie-rabot-na-proektirovanie-i-detalnoe-instrumentalnoe-obsledovanie-tehnicheskogo-sostoyaniya-stroitelnyh",
+    "type": "secondary_procurement",
+    "status": "secondary",
+    "autoFetch": false,
+    "extractLinks": false,
+    "region": "Красноярский край",
+    "notes": "РосТендер и КомТендер: открытый тендер, срок 06.12 23:00 МСК; Tender.Pro недоступен."
   }
 ]

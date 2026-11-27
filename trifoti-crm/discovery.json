@@ -1,14 +1,9 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-27T01:02:31.776923+00:00",
+  "generated_at": "2026-11-27T15:12:06.862716+00:00",
   "disclaimer": "Discovery candidates only. Verify the official notice, deadline, status and technical specification manually.",
   "sources_attempted": 6,
-  "errors": [
-    {
-      "query": "тендер изготовление наград статуэток кубков Москва",
-      "error": "HTTPError"
-    }
-  ],
+  "errors": [],
   "items": [
     {
       "id": "2e728947453a16056574",

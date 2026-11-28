@@ -1,6 +1,119 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Источники · Транскриптер РЖЯ</title><link rel="stylesheet" href="./style.css"></head>
-<body><main class="wrap"><div class="intro"><p><a href="./">Вернуться к распознаванию</a></p><h1 style="margin-top:25px">Авторы и источники</h1></div>
-<section id="experiment"><h2>Видеокорпус Slovo</h2><p>Alexander Kapitanov, Karina Kvanchiani, Alexander Nagaev, Elizaveta Petrova. Slovo: Russian Sign Language Dataset, 2023–2024. Авторы предоставили записи по публичной лицензии Slovo с указанием авторства и сохранением условий. Видео, извлечённые координаты и иллюстрации в примерах сохраняют эти условия. Корпус распространяется без гарантий.</p>
-<p>Мы уменьшили исходные ролики, убрали звук и извлекли координаты рук. Идентификаторы трёх фрагментов указаны в описании проекта.</p>
-<div class="links"><a href="https://github.com/hukenovs/slovo">Корпус Slovo</a><a href="https://arxiv.org/abs/2305.14527">Статья авторов</a><a href="https://github.com/hukenovs/slovo/blob/main/license/ru.pdf">Текст лицензии</a></div></section>
-<section class="dictionary"><h2>Распознавание</h2><p>Точки кистей определяет MediaPipe Hand Landmarker. Классификатор восьми жестов обучен для этого прототипа. Исходный код и результаты эксперимента доступны в репозитории Технопарка.</p><div class="links"><a href="https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/web_js">Документация MediaPipe</a><a href="https://github.com/STEP3DLab/Technopark_project/tree/main/rsl-nts">Проект на GitHub</a></div></section></main></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#082567">
+  <title>Авторы и источники · Транскриптер РЖЯ</title>
+  <link rel="icon" href="./assets/rgsu.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .source-page { max-width: 960px; }
+    .source-page .intro { padding-bottom: 26px; }
+    .source-card { padding: 28px 30px; margin-bottom: 18px; }
+    .source-card h2 { font-size: 1.35rem; margin-bottom: 14px; }
+    .source-card p + p { margin-top: 12px; }
+    .source-card p, .source-card li { line-height: 1.7; }
+    .source-card .links { margin-top: 17px; }
+    .source-card ul { margin: 14px 0 0; padding-left: 22px; }
+    .source-card li + li { margin-top: 7px; }
+    .source-table-wrap { overflow-x: auto; margin-top: 17px; }
+    .source-table { width: 100%; border-collapse: collapse; font-size: .9375rem; }
+    .source-table th, .source-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .source-table th { color: var(--navy); }
+    .source-table code { overflow-wrap: anywhere; }
+    .source-note { margin-top: 16px; padding: 14px 17px; border-radius: 9px; background: #edf2fb; color: #36517d; }
+    @media (max-width: 600px) {
+      .source-card { padding: 22px 19px; border-radius: 16px; }
+      .source-table { font-size: .875rem; }
+      .source-table th, .source-table td { padding: 10px 7px; }
+      .source-table th:last-child { min-width: 160px; }
+      .source-page h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap head">
+      <a class="identity" href="./" aria-label="Транскриптер РЖЯ, главная">
+        <img src="./assets/rgsu.svg" alt="РГСУ" width="32" height="48">
+        <span>Российский государственный<br>социальный университет</span>
+      </a>
+      <nav class="header-nav" aria-label="Навигация"><a href="./">К приложению</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap source-page">
+    <div class="intro">
+      <p class="eyebrow">Транскриптер РЖЯ · MVP 1.0</p>
+      <h1>Авторы и источники</h1>
+      <p class="lead">Данные, модель и результаты, на которых основано приложение СКБ Технопарка РГСУ.</p>
+    </div>
+
+    <section class="source-card card" aria-labelledby="slovo-title">
+      <h2 id="slovo-title">Видеокорпус Slovo</h2>
+      <p>Alexander Kapitanov, Karina Kvanchiani, Alexander Nagaev, Elizaveta Petrova. <em>Slovo: Russian Sign Language Dataset.</em> Научная публикация — 2023 год.</p>
+      <p>Авторы предоставили записи по публичной лицензии Slovo с указанием авторства и сохранением условий. Видео, извлечённые координаты, иллюстрации и другие производные материалы корпуса сохраняют эти условия. Корпус распространяется без гарантий. Участие авторов Slovo в разработке приложения Технопарка не предполагается.</p>
+      <p>Для встроенных примеров исходные ролики уменьшены и перекодированы без звука. Координаты рук извлечены из оригиналов; при нажатии «Распознать пример» классификатор обрабатывает эти сохранённые координаты.</p>
+      <div class="source-table-wrap">
+        <table class="source-table">
+          <thead><tr><th scope="col">Пример</th><th scope="col">Эталон</th><th scope="col">Идентификатор Slovo</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>вопрос</td><td><code>1cb4590b-dc1e-41ec-85d7-461207491a00</code></td></tr>
+            <tr><td>2</td><td>помочь</td><td><code>8e2bd0b6-7764-4e2d-a538-63cddca0e815</code></td></tr>
+            <tr><td>3</td><td>дом, вне словаря</td><td><code>34642453-0a9c-4a59-9919-1841d44cd32e</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="source-note">На сохранённых координатах третьего примера модель ошибочно предлагает «вода». Этот пример показывает ограничение модели и необходимость проверки пользователем.</p>
+      <div class="links">
+        <a href="https://github.com/hukenovs/slovo">Корпус Slovo</a>
+        <a href="https://arxiv.org/abs/2305.14527">Статья авторов</a>
+        <a href="https://github.com/hukenovs/slovo/blob/main/license/ru.pdf">Лицензия Slovo</a>
+      </div>
+    </section>
+
+    <section class="source-card card" aria-labelledby="mediapipe-title">
+      <h2 id="mediapipe-title">MediaPipe и модель положения рук</h2>
+      <p>Координаты кистей определяет MediaPipe Hand Landmarker. В приложение включены неизменённые файлы <strong>tasks-vision 0.10.21</strong> и модель <strong>Hand Landmarker float16, версия 1</strong>. Авторство — Google LLC и участники проекта MediaPipe.</p>
+      <p>Программные файлы и модель распространяются по Apache License 2.0. Лицензия программы указана в исходном пакете, лицензия модели — в официальной карточке Hand Tracking, на странице 2. Лицензия сохранена вместе с зависимостями; отдельные условия Slovo продолжают действовать для материалов видеокорпуса.</p>
+      <p>Файлы размещены на том же сайте, что и приложение. При первом распознавании своего видео загружается около 18 МБ; повторная загрузка зависит от браузерного кэша. Видео пользователя остаётся на устройстве. Доступность модуля зависит от возможностей браузера и WebGL.</p>
+      <div class="links">
+        <a href="https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/web_js">Документация MediaPipe</a>
+        <a href="https://storage.googleapis.com/mediapipe-assets/Model%20Card%20Hand%20Tracking%20%28Lite_Full%29%20with%20Fairness%20Oct%202021.pdf">Официальная карточка модели</a>
+        <a href="./vendor/LICENSE">Apache License 2.0</a>
+        <a href="https://github.com/STEP3DLab/Technopark_project/blob/main/rsl-nts/vendor/README.md">Версии и происхождение файлов</a>
+        <a href="./vendor/manifest.json">Контрольные суммы</a>
+      </div>
+    </section>
+
+    <section class="source-card card" aria-labelledby="experiment-title">
+      <h2 id="experiment-title">Классификатор и собственный эксперимент</h2>
+      <p>Классификатор восьми жестов обучен для проекта. Он использует 16 кадров, координаты и взаимное положение кистей и многоклассовую логистическую регрессию. Обучение и проверка разделены по исполнителям. Веса, признаки и порог в MVP 1.0 сохранены; изменения интерфейса не являются новым измерением точности.</p>
+      <ul>
+        <li>Первый вариант верен на 33 из 40 контрольных записей знакомых жестов.</li>
+        <li>После порога предложены 24 ответа на знакомые жесты, из них 23 верны.</li>
+        <li>На 17 из 40 записей незнакомых жестов модель ошибочно предложила слово.</li>
+      </ul>
+      <p class="source-note">Проверка с носителями РЖЯ на физических телефонах ещё предстоит. Приложение предлагает отдельные слова из восьми известных жестов; свободные фразы пока не переводятся. Все слова добавляются в сообщение только после подтверждения.</p>
+      <p style="margin-top:16px">Историческая модель по движению сохранена в репозитории для воспроизведения прежнего исследования. В MVP 1.0 она отключена: при сбое основной модели приложение сообщает об ошибке.</p>
+      <div class="links">
+        <a href="https://github.com/STEP3DLab/Technopark_project/tree/main/rsl-nts">Код, запуск и методика</a>
+        <a href="./research/predictions.csv" download>Все 80 ответов · CSV</a>
+        <a href="./research/metrics.json">Сводка и матрица ошибок</a>
+      </div>
+    </section>
+
+    <section class="source-card card" aria-labelledby="orientation-title">
+      <h2 id="orientation-title">Исследовательские ориентиры</h2>
+      <p>Соревнования Google по американскому жестовому языку посвящены двум самостоятельным задачам: распознаванию отдельных жестов и распознаванию дактиля — передаче слов по буквам. Эти работы используются как методические ориентиры; приложение обучено на записях русского жестового языка из Slovo.</p>
+      <div class="links">
+        <a href="https://www.kaggle.com/competitions/asl-signs">Isolated Sign Language Recognition</a>
+        <a href="https://www.kaggle.com/competitions/asl-fingerspelling">ASL Fingerspelling Recognition</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap site-footer"><span>СКБ Технопарка РГСУ · 2026 · MVP 1.0</span><a href="./">Вернуться к приложению</a></footer>
+</body>
+</html>

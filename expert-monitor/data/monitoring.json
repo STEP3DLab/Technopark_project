@@ -925,77 +925,74 @@
     }
   ],
   "newCandidates": [],
-  "registryRecords": 227,
+  "registryRecords": 230,
   "automaticSources": 9,
   "successfulSources": 8,
   "manualSources": 55,
   "automaticSending": false,
   "research": {
-    "date": "2026-11-27",
-    "completedAt": "2026-11-27T07:48:51+03:00",
+    "date": "2026-11-28",
+    "completedAt": "2026-11-28T07:42:19+03:00",
     "status": "partial",
-    "summary": "4 новых закупочных сигналов, 5 истёкших сроков, изменение срока 0173200001326000033; 24 карточек прочитано, 3 недоступны; курсор 57→69; судебные запросы не подтверждены.",
+    "summary": "3 новых закупочных сигналов, 6 истекших сроков, новый срок 32616549115; 24 индивидуальных карточек/индексов; 12 региональных попыток 69→81; судебные запросы не подтверждены.",
     "newIds": [
-      "proc-4695317",
-      "proc-0829600008426000262",
-      "proc-0813500000126023153",
-      "proc-1272366"
+      "proc-0190600005226000723",
+      "proc-32616623703",
+      "proc-10905263"
     ],
     "changedIds": [
       "proc-32616549115",
       "proc-0173200001326000031",
-      "proc-32616577020",
       "proc-4681481",
-      "proc-32616590613",
       "proc-32616585560",
-      "proc-32616581023",
       "proc-32616584330",
       "proc-0348200012426000090",
-      "proc-0328100002326000739",
       "proc-4687732",
       "proc-145345-ТТ",
       "proc-0124200000626008284",
       "proc-32616548327",
+      "proc-206320000012600274",
+      "proc-4689140",
       "proc-0172100008126000104",
       "proc-0172100008126000105",
-      "proc-0162300005326002172",
-      "proc-0173200001326000033",
       "proc-32616600261",
       "proc-32616588564",
       "proc-4696408",
       "proc-0002718",
       "proc-0813500000126023014",
       "proc-32616621725",
-      "proc-1273283"
+      "proc-1273283",
+      "proc-4695317",
+      "proc-0829600008426000262",
+      "proc-0813500000126023153"
     ],
     "closedIds": [
-      "proc-32616577020",
-      "proc-32616590613",
-      "proc-32616581023",
-      "proc-0328100002326000739",
-      "proc-0162300005326002172"
+      "proc-4681481",
+      "proc-32616585560",
+      "proc-4687732",
+      "proc-145345-ТТ",
+      "proc-0002718",
+      "proc-4695317"
     ],
     "excludedIds": [
-      "0103100011626000004 — строительный контроль, не профильная экспертиза",
-      "0173200001326000029 — срок 23.11 истёк",
-      "0572500002526004916 — вероятный запрос КП, первичная карточка недоступна; тип требует уточнения",
-      "А70-18011/2025 — адресный запрос от 01.07.2026, текущий статус не подтверждён",
-      "А81-2104/2025 — старое определение, последующие акты не проверены",
-      "А33-2041/2025 — автомобильная экспертиза, непрофильная"
+      "346218156 — Гатчина: только ID агрегатора, заказчик и номер первичной процедуры не установлены; срок без часа 30.11.",
+      "050070000012600130 — строительный контроль, не профильная экспертиза.",
+      "202450000012600246, 202450000012600247 — капремонт в составе комплексного заказа, не самостоятельная экспертиза.",
+      "011820000452600030 — предварительный отбор 615-ПП, не заказ на экспертизу.",
+      "0161200000226000022 — крупный комплекс со строительством, не отдельная экспертиза.",
+      "А19-23152/2024, А51-8232/2025, А51-4470/2025 — старые акты о назначении/приостановлении, открытый запрос не подтвержден."
     ],
     "errors": [
       "КАД/Банк решений: формы доступны, актуальные процессуальные цепочки не извлечены.",
-      "ГАС Правосудие/ЕИС: первичные акты и извещения не извлечены.",
-      "Республика Алтай, Хакасия: официальные сайты недоступны.",
-      "proc-0328100002326000739 — карточка не прочитана, вторичный поиск без пригодного результата",
-      "proc-206320000012600274 — карточка не прочитана, вторичный поиск без пригодного результата",
-      "proc-4689140 — карточка не прочитана, вторичный поиск без пригодного результата",
-      "Три новых сигнала: первичная документация не получена."
+      "ГАС Правосудие и ЕИС: timeout; прямое извещение 0190600005226000723 недоступно.",
+      "4689140, 206320000012600274, 4687732: прямые карточки недоступны/оболочка; использованы вторичные индексы.",
+      "10905263: доступен только индекс агрегатора, первичный РТС не установлен.",
+      "Публичный JSON Pages: URL недоступен при предварительном чтении."
     ],
     "limitations": [
-      "Ни один регион не отмечен завершённым: первичные актуальные акты и последующие определения не получены.",
-      "По трём новым сигналам только вторичные источники; допуски не подтверждены.",
-      "Закрытие по сроку не подтверждает завершение процедуры."
+      "12 регионов — попытки, не завершенные проверки; открытых судебных запросов не подтверждено.",
+      "Все новые записи needs_review; по одной малой закупке запрос цен, не подтвержден договор.",
+      "Закрытие по сроку не подтверждает завершение процедуры; снимки некоторых карточек до истечения срока."
     ],
     "searchedDistricts": [
       "central",
@@ -1008,37 +1005,37 @@
       "fareast"
     ],
     "districtsCompleted": [],
-    "rotationStart": 57,
-    "rotationEnd": 69,
+    "rotationStart": 69,
+    "rotationEnd": 81,
     "rotationAttemptCount": 12,
     "regionsAttempted": [
-      "Ульяновская область",
-      "Курганская область",
-      "Свердловская область",
-      "Тюменская область",
-      "Челябинская область",
-      "Ханты-Мансийский автономный округ — Югра",
-      "Ямало-Ненецкий автономный округ",
-      "Республика Алтай",
-      "Республика Тыва",
-      "Республика Хакасия",
-      "Алтайский край",
-      "Красноярский край"
+      "Иркутская область",
+      "Кемеровская область",
+      "Новосибирская область",
+      "Омская область",
+      "Томская область",
+      "Республика Бурятия",
+      "Республика Саха (Якутия)",
+      "Забайкальский край",
+      "Камчатский край",
+      "Приморский край",
+      "Хабаровский край",
+      "Амурская область"
     ],
     "regionsSuccessful": [],
     "regionsBlocked": [
-      "Ульяновская область",
-      "Курганская область",
-      "Свердловская область",
-      "Тюменская область",
-      "Челябинская область",
-      "Ханты-Мансийский автономный округ — Югра",
-      "Ямало-Ненецкий автономный округ",
-      "Республика Алтай",
-      "Республика Тыва",
-      "Республика Хакасия",
-      "Алтайский край",
-      "Красноярский край"
+      "Иркутская область",
+      "Кемеровская область",
+      "Новосибирская область",
+      "Омская область",
+      "Томская область",
+      "Республика Бурятия",
+      "Республика Саха (Якутия)",
+      "Забайкальский край",
+      "Камчатский край",
+      "Приморский край",
+      "Хабаровский край",
+      "Амурская область"
     ],
     "retryRegions": [
       "Москва",
@@ -1133,131 +1130,11 @@
     ],
     "regionalResults": [
       {
-        "region": "Ульяновская область",
-        "districtId": "volga",
-        "sourceUrl": "https://ulyanovsk.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Ульяновская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Курганская область",
-        "districtId": "ural",
-        "sourceUrl": "https://kurgan.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Курганская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Свердловская область",
-        "districtId": "ural",
-        "sourceUrl": "https://ekaterinburg.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Свердловская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Тюменская область",
-        "districtId": "ural",
-        "sourceUrl": "https://tumen.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Тюменская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Челябинская область",
-        "districtId": "ural",
-        "sourceUrl": "https://chel.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Челябинская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Ханты-Мансийский автономный округ — Югра",
-        "districtId": "ural",
-        "sourceUrl": "https://hmao.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Ханты-Мансийский автономный округ — Югра арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Ямало-Ненецкий автономный округ",
-        "districtId": "ural",
-        "sourceUrl": "https://yamal.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Ямало-Ненецкий автономный округ арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "official_homepage_read",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Республика Алтай",
+        "region": "Иркутская область",
         "districtId": "siberia",
-        "sourceUrl": "https://altai.arbitr.ru/",
+        "sourceUrl": "https://irkutsk.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Республика Алтай арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "unavailable_or_timeout",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Республика Тыва",
-        "districtId": "siberia",
-        "sourceUrl": "https://tyva.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Республика Тыва арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "query": "Иркутская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
         "officialHomepageStatus": "official_homepage_read",
         "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
         "caseCardsVerified": 0,
@@ -1265,29 +1142,14 @@
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
       },
       {
-        "region": "Республика Хакасия",
+        "region": "Кемеровская область",
         "districtId": "siberia",
-        "sourceUrl": "https://hakasia.arbitr.ru/",
+        "sourceUrl": "https://kemerovo.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Республика Хакасия арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "officialHomepageStatus": "unavailable_or_timeout",
-        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
-        "caseCardsVerified": 0,
-        "successful": false,
-        "blocked": true,
-        "retryNeeded": true,
-        "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
-      },
-      {
-        "region": "Алтайский край",
-        "districtId": "siberia",
-        "sourceUrl": "https://altai-krai.arbitr.ru/",
-        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Алтайский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "query": "Кемеровская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
         "officialHomepageStatus": "official_homepage_read",
         "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
         "caseCardsVerified": 0,
@@ -1295,14 +1157,14 @@
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
       },
       {
-        "region": "Красноярский край",
+        "region": "Новосибирская область",
         "districtId": "siberia",
-        "sourceUrl": "https://krasnoyarsk.arbitr.ru/",
+        "sourceUrl": "https://novosib.arbitr.ru/",
         "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
-        "query": "Красноярский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "query": "Новосибирская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
         "officialHomepageStatus": "official_homepage_read",
         "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
         "caseCardsVerified": 0,
@@ -1310,384 +1172,500 @@
         "blocked": true,
         "retryNeeded": true,
         "secondarySearchAttempted": true,
-        "notes": "Адресный поиск выполнен; первичный актуальный запрос и последующие акты не извлечены."
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Омская область",
+        "districtId": "siberia",
+        "sourceUrl": "https://omsk.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Омская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Томская область",
+        "districtId": "siberia",
+        "sourceUrl": "https://tomsk.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Томская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Республика Бурятия",
+        "districtId": "fareast",
+        "sourceUrl": "https://buryatia.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Бурятия арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Республика Саха (Якутия)",
+        "districtId": "fareast",
+        "sourceUrl": "https://yakutsk.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Якутия арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Забайкальский край",
+        "districtId": "fareast",
+        "sourceUrl": "https://chita.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Забайкальский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Камчатский край",
+        "districtId": "fareast",
+        "sourceUrl": "https://kamchatka.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Камчатский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Приморский край",
+        "districtId": "fareast",
+        "sourceUrl": "https://primkray.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Приморский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Хабаровский край",
+        "districtId": "fareast",
+        "sourceUrl": "https://khabarovsk.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Хабаровский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
+      },
+      {
+        "region": "Амурская область",
+        "districtId": "fareast",
+        "sourceUrl": "https://amuras.arbitr.ru/",
+        "officialDirectoryUrl": "https://arbitr.ru/materials/as/subj",
+        "query": "Амурская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "officialHomepageStatus": "official_homepage_read",
+        "officialActsStatus": "case_documents_and_subsequent_acts_not_verified",
+        "caseCardsVerified": 0,
+        "successful": false,
+        "blocked": true,
+        "retryNeeded": true,
+        "secondarySearchAttempted": true,
+        "notes": "Официальный сайт открыт, адресный поиск выполнен; актуальный запрос и последующие акты не извлечены."
       }
     ],
     "sourceAudit": [
       {
+        "url": "https://zakupki.kontur.ru/32616549115",
+        "query": "32616549115 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур (снимок 28.11) показывает новый срок 02.12 03:00 МСК; предыдущие индексы 30.11 03:00. Тендер Медиа отражает изменение 26.11, но другой час без явной зоны. Первичный срок не подтверждён; ориентир по свежей карточке, только МСП."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/0173200001326000031",
+        "query": "0173200001326000031 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 01.12 23:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://www.b2b-center.ru/app/market-next/tekhnicheskoe-obsledovanie-zdaniia/tender-4681481/",
+        "query": "4681481 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "B2B-Center: 27.11 15:00 МСК, автопродление 15 мин; снимок до окончания, продление не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/32616585560",
+        "query": "32616585560 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 27.11 09:00 МСК; продление не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/32616584330",
+        "query": "32616584330 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 03.12 08:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/0348200012426000090",
+        "query": "0348200012426000090 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 30.11 10:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://www.b2b-center.ru/app/market-next/uslugi-obsledovanie-i-otsenka-tekhnicheskogo-sostoianiia-stroitelnykh/tender-4687732/",
+        "query": "4687732 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "B2B-Center, позиции и Контур: 27.11 12:00 МСК; основной URL отдал оболочку; продление не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/IS89201914",
+        "query": "145345-ТТ срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 27.11 10:00 МСК; продление не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/0124200000626008284",
+        "query": "0124200000626008284 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 02.12 07:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/32616548327",
+        "query": "32616548327 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур подробная карточка старого снимка 23.11, свежий индекс Контур 30.11 09:00 МСК и СпросРадар 30.11 09:00 без зоны; сохраняется более свежая дата, только МСП."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/206320000012600274",
+        "query": "206320000012600274 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Прямой URL Контур cache miss; индекс Контур: 30.11 11:00 МСК, 615-ПП; первоисточник не подтвержден."
+      },
+      {
+        "url": "https://www.b2b-center.ru/market/vypolnenie-kompleksnogo-obsledovaniia-osnovanii-i-chash-ulichnykh-fontanov/tender-4689140/",
+        "query": "4689140 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Первичная B2B-Center недоступна; Контур и КомТендер: 30.11 17:00 МСК; продление не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/0172100008126000104",
+        "query": "0172100008126000104 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 02.12 10:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/0172100008126000105",
+        "query": "0172100008126000105 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 03.12 10:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/32616600261",
+        "query": "32616600261 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 02.12 09:00 МСК; первичное извещение не подтверждено."
+      },
+      {
+        "url": "https://zakupki.kontur.ru/32616588564",
+        "query": "32616588564 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "Контур: 04.12 06:00 МСК; только МСП."
+      },
+      {
+        "url": "https://rostender.info/region/ulyanovskaya-oblast/ulyanovsk/96844735-tender-obsledovanie-stroitelnyh-konstrukcij-vysokoj-chasti-ramnogo-korpusa",
+        "query": "4696408 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 01.12 12:45 МСК; первичная стадия не подтверждена."
+      },
+      {
+        "url": "https://rostender.info/region/hanty-mansijskij-avtonomnyj-okrug---yugra-avtonomnyj-okrug/nijnevartovsk/96847941-tender-obsledovanie-zdaniya-i-stroitelnyh-konstrukcij-razrabotka-proektno-smetnoj",
+        "query": "0002718 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 27.11 15:00 МСК; продление не подтверждено."
+      },
+      {
+        "url": "https://rostender.info/region/udmurtskaya-respublika/96844066-tender-zz-0017-53175-2026-okazanie-uslug-po-opredeleniyu-ocenki-i-kategorii-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-opredelenie",
+        "query": "0813500000126023014 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 02.12 06:00 МСК; первичная стадия не подтверждена."
+      },
+      {
+        "url": "https://rostender.info/region/sverdlovskaya-oblast/ekaterinburg/96845455-tender-vypolnenie-rabot-po-kompleksnomu-obsledovaniyu-stroitelnyh-konstrukcij-zdanij-i-soorujenij-elektricheskih-podstancij-ao",
+        "query": "32616621725 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 03.12 09:00 МСК; первичная стадия не подтверждена."
+      },
+      {
+        "url": "https://rostender.info/region/novosibirskaya-oblast/96849354-tender-okazanie-uslug-po-kompleksnomu-obsledovaniyu-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-i-oborudovaniya-zdanij-i-soorujenij",
+        "query": "1273283 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 04.12 14:00 МСК; первичная стадия не подтверждена."
+      },
+      {
+        "url": "https://www.b2b-center.ru/market/vizualnoe-i-instrumentalnoe-obsledovanie-konstruktsii-sushchestvuiushchikh/tender-4695317/",
+        "query": "4695317 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "B2B-Center: 27.11 18:00, снимок до окончания; продление не подтверждено."
+      },
+      {
+        "url": "https://rostender.info/region/volgogradskaya-oblast/voljskij/96797627-tender-obsledovanie-stroitelnyh-konstrukcij-mnogokvartirnogo-doma",
+        "query": "0829600008426000262 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 01.12 10:00 МСК; первичная стадия не подтверждена."
+      },
+      {
+        "url": "https://rostender.info/region/udmurtskaya-respublika/96891538-tender-zz-0017-53137-2026-okazanie-uslug-po-opredeleniyu-ocenki-i-kategorii-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-opredelenie",
+        "query": "0813500000126023153 срок закупки",
+        "status": "card_or_index_read",
+        "date": "2026-11-28",
+        "notes": "РосТендер: 03.12 06:00 МСК; первичная стадия не подтверждена."
+      },
+      {
+        "url": "https://rostender.info/region/yamalo-neneckij-avtonomnyj-okrug/labytnangi/96786190-tender-provedenie-stroitelno-tehnicheskoj-ekspertizy-o-priznanii-avarijnymi-i-podlejashchimi-snosu-ili-rekonstrukcii",
+        "query": "0190600005226000723 обследование строительных конструкций ноябрь 2026",
+        "status": "secondary_card_or_index",
+        "date": "2026-11-28",
+        "notes": "РосТендер и Синапс: 02.12 06:00 МСК, НМЦК 320000, семь позиций; первичное ЕИС недоступно."
+      },
+      {
+        "url": "https://www.b2b-center.ru/search/number/l32616623703-1/",
+        "query": "32616623703 обследование строительных конструкций ноябрь 2026",
+        "status": "secondary_card_or_index",
+        "date": "2026-11-28",
+        "notes": "Агрегатор B2B-Center, РосТендер и Синапс: 03.12 10:00 МСК; B2B-Center 7910613,82. Тендер Медиа показывает иной срок 09.12 без явной зоны, тип предварительный отбор; первичная редакция не проверена."
+      },
+      {
+        "url": "https://www.b2b-center.ru/search/number/l15453810-3-9-1/",
+        "query": "10905263 обследование строительных конструкций ноябрь 2026",
+        "status": "secondary_card_or_index",
+        "date": "2026-11-28",
+        "notes": "Индекс агрегатора B2B-Center: РТС-тендер, малая закупка, запрос цен, 28.11 19:00 МСК, 306255; прямой URL cache miss, первичная карточка не извлечена. Не подтверждено, что запрос ведет к заключению договора."
+      },
+      {
+        "url": "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%22%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%22%20%22%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%22%20%22%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8F%22%202026%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0%20%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D0%BC%D0%B8%D1%80%20%D0%BD%D0%BE%D1%8F%D0%B1%D1%80%D1%8C",
+        "query": "закупка \"обследование\" \"строительных конструкций\" \"декабря\" 2026 Москва Владимир ноябрь",
+        "districtId": "central",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%20%D0%90%D1%80%D1%85%D0%B0%D0%BD%D0%B3%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%20%D0%BD%D0%BE%D1%8F%D0%B1%D1%80%D1%8C",
+        "query": "закупка обследование зданий конструкций декабрь 2026 Санкт-Петербург Архангельск ноябрь",
+        "districtId": "northwest",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%20%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%20%D1%8D%D0%BA%D1%81%D0%BF%D0%B5%D1%80%D1%82%D0%B8%D0%B7%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A0%D0%BE%D1%81%D1%82%D0%BE%D0%B2%20%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B4%D0%B0%D1%80%20%D0%92%D0%BE%D0%BB%D0%B3%D0%BE%D0%B3%D1%80%D0%B0%D0%B4",
+        "query": "тендер строительно техническая экспертиза обследование зданий декабрь 2026 Ростов Краснодар Волгоград",
+        "districtId": "south",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D1%8D%D0%BA%D1%81%D0%BF%D0%B5%D1%80%D1%82%D0%B8%D0%B7%D0%B0%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%94%D0%B0%D0%B3%D0%B5%D1%81%D1%82%D0%B0%D0%BD%20%D0%A1%D1%82%D0%B0%D0%B2%D1%80%D0%BE%D0%BF%D0%BE%D0%BB%D1%8C",
+        "query": "закупка обследование зданий строительная экспертиза декабрь 2026 Дагестан Ставрополь",
+        "districtId": "caucasus",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A2%D0%B0%D1%82%D0%B0%D1%80%D1%81%D1%82%D0%B0%D0%BD%20%D0%91%D0%B0%D1%88%D0%BA%D0%BE%D1%80%D1%82%D0%BE%D1%81%D1%82%D0%B0%D0%BD%20%D0%A1%D0%B0%D0%BC%D0%B0%D1%80%D0%B0",
+        "query": "тендер обследование строительных конструкций декабрь 2026 Татарстан Башкортостан Самара",
+        "districtId": "volga",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A1%D0%B2%D0%B5%D1%80%D0%B4%D0%BB%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%A2%D1%8E%D0%BC%D0%B5%D0%BD%D1%8C%20%D0%A7%D0%B5%D0%BB%D1%8F%D0%B1%D0%B8%D0%BD%D1%81%D0%BA",
+        "query": "закупка обследование строительных конструкций декабрь 2026 Свердловская Тюмень Челябинск",
+        "districtId": "ural",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%98%D1%80%D0%BA%D1%83%D1%82%D1%81%D0%BA%20%D0%9A%D0%B5%D0%BC%D0%B5%D1%80%D0%BE%D0%B2%D0%BE%20%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D0%B8%D0%B1%D0%B8%D1%80%D1%81%D0%BA",
+        "query": "тендер обследование конструкций зданий декабрь 2026 Иркутск Кемерово Новосибирск",
+        "districtId": "siberia",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
+        "url": "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A5%D0%B0%D0%B1%D0%B0%D1%80%D0%BE%D0%B2%D1%81%D0%BA%20%D0%AF%D0%BA%D1%83%D1%82%D1%81%D0%BA%20%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D0%B2%D0%BE%D1%81%D1%82%D0%BE%D0%BA",
+        "query": "тендер обследование конструкций зданий декабрь 2026 Хабаровск Якутск Владивосток",
+        "districtId": "fareast",
+        "status": "thematic_web_search",
+        "date": "2026-11-28"
+      },
+      {
         "url": "https://kad.arbitr.ru/",
-        "query": "site:kad.arbitr.ru экспертным организациям строительно-технической ноябрь 2026",
+        "query": "site:kad.arbitr.ru экспертным организациям строительно ноябрь 2026",
         "status": "form_only",
-        "date": "2026-11-27"
+        "date": "2026-11-28"
       },
       {
         "url": "https://ras.arbitr.ru/",
-        "query": "site:ras.arbitr.ru экспертным организациям строительная экспертиза ноябрь 2026",
+        "query": "site:ras.arbitr.ru строительно-технической представить ноябрь 2026",
         "status": "form_only",
-        "date": "2026-11-27"
+        "date": "2026-11-28"
       },
       {
         "url": "https://sudrf.ru/index.php?id=300",
-        "query": "site:sudrf.ru экспертным организациям землеустроительная экспертиза ноябрь 2026",
-        "status": "acts_not_retrieved",
-        "date": "2026-11-27"
+        "query": "site:sudrf.ru экспертным организациям строительно ноябрь 2026",
+        "status": "timeout",
+        "date": "2026-11-28"
       },
       {
         "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
-        "query": "site:zakupki.gov.ru строительно-техническая экспертиза ноябрь 2026 декабрь",
-        "status": "primary_not_retrieved",
-        "date": "2026-11-27"
+        "query": "site:zakupki.gov.ru обследование строительных конструкций декабрь 2026",
+        "status": "timeout",
+        "date": "2026-11-28"
       },
       {
         "url": "https://arbitr.ru/materials/as/subj",
         "query": "официальный каталог арбитражных судов субъектов",
-        "status": "read_no_new_regions",
-        "date": "2026-11-27"
+        "status": "directory_read",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "закупка обследование строительных конструкций ноябрь 2026 26.11.26 декабрь Москва Московская область",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "central"
+        "url": "https://irkutsk.arbitr.ru/",
+        "query": "Иркутская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "закупка строительно техническая экспертиза обследование зданий 26.11.2026 декабрь Санкт-Петербург Архангельск",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "northwest"
+        "url": "https://kemerovo.arbitr.ru/",
+        "query": "Кемеровская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "тендер обследование зданий конструкций 26.11.26 Ростов Краснодар Волгоград",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "south"
+        "url": "https://novosib.arbitr.ru/",
+        "query": "Новосибирская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "тендер обследование зданий конструкций 26.11.26 Ставрополь Дагестан Чечня",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "caucasus"
+        "url": "https://omsk.arbitr.ru/",
+        "query": "Омская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "тендер обследование строительных конструкций 26.11.26 Татарстан Самара Нижний Новгород",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "volga"
+        "url": "https://tomsk.arbitr.ru/",
+        "query": "Томская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "тендер обследование строительных конструкций 26.11.26 Екатеринбург Тюмень Курган",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "ural"
+        "url": "https://buryatia.arbitr.ru/",
+        "query": "Бурятия арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "тендер обследование строительных конструкций 26.11.26 Красноярск Новосибирск Омск",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "siberia"
+        "url": "https://yakutsk.arbitr.ru/",
+        "query": "Якутия арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://rostender.info/",
-        "query": "тендер обследование строительных конструкций 26.11.26 Хабаровск Владивосток Якутск",
-        "date": "2026-11-27",
-        "status": "thematic_search_attempted",
-        "districtId": "fareast"
+        "url": "https://chita.arbitr.ru/",
+        "query": "Забайкальский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://ulyanovsk.arbitr.ru/",
-        "query": "Ульяновская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
+        "url": "https://kamchatka.arbitr.ru/",
+        "query": "Камчатский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://kurgan.arbitr.ru/",
-        "query": "Курганская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
+        "url": "https://primkray.arbitr.ru/",
+        "query": "Приморский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://ekaterinburg.arbitr.ru/",
-        "query": "Свердловская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
+        "url": "https://khabarovsk.arbitr.ru/",
+        "query": "Хабаровский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       },
       {
-        "url": "https://tumen.arbitr.ru/",
-        "query": "Тюменская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://chel.arbitr.ru/",
-        "query": "Челябинская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://hmao.arbitr.ru/",
-        "query": "Ханты-Мансийский автономный округ — Югра арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://yamal.arbitr.ru/",
-        "query": "Ямало-Ненецкий автономный округ арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://altai.arbitr.ru/",
-        "query": "Республика Алтай арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "unavailable_or_timeout; acts_unverified"
-      },
-      {
-        "url": "https://tyva.arbitr.ru/",
-        "query": "Республика Тыва арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://hakasia.arbitr.ru/",
-        "query": "Республика Хакасия арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "unavailable_or_timeout; acts_unverified"
-      },
-      {
-        "url": "https://altai-krai.arbitr.ru/",
-        "query": "Алтайский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://krasnoyarsk.arbitr.ru/",
-        "query": "Красноярский край арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
-        "date": "2026-11-27",
-        "status": "official_homepage_read; acts_unverified"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616549115",
-        "query": "32616549115 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0173200001326000031",
-        "query": "0173200001326000031 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616577020",
-        "query": "32616577020 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://www.b2b-center.ru/app/market-next/tekhnicheskoe-obsledovanie-zdaniia/tender-4681481/",
-        "query": "4681481 обследование",
-        "date": "2026-11-27",
-        "status": "primary_public_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616590613",
-        "query": "32616590613 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616585560",
-        "query": "32616585560 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616581023",
-        "query": "32616581023 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616584330",
-        "query": "32616584330 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0348200012426000090",
-        "query": "0348200012426000090 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/RQ0328100002326000739",
-        "query": "0328100002326000739 обследование",
-        "date": "2026-11-27",
-        "status": "unavailable_secondary_search_attempted"
-      },
-      {
-        "url": "https://www.b2b-center.ru/app/market-next/uslugi-obsledovanie-i-otsenka-tekhnicheskogo-sostoianiia-stroitelnykh/tender-4687732/",
-        "query": "4687732 обследование",
-        "date": "2026-11-27",
-        "status": "primary_public_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/IS89201914",
-        "query": "145345-ТТ обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0124200000626008284",
-        "query": "0124200000626008284 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616548327",
-        "query": "32616548327 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/206320000012600274",
-        "query": "206320000012600274 обследование",
-        "date": "2026-11-27",
-        "status": "unavailable_secondary_search_attempted"
-      },
-      {
-        "url": "https://www.b2b-center.ru/market/vypolnenie-kompleksnogo-obsledovaniia-osnovanii-i-chash-ulichnykh-fontanov/tender-4689140/",
-        "query": "4689140 обследование",
-        "date": "2026-11-27",
-        "status": "unavailable_secondary_search_attempted"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0172100008126000104",
-        "query": "0172100008126000104 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0172100008126000105",
-        "query": "0172100008126000105 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0162300005326002172",
-        "query": "0162300005326002172 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/0173200001326000033",
-        "query": "0173200001326000033 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616600261",
-        "query": "32616600261 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://zakupki.kontur.ru/32616588564",
-        "query": "32616588564 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://rostender.info/region/ulyanovskaya-oblast/ulyanovsk/96844735-tender-obsledovanie-stroitelnyh-konstrukcij-vysokoj-chasti-ramnogo-korpusa",
-        "query": "4696408 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://rostender.info/region/hanty-mansijskij-avtonomnyj-okrug---yugra-avtonomnyj-okrug/nijnevartovsk/96847941-tender-obsledovanie-zdaniya-i-stroitelnyh-konstrukcij-razrabotka-proektno-smetnoj",
-        "query": "0002718 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://rostender.info/region/udmurtskaya-respublika/96844066-tender-zz-0017-53175-2026-okazanie-uslug-po-opredeleniyu-ocenki-i-kategorii-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-opredelenie",
-        "query": "0813500000126023014 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://rostender.info/region/sverdlovskaya-oblast/ekaterinburg/96845455-tender-vypolnenie-rabot-po-kompleksnomu-obsledovaniyu-stroitelnyh-konstrukcij-zdanij-i-soorujenij-elektricheskih-podstancij-ao",
-        "query": "32616621725 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://rostender.info/region/novosibirskaya-oblast/96849354-tender-okazanie-uslug-po-kompleksnomu-obsledovaniyu-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-i-oborudovaniya-zdanij-i-soorujenij",
-        "query": "1273283 обследование",
-        "date": "2026-11-27",
-        "status": "secondary_card_read"
-      },
-      {
-        "url": "https://www.b2b-center.ru/market/vizualnoe-i-instrumentalnoe-obsledovanie-konstruktsii-sushchestvuiushchikh/tender-4695317/",
-        "query": "обследование строительных конструкций ноябрь 2026 4695317",
-        "date": "2026-11-27",
-        "status": "primary_public_card_read"
-      },
-      {
-        "url": "https://rostender.info/region/volgogradskaya-oblast/voljskij/96797627-tender-obsledovanie-stroitelnyh-konstrukcij-mnogokvartirnogo-doma",
-        "query": "обследование строительных конструкций ноябрь 2026 0829600008426000262",
-        "date": "2026-11-27",
-        "status": "secondary_signal_primary_unverified"
-      },
-      {
-        "url": "https://rostender.info/region/udmurtskaya-respublika/96891538-tender-zz-0017-53137-2026-okazanie-uslug-po-opredeleniyu-ocenki-i-kategorii-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-opredelenie",
-        "query": "обследование строительных конструкций ноябрь 2026 0813500000126023153",
-        "date": "2026-11-27",
-        "status": "secondary_signal_primary_unverified"
-      },
-      {
-        "url": "https://rostender.info/region/krasnoyarskij-kraj/krasnoyarsk/96799992-tender-vypolnenie-rabot-na-proektirovanie-i-detalnoe-instrumentalnoe-obsledovanie-tehnicheskogo-sostoyaniya-stroitelnyh",
-        "query": "обследование строительных конструкций ноябрь 2026 1272366",
-        "date": "2026-11-27",
-        "status": "secondary_signal_primary_unverified"
+        "url": "https://amuras.arbitr.ru/",
+        "query": "Амурская область арбитражный суд \"экспертным организациям\" строительная экспертиза ноябрь 2026",
+        "status": "homepage_read_acts_unverified",
+        "date": "2026-11-28"
       }
     ],
     "checkedUrls": [
-      "https://kad.arbitr.ru/",
-      "https://ras.arbitr.ru/",
-      "https://sudrf.ru/index.php?id=300",
-      "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
-      "https://arbitr.ru/materials/as/subj",
-      "https://rostender.info/",
-      "https://ulyanovsk.arbitr.ru/",
-      "https://kurgan.arbitr.ru/",
-      "https://ekaterinburg.arbitr.ru/",
-      "https://tumen.arbitr.ru/",
-      "https://chel.arbitr.ru/",
-      "https://hmao.arbitr.ru/",
-      "https://yamal.arbitr.ru/",
-      "https://altai.arbitr.ru/",
-      "https://tyva.arbitr.ru/",
-      "https://hakasia.arbitr.ru/",
-      "https://altai-krai.arbitr.ru/",
-      "https://krasnoyarsk.arbitr.ru/",
       "https://zakupki.kontur.ru/32616549115",
       "https://zakupki.kontur.ru/0173200001326000031",
-      "https://zakupki.kontur.ru/32616577020",
       "https://www.b2b-center.ru/app/market-next/tekhnicheskoe-obsledovanie-zdaniia/tender-4681481/",
-      "https://zakupki.kontur.ru/32616590613",
       "https://zakupki.kontur.ru/32616585560",
-      "https://zakupki.kontur.ru/32616581023",
       "https://zakupki.kontur.ru/32616584330",
       "https://zakupki.kontur.ru/0348200012426000090",
-      "https://zakupki.kontur.ru/RQ0328100002326000739",
       "https://www.b2b-center.ru/app/market-next/uslugi-obsledovanie-i-otsenka-tekhnicheskogo-sostoianiia-stroitelnykh/tender-4687732/",
       "https://zakupki.kontur.ru/IS89201914",
       "https://zakupki.kontur.ru/0124200000626008284",
@@ -1696,8 +1674,6 @@
       "https://www.b2b-center.ru/market/vypolnenie-kompleksnogo-obsledovaniia-osnovanii-i-chash-ulichnykh-fontanov/tender-4689140/",
       "https://zakupki.kontur.ru/0172100008126000104",
       "https://zakupki.kontur.ru/0172100008126000105",
-      "https://zakupki.kontur.ru/0162300005326002172",
-      "https://zakupki.kontur.ru/0173200001326000033",
       "https://zakupki.kontur.ru/32616600261",
       "https://zakupki.kontur.ru/32616588564",
       "https://rostender.info/region/ulyanovskaya-oblast/ulyanovsk/96844735-tender-obsledovanie-stroitelnyh-konstrukcij-vysokoj-chasti-ramnogo-korpusa",
@@ -1708,7 +1684,34 @@
       "https://www.b2b-center.ru/market/vizualnoe-i-instrumentalnoe-obsledovanie-konstruktsii-sushchestvuiushchikh/tender-4695317/",
       "https://rostender.info/region/volgogradskaya-oblast/voljskij/96797627-tender-obsledovanie-stroitelnyh-konstrukcij-mnogokvartirnogo-doma",
       "https://rostender.info/region/udmurtskaya-respublika/96891538-tender-zz-0017-53137-2026-okazanie-uslug-po-opredeleniyu-ocenki-i-kategorii-tehnicheskogo-sostoyaniya-stroitelnyh-konstrukcij-opredelenie",
-      "https://rostender.info/region/krasnoyarskij-kraj/krasnoyarsk/96799992-tender-vypolnenie-rabot-na-proektirovanie-i-detalnoe-instrumentalnoe-obsledovanie-tehnicheskogo-sostoyaniya-stroitelnyh"
+      "https://rostender.info/region/yamalo-neneckij-avtonomnyj-okrug/labytnangi/96786190-tender-provedenie-stroitelno-tehnicheskoj-ekspertizy-o-priznanii-avarijnymi-i-podlejashchimi-snosu-ili-rekonstrukcii",
+      "https://www.b2b-center.ru/search/number/l32616623703-1/",
+      "https://www.b2b-center.ru/search/number/l15453810-3-9-1/",
+      "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%22%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%22%20%22%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%22%20%22%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8F%22%202026%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0%20%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D0%BC%D0%B8%D1%80%20%D0%BD%D0%BE%D1%8F%D0%B1%D1%80%D1%8C",
+      "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%20%D0%90%D1%80%D1%85%D0%B0%D0%BD%D0%B3%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%20%D0%BD%D0%BE%D1%8F%D0%B1%D1%80%D1%8C",
+      "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%20%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%20%D1%8D%D0%BA%D1%81%D0%BF%D0%B5%D1%80%D1%82%D0%B8%D0%B7%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A0%D0%BE%D1%81%D1%82%D0%BE%D0%B2%20%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B4%D0%B0%D1%80%20%D0%92%D0%BE%D0%BB%D0%B3%D0%BE%D0%B3%D1%80%D0%B0%D0%B4",
+      "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D1%8D%D0%BA%D1%81%D0%BF%D0%B5%D1%80%D1%82%D0%B8%D0%B7%D0%B0%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%94%D0%B0%D0%B3%D0%B5%D1%81%D1%82%D0%B0%D0%BD%20%D0%A1%D1%82%D0%B0%D0%B2%D1%80%D0%BE%D0%BF%D0%BE%D0%BB%D1%8C",
+      "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A2%D0%B0%D1%82%D0%B0%D1%80%D1%81%D1%82%D0%B0%D0%BD%20%D0%91%D0%B0%D1%88%D0%BA%D0%BE%D1%80%D1%82%D0%BE%D1%81%D1%82%D0%B0%D0%BD%20%D0%A1%D0%B0%D0%BC%D0%B0%D1%80%D0%B0",
+      "https://www.google.com/search?q=%D0%B7%D0%B0%D0%BA%D1%83%D0%BF%D0%BA%D0%B0%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A1%D0%B2%D0%B5%D1%80%D0%B4%D0%BB%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%A2%D1%8E%D0%BC%D0%B5%D0%BD%D1%8C%20%D0%A7%D0%B5%D0%BB%D1%8F%D0%B1%D0%B8%D0%BD%D1%81%D0%BA",
+      "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%98%D1%80%D0%BA%D1%83%D1%82%D1%81%D0%BA%20%D0%9A%D0%B5%D0%BC%D0%B5%D1%80%D0%BE%D0%B2%D0%BE%20%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D0%B8%D0%B1%D0%B8%D1%80%D1%81%D0%BA",
+      "https://www.google.com/search?q=%D1%82%D0%B5%D0%BD%D0%B4%D0%B5%D1%80%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C%202026%20%D0%A5%D0%B0%D0%B1%D0%B0%D1%80%D0%BE%D0%B2%D1%81%D0%BA%20%D0%AF%D0%BA%D1%83%D1%82%D1%81%D0%BA%20%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D0%B2%D0%BE%D1%81%D1%82%D0%BE%D0%BA",
+      "https://kad.arbitr.ru/",
+      "https://ras.arbitr.ru/",
+      "https://sudrf.ru/index.php?id=300",
+      "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+      "https://arbitr.ru/materials/as/subj",
+      "https://irkutsk.arbitr.ru/",
+      "https://kemerovo.arbitr.ru/",
+      "https://novosib.arbitr.ru/",
+      "https://omsk.arbitr.ru/",
+      "https://tomsk.arbitr.ru/",
+      "https://buryatia.arbitr.ru/",
+      "https://yakutsk.arbitr.ru/",
+      "https://chita.arbitr.ru/",
+      "https://kamchatka.arbitr.ru/",
+      "https://primkray.arbitr.ru/",
+      "https://khabarovsk.arbitr.ru/",
+      "https://amuras.arbitr.ru/"
     ],
     "sheetSyncStatus": "partial"
   },
